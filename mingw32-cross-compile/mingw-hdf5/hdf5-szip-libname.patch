@@ -1,0 +1,20 @@
+--- hdf5-1.8.22.orig/configure.ac	2017-11-28 22:38:51.000000000 +0100
++++ hdf5-1.8.22/configure.ac	2020-02-03 14:16:02.591419643 +0100
+@@ -1243,7 +1243,7 @@ case $withval in
+     HAVE_SZLIB="yes"
+     AC_CHECK_HEADERS([szlib.h], [HAVE_SZLIB_H="yes"], [unset HAVE_SZLIB])
+     if test "x$HAVE_SZLIB" = "xyes" -a "x$HAVE_SZLIB_H" = "xyes"; then
+-      AC_CHECK_LIB([sz], [SZ_BufftoBuffCompress],, [unset HAVE_SZLIB])
++      AC_CHECK_LIB([szip], [SZ_BufftoBuffCompress],, [unset HAVE_SZLIB])
+     fi
+     if test -z "$HAVE_SZLIB" -a -n "$HDF5_CONFIG_ABORT"; then
+       AC_MSG_ERROR([couldn't find szlib library])
+@@ -1289,7 +1289,7 @@ case $withval in
+     fi
+ 
+     if test "x$HAVE_SZLIB" = "xyes"; then
+-      AC_CHECK_LIB([sz], [SZ_BufftoBuffCompress],,
++      AC_CHECK_LIB([szip], [SZ_BufftoBuffCompress],,
+                    [CPPFLAGS="$saved_CPPFLAGS"; AM_CPPFLAGS="$saved_AM_CPPFLAGS"; LDFLAGS="$saved_LDFLAGS"; AM_LDFLAGS="$saved_AM_LDFLAGS"; unset HAVE_SZLIB])
+       if test -n "$HAVE_SZLIB"; then
+         AC_CHECK_HEADERS([szlib.h],

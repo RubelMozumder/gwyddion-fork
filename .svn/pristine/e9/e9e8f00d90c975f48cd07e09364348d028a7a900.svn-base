@@ -1,0 +1,347 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-dependencies'>
+  <title>Build Dependencies</title>
+  <para>
+    The following table lists packages required to build
+    <application>Gwyddion</application> from source code.  If your operating
+    system has separate development packages for libraries you need them too.
+    The table does not include common software compilation prerequisites like
+    the C compiler or the <command>make</command> utility.  Operating system
+    specifics are described in following sections dedicated to building on
+    particular operating systems.
+  </para>
+  <para>
+    Minimum required versions are listed for some packages.  If no specific
+    version is listed, the minimum version is so old that it did not
+    seem useful to determine it exactly.  Specific environments may be listed
+    in the Dependency column, meaning the package is useful only in this
+    environment.
+  </para>
+  <informaltable id='table-installation-dependencies'>
+    <tgroup cols='4' align='left'>
+    <?dblatex lllX?>
+      <thead>
+        <row>
+          <entry>Package</entry>
+          <entry>Version</entry>
+          <entry>Dependency</entry>
+          <entry>Required for, Notes</entry>
+        </row>
+      </thead>
+      <tbody valign='top'>
+        <row id='dependency-pkg-config'>
+          <entry><ulink url='https://www.freedesktop.org/wiki/Software/pkg-config/'>pkg-config</ulink></entry>
+          <entry>0.16</entry>
+          <entry><emphasis role='strong'>Required</emphasis></entry>
+          <entry>
+            Tracking the locations and compiler and linker flags of the various packages.
+          </entry>
+        </row>
+        <row id='dependency-gtk'>
+          <entry><ulink url='https://www.gtk.org/'>GTK+ 2</ulink></entry>
+          <entry>2.18.0</entry>
+          <entry><emphasis role='strong'>Required</emphasis></entry>
+          <entry>
+            Gwyddion user interface.  This entry implies the dependencies of
+            GTK+ itself, such as GLib, Gdk-Pixbuf, Pango or Cairo.
+          </entry>
+        </row>
+        <row id='dependency-glib'>
+          <entry><ulink url='https://www.gtk.org/'>GLib</ulink></entry>
+          <entry>2.32.0</entry>
+          <entry><emphasis role='strong'>Required</emphasis></entry>
+          <entry>
+            Everything.  GLib is a base library also required by GTK+, but
+            Gwyddion needs a slightly newer version than strictly required by
+            GTK+.
+          </entry>
+        </row>
+        <row id='dependency-pango'>
+          <entry><ulink url='https://www.pango.org/'>Pango</ulink></entry>
+          <entry>1.10</entry>
+          <entry><emphasis role='strong'>Required</emphasis></entry>
+          <entry>
+            All text rendering.  This entry implies pangocairo, which is an
+            optional component of Pango and in principle can be disabled.
+            However, it is normally included in Pango packages.
+          </entry>
+        </row>
+        <row id='dependency-cairo'>
+          <entry><ulink url='https://www.cairographics.org/'>Cairo</ulink></entry>
+          <entry>1.2</entry>
+          <entry><emphasis role='strong'>Required</emphasis></entry>
+          <entry>
+            All drawing within GTK+.  Version at least 1.6 is recommended.
+          </entry>
+        </row>
+        <row id='dependency-fftw'>
+          <entry><ulink url='http://www.fftw.org/'>FFTW3</ulink></entry>
+          <entry>3.1</entry>
+          <entry><emphasis role='strong'>Required</emphasis></entry>
+          <entry>
+            Integral transforms, power spectrum, convolution, deconvolution
+            and correlation operations.
+            If OpenMP is enabled and FFTW3 with OpenMP support is found
+            Gwyddion will be able to utilise multithreaded FFT.
+          </entry>
+        </row>
+        <row id='dependency-gtkxlext'>
+          <entry><ulink url='https://projects-old.gnome.org/gtkglext/'>GtkGLExt</ulink></entry>
+          <entry>1.0</entry>
+          <entry>Optional</entry>
+          <entry>
+            OpenGL 3D data views.  This entry implies the dependencies of GtkGLExt itself,
+            such as the platform OpenGL libraries and headers.
+          </entry>
+        </row>
+        <row id='dependency-unique'>
+          <entry><ulink url='http://www.gnome.org/~ebassi/source/'>libunique</ulink></entry>
+          <entry>1.0</entry>
+          <entry>Optional</entry>
+          <entry>
+            <link linkend='remote-control'>Remote control</link> based
+            on D-BUS or whatever technology is currently in.
+          </entry>
+        </row>
+        <row id='dependency-python'>
+          <entry><ulink url='https://www.python.org/'>Python</ulink></entry>
+          <entry>2.4</entry>
+          <entry>Optional</entry>
+          <entry>
+            Pygwy, the Gwyddion Python scripting interface.  Not just the
+            interpreter is required to build pygwy, but also the Python headers
+            and development libraries.
+          </entry>
+        </row>
+        <row id='dependency-pygtk2'>
+          <entry><ulink url='https://www.pygtk.org/'>PyGTK2</ulink></entry>
+          <entry>2.10</entry>
+          <entry>Optional</entry>
+          <entry>
+            Pygwy, the Gwyddion Python scripting interface.  You need
+            PyGTK2 including the compile-time parts, i.e. codegen, to build pygwy.
+          </entry>
+        </row>
+        <row id='dependency-gtksourceview'>
+          <entry><ulink url='https://gtksourceview.sourceforge.net/'>GtkSourceView 2</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Syntax highlighting in the Python scripting console.
+          </entry>
+        </row>
+        <row id='dependency-openmp'>
+          <entry><ulink url='https://www.openmp.org/'>OpenMP</ulink></entry>
+          <entry>3.1</entry>
+          <entry>Optional</entry>
+          <entry>
+            Speedup of various computation using OpenMP multithread
+            parallelisation. OpenMP is a standard, not specific software, but
+            an additional package may be needed to enable it in your
+            C compiler.
+          </entry>
+        </row>
+        <row id='dependency-zlib'>
+          <entry><ulink url='http://www.zlib.net/'>zlib</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import of SPML data files and import of gzip-compressed data from
+            other file formats (Createc, NRRD, RHK SM4 PRM metadata).
+          </entry>
+        </row>
+        <row id='dependency-libzip'>
+          <entry><ulink url='https://libzip.org/'>libzip</ulink></entry>
+          <entry>0.11</entry>
+          <entry>Optional</entry>
+          <entry>
+            Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC
+            SPMxFormat, Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT and JPK
+            force data files which use ZIP compression.
+            Alternatively,
+            <link linkend='dependency-minizip'>minizip</link>
+            can be used. Only one of the ZIP libraries is needed.
+          </entry>
+        </row>
+        <row id='dependency-minizip'>
+          <entry><ulink url='http://www.zlib.net/'>minizip</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC
+            SPMxFormat, Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT and JPK
+            force data files which use ZIP compression.
+            This is an alternative to
+            <link linkend='dependency-libzip'>libzip</link>.
+            Mnizip versions change often; versions 1, 2 and 3 should be OK.
+            Only one of the ZIP libraries is needed.
+          </entry>
+        </row>
+        <row id='dependency-zziplib'>
+          <entry><ulink url='http://zziplib.sourceforge.net/'>zziplib</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC
+            SPMxFormat, Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT and JPK
+            force data files which use ZIP compression.
+            This is a fallback alternative to
+            <link linkend='dependency-libzip'>libzip</link>
+            and
+            <link linkend='dependency-minizip'>minizip</link>
+            which are preferred.
+            Only one of the ZIP libraries is needed.
+          </entry>
+        </row>
+        <row id='dependency-bzip2'>
+          <entry><ulink url='http://www.bzip.org/'>bzip2</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import of bzip2-compressed data from NRRD.
+          </entry>
+        </row>
+        <row id='dependency-libxml2'>
+          <entry><ulink url='http://xmlsoft.org/'>LibXML2</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import of SPML, APE DAX and Anasys XML data files.
+          </entry>
+        </row>
+        <row id='dependency-hdf5'>
+          <entry><ulink url='https://portal.hdfgroup.org/display/HDF5/HDF5'>HDF5</ulink></entry>
+          <entry>1.8.13</entry>
+          <entry>Optional</entry>
+          <entry>
+            Import of Asylum Research Ergo, Shilps Lucent, Matlab 7 MAT and
+            generic HDF5 data files.
+          </entry>
+        </row>
+        <row id='dependency-jansson'>
+          <entry><ulink url='http://www.digip.org/jansson/'>JANSSON</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import of Park PS-PPT data files.
+          </entry>
+        </row>
+        <row id='dependency-png'>
+          <entry><ulink url='http://www.libpng.org/pub/png/'>libpng</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Export of height fields to 16bit greyscale PNG images and import
+            from 16bit PNG images.  For common 8bit images, you just need PNG
+            support in Gdk-Pixbuf.
+          </entry>
+        </row>
+        <row id='dependency-webp'>
+          <entry><ulink url='https://webmproject.org/'>libwebp</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            WebP format support for image export.
+          </entry>
+        </row>
+        <row id='dependency-jpegxl'>
+          <entry><ulink url='https://jpeg.org/jpegxl/'>jpegxl</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            JPEG-XL format support for image export.
+          </entry>
+        </row>
+        <row id='dependency-gdk-pixbuf-webp'>
+          <entry><ulink url='https://github.com/aruiz/webp-pixbuf-loader'>WebP pixbuf loader</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            WebP format support for image import.  This is a run-time
+            dependency.  It does not matter if you have the pixbuf loader
+            during Gwyddion compilation.
+          </entry>
+        </row>
+        <row id='dependency-gdk-pixbuf-heif'>
+          <entry><ulink url='https://github.com/strukturag/libheif'>HEIF pixbuf loader</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            High Efficiency Image File Format support for image import.  This is a run-time
+            dependency.  It does not matter if you have the pixbuf loader
+            during Gwyddion compilation.
+          </entry>
+        </row>
+        <row id='dependency-gdk-pixbuf-jxl'>
+          <entry><ulink url='https://jpeg.org/jpegxl/'>JPEG-XL pixbuf loader</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            JPEG-XL format support for image import.  This is a run-time
+            dependency.  It does not matter if you have the pixbuf loader
+            during Gwyddion compilation.
+          </entry>
+        </row>
+        <row id='dependency-openexr'>
+          <entry><ulink url='https://www.openexr.com/'>OpenEXR</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import and export of OpenEXR HDR images.
+          </entry>
+        </row>
+        <row id='dependency-cxx'>
+          <entry>C++ compiler</entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import and export of OpenEXR HDR images and import of other
+            high-depth images.
+          </entry>
+        </row>
+        <row id='dependency-cfitsio'>
+          <entry><ulink url='https://heasarc.gsfc.nasa.gov/fitsio/fitsio.html'>cfitsio</ulink></entry>
+          <entry/>
+          <entry>Optional</entry>
+          <entry>
+            Import of Flexible Image Transport System (FITS) files.
+          </entry>
+        </row>
+        <row id='dependency-desktop-file-utils'>
+          <entry><ulink url='http://www.freedesktop.org/software/desktop-file-utils'>desktop-file-utils</ulink></entry>
+          <entry/>
+          <entry>Optional, Unix</entry>
+          <entry>
+            Basic desktop integration to Freedesktop-conforming environments,
+            such as file associations and installation of Gwyddion to the desktop
+            environments menus.
+          </entry>
+        </row>
+        <row id='dependency-gtk-mac-integration'>
+          <entry><ulink url='https://github.com/jralls/gtk-mac-integration'>gtk-mac-integration</ulink></entry>
+          <entry/>
+          <entry>Optional, OS X</entry>
+          <entry>
+            OS X platform integration such as the global menu.
+          </entry>
+        </row>
+        <row id='dependency-libxmu'>
+          <entry><ulink url='https://www.x.org/wiki/'>libXmu</ulink></entry>
+          <entry/>
+          <entry>Obsolete, X11</entry>
+          <entry>
+            <link linkend='remote-control'>Remote control</link> on
+            X11.  This is a standard X Window System library and everyone
+            having X probably has its runtime files.  However, since the
+            modularisation of X in Xorg 7.0, it is distributed separately and
+            therefore you might not have its development files installed.
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

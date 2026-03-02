@@ -1,0 +1,285 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: fourier-transform.xml 22413 2019-08-19 08:32:13Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='fourier-transform' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>
+    Fourier Transform <gwy:icon name='fft'/>
+  </title>
+  <indexterm><primary>Fourier transform</primary></indexterm>
+  <para>
+    Two-dimensional Fourier transform can be accessed using
+    <menuchoice>
+      <guimenu>Data Process</guimenu>
+      <guisubmenu>Integral Transforms</guisubmenu>
+      <guimenuitem>2D FFT</guimenuitem>
+    </menuchoice>
+    which implements the Fast Fourier Transform (FFT). Fourier transform
+    decomposes signal into its harmonic components, it is therefore useful
+    while studying spectral frequencies present in the SPM data.
+  </para>
+  <para>
+    The <guilabel>2D FFT</guilabel> module provides several types of output:
+    <itemizedlist>
+      <listitem>
+        Modulus – absolute value of the complex Fourier coefficient,
+        proportional to the square root of the power spectrum density function
+        (PSDF).
+      </listitem>
+      <listitem>
+        Phase – phase of the complex coefficient (rarely used).
+      </listitem>
+      <listitem>
+        Real – real part of the complex coefficient.
+      </listitem>
+      <listitem>
+        Imaginary – imaginary part of the complex coefficient.
+      </listitem>
+    </itemizedlist>
+    and some of their combinations for convenience.
+  </para>
+  <para>
+    Radial sections of the two-dimensional PSDF can be conveniently obtained
+    with <link linkend='psdf2d'>2D PSDF</link>.
+    Several other functions producing spectral densities are described in
+    section
+    <link linkend='power-spectral-density-1d'>Statistical Analysis</link>.
+    It is also possible to filter images in the frequency domain using
+    <link linkend='fft-filter-1d'>one-dimensional</link> and
+    <link linkend='fft-filter-2d'>two-dimensional</link> FFT filters
+    or simple <link linkend='frequency-split'>frequency splitting</link>.
+  </para>
+  <para id='psdf-log-phi'>
+    <indexterm>
+      <primary>power spectral density function</primary>
+      <secondary>log-phi</secondary>
+    </indexterm>
+    For scale and rotation-independent texture comparison it is useful to
+    transform the PSDF from Cartesian frequency coordinates to coordinates
+    consisting of logarithm of the spatial frequency and its direction.
+    Scaling and rotation then become mere shifts in the new coordinates.
+    The function
+    <menuchoice>
+      <guimenu>Data Process</guimenu>
+      <guisubmenu>Statistics</guisubmenu>
+      <guimenuitem>Log-Phi PSDF</guimenuitem>
+    </menuchoice>
+    calculates directly the transformed PSDF.  The dimensionless horizontal
+    coordinate is the angle (from 0 to <xi:include href="eqi-2-pi.xml"/>)
+    the vertical is the frequency logarithm.  It is possible to smooth the
+    PSDF using a Gaussian filter of given width before the transformation.
+  </para>
+  <para>
+    Note that the Fourier transform treats data as being infinite, thus
+    implying some cyclic boundary conditions. As the real data do not have
+    these properties, it is necessary to use some windowing function to
+    suppress the data at the edgest of the image. If you do not do this, FFT
+    treats data as being windowed by rectangular windowing function which
+    has really bad  Fourier image thus leading to corruption of the Fourier
+    spectrum.
+  </para>
+  <para id='windowing'>
+    Gwyddion offers several windowing functions. Most of them are formed by
+    some sine and cosine functions that damp data correctly at the edges.
+    In the following windowing formula table the independent variable
+    <xi:include href="eqi-x.xml"/>
+    is from interval <xi:include href="eqi-interval-0-1.xml"/>
+    which corresponds to the normalized abscissa; for simplicity variable
+    <xi:include href="eqi-xi-is-2pi-x.xml"/>
+    is used in some formulas.  The available windowing types include:
+  </para>
+  <informaltable id='table-windowing-types'>
+    <tgroup cols='2' align='left'>
+      <?dblatex lX?>
+      <thead>
+        <row>
+          <entry>Name</entry>
+          <entry>Formula</entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>None</entry>
+          <entry>1</entry>
+        </row>
+        <row>
+          <entry>Rect</entry>
+          <entry>0.5 at edge points, 1 everywhere else</entry>
+        </row>
+        <row>
+          <entry>Hann</entry>
+          <entry><xi:include href="eq-windowing-hann.xml"/></entry>
+        </row>
+        <row>
+          <entry>Hamming</entry>
+          <entry><xi:include href="eq-windowing-hamming.xml"/></entry>
+        </row>
+        <row>
+          <entry>Blackmann</entry>
+          <entry><xi:include href="eq-windowing-blackmann.xml"/></entry>
+        </row>
+        <row>
+          <entry>Lanczos</entry>
+          <entry><xi:include href="eq-windowing-lanczos.xml"/></entry>
+        </row>
+        <row>
+          <entry>Welch</entry>
+          <entry><xi:include href="eq-windowing-welch.xml"/></entry>
+        </row>
+        <row>
+          <entry>Nutall</entry>
+          <entry><xi:include href="eq-windowing-nutall.xml"/></entry>
+        </row>
+        <row>
+          <entry>Flat-top</entry>
+          <entry><xi:include href="eq-windowing-flat-top.xml"/></entry>
+        </row>
+        <row>
+          <entry>Kaiser <xi:include href="eqi-alpha.xml"/></entry>
+          <entry>
+            <xi:include href="eq-windowing-kaiser.xml"/>,
+            where <xi:include href="eqi-BesselI0.xml"/>
+            is the modified Bessel function of zeroth order and
+            <xi:include href="eqi-alpha.xml"/> is a parameter
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+  <informalfigure id='fig-windowing-win'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='windowing-win.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='windowing-win.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Windowing functions: Hann, Hamming, Blackmann, Lanczos, Welch,
+        Nutall, Flat-top, Kaiser 2.5.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <informalfigure id='fig-windowing-fft'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='windowing-fft.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='windowing-fft.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Envelopes of windowing functions frequency responses: Hann, Hamming,
+        Blackmann, Lanczos, Welch, Nutall, Flat-top, Kaiser 2.5.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <sect2 id='fft-filter-1d'>
+    <title>
+      1D FFT Filter <gwy:icon name='fft_filter_1d'/>
+    </title>
+    <indexterm>
+      <primary>Fourier transform</primary>
+      <secondary>1D filtering</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>1D FFT Filtering</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      One excellent way of removing frequency based of noise from an image is
+      to use Fourier filtering.  First, the Fourier transform of the image is
+      calculated.  Next, a filter is applied to this transform.  Finally, the
+      inverse transform is applied to obtain a filtered image.  Gwyddion uses
+      the Fast Fourier Transform (or FFT) to make this intensive calculation
+      much faster.
+    </para>
+    <para>
+      Within the 1D FFT filter the frequencies that should be removed from
+      spectrum (suppress type: null) or suppressed to value of neighbouring
+      frequencies (suppress type: suppress) can be selected by marking
+      appropriate areas in the power spectrum graph. The selection can be
+      inverted easily using the Filter type choice. 1D FFT filter can be used
+      both for horizontal and vertical direction.
+    </para>
+  </sect2>
+  <sect2 id='fft-filter-2d'>
+    <title>
+      2D FFT Filter <gwy:icon name='fft_filter_2d'/>
+    </title>
+    <indexterm>
+      <primary>Fourier transform</primary>
+      <secondary>2D filtering</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>2D FFT Filtering</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+     2D FFT filter acts similarly as the 1D variant (see above) but using 2D
+     FFT transform. Therefore, the spatial frequencies that should be
+     filtered must be selected in 2D using mask editor. As the frequencies
+     are related to center of the image (corresponding to zero frequency),
+     the mask can be snapped to the center (coordinate system origin) while
+     being edited. There are also different display and output modes that are
+     self-explanatory – image or FFT coefficients can be outputted by module
+     (or both).
+    </para>
+  </sect2>
+  <sect2 id='frequency-split'>
+    <title>
+      Frequency Split <gwy:icon name='frequency_split'/>
+    </title>
+    <indexterm>
+      <primary>Fourier transform</primary>
+      <secondary>high-pass filter</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>Fourier transform</primary>
+      <secondary>low-pass filter</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Level</guisubmenu>
+        <guimenuitem>Frequency Split</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      A simple alternative to
+      <link linkend='fft-filter-2d'>2D FFT filtering</link> is the separation
+      of low and high spatial frequencies in the image using a simple
+      low-pass and/or high-pass filter.  The frequency split module can create
+      either the low-frequency or high-frequency image or both, depending on
+      the selected <guilabel>Output type</guilabel>.
+    </para>
+    <para>
+      <guilabel>Cut-off</guilabel> selects the spatial frequency cut off, which
+      is displayed as relative fraction of the Nyquist frequency and also as
+      the corresponding spatial wavelength.  If <guilabel>Edge width</guilabel>
+      (again given as relative to Nyquist frequency) is zero the filter has
+      sharp edge.  For non-zero values the transition has the shape of
+      error function, with specified width.
+    </para>
+    <para>
+      Frequency domain filtering can lead to artefacts close to image
+      boundaries.  Therefore, several boundary handling options are provided,
+      aside from <guilabel>None</guilabel> which is mostly useful for periodic
+      data (or otherwise continuous across edges).
+      <guilabel>Laplace</guilabel> and <guilabel>Mirror</guilabel> extend
+      the image by Laplace's equation method and mirroring, respectively,
+      exactly as the <link linkend='extend'>Extend</link> function.
+      <guilabel>Smooth connect</guilabel> applies to rows and column the
+      one-dimensional smooth extension method used in
+      <link linkend='roughness-iso'>Roughness tool</link>
+      to suppress edge artefacts.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

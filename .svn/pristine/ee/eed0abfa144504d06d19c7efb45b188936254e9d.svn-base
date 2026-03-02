@@ -1,0 +1,530 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2003-2022 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwymodule/gwymodule-tool.h>
+#include <libprocess/gwyprocesstypes.h>
+#include <libprocess/elliptic.h>
+#include <libprocess/filters.h>
+#include <libprocess/linestats.h>
+#include <libgwydgets/gwystock.h>
+#include <app/gwyapp.h>
+
+#define FWHM2SIGMA (1.0/(2.0*sqrt(2*G_LN2)))
+
+enum {
+    PARAM_FILTER_TYPE,
+    PARAM_MASKING,
+    PARAM_SIZE,
+    PARAM_SIZE_GAUSS,
+    PARAM_SIZE_GUI,
+};
+
+typedef enum {
+    FILTER_UNDEFINED     = -1,
+    FILTER_MEAN          = 0,
+    FILTER_MEDIAN        = 1,
+    FILTER_CONSERVATIVE  = 2,
+    FILTER_MINIMUM       = 3,
+    FILTER_MAXIMUM       = 4,
+    FILTER_KUWAHARA      = 5,
+    FILTER_DECHECKER     = 6,
+    FILTER_GAUSSIAN      = 7,
+    FILTER_SHARPEN       = 8,
+    FILTER_OPENING       = 9,
+    FILTER_CLOSING       = 10,
+    FILTER_ASF_OPENING   = 11,
+    FILTER_ASF_CLOSING   = 12,
+} FilterType;
+
+#define GWY_TYPE_TOOL_FILTER            (gwy_tool_filter_get_type())
+#define GWY_TOOL_FILTER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GWY_TYPE_TOOL_FILTER, GwyToolFilter))
+#define GWY_IS_TOOL_FILTER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GWY_TYPE_TOOL_FILTER))
+#define GWY_TOOL_FILTER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GWY_TYPE_TOOL_FILTER, GwyToolFilterClass))
+
+typedef struct _GwyToolFilter      GwyToolFilter;
+typedef struct _GwyToolFilterClass GwyToolFilterClass;
+
+struct _GwyToolFilter {
+    GwyPlainTool parent_instance;
+
+    GwyParams *params;
+    gint isel[4];
+
+    GwyRectSelectionLabels *rlabels;
+    GwyParamTable *table;
+    FilterType oldfilter;
+
+    /* potential class data */
+    GType layer_type_rect;
+};
+
+struct _GwyToolFilterClass {
+    GwyPlainToolClass parent_class;
+};
+
+static gboolean     module_register                  (void);
+static GwyParamDef* define_module_params             (void);
+static GType        gwy_tool_filter_get_type         (void)                      G_GNUC_CONST;
+static void         gwy_tool_filter_finalize         (GObject *object);
+static void         gwy_tool_filter_init_dialog      (GwyToolFilter *tool);
+static void         gwy_tool_filter_data_switched    (GwyTool *gwytool,
+                                                      GwyDataView *data_view);
+static void         gwy_tool_filter_data_changed     (GwyPlainTool *plain_tool);
+static void         gwy_tool_filter_response         (GwyTool *tool,
+                                                      gint response_id);
+static void         gwy_tool_filter_selection_changed(GwyPlainTool *plain_tool,
+                                                      gint hint);
+static void         param_changed                    (GwyToolFilter *tool,
+                                                      gint id);
+static void         update_selected_rectangle        (GwyToolFilter *tool);
+static void         set_up_size_for_mode             (GwyToolFilter *tool);
+static void         gwy_tool_filter_apply            (GwyToolFilter *tool);
+static void         filter_area_sharpen              (GwyDataField *dfield,
+                                                      gdouble sigma,
+                                                      gint col,
+                                                      gint row,
+                                                      gint width,
+                                                      gint height);
+static void         apply_masking                    (GwyDataField *dfield,
+                                                      GwyDataField *orig,
+                                                      GwyDataField *mask,
+                                                      GwyMaskingType masking);
+static gboolean     filter_is_sized                  (FilterType type);
+static gboolean     filter_is_float_sized            (FilterType type);
+static gboolean     filter_needs_kernel              (FilterType type);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Filter tool, processes selected part of data with a filter (conservative denoise, mean, median, "
+       "Kuwahara, minimum, maximum)."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "4.0",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2003",
+};
+
+GWY_MODULE_QUERY2(module_info, filter)
+
+G_DEFINE_TYPE(GwyToolFilter, gwy_tool_filter, GWY_TYPE_PLAIN_TOOL)
+
+static gboolean
+module_register(void)
+{
+    gwy_tool_func_register(GWY_TYPE_TOOL_FILTER);
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum filters[] = {
+        { N_("Mean value"),           FILTER_MEAN,         },
+        { N_("Median value"),         FILTER_MEDIAN,       },
+        { N_("Conservative denoise"), FILTER_CONSERVATIVE, },
+        { N_("Minimum"),              FILTER_MINIMUM,      },
+        { N_("Maximum"),              FILTER_MAXIMUM,      },
+        { N_("filter|Opening"),       FILTER_OPENING,      },
+        { N_("filter|Closing"),       FILTER_CLOSING,      },
+        { N_("ASF Opening"),          FILTER_ASF_OPENING,  },
+        { N_("ASF Closing"),          FILTER_ASF_CLOSING,  },
+        { N_("Kuwahara"),             FILTER_KUWAHARA,     },
+        { N_("Dechecker"),            FILTER_DECHECKER,    },
+        { N_("filter|Gaussian"),      FILTER_GAUSSIAN,     },
+        { N_("Sharpen"),              FILTER_SHARPEN,      },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, "filter");
+    gwy_param_def_add_gwyenum(paramdef, PARAM_FILTER_TYPE, "filter_type", _("_Type"),
+                              filters, G_N_ELEMENTS(filters), FILTER_MEAN);
+    gwy_param_def_add_enum(paramdef, PARAM_MASKING, "masking", NULL, GWY_TYPE_MASKING_TYPE, GWY_MASK_IGNORE);
+    /* The slider actually represents two different parameters.  So we define those, plus one just for the GUI, which
+     * is not saved and represent whichever type is active. */
+    gwy_param_def_add_int(paramdef, PARAM_SIZE, "size", _("Si_ze"), 2, 31, 5);
+    gwy_param_def_add_double(paramdef, PARAM_SIZE_GAUSS, "size_gauss", _("Si_ze"), 0.01, 40.0, 5.0);
+    gwy_param_def_add_double(paramdef, PARAM_SIZE_GUI, NULL, _("Si_ze"), 0.01, 40.0, 5.0);
+
+    return paramdef;
+}
+
+static void
+gwy_tool_filter_class_init(GwyToolFilterClass *klass)
+{
+    GwyPlainToolClass *ptool_class = GWY_PLAIN_TOOL_CLASS(klass);
+    GwyToolClass *tool_class = GWY_TOOL_CLASS(klass);
+    GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+
+    gobject_class->finalize = gwy_tool_filter_finalize;
+
+    tool_class->stock_id = GWY_STOCK_FILTER;
+    tool_class->title = _("Filter");
+    tool_class->tooltip = _("Basic filters: mean, median, denoise, …");
+    tool_class->prefix = "/module/filter";
+    tool_class->data_switched = gwy_tool_filter_data_switched;
+    tool_class->response = gwy_tool_filter_response;
+
+    ptool_class->data_changed = gwy_tool_filter_data_changed;
+    ptool_class->selection_changed = gwy_tool_filter_selection_changed;
+}
+
+static void
+gwy_tool_filter_finalize(GObject *object)
+{
+    GwyToolFilter *tool = GWY_TOOL_FILTER(object);
+
+    gwy_params_save_to_settings(tool->params);
+    GWY_OBJECT_UNREF(tool->params);
+
+    G_OBJECT_CLASS(gwy_tool_filter_parent_class)->finalize(object);
+}
+
+static void
+gwy_tool_filter_init(GwyToolFilter *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+
+    tool->layer_type_rect = gwy_plain_tool_check_layer_type(plain_tool, "GwyLayerRectangle");
+
+    if (!tool->layer_type_rect)
+        return;
+
+    tool->params = gwy_params_new_from_settings(define_module_params());
+    tool->oldfilter = FILTER_UNDEFINED;
+
+    plain_tool->lazy_updates = TRUE;
+    gwy_plain_tool_connect_selection(plain_tool, tool->layer_type_rect, "rectangle");
+
+    gwy_tool_filter_init_dialog(tool);
+}
+
+static void
+gwy_tool_filter_rect_updated(GwyToolFilter *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+
+    gwy_rect_selection_labels_select(tool->rlabels, plain_tool->selection, plain_tool->data_field);
+}
+
+static void
+gwy_tool_filter_init_dialog(GwyToolFilter *tool)
+{
+    GtkDialog *dialog = GTK_DIALOG(GWY_TOOL(tool)->dialog);
+    GwyParamTable *table;
+
+    /* Selection info */
+    tool->rlabels = gwy_rect_selection_labels_new(TRUE, G_CALLBACK(gwy_tool_filter_rect_updated), tool);
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), gwy_rect_selection_labels_get_table(tool->rlabels), FALSE, FALSE, 0);
+
+    /* Options */
+    table = tool->table = gwy_param_table_new(tool->params);
+    gwy_param_table_append_header(table, -1, _("Filter"));
+    gwy_param_table_append_combo(table, PARAM_FILTER_TYPE);
+    gwy_param_table_append_slider(table, PARAM_SIZE_GUI);
+    gwy_param_table_set_unitstr(table, PARAM_SIZE_GUI, _("px"));
+
+    gwy_param_table_append_header(table, -1, _("Masking Mode"));
+    gwy_param_table_append_radio_item(table, PARAM_MASKING, GWY_MASK_EXCLUDE);
+    gwy_param_table_append_radio_item(table, PARAM_MASKING, GWY_MASK_INCLUDE);
+    gwy_param_table_append_radio_item(table, PARAM_MASKING, GWY_MASK_IGNORE);
+    gwy_plain_tool_add_param_table(GWY_PLAIN_TOOL(tool), table);
+
+    set_up_size_for_mode(tool);
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    gwy_plain_tool_add_clear_button(GWY_PLAIN_TOOL(tool));
+    gwy_tool_add_hide_button(GWY_TOOL(tool), FALSE);
+    gtk_dialog_add_button(dialog, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY);
+    gtk_dialog_set_default_response(dialog, GTK_RESPONSE_APPLY);
+    gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_APPLY, FALSE);
+    gwy_help_add_to_tool_dialog(dialog, GWY_TOOL(tool), GWY_HELP_DEFAULT);
+
+    g_signal_connect_swapped(tool->table, "param-changed", G_CALLBACK(param_changed), tool);
+
+    gtk_widget_show_all(dialog->vbox);
+}
+
+static void
+gwy_tool_filter_data_switched(GwyTool *gwytool,
+                              GwyDataView *data_view)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(gwytool);
+    GwyToolFilter *tool = GWY_TOOL_FILTER(gwytool);
+    gboolean ignore = (data_view == plain_tool->data_view);
+
+    GWY_TOOL_CLASS(gwy_tool_filter_parent_class)->data_switched(gwytool, data_view);
+
+    if (ignore || plain_tool->init_failed)
+        return;
+
+    if (data_view) {
+        gwy_object_set_or_reset(plain_tool->layer, tool->layer_type_rect,
+                                "editable", TRUE,
+                                "focus", -1,
+                                NULL);
+        gwy_selection_set_max_objects(plain_tool->selection, 1);
+    }
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(gwytool->dialog), GTK_RESPONSE_APPLY, !!data_view);
+}
+
+static void
+gwy_tool_filter_data_changed(GwyPlainTool *plain_tool)
+{
+    update_selected_rectangle(GWY_TOOL_FILTER(plain_tool));
+}
+
+static void
+gwy_tool_filter_response(GwyTool *tool,
+                         gint response_id)
+{
+    GWY_TOOL_CLASS(gwy_tool_filter_parent_class)->response(tool, response_id);
+
+    if (response_id == GTK_RESPONSE_APPLY)
+        gwy_tool_filter_apply(GWY_TOOL_FILTER(tool));
+}
+
+static void
+gwy_tool_filter_selection_changed(GwyPlainTool *plain_tool,
+                                  gint hint)
+{
+    g_return_if_fail(hint <= 0);
+    update_selected_rectangle(GWY_TOOL_FILTER(plain_tool));
+}
+
+static void
+param_changed(GwyToolFilter *tool, gint id)
+{
+    GwyParams *params = tool->params;
+
+    if (id < 0 || id == PARAM_FILTER_TYPE) {
+        set_up_size_for_mode(tool);
+        tool->oldfilter = gwy_params_get_enum(params, PARAM_FILTER_TYPE);
+    }
+
+    if (id == PARAM_SIZE_GUI) {
+        gdouble size = gwy_params_get_double(params, PARAM_SIZE_GUI);
+
+        if (filter_is_float_sized(gwy_params_get_enum(params, PARAM_FILTER_TYPE)))
+            gwy_params_set_double(params, PARAM_SIZE_GAUSS, size);
+        else
+            gwy_params_set_int(params, PARAM_SIZE, GWY_ROUND(size));
+    }
+}
+
+static void
+set_up_size_for_mode(GwyToolFilter *tool)
+{
+    GwyParams *params = tool->params;
+    FilterType prevtype = tool->oldfilter, newtype = gwy_params_get_enum(params, PARAM_FILTER_TYPE);
+    GwyParamTable *table = tool->table;
+    gboolean sensitive, newfloat;
+    gdouble value;
+
+    sensitive = filter_is_sized(newtype);
+    gwy_param_table_set_sensitive(table, PARAM_SIZE_GUI, sensitive);
+
+    newfloat = filter_is_float_sized(newtype);
+    if (prevtype != FILTER_UNDEFINED && filter_is_float_sized(prevtype) == newfloat)
+        return;
+
+    if (newfloat) {
+        value = gwy_params_get_double(params, PARAM_SIZE_GAUSS);
+        gwy_param_table_slider_restrict_range(table, PARAM_SIZE_GUI, 0.01, 40.0);
+        gwy_param_table_slider_set_digits(table, PARAM_SIZE_GUI, 2);
+        gwy_param_table_slider_set_steps(table, PARAM_SIZE_GUI, 0.01, 1.0);
+    }
+    else {
+        value = gwy_params_get_int(params, PARAM_SIZE);
+        gwy_param_table_slider_restrict_range(table, PARAM_SIZE_GUI, 2.0, 31.0);
+        gwy_param_table_slider_set_digits(table, PARAM_SIZE_GUI, 0);
+        gwy_param_table_slider_set_steps(table, PARAM_SIZE_GUI, 1, 5);
+    }
+    gwy_param_table_slider_set_snapping(table, PARAM_SIZE_GUI, !newfloat);
+    gwy_param_table_set_double(table, PARAM_SIZE_GUI, value);
+}
+
+static void
+update_selected_rectangle(GwyToolFilter *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwySelection *selection = plain_tool->selection;
+    GwyDataField *field = plain_tool->data_field;
+    gint n = selection ? gwy_selection_get_data(selection, NULL) : 0;
+
+    gwy_rect_selection_labels_fill(tool->rlabels, n == 1 ? selection : NULL, field, NULL, tool->isel);
+}
+
+static void
+gwy_tool_filter_apply(GwyToolFilter *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyDataField *field = plain_tool->data_field;
+    GwyDataField *mask = plain_tool->mask_field;
+    GwyDataField *origfield = NULL, *kernel = NULL;
+    GwyMaskingType masking = gwy_params_get_masking(tool->params, PARAM_MASKING, &mask);
+    FilterType filter_type = gwy_params_get_enum(tool->params, PARAM_FILTER_TYPE);
+    gdouble sigma = gwy_params_get_double(tool->params, PARAM_SIZE_GAUSS);
+    gint size = gwy_params_get_int(tool->params, PARAM_SIZE);
+    gint col, row, w, h, n = 0;
+
+    g_return_if_fail(plain_tool->id >= 0 && field != NULL);
+
+    col = tool->isel[0];
+    row = tool->isel[1];
+    w = tool->isel[2]+1 - tool->isel[0];
+    h = tool->isel[3]+1 - tool->isel[1];
+
+    gwy_app_undo_qcheckpoint(plain_tool->container, gwy_app_get_data_key_for_id(plain_tool->id), 0);
+
+    if (filter_needs_kernel(filter_type)) {
+        kernel = gwy_data_field_new(size, size, size, size, TRUE);
+        n = gwy_data_field_elliptic_area_fill(kernel, 0, 0, size, size, 1.0);
+        if (filter_type == FILTER_MEAN)
+            gwy_data_field_multiply(kernel, 1.0/n);
+    }
+
+    /*
+     * Remember the original for merging when masking is used.
+     *
+     * XXX: This is inefficient when the area to actually modify is small. However, linear operations are implemented
+     * using FFT and most morphological operations are implemented using some moving window algorithms.  For these we
+     * would have to switch to an idependent pixel-by-pixel evaluation method (based on some ad-hoc threshold).
+     * Kuwahara, dechecker, conservative denoising and (currently) median are evaluated pixel-by-pixel anyway so
+     * native masking would not be difficult, but apart from median probably also not worth it.
+     */
+    if (mask)
+        origfield = gwy_data_field_duplicate(field);
+
+    if (filter_type == FILTER_MEAN)
+        gwy_data_field_area_ext_convolve(field, col, row, w, h, field, kernel, GWY_EXTERIOR_BORDER_EXTEND, 0.0, FALSE);
+    else if (filter_type == FILTER_MEDIAN)
+        gwy_data_field_area_filter_kth_rank(field, kernel, col, row, w, h, n/2, NULL);
+    else if (filter_type == FILTER_MINIMUM)
+        gwy_data_field_area_filter_min_max(field, kernel, GWY_MIN_MAX_FILTER_MINIMUM, col, row, w, h);
+    else if (filter_type == FILTER_MAXIMUM)
+        gwy_data_field_area_filter_min_max(field, kernel, GWY_MIN_MAX_FILTER_MAXIMUM, col, row, w, h);
+    else if (filter_type == FILTER_CONSERVATIVE)
+        gwy_data_field_area_filter_conservative(field, size, col, row, w, h);
+    else if (filter_type == FILTER_KUWAHARA)
+        gwy_data_field_area_filter_kuwahara(field, col, row, w, h);
+    else if (filter_type == FILTER_DECHECKER)
+        gwy_data_field_area_filter_dechecker(field, col, row, w, h);
+    else if (filter_type == FILTER_GAUSSIAN)
+        gwy_data_field_area_filter_gaussian(field, sigma, col, row, w, h);
+    else if (filter_type == FILTER_SHARPEN)
+        filter_area_sharpen(field, sigma, col, row, w, h);
+    else if (filter_type == FILTER_OPENING)
+        gwy_data_field_area_filter_min_max(field, kernel, GWY_MIN_MAX_FILTER_OPENING, col, row, w, h);
+    else if (filter_type == FILTER_CLOSING)
+        gwy_data_field_area_filter_min_max(field, kernel, GWY_MIN_MAX_FILTER_CLOSING, col, row, w, h);
+    else if (filter_type == FILTER_ASF_OPENING)
+        gwy_data_field_area_filter_disc_asf(field, size/2, FALSE, col, row, w, h);
+    else if (filter_type == FILTER_ASF_CLOSING)
+        gwy_data_field_area_filter_disc_asf(field, size/2, TRUE, col, row, w, h);
+    else {
+        g_assert_not_reached();
+    }
+
+    if (origfield) {
+        apply_masking(field, origfield, plain_tool->mask_field, masking);
+        g_object_unref(origfield);
+    }
+
+    GWY_OBJECT_UNREF(kernel);
+    gwy_data_field_data_changed(field);
+    gwy_params_save_to_settings(tool->params);   /* Ensure correct parameters in the log. */
+    gwy_plain_tool_log_add(plain_tool);
+}
+
+static void
+filter_area_sharpen(GwyDataField *dfield, gdouble sigma,
+                    gint col, gint row, gint width, gint height)
+{
+    GwyDataField *origpart;
+    gint i, j, xres = dfield->xres;
+    gdouble *d, *p;
+
+    origpart = gwy_data_field_area_extract(dfield, col, row, width, height);
+    gwy_data_field_area_filter_gaussian(dfield, sigma, col, row, width, height);
+
+    for (i = 0; i < height; i++) {
+        d = dfield->data + (i + row)*xres + col;
+        p = origpart->data + i*width;
+        for (j = 0; j < width; j++)
+            d[j] = 2*p[j] - d[j];
+    }
+
+    g_object_unref(origpart);
+}
+
+static void
+apply_masking(GwyDataField *dfield, GwyDataField *orig, GwyDataField *mask,
+              GwyMaskingType masking)
+{
+    const gdouble *r = gwy_data_field_get_data_const(orig);
+    const gdouble *m = gwy_data_field_get_data_const(mask);
+    gdouble *d = gwy_data_field_get_data(dfield);
+    gint xres = gwy_data_field_get_xres(dfield);
+    gint yres = gwy_data_field_get_yres(dfield);
+    gint k;
+
+    if (masking == GWY_MASK_INCLUDE) {
+        for (k = 0; k < xres*yres; k++) {
+            if (m[k] <= 0.0)
+                d[k] = r[k];
+        }
+    }
+    else {
+        for (k = 0; k < xres*yres; k++) {
+            if (m[k] > 0.0)
+                d[k] = r[k];
+        }
+    }
+
+    gwy_data_field_invalidate(dfield);
+}
+
+static gboolean
+filter_is_float_sized(FilterType type)
+{
+    return (type == FILTER_GAUSSIAN || type == FILTER_SHARPEN);
+}
+
+static gboolean
+filter_is_sized(FilterType type)
+{
+    return (type != FILTER_KUWAHARA && type != FILTER_DECHECKER);
+}
+
+static gboolean
+filter_needs_kernel(FilterType type)
+{
+    return (type == FILTER_MINIMUM || type == FILTER_MAXIMUM
+            || type == FILTER_OPENING || type == FILTER_CLOSING
+            || type == FILTER_MEAN || type == FILTER_MEDIAN);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

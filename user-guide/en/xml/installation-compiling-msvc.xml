@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: installation-compiling-msvc.xml 16770 2014-11-06 21:22:39Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-compiling-msvc'>
+  <title>Compiling on MS Windows using Microsoft Visual Studio</title>
+  <sect2 id='installation-compiling-msvc-installation'>
+    <title>Bundle Installation</title>
+    <para>
+    Bundle for compiling in Visual Studio is available 
+    <ulink url='http://sourceforge.net/projects/gwyddion/files/gwyddion/2.43/Gwyddion-2.43-msvc.zip/download'>here</ulink>.
+    </para>
+    <sect3 id='installation-compiling-msvc-installation-solution'>
+      <title>Solution</title>
+      <para>
+      Copy <literal>msvc2015</literal> folder to <command>gwyddion</command> 
+      source code folder (<literal>/trunk/gwyddion</literal> folder in <literal>svn</literal>, 
+      simply called <literal>gwyddion</literal> in the following text).
+      </para>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-generated_files'>
+      <title>Generated files</title>
+      <para>
+      Copy contents of <literal>generated-files</literal> folder to <literal>gwyddion</literal> folder.
+      </para>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-python'>
+      <title>Python 2.7</title>
+      <para>
+      Install Python 2.7. Version 2.7.11 does not work. The latest stable 
+      version is Python 2.7.9. Python installation packs are in <literal>libs-install</literal> 
+      folder. Install them to <literal>C:\libs\Python\Win32</literal> and 
+      <literal>C:\libs\Python\x64</literal> folders. It is unpossible to link 
+      against Python Debug library because <literal>python27_d.lib</literal> 
+      file is missing. It does not help to define 
+      <literal>MS_NO_COREDLL</literal>, <literal>Py_NO_ENABLE_SHARED</literal> 
+      and <literal>SWIG_PYTHON_INTERPRETER_NO_DEBUG</literal>.
+      </para>
+      <sect4 id='installation-compiling-msvc-installation-python-resolution'>
+        <title>Resolution:</title>
+          <itemizedlist>
+            <listitem>copy <literal>python27.lib</literal> to <literal>python27_d.lib</literal></listitem>
+            <listitem>in <literal>pyconfig.h</literal> comment out <literal>define Py_DEBUG</literal></listitem>
+          </itemizedlist>
+          <para>
+          <literal>python27_d.lib</literal> and <literal>pyconfig.h</literal> 
+          are in <literal>libs\Python27</literal> folder so you can just copy 
+          them to <literal>C:\libs\Python27</literal> folder.
+          </para>
+      </sect4>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-libraries'>
+      <title>Libraries</title>
+      <para>
+      <command>Gwyddion</command> depends on external libraries. Set paths to libraries as 
+      <command>environment variables</command>. Path must be ended by '\'. 
+      Stable versions of these libraries are in <literal>libs</literal> folder.
+      Example of environment variables setting follows:
+      </para>
+      <programlisting><![CDATA[
+CFITSIO_DIR = C:\libs\cfitsio\
+GTK_DIR = C:\libs\Gtk\
+GTKGLEXT_DIR = C:\libs\GetGLExt\
+LIBICONV_DIR = C:\libs\libiconv\
+LIBXML_DIR = C:\libs\libxml\
+PYTHON_DIR = C:\libs\Python27\
+ZLIB_DIR = C:\libs\zlib\
+]]></programlisting>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-build_events'>
+      <title>'Build Events'</title>
+      <para>
+      A part of project build is copying all files needed to run Gwyddion. 
+      Specific files are copied from <literal>gwyddion</literal> folder 
+      to <literal>$(OutDir)</literal> folder (or appropriate subfolder). 
+      DLL files are copied from extern library paths defined as environment 
+      variables to <literal>$(OutDir)</literal> folder. Commands 
+      are in menu item <literal>Project/Properties/Build Events/Post-Build Event</literal>.
+      </para>
+    </sect3>
+  </sect2>
+  <sect2 id='installation-compiling-msvc-generating'>
+    <title>Solution Generating</title>
+    <para>
+    <command>Gwyddion</command> is natively compiled on Linux using <command>autotools</command>. 
+    Conversion of conditional compilation prescriptions between different platforms 
+    is not trivial (conditions, dependencies, variable expansion, different 
+    configuration files on Linux/Windows due different library availability). 
+    These factors avoid adequate full automatic conversion.
+    </para>
+    <para>
+    <literal>gen-gwyddion-msvc-sln.py</literal> is script generating Visual Studio 
+    <command>solution</command> and <command>projects</command>. Script must be 
+    run in <literal>gwyddion</literal> folder (see above). <command>Gwyddion</command> 
+    must be compiled on Linux before running the script. Linux compilation 
+    generates specific .c, .h files and allows script to generate exported 
+    function files (.def). All these files are needed for compilation on Windows. 
+    They are all sorted to <literal>generated-files</literal> folder and must be copied 
+    to <literal>gwyddion</literal> folder on Windows. The script results 
+    in Visual Studio <literal>solution</literal> and <literal>projects</literal>
+    which are generated to <literal>msvc2015</literal> folder. All folders 
+    generated by script are created in <literal>gwyddion</literal> folder.       
+    </para>
+    <para>
+    <literal>config.h</literal> a <literal>gwyconfig.h</literal> configuration 
+    files are natively generated on Linux by <command>autotools</command>. These 
+    files correspond to Linux configuration and must be modified to be able to compile 
+    in Visual Studio. Prepared Windows friendly configuration files are part of
+    script. These files are copied to <literal>generated-files</literal> folder
+    during script generating process.  
+    </para>
+    <sect3 id='installation-compiling-msvc-generating-procedure'>
+      <title>Procedure:</title>
+      <sect4 id='installation-compiling-msvc-generating-procedure-compile'>
+        <title>Compile on Linux</title>
+        <para>
+        On Linux. Run <literal>./autogen.sh</literal> and <literal>make</literal> 
+        in source code folder (usually <literal>gwyddion</literal> folder). 
+        See <link linkend='installation-unix-source'>compilation on Linux/Unix</link>.
+        </para>
+      </sect4>
+      <sect4 id='installation-compiling-msvc-generating-procedure-script'>
+        <title>Run script to generate <literal>solution</literal> and to copy 
+        out generated files</title>
+        <para>
+        On Linux. Run <literal>gen-gwyddion-msvc-sln.py</literal> in <literal>gwyddion</literal> folder. 
+        </para>
+        <para>
+        <informaltable id='table-generated_folders'>
+          <tgroup cols='2'>
+            <?dblatex ll?>
+            <thead>
+              <row>
+                <entry><literal>Generated folder</literal></entry>
+                <entry>Contents</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry><literal>msvc2015</literal></entry>
+                <entry>Gwyddion Solution</entry>
+              </row>
+              <row>
+                <entry><literal>msvc2015/generated-files</literal></entry>
+                <entry>.def, .c, .h files</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        </para>
+        <para>
+        Copy all files and folders from <literal>./msvc2015/generated-files</literal> on Linux machine to <literal>./gwyddion</literal> on Windows machine.
+        </para>
+      </sect4>
+      <sect4 id='installation-compiling-msvc-generating-procedure-installation'>
+        <title>Installation</title>
+        <para>
+        On Windows. See the 
+        <link linkend='installation-compiling-msvc-installation'>bundle installation</link> 
+        section.         
+        </para>
+      </sect4>
+    </sect3>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

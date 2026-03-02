@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='fractal-analysis' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>
+    Fractal Analysis <gwy:icon name='fractal_measure'/>
+  </title>
+  <para>
+    In practice objects exhibiting random properties are encountered. It is
+    often assumed that these objects exhibit the self-affine properties in
+    a certain range of scales. Self-affinity is a generalization of
+    self-similarity which is the basic property of most of the deterministic
+    fractals. A part of self-affine object is similar to whole object after
+    anisotropic scaling. Many randomly rough surfaces are assumed to belong
+    to the random objects that exhibit the self-affine properties and they
+    are treated self-affine statistical fractals. Of course, these surfaces
+    can be studied using atomic force microscopy (AFM). The results of the
+    fractal analysis of the self-affine random surfaces using AFM are often
+    used to classify these surfaces prepared by various technological
+    procedures
+    [<link linkend='fractal-analysis-ref-1'>1</link>,<link linkend='fractal-analysis-ref-2'>2</link>,<link linkend='fractal-analysis-ref-3'>3</link>,<link linkend='fractal-analysis-ref-4'>4</link>].
+  </para>
+  <para id='fractal-dimension'>
+    <indexterm><primary>fractal dimension</primary></indexterm>
+    Within Gwyddion, there are different methods of fractal analysis
+    implemented within
+  <menuchoice>
+    <guimenu>Data Process</guimenu>
+    <guisubmenu>Statistics</guisubmenu>
+    <guimenuitem>Fractal analysis</guimenuitem>
+  </menuchoice>.
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        Cube counting method
+        [<link linkend='fractal-analysis-ref-1'>1</link>,<link linkend='fractal-analysis-ref-2'>2</link>]
+      </term>
+      <listitem>
+        is derived directly from a definition of box-counting fractal
+        dimension. The algorithm is based on the following steps: a cubic
+        lattice with lattice constant <xi:include href="eqi-l.xml"/>
+        is superimposed on the <xi:include href="eqi-z.xml"/>-expanded surface.
+        Initially <xi:include href="eqi-l.xml"/> is set at
+        <xi:include href="eqi-X-over-2.xml"/>
+        (where <xi:include href="eqi-X.xml"/> is length of edge of the
+        surface), resulting in a lattice of
+        <xi:include href="eqi-2x2x2-is-8.xml"/> cubes.  Then
+        <xi:include href="eqi-N-of-l.xml"/> is the number of all cubes that
+        contain at least one pixel of the image.  The lattice constant
+        <xi:include href="eqi-l.xml"/> is then reduced stepwise by factor of
+        2 and the process repeated until <xi:include href="eqi-l.xml"/>
+        equals to the distance between two adjacent pixels. The slope of
+        a plot of <xi:include href="eqi-log-N-of-l.xml"/> versus
+        <xi:include href="eqi-log-1-over-l.xml"/>
+        gives the fractal dimension <xi:include href="eqi-D_f.xml"/> directly.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Triangulation method
+        [<link linkend='fractal-analysis-ref-1'>1</link>]
+      </term>
+      <listitem>
+        is very similar to cube counting method and is also based directly on
+        the box-counting fractal dimension definition. The method works as
+        follows: a grid of unit dimension <xi:include href="eqi-l.xml"/>
+        is placed on the surface. This defines the location of the vertices of
+        a number of triangles.  When, for example,
+        <xi:include href="eqi-l-is-X-over-4.xml"/>,
+        the surface is covered by 32 triangles of different areas inclined at
+        various angles with respect to the <xi:include href="eqi-xy.xml"/>
+        plane.  The areas of all triangles are calculated and summed to obtain
+        an approximation of the surface area <xi:include href="eqi-S-of-l.xml"/>
+        corresponding to <xi:include href="eqi-l.xml"/>.
+        The grid size is then decreased by successive factor of 2, as before,
+        and the process continues until <xi:include href="eqi-l.xml"/>
+        corresponds to distance between two adjacent pixel points.
+        The slope of a plot of <xi:include href="eqi-log-S-of-l.xml"/> versus
+        <xi:include href="eqi-log-1-over-l.xml"/> then corresponds to
+        <xi:include href="eqi-D_f-minus-2.xml"/>.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Variance (partitioning) method
+        [<link linkend='fractal-analysis-ref-3'>3</link>,<link linkend='fractal-analysis-ref-4'>4</link>]
+      </term>
+      <listitem>
+        is based on the scale dependence of the
+        variance of fractional Brownian motion. In practice, in the variance
+        method one divides the full surface into equal-sized squared boxes, and
+        the variance (power of RMS value of heights), is calculated for a
+        particular box size. The fractal dimension is
+        evaluated from the slope <xi:include href="eqi-beta.xml"/>
+        of a least-square regression line fit to the data points in log-log
+        plot of variance as
+        <xi:include href="eqi-D_f-is-3-minus-beta-over-2.xml"/>.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Power spectrum method
+        [<link linkend='fractal-analysis-ref-3'>3</link>,<link linkend='fractal-analysis-ref-4'>4</link>,<link linkend='fractal-analysis-ref-5'>5</link>]
+      </term>
+      <listitem>
+        is based on the power spectrum dependence of fractional Brownian
+        motion. In the power spectrum method, every line height profiles that
+        forms the image is Fourier transformed and the power spectrum evaluated
+        and then all these power spectra are averaged. The factal dimension is
+        evaluated from the slope
+        <xi:include href="eqi-beta.xml"/> of a least-square regression line fit
+        to the data points in log-log plot of power spectrum as
+        <xi:include href="eqi-D_f-is-7-over-2-plus-beta-over-2.xml"/>.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Structure function (HHCF) method
+      </term>
+      <listitem>
+        is similar to the power spectrum method, but instead of the power spectrum,
+        the structure function (height-height correlation function) is fitted around zero.
+        The fractal dimension is evaluated from the slope <xi:include href="eqi-beta.xml"/>
+        of a least-square regression line fit to the data points in log-log
+        plot of variance as
+        <xi:include href="eqi-D_f-is-3-minus-beta-over-2.xml"/>.
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    The axes in <guilabel>Fractal Dimension</guilabel> graphs always show already logarithmed
+    quantities, therefore the linear dependencies mentioned above correspond
+    to straight lines there.  Frequently only a part of the plotted curve is a
+    straight line as the end tend to be influenced by various systematic errors and
+    artefacts. The measure of the axes should be treated as arbitrary.
+  </para>
+  <para>
+    Note that that results of different methods differ. This fact is caused by
+    systematic error of different fractal analysis approaches.
+  </para>
+  <informalfigure id='fig-fractal-dimension-screenshot'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='fractal.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Fractal Dimension dialog.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <para>
+    Moreover, the results of the fractal analysis can be influenced strongly by
+    the tip convolution. We recommend therefore to check the certainty map
+    before fractal analysis. In cases when the surface is influenced a lot by
+    tip imaging, the results of the fractal analysis can be misrepresented
+    strongly.
+  </para>
+  <para>
+    Note, that algorithms that can be used within the fractal analysis module
+    are also used in <link linkend='fractal-correction'>Fractal Correction</link>
+    module and Fractal Correction option of <link linkend='remove-spots'>Remove Spots</link>
+    tool.
+  </para>
+  <sect2 id='fractal-analysis-ref'>
+    <title>References</title>
+    <para id='fractal-analysis-ref-1'>
+      [1] C. Douketis, Z. Wang, T. L. Haslett, M. Moskovits: Fractal
+      character of cold-deposited silver films determined by low-temperature
+      scanning tunneling microscopy. Physical Review B 51 (1995) 11022,
+      <ulink url='http://dx.doi.org/10.1103/PhysRevB.51.11022'>doi:10.1103/PhysRevB.51.11022</ulink>
+    </para>
+    <para id='fractal-analysis-ref-2'>
+      [2] W. Zahn, A. Zösch: The dependence of fractal dimension on measuring
+      conditions of scanning probe microscopy. Fresenius J Analen Chem 365 (1999)
+      168-172,
+      <ulink url='http://dx.doi.org/10.1007/s002160051466'>doi:10.1007/s002160051466</ulink>
+    </para>
+    <para id='fractal-analysis-ref-3'>
+      [3] A. Van Put, A. Vertes, D. Wegrzynek, B. Treiger, R. Van Grieken:
+      Quantitative characterization of individual particle surfaces by fractal
+      analysis of scanning electron microscope images. Fresenius J Analen
+      Chem 350 (1994) 440-447,
+      <ulink url='http://dx.doi.org/10.1007/BF00321787'>doi:10.1007/BF00321787</ulink>
+    </para>
+    <para id='fractal-analysis-ref-4'>
+      [4] A. Mannelquist, N. Almquist, S. Fredriksson: Influence of tip
+      geometry on fractal analysis of atomic force microscopy images. Appl.
+      Phys. A 66 (1998) 891-895,
+      <ulink url='http://dx.doi.org/10.1007/s003390051262'>doi:10.1007/s003390051262</ulink>
+    </para>
+    <para id='fractal-analysis-ref-5'>
+      [5] W. Zahn, A. Zösch: Characterization of thin film surfaces by
+      fractal geometry. Fresenius J Anal Chem 358 (1997) 119-121,
+      <ulink url='http://dx.doi.org/10.1007/s002160050360'>doi:10.1007/s002160050360</ulink>
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

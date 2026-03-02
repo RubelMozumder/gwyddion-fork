@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: expressions.xml 21607 2018-11-07 13:13:11Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="expression-syntax">
+  <title>Выражения</title>
+  <para>Выражения, используемые в модуле <quote>арифметика над данными</quote>, формулах величин зёрен и в аппроксимирующих функциях графиков, имеют синтаксис подобный многим языкам программирования.</para>
+  <para>Все числа являются действительными (с плавающей точкой), числовые константы используют стандартную нотацию. Примеры правильных чисел:  <literal>1</literal>, <literal>.707</literal>, <literal>2.661</literal>, <literal>8.2e-34</literal>.</para>
+  <para>Имена функций, постоянных и переменных начинаются с буквы и продолжаются нулём или более букв, цифр и знаков подчёркивания. Примеры правильных идентификаторов: <literal>pow10</literal> (функция), <literal>Pi</literal> (постоянная), <literal>d2_2</literal> (переменная).</para>
+  <para>Приоритет операций сведён в нижеприведённую таблицу.</para>
+  <para>
+    <informaltable id="table-expressions-precedence">
+      <tgroup cols="3" align="left">
+        <?dblatex lll?>
+        <thead>
+          <row>
+            <entry>Операция</entry>
+            <entry>Ассоциативность</entry>
+            <entry>Примеры</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>скобки</entry>
+            <entry>недоступно</entry>
+            <entry><literal>(x)</literal></entry>
+          </row>
+          <row>
+            <entry>вызовы функций и унарные операторы</entry>
+            <entry>справа налево</entry>
+            <entry><literal>-sqrt 3</literal></entry>
+          </row>
+          <row>
+            <entry>оператор степени</entry>
+            <entry>справа налево</entry>
+            <entry><literal>2^16</literal></entry>
+          </row>
+          <row>
+            <entry>операторы умножения, деления, остатка от деления </entry>
+            <entry>слева направо</entry>
+            <entry><literal>9/2 * 8</literal></entry>
+          </row>
+          <row>
+            <entry>операторы сложения и вычитания</entry>
+            <entry>слева направо</entry>
+            <entry><literal>3 - 4 + 5</literal></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </para>
+  <para>Следует заметить, что <literal>-3^2</literal> равно 9, и равносильно <literal>(-3)^2</literal>, как в <command>bc</command>, но в отличие от Perl или Python.</para>
+  <para>Доступные операторы и функции сведены в нижеследующую таблицу.</para>
+  <para>
+    <informaltable id="table-expression-operators">
+      <tgroup cols="2" align="left">
+        <?dblatex ll?>
+        <thead>
+          <row>
+            <entry>Оператор</entry>
+            <entry>Смысл</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><literal>+</literal> (унарный)</entry>
+            <entry>нет операции</entry>
+          </row>
+          <row>
+            <entry><literal>-</literal> (унарный)</entry>
+            <entry>отрицательное значение</entry>
+          </row>
+          <row>
+            <entry><literal>~</literal></entry>
+            <entry>отрицательное значение (эквивалентно <literal>-</literal>)</entry>
+          </row>
+          <row>
+            <entry><literal>+</literal> (бинарный)</entry>
+            <entry>сложение</entry>
+          </row>
+          <row>
+            <entry><literal>-</literal> (бинарный)</entry>
+            <entry>вычитание</entry>
+          </row>
+          <row>
+            <entry><literal>*</literal></entry>
+            <entry>умножение</entry>
+          </row>
+          <row>
+            <entry><literal>/</literal></entry>
+            <entry>деление</entry>
+          </row>
+          <row>
+            <entry><literal>%</literal></entry>
+            <entry>остаток с плавающей точкой</entry>
+          </row>
+          <row>
+            <entry><literal>^</literal></entry>
+            <entry>степень</entry>
+          </row>
+          <row>
+            <entry><literal>abs</literal></entry>
+            <entry>модуль</entry>
+          </row>
+          <row>
+            <entry><literal>floor</literal></entry>
+            <entry>округление вниз к ближайшему целому (отбрасывание дробной части)</entry>
+          </row>
+          <row>
+            <entry><literal>ceil</literal></entry>
+            <entry>округление вверх до ближайшего целого (следующего после вещественного)</entry>
+          </row>
+          <row>
+            <entry><literal>sqrt</literal></entry>
+            <entry>квадратный корень</entry>
+          </row>
+          <row>
+            <entry><literal>cbrt</literal></entry>
+            <entry>корень кубический</entry>
+          </row>
+          <row>
+            <entry><literal>sin</literal></entry>
+            <entry>функция синуса</entry>
+          </row>
+          <row>
+            <entry><literal>cos</literal></entry>
+            <entry>функция косинуса</entry>
+          </row>
+          <row>
+            <entry><literal>tan</literal></entry>
+            <entry>функция тангенса</entry>
+          </row>
+          <row>
+            <entry><literal>asin</literal></entry>
+            <entry>функция арксинуса</entry>
+          </row>
+          <row>
+            <entry><literal>acos</literal></entry>
+            <entry>функция арккосинуса</entry>
+          </row>
+          <row>
+            <entry><literal>atan</literal></entry>
+            <entry>функция арктангенса</entry>
+          </row>
+          <row>
+            <entry><literal>sinc</literal></entry>
+            <entry>функция "кардинальный синус", синус делённый на значение</entry>
+          </row>
+          <row>
+            <entry><literal>exp</literal></entry>
+            <entry>функция экспоненты по основанию e</entry>
+          </row>
+          <row>
+            <entry><literal>ln</literal></entry>
+            <entry>функция логарифма по основанию e</entry>
+          </row>
+          <row>
+            <entry><literal>log</literal></entry>
+            <entry>функция логарифма по основанию e</entry>
+          </row>
+          <row>
+            <entry><literal>pow10</literal></entry>
+            <entry>степенная функция по основанию 10</entry>
+          </row>
+          <row>
+            <entry><literal>log10</literal></entry>
+            <entry>функция логарифма по основанию 10</entry>
+          </row>
+          <row>
+            <entry><literal>pow2</literal></entry>
+            <entry>функция экспоненты по основанию 2</entry>
+          </row>
+          <row>
+            <entry><literal>log2</literal></entry>
+            <entry>функция логарифма по основанию 2</entry>
+          </row>
+          <row>
+            <entry><literal>spow</literal></entry>
+            <entry>функция степени со знаком; результат будет иметь тот же знак, что и аргумент</entry>
+          </row>
+          <row>
+            <entry><literal>sinh</literal></entry>
+            <entry>функция гиперболического синуса</entry>
+          </row>
+          <row>
+            <entry><literal>cosh</literal></entry>
+            <entry>функция гиперболического косинуса</entry>
+          </row>
+          <row>
+            <entry><literal>tanh</literal></entry>
+            <entry>функция гиперболического тангенса</entry>
+          </row>
+          <row>
+            <entry><literal>asinh</literal></entry>
+            <entry>инверсия функции гиперболического синуса</entry>
+          </row>
+          <row>
+            <entry><literal>acosh</literal></entry>
+            <entry>инверсия функции гиперболического косинуса</entry>
+          </row>
+          <row>
+            <entry><literal>atanh</literal></entry>
+            <entry>инверсия функции гиперболического тангенса</entry>
+          </row>
+          <row>
+            <entry><literal>pow</literal></entry>
+            <entry>функция степени, <literal>pow(x,y)</literal> соответствует <literal>x^y</literal></entry>
+          </row>
+          <row>
+            <entry><literal>min</literal></entry>
+            <entry>минимум двух значений</entry>
+          </row>
+          <row>
+            <entry><literal>max</literal></entry>
+            <entry>максимум двух значений</entry>
+          </row>
+          <row>
+            <entry><literal>step</literal></entry>
+            <entry>нуль для отрицательных чисел или нуля, один для положительных значений</entry>
+          </row>
+          <row>
+            <entry><literal>mod</literal></entry>
+            <entry>остаток от деления с плавающей точкой,  <literal>mod(x,y)</literal> эквивалентен <literal>x % y</literal></entry>
+          </row>
+          <row>
+            <entry><literal>hypot</literal></entry>
+            <entry>Эвклидова функция расстояния, <literal>hypot(x,y)</literal> соответствует <literal>sqrt(x^2+y^2)</literal></entry>
+          </row>
+          <row>
+            <entry><literal>atan2</literal></entry>
+            <entry>функция арктангенса двух переменных</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </para>
+  <para>Следующие функции будут доступны если системная математическая библиотека их содержит:</para>
+  <para>
+    <informaltable id="table-expression-extra-functions">
+      <tgroup cols="2" align="left">
+        <?dblatex ll?>
+        <thead>
+          <row>
+            <entry>Оператор</entry>
+            <entry>Смысл</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><literal>erf</literal></entry>
+            <entry>функция ошибки (интеграл гауссовой функции от нуля)</entry>
+          </row>
+          <row>
+            <entry><literal>erfc</literal></entry>
+            <entry>дополнительная функция ошибки (интеграл гауссовой функции до бесконечности)</entry>
+          </row>
+          <row>
+            <entry><literal>lGamma</literal></entry>
+            <entry>логарифм функции <xi:include href="eqi-Gamma.xml"/></entry>
+          </row>
+          <row>
+            <entry><literal>Gamma</literal></entry>
+            <entry>функция <xi:include href="eqi-Gamma.xml"/></entry>
+          </row>
+          <row>
+            <entry><literal>J0</literal></entry>
+            <entry>функция Бесселя первого рода порядка 0</entry>
+          </row>
+          <row>
+            <entry><literal>J1</literal></entry>
+            <entry>функция Бесселя первого рода порядка 1</entry>
+          </row>
+          <row>
+            <entry><literal>Y0</literal></entry>
+            <entry>функция Бесселя второго рода порядка 0</entry>
+          </row>
+          <row>
+            <entry><literal>Y1</literal></entry>
+            <entry>функция Бесселя второго рода порядка 1</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </para>
+  <para>Помимо этого, есть несколько особенностей, которые упрощают набор простых выражений: <itemizedlist>
+      <listitem>
+        <para>Знака умножения являются опциональными, вместо них можно использовать пробелы (или в некоторых случаях ничего не ставить). Например, <literal>3/4 Pi</literal> и <literal>5(4+3)(2+1)</literal> будут правильными выражениями. Однако, <literal>3a</literal> не будет, <literal>3e-4</literal> всегда обозначает <literal>0.0003</literal>, а не <literal>3*e - 4</literal>.</para>
+      </listitem>
+      <listitem>
+        <para>Между вызовом функций и унарными операторами нет отличий, поэтому скобки нередко могут опускаться. Например, <literal>sqrt 5</literal> и <literal>hypot hypot 3,4,5</literal> будут правильными выражениями. Последнее можно расписать со скобками следующим образом:  <literal>hypot(hypot(3,4),5)</literal>.</para>
+        <para>Следует однако отметить, что вызов функции имеет больший приоритет, чем любой другой оператор, поэтому <literal>sin Pi/2</literal> будет эквивалентом <literal>(sin Pi)/2</literal>, а не <literal>sin(Pi/2)</literal>.</para>
+      </listitem>
+    </itemizedlist> Если сомневаетесь, то пишите выражения в их полной форме.</para>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

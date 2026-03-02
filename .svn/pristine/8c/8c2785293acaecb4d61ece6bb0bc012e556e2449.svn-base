@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: filters.xml 9429 2009-07-14 21:11:45Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='force_indentation' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Force and Indentation</title>
+  <sect2 id='indentanalyze'>
+    <title>
+      Analyze Imprint
+      <gwy:icon name='tip_indent_analyze'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>SPM Modes</guisubmenu>
+        <guisubmenu>Force and Indentation</guisubmenu>
+        <guisubmenu>Analyze Imprint...</guisubmenu>
+      </menuchoice>
+    </para>
+
+    <para>
+      The module identifies different characteristic parts of an indent and calculates the corresponding projected and developed areas (<xi:include href="eqi-A_p.xml"/> and <xi:include href="eqi-A_d.xml"/>) and volumes.
+      <variablelist>
+        <varlistentry>
+          <term> Impression </term>
+          <listitem>
+            <para> Is defined as the region around the local minimum with the same normal vector (up to symmetry).
+            This corresponds to the usual definition of the contact area.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Inner pile-up </term>
+        <listitem>
+          <para>
+            Part of the impression lying above the reference plane.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Outer pile-up </term>
+        <listitem>
+          <para>
+            Part of the image above the reference plane but with a different normal vector than the impression.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Special points </term>
+        <listitem>
+          <para>
+            Include the maximum, minimum and points along steepest slope profiles.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Expected projected and developed areas </term>
+        <listitem>
+          <para>
+            Refer to the values obtained by evaluating the theoretical area function of the chosen indentor type at the depth of the imprint.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Volume above-below </term>
+        <listitem>
+          <para>
+            Volume above-below is the difference between the volume above the reference plane and the volume below.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+  <para>
+    Note, that the module levels the data by fitting planes along the borders of the image. This may lead to mismatch between some of the values returned by this model and analoguous ones returned by the <link linkend='tool-stats'>Statistical Quantities tool</link>. The data should be leveled manually in order to reduce this effect.
+  </para>
+  <informalfigure id='fig-indent-analyze'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='indentation-pileup.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Scheme of different regions of an indentation: above, below, plane, impression, inner pile-up and outer pile-up.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+</sect2>
+  </sect1>
+
+  <!-- vim: set ts=2 sw=2 et : -->

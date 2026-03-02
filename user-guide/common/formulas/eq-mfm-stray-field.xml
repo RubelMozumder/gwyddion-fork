@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eq-mfm-stray-field.xml 23151 2021-02-13 09:13:08Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informalequation id='eq-mfm-stray-field'>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref='eq-mfm-stray-field.svg' format='SVG'/>
+    </imageobject>
+    <textobject role='tex'>
+      <phrase>
+<![CDATA[
+\begin{array}{r@{{}={}}l}
+\displaystyle
+H_{x,y}(\vec{r},z)
+  & \displaystyle
+    \frac{1}{4\pi ^2} \int_{-\infty}^{\infty} A_{H_{x,y}}^{z, d}\e^{-\im\vec{kr}} \d \vec{k}\\
+\noalign{\smallskip}
+\displaystyle
+H_{z}(\vec{r},z)
+  & \displaystyle
+    \frac{1}{4\pi ^2} \int_{-\infty}^{\infty} A_{H_{z}}^{z, d}\e^{-\im\vec{kr}} \d \vec{k}\\
+\end{array}
+]]>
+      </phrase>
+    </textobject>
+  </mediaobject>
+</informalequation>
+<!-- vim: set ts=2 sw=2 et : -->

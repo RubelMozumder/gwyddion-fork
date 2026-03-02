@@ -1,0 +1,20 @@
+--- pango-1.40.12.orig/pango/Makefile.am	2021-02-23 15:05:38.000000000 +0100
++++ pango-1.40.12/pango/Makefile.am	2021-02-23 15:20:31.460503641 +0100
+@@ -421,7 +421,7 @@ libpangowin32_1_0_la_LDFLAGS = $(LIBRARY
+ libpangowin32_1_0_la_LIBADD =			\
+ 	libpango-$(PANGO_API_VERSION).la	\
+ 	$(GLIB_LIBS)				\
+-	-lgdi32 -lusp10
++	-lusp10 -lgdi32
+ libpangowin32_1_0_la_DEPENDENCIES =		\
+ 	libpango-$(PANGO_API_VERSION).la
+ libpangowin32_1_0_la_SOURCES =	\
+--- pango-1.40.12.orig/pangowin32.pc.in	2016-10-22 07:00:03.000000000 +0200
++++ pango-1.40.12/pangowin32.pc.in	2021-02-23 15:21:10.367962666 +0100
+@@ -8,5 +8,5 @@ Description: Win32 GDI font support for
+ Version: @VERSION@
+ Requires: pango
+ Libs: -L${libdir} -lpangowin32-@PANGO_API_VERSION@
+-Libs.private: -lgdi32 -lusp10
++Libs.private: -lusp10 -lgdi32
+ Cflags: -I${includedir}/pango-1.0

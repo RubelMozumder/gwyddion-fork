@@ -1,0 +1,857 @@
+/*
+ *  $Id: cmap_lockin.c 26117 2024-01-07 17:44:59Z yeti-dn $
+ *  Copyright (C) 2021 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwythreads.h>
+#include <libprocess/lawn.h>
+#include <libprocess/stats.h>
+#include <libprocess/correct.h>
+#include <libprocess/gwyprocesstypes.h>
+#include <libgwydgets/gwydataview.h>
+#include <libgwydgets/gwygraph.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-cmap.h>
+#include <libgwyddion/gwyddion.h>
+#include <libprocess/gwyprocess.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+#include "libgwyddion/gwyomp.h"
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+};
+
+typedef enum {
+    OUTPUT_QUANTITY   = 0,
+    OUTPUT_PREVIEW    = 1,
+} LockinOutput;
+
+typedef enum {
+    SHOW_CARRIER   = 0,
+    SHOW_QUANTITY  = 1,
+} LockinShow;
+
+
+enum {
+    PARAM_RANGE_FROM,
+    PARAM_RANGE_TO,
+    PARAM_CARRIER,
+    PARAM_QUANTITY,
+    PARAM_ORDER,
+    PARAM_SEGMENT,
+    PARAM_ENABLE_SEGMENT,
+    PARAM_XPOS,
+    PARAM_YPOS,
+    PARAM_SHOW,
+    PARAM_OUTPUT,
+};
+
+typedef struct {
+    GwyParams *params;
+    GwyLawn *lawn;
+    GwyDataField *amplitude;
+    GwyDataField *phase;
+    GwyDataField *mask;
+    gint nsegments;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table;
+    GwyParamTable *table_output;
+    GwyContainer *data;
+    GwySelection *selection;
+    GwySelection *graph_selection;
+    GwyGraphModel *gmodel;
+} ModuleGUI;
+
+static gboolean         module_register         (void);
+static GwyParamDef*     define_module_params    (void);
+static void             lockin                  (GwyContainer *data,
+                                                 GwyRunType runtype);
+static void             execute                 (ModuleArgs *args,
+                                                 GtkWindow *window);
+static GwyDialogOutcome run_gui                 (ModuleArgs *args,
+                                                 GwyContainer *data,
+                                                 gint id);
+static void             param_changed           (ModuleGUI *gui,
+                                                 gint id);
+static void             preview                 (gpointer user_data);
+static void             set_selection           (ModuleGUI *gui);
+static void             point_selection_changed (ModuleGUI *gui,
+                                                 gint id,
+                                                 GwySelection *selection);
+static void             extract_one_curve       (GwyLawn *lawn,
+                                                 GwyGraphCurveModel *gcmodel,
+                                                 gint col,
+                                                 gint row,
+                                                 GwyParams *params);
+static void             do_polylevel            (const gdouble *xdata,
+                                                 const gdouble *ydata,
+                                                 gint ndata,
+                                                 gdouble **nxdata,
+                                                 gdouble **nydata,
+                                                 gint *nndata,
+                                                 const gint *segments,
+                                                 gint segment,
+                                                 gboolean segment_enabled,
+                                                 gdouble from,
+                                                 gdouble to,
+                                                 gint degree,
+                                                 gboolean subtract,
+                                                 gdouble *retparam);
+static gboolean         process_point           (GwyLawn *lawn,
+                                                 gint nsegments,
+                                                 const gint *segments,
+                                                 gint col,
+                                                 gint row,
+                                                 GwyParams *params,
+                                                 gdouble *amplitude,
+                                                 gdouble *phase);
+static void             update_graph_model_props(GwyGraphModel *gmodel,
+                                                 ModuleArgs *args);
+static void             sanitise_params         (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Detect oscillations in a curve."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2022",
+};
+
+GWY_MODULE_QUERY2(module_info, cmap_lockin)
+
+static gboolean
+module_register(void)
+{
+    gwy_curve_map_func_register("cmap_lockin",
+                                (GwyCurveMapFunc)&lockin,
+                                N_("/_Demodulation..."),
+                                NULL,
+                                RUN_MODES,
+                                GWY_MENU_FLAG_CURVE_MAP,
+                                N_("Detect oscillations in a curve"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+    static const GwyEnum outputs[] = {
+        { N_("Extract amplitude/phase"),   (1 << OUTPUT_QUANTITY),   },
+        { N_("Set preview"),               (1 << OUTPUT_PREVIEW),    },
+    };
+    static const GwyEnum shows[] = {
+        { N_("Reference"),   SHOW_CARRIER,   },
+        { N_("Quantity"),    SHOW_QUANTITY,  },
+    };
+
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_curve_map_func_current());
+    gwy_param_def_add_lawn_curve(paramdef, PARAM_CARRIER, "carrier", _("Reference"));
+    gwy_param_def_add_lawn_curve(paramdef, PARAM_QUANTITY, "quantity", _("Quantity"));
+    gwy_param_def_add_int(paramdef, PARAM_XPOS, "xpos", NULL, -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_YPOS, "ypos", NULL, -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_ORDER, "order", _("_Degree"), 0, 5, 2);
+    gwy_param_def_add_double(paramdef, PARAM_RANGE_FROM, "from", _("_From"), 0.0, 1.0, 0.0);
+    gwy_param_def_add_double(paramdef, PARAM_RANGE_TO, "to", _("_To"), 0.0, 1.0, 1.0);
+    gwy_param_def_add_lawn_segment(paramdef, PARAM_SEGMENT, "segment", NULL);
+    gwy_param_def_add_boolean(paramdef, PARAM_ENABLE_SEGMENT, "enable_segment", NULL, FALSE);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_SHOW, "show", _("_Show"),
+                              shows, G_N_ELEMENTS(shows), (1 << SHOW_CARRIER));
+    gwy_param_def_add_gwyflags(paramdef, PARAM_OUTPUT, "output", _("Output _type"),
+                               outputs, G_N_ELEMENTS(outputs), (1 << OUTPUT_QUANTITY));
+
+    return paramdef;
+}
+
+static void
+lockin(GwyContainer *data, GwyRunType runtype)
+{
+    ModuleArgs args;
+    GwyLawn *lawn = NULL;
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    gint id, newid;
+    LockinOutput output;
+    GwyDataField *field;
+    const guchar *gradient;
+
+
+    g_return_if_fail(runtype & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_clear(&args, 1);
+    gwy_app_data_browser_get_current(GWY_APP_LAWN, &lawn,
+                                     GWY_APP_LAWN_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_LAWN(lawn));
+
+    args.lawn = lawn;
+    args.nsegments = gwy_lawn_get_n_segments(lawn);
+    args.params = gwy_params_new_from_settings(define_module_params());
+    sanitise_params(&args);
+
+    args.amplitude = gwy_data_field_new(gwy_lawn_get_xres(lawn), gwy_lawn_get_yres(lawn),
+                                        gwy_lawn_get_xreal(lawn), gwy_lawn_get_yreal(lawn), TRUE);
+    gwy_data_field_set_xoffset(args.amplitude, gwy_lawn_get_xoffset(lawn));
+    gwy_data_field_set_yoffset(args.amplitude, gwy_lawn_get_yoffset(lawn));
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_xy(args.amplitude), gwy_lawn_get_si_unit_xy(lawn));
+
+    args.phase = gwy_data_field_new(gwy_lawn_get_xres(lawn), gwy_lawn_get_yres(lawn),
+                                    gwy_lawn_get_xreal(lawn), gwy_lawn_get_yreal(lawn), TRUE);
+    gwy_data_field_set_xoffset(args.phase, gwy_lawn_get_xoffset(lawn));
+    gwy_data_field_set_yoffset(args.phase, gwy_lawn_get_yoffset(lawn));
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_xy(args.phase), gwy_lawn_get_si_unit_xy(lawn));
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_z(args.phase), gwy_si_unit_new("rad"));
+
+
+    args.mask = gwy_data_field_new(gwy_lawn_get_xres(lawn), gwy_lawn_get_yres(lawn),
+                                   gwy_lawn_get_xreal(lawn), gwy_lawn_get_yreal(lawn), TRUE);
+
+    if (runtype == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, id);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+    }
+    if (outcome != GWY_DIALOG_HAVE_RESULT)
+        execute(&args, gwy_app_find_window_for_curve_map(data, id));
+
+
+    output = gwy_params_get_flags(args.params, PARAM_OUTPUT);
+    if (output & (1 << OUTPUT_PREVIEW)) {
+        field = gwy_container_get_object(data, gwy_app_get_lawn_preview_key_for_id(id));
+        gwy_data_field_assign(field, args.amplitude);
+        gwy_data_field_data_changed(field);
+    }
+    if (output & (1 << OUTPUT_QUANTITY)) {
+        newid = gwy_app_data_browser_add_data_field(args.amplitude, data, TRUE);
+        gwy_app_set_data_field_title(data, newid, _("Amplitude"));
+        if (gwy_data_field_get_max(args.mask) > 0.0)
+            gwy_container_set_object(data, gwy_app_get_mask_key_for_id(newid), args.mask);
+
+        if (gwy_container_gis_string(data, gwy_app_get_lawn_palette_key_for_id(id), &gradient)) {
+            gwy_container_set_const_string(data,
+                                           gwy_app_get_data_palette_key_for_id(newid), gradient);
+        }
+
+        gwy_app_channel_log_add(data, -1, newid, "cmap::cmap_possearch", NULL);
+
+        newid = gwy_app_data_browser_add_data_field(args.phase, data, TRUE);
+        gwy_app_set_data_field_title(data, newid, _("Phase"));
+        if (gwy_data_field_get_max(args.mask) > 0.0)
+            gwy_container_set_object(data, gwy_app_get_mask_key_for_id(newid), args.mask);
+
+        if (gwy_container_gis_string(data, gwy_app_get_lawn_palette_key_for_id(id), &gradient)) {
+            gwy_container_set_const_string(data,
+                                           gwy_app_get_data_palette_key_for_id(newid), gradient);
+        }
+
+        gwy_app_channel_log_add(data, -1, newid, "cmap::cmap_possearch", NULL);
+    }
+
+end:
+    g_object_unref(args.amplitude);
+    g_object_unref(args.phase);
+    g_object_unref(args.mask);
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GtkWidget *hbox, *graph, *dataview, *align, *area;
+    GwyParamTable *table;
+    GwyDialog *dialog;
+    ModuleGUI gui;
+    GwyDataField *field;
+    GwyDialogOutcome outcome;
+    GwyGraphCurveModel *gcmodel;
+    GwyVectorLayer *vlayer = NULL;
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.data = gwy_container_new();
+    field = gwy_container_get_object(data, gwy_app_get_lawn_preview_key_for_id(id));
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), field);
+    if (gwy_container_gis_string(data, gwy_app_get_lawn_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.dialog = gwy_dialog_new(_("Demodulation"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(0);
+    gwy_dialog_add_content(GWY_DIALOG(gui.dialog), hbox, TRUE, TRUE, 0);
+
+    align = gtk_alignment_new(0.0, 0.0, 0.0, 0.0);
+    gtk_box_pack_start(GTK_BOX(hbox), align, FALSE, FALSE, 0);
+
+    dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    gtk_container_add(GTK_CONTAINER(align), dataview);
+    vlayer = g_object_new(g_type_from_name("GwyLayerPoint"), NULL);
+    gwy_vector_layer_set_selection_key(vlayer, "/0/select/pointer");
+    gwy_data_view_set_top_layer(GWY_DATA_VIEW(dataview), vlayer);
+    gui.selection = gwy_vector_layer_ensure_selection(vlayer);
+    set_selection(&gui);
+
+    gui.gmodel = gwy_graph_model_new();
+    gcmodel = gwy_graph_curve_model_new();
+    g_object_set(gcmodel,
+                 "mode", GWY_GRAPH_CURVE_LINE,
+                 "color", gwy_graph_get_preset_color(0),
+                 "description", g_strdup(_("data")),
+                 NULL);
+    gwy_graph_model_add_curve(gui.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+
+    gcmodel = gwy_graph_curve_model_new();
+    g_object_set(gcmodel,
+                 "mode", GWY_GRAPH_CURVE_LINE,
+                 "color", gwy_graph_get_preset_color(1),
+                 "description", g_strdup(_("fit")),
+                 NULL);
+    gwy_graph_model_add_curve(gui.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+
+
+    graph = gwy_graph_new(gui.gmodel);
+    area = gwy_graph_get_area(GWY_GRAPH(graph));
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gwy_graph_area_set_status(GWY_GRAPH_AREA(area), GWY_GRAPH_STATUS_XSEL);
+    gwy_graph_area_set_selection_editable(GWY_GRAPH_AREA(area), FALSE);
+    gui.graph_selection = gwy_graph_area_get_selection(GWY_GRAPH_AREA(area), GWY_GRAPH_STATUS_XSEL);
+    gtk_widget_set_size_request(graph, PREVIEW_SIZE, PREVIEW_SIZE);
+    gtk_box_pack_start(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+
+
+    hbox = gwy_hbox_new(20);
+    gwy_dialog_add_content(GWY_DIALOG(gui.dialog), hbox, TRUE, TRUE, 4);
+
+    table = gui.table = gwy_param_table_new(args->params);
+    gwy_param_table_append_lawn_curve(table, PARAM_CARRIER, args->lawn);
+    gwy_param_table_append_lawn_curve(table, PARAM_QUANTITY, args->lawn);
+    gwy_param_table_append_slider(table, PARAM_RANGE_FROM);
+    gwy_param_table_slider_set_factor(table, PARAM_RANGE_FROM, 100.0);
+    gwy_param_table_set_unitstr(table, PARAM_RANGE_FROM, "%");
+    gwy_param_table_append_slider(table, PARAM_RANGE_TO);
+    gwy_param_table_slider_set_factor(table, PARAM_RANGE_TO, 100.0);
+    gwy_param_table_set_unitstr(table, PARAM_RANGE_TO, "%");
+    gwy_param_table_append_slider(table, PARAM_ORDER);
+    if (args->nsegments) {
+        gwy_param_table_append_lawn_segment(table, PARAM_SEGMENT, args->lawn);
+        gwy_param_table_add_enabler(table, PARAM_ENABLE_SEGMENT, PARAM_SEGMENT);
+    }
+
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_output = gwy_param_table_new(args->params);
+    gwy_param_table_append_radio(table, PARAM_SHOW);
+    gwy_param_table_append_checkboxes(table, PARAM_OUTPUT);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    g_signal_connect_swapped(gui.table, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_output, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.selection, "changed", G_CALLBACK(point_selection_changed), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.gmodel);
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+param_changed(ModuleGUI *gui, G_GNUC_UNUSED gint id)
+{
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+set_selection(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    gint col = gwy_params_get_int(args->params, PARAM_XPOS);
+    gint row = gwy_params_get_int(args->params, PARAM_YPOS);
+    gdouble xy[2];
+
+    xy[0] = (col + 0.5)*gwy_lawn_get_dx(args->lawn);
+    xy[1] = (row + 0.5)*gwy_lawn_get_dy(args->lawn);
+    gwy_selection_set_object(gui->selection, 0, xy);
+}
+
+static void
+point_selection_changed(ModuleGUI *gui, gint id, GwySelection *selection)
+{
+    ModuleArgs *args = gui->args;
+    GwyLawn *lawn = args->lawn;
+    gint i, xres = gwy_lawn_get_xres(lawn), yres = gwy_lawn_get_yres(lawn);
+    gdouble xy[2];
+
+    gwy_selection_get_object(selection, id, xy);
+    i = GWY_ROUND(floor(xy[0]/gwy_lawn_get_dx(lawn)));
+    gwy_params_set_int(args->params, PARAM_XPOS, CLAMP(i, 0, xres-1));
+    i = GWY_ROUND(floor(xy[1]/gwy_lawn_get_dy(lawn)));
+    gwy_params_set_int(args->params, PARAM_YPOS, CLAMP(i, 0, yres-1));
+
+    gwy_param_table_param_changed(gui->table, PARAM_XPOS);
+    gwy_param_table_param_changed(gui->table, PARAM_YPOS);
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    gint col = gwy_params_get_int(params, PARAM_XPOS);
+    gint row = gwy_params_get_int(params, PARAM_YPOS);
+    gdouble from = gwy_params_get_double(params, PARAM_RANGE_FROM);
+    gdouble to = gwy_params_get_double(params, PARAM_RANGE_TO);
+    gdouble sel[2];
+    GwyGraphCurveModel *gc;
+    gdouble xfrom, xto;
+    const gdouble *xdata, *ydata;
+    gdouble *xfit = NULL, *yfit = NULL, *fitparams, x;
+    gint i;
+    gdouble amplitude, phase;
+    gint ndata, nfit;
+    gint degree = gwy_params_get_int(params, PARAM_ORDER);
+    gboolean segment_enabled = args->nsegments ? gwy_params_get_boolean(params, PARAM_ENABLE_SEGMENT) : FALSE;
+    gint segment = segment_enabled ? gwy_params_get_int(params, PARAM_SEGMENT) : -1;
+
+    fitparams = g_new(gdouble, 6);
+
+    gc = gwy_graph_model_get_curve(gui->gmodel, 0);
+    extract_one_curve(args->lawn, gc, col, row, params);
+
+    xdata = gwy_graph_curve_model_get_xdata(gc);
+    ydata = gwy_graph_curve_model_get_ydata(gc);
+    ndata = gwy_graph_curve_model_get_ndata(gc);
+
+    do_polylevel(xdata, ydata, ndata, &xfit, &yfit, &nfit, gwy_lawn_get_segments(args->lawn, col, row, NULL),
+                 segment, segment_enabled, from, to, degree, FALSE, fitparams);
+
+    update_graph_model_props(gui->gmodel, args);
+
+    gwy_graph_curve_model_get_x_range(gc, &xfrom, &xto);
+    sel[0] = xfrom + from*(xto-xfrom);
+    sel[1] = xfrom + to*(xto-xfrom);
+
+    gwy_selection_set_data(gui->graph_selection, 1, sel);
+
+    gc = gwy_graph_model_get_curve(gui->gmodel, 1);
+    for (i = 0; i < nfit; i++) {
+        x = xfit[i];
+        yfit[i] = fitparams[0] + fitparams[1]*x + fitparams[2]*x*x + fitparams[3]*x*x*x
+                  + fitparams[4]*x*x*x*x + fitparams[5]*x*x*x*x*x;
+    }
+    gwy_graph_curve_model_set_data(gc, xfit, yfit, nfit);
+    g_free(xfit);
+    g_free(yfit);
+
+    //this is useless, just to test it
+    process_point(args->lawn, args->nsegments, gwy_lawn_get_segments(args->lawn, col, row, NULL),
+                  col, row, params, &amplitude, &phase);
+
+    //printf("result at %d %d : %g %g\n", col, row, amplitude, phase);
+
+    g_free(fitparams);
+}
+
+static void
+execute(ModuleArgs *args, GtkWindow *window)
+{
+    GwyParams *params = args->params;
+    gdouble amplitude, phase;
+    gdouble *adata, *pdata, *mdata;
+    gint xres = gwy_lawn_get_xres(args->lawn), yres = gwy_lawn_get_yres(args->lawn);
+    gint quantity = gwy_params_get_int(params, PARAM_QUANTITY);
+    gint k, col, row;
+    gboolean fitok;
+
+    adata = gwy_data_field_get_data(args->amplitude);
+    pdata = gwy_data_field_get_data(args->phase);
+    mdata = gwy_data_field_get_data(args->mask);
+
+    gwy_app_wait_start(window, _("Fitting..."));
+
+    gwy_data_field_fill(args->mask, 1);
+    for (k = 0; k < xres*yres; k++) {
+        if (!gwy_app_wait_set_fraction((gdouble)k/(xres*yres)))
+            break;
+
+        col = k % xres;
+        row = k/xres;
+
+        fitok = process_point(args->lawn, args->nsegments, gwy_lawn_get_segments(args->lawn, col, row, NULL),
+                              col, row, params, &amplitude, &phase);
+        //printf("result at %d %d : %g %g\n", col, row, amplitude, phase);
+        adata[k] = amplitude;
+        pdata[k] = phase;
+        mdata[k] = !fitok;
+    }
+    gwy_data_field_data_changed(args->amplitude);
+    gwy_data_field_data_changed(args->phase);
+    gwy_data_field_data_changed(args->mask);
+
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_z(args->amplitude), gwy_lawn_get_si_unit_curve(args->lawn, quantity));
+
+    gwy_app_wait_finish();
+
+    if (gwy_data_field_get_max(args->mask) > 0.0) {
+        gwy_data_field_laplace_solve(args->amplitude, args->mask, -1, 1.0);
+        gwy_data_field_laplace_solve(args->phase, args->mask, -1, 1.0);
+    }
+}
+
+static void
+extract_one_curve(GwyLawn *lawn, GwyGraphCurveModel *gcmodel,
+                  gint col, gint row,
+                  GwyParams *params)
+{
+    gint carrier = gwy_params_get_int(params, PARAM_CARRIER);
+    gint quantity = gwy_params_get_int(params, PARAM_QUANTITY);
+    gint show = gwy_params_get_enum(params, PARAM_SHOW);
+    const gdouble *ydata;
+    gdouble *xdata;
+    gint i, ndata;
+
+    if (show == SHOW_CARRIER)
+        ydata = gwy_lawn_get_curve_data_const(lawn, col, row, carrier, &ndata);
+    else
+        ydata = gwy_lawn_get_curve_data_const(lawn, col, row, quantity, &ndata);
+
+    xdata = g_new(gdouble, ndata);
+    for (i = 0; i < ndata; i++)
+           xdata[i] = i;
+
+    gwy_graph_curve_model_set_data(gcmodel, xdata, ydata, ndata);
+    g_free(xdata);
+}
+
+
+//subtract means that the data will be changed, which is good for final operation
+//fitparams are used to get the fit results and plot it with original data, which is good for GUI
+static void
+do_polylevel(const gdouble *xdata, const gdouble *ydata, gint ndata,
+             gdouble **nxdata, gdouble **nydata, gint *nndata,
+             const gint *segments,
+             gint segment, gboolean segment_enabled,
+             gdouble from, gdouble to,
+             gint degree, gboolean subtract, gdouble *fitparams)
+{
+    gint i, j, n;
+    gdouble startval, endval, xmin, xmax, ymin, ymax;
+    gdouble *xf, *yf;
+    gdouble *param, x;
+    gint segment_from, segment_to;
+
+    param = g_new(gdouble, 6);
+
+    //get the total range and fit range
+    xmin = G_MAXDOUBLE;
+    xmax = -G_MAXDOUBLE;
+    ymin = G_MAXDOUBLE;
+    ymax = -G_MAXDOUBLE;
+    for (i = 0; i < ndata; i++) {
+       if (xdata[i] < xmin)
+           xmin = xdata[i];
+       if (xdata[i] > xmax)
+           xmax = xdata[i];
+       if (ydata[i] < ymin)
+           ymin = ydata[i];
+       if (ydata[i] > ymax)
+           ymax = ydata[i];
+    }
+    startval = xmin + from*(xmax-xmin);
+    endval = xmin + to*(xmax-xmin);
+
+    if (segment_enabled) {
+        segment_from = segments[2*segment];
+        segment_to = segments[2*segment + 1];
+    } else {
+        segment_from = 0;
+        segment_to = G_MAXINT;
+    }
+
+    //determine number of points to fit
+    n = 0;
+    for (i = 0; i < ndata; i++) {
+        if (xdata[i] >= startval && xdata[i] < endval && i >= segment_from && i < segment_to)
+            n++;
+    }
+
+    //fill the data to fit
+    xf = g_new(gdouble, n);
+    yf = g_new(gdouble, n);
+    j = 0;
+    for (i = 0; i < ndata; i++) {
+        if (xdata[i] >= startval && xdata[i] < endval && i >= segment_from && i < segment_to) {
+            xf[j] = xdata[i];
+            yf[j] = ydata[i];
+            j++;
+        }
+    }
+
+    param[0] = (ymin + ymax)/2.0;
+    for (i = 1; i < 6; i++) {
+        param[i] = 0;
+    }
+    param = gwy_math_fit_polynom(n, xf, yf, degree, param);
+
+    *nxdata = g_new(gdouble, n);
+    *nydata = g_new(gdouble, n);
+    j = 0;
+    for (i = 0; i < ndata; i++) {
+        if (xdata[i] >= startval && xdata[i] < endval && i >= segment_from && i < segment_to) {
+            (*nxdata)[j] = xdata[i];
+            j++;
+        }
+    }
+    *nndata = n;
+
+    if (subtract) {
+        j = 0;
+        for (i = 0; i < ndata; i++) {
+            if (xdata[i] >= startval && xdata[i] < endval && i >= segment_from && i < segment_to) {
+                x = xdata[i];
+                (*nydata)[j] = ydata[i] - (param[0] + param[1]*x + param[2]*x*x + param[3]*x*x*x
+                             + param[4]*x*x*x*x + param[5]*x*x*x*x*x);
+                j++;
+            }
+        }
+    }
+
+    if (fitparams)
+        gwy_assign(fitparams, param, 6);
+
+    g_free(param);
+
+    g_free(xf);
+    g_free(yf);
+}
+
+static gdouble
+func_sine(gdouble x,
+          G_GNUC_UNUSED gint n_param,
+          const gdouble *param,
+          G_GNUC_UNUSED gpointer user_data,
+          gboolean *fres)
+{
+    *fres = TRUE;
+    return param[0]*sin(param[1]*x+param[2])+param[3];
+}
+
+static gdouble
+guess(gdouble *y, gint n, gdouble *amplitude, gdouble *phase, gdouble *offset)
+{
+    gint i;
+    gdouble period;
+    gdouble min, max, avg;
+    gint nup, ndown;
+
+    min = G_MAXDOUBLE;
+    max = -G_MAXDOUBLE;
+    avg = 0;
+    for (i = 0; i < n; i++) {
+        if (y[i] < min)
+            min = y[i];
+        if (y[i] > max)
+            max = y[i];
+        avg += y[i];
+    }
+    *amplitude = (max - min)/2;
+    avg /= n;
+
+    nup = ndown = 0;
+    for (i = 1; i < n; i++) {
+        if (y[i-1] < avg && y[i] >= avg)
+            nup++;
+        if (y[i-1] >= avg && y[i] < avg)
+            ndown++;
+    }
+    period = n/((nup + ndown)/2.0);
+    //printf("min/max %g %g avg %g  amplitude %g  nus %d %d period %g\n", min, max, avg,
+    //*amplitude, nup, ndown, period);
+
+    *offset = avg;
+    *phase = 0; //we can't guess it now
+
+    return 1.0/period;
+}
+
+static gboolean
+process_point(GwyLawn *lawn, gint nsegments, const gint *segments, gint col, gint row,
+              GwyParams *params, gdouble *amplitude, gdouble *phase)
+{
+    gint i, ndata, nndata;
+    gdouble from = gwy_params_get_double(params, PARAM_RANGE_FROM);
+    gdouble to = gwy_params_get_double(params, PARAM_RANGE_TO);
+    gint degree = gwy_params_get_int(params, PARAM_ORDER);
+    gint carrier = gwy_params_get_int(params, PARAM_CARRIER);
+    gint quantity = gwy_params_get_int(params, PARAM_QUANTITY);
+    gboolean segment_enabled = nsegments ? gwy_params_get_boolean(params, PARAM_ENABLE_SEGMENT) : FALSE;
+    gint segment = segment_enabled ? gwy_params_get_int(params, PARAM_SEGMENT) : -1;
+    gdouble *xdata, *xcl = NULL, *xql = NULL, *ycl = NULL, *yql = NULL;
+    gdouble frequency, guess_amplitude, guess_phase, offset;
+    const gdouble *yc = gwy_lawn_get_curve_data_const(lawn, col, row, carrier, &ndata);
+    const gdouble *yq = gwy_lawn_get_curve_data_const(lawn, col, row, quantity, &ndata);
+    GwyNLFitter *fitter;
+    gdouble param[4], carrier_phase;
+    gboolean fix[4], fitok;
+
+    //printf("processing point %d %d\n", col, row);
+
+    xdata = g_new(gdouble, ndata);
+    for (i = 0; i < ndata; i++)
+           xdata[i] = i;
+
+    do_polylevel(xdata, yc, ndata, &xcl, &ycl, &nndata, segments, segment, segment_enabled,
+                 from, to, degree, TRUE, NULL);
+    do_polylevel(xdata, yq, ndata, &xql, &yql, &nndata, segments, segment, segment_enabled,
+                 from, to, degree, TRUE, NULL);
+
+    //printf("\n\n");
+    //for (i=0; i<ndata; i++) printf("%d %g %g\n", i, ycl[i], yql[i]);
+
+    frequency = guess(ycl, nndata, &guess_amplitude, &guess_phase, &offset);
+
+    //TODO: move it outside of the loop
+    fitter = gwy_math_nlfit_new((GwyNLFitFunc)func_sine, gwy_math_nlfit_diff);
+
+    fix[0] = 0;
+    fix[1] = 0;
+    fix[2] = 0;
+    fix[3] = 0;
+
+    param[0] = guess_amplitude;
+    param[1] = frequency;
+    param[2] = 0; //phase
+    param[3] = offset; //offset
+
+    //printf("fit init: amplitude %g  freq %g  phase %g  offset %g\n", param[0], param[1], param[2], param[3]);
+
+    gwy_math_nlfit_fit_full(fitter, nndata, xcl, ycl, NULL, 4, param, fix, NULL, NULL);
+    fitok = gwy_math_nlfit_succeeded(fitter);
+
+    //printf("fit C results: amplitude %g  freq %g  phase %g  offset %g\n", param[0], param[1], param[2], param[3]);
+
+    if (fitok) {
+        guess(yql, nndata, &guess_amplitude, &guess_phase, &offset);
+
+        carrier_phase = param[2];
+        fix[1] = 1; //fix the frequency now
+        param[0] = guess_amplitude;
+        param[3] = offset; //offset
+
+        gwy_math_nlfit_fit_full(fitter, nndata, xql, yql, NULL, 4, param, fix, NULL, NULL);
+        fitok = gwy_math_nlfit_succeeded(fitter);
+
+        //printf("fit Q results: amplitude %g  freq %g  phase %g  offset %g\n", param[0], param[1], param[2], param[3]);
+
+         *amplitude = param[0];
+         *phase = param[2] - carrier_phase;
+    } else {
+        *amplitude = 0;
+        *phase = 0;
+    }
+
+    g_free(xcl);
+    g_free(xql);
+    g_free(ycl);
+    g_free(yql);
+    g_free(xdata);
+    gwy_math_nlfit_free(fitter);
+
+    return fitok;
+}
+
+static void
+update_graph_model_props(GwyGraphModel *gmodel, ModuleArgs *args)
+{
+    GwyLawn *lawn = args->lawn;
+    GwyParams *params = args->params;
+    gint carrier = gwy_params_get_int(params, PARAM_CARRIER);
+    gint quantity = gwy_params_get_int(params, PARAM_QUANTITY);
+    gint show = gwy_params_get_enum(params, PARAM_SHOW);
+    GwySIUnit *yunit;
+    const gchar *ylabel;
+
+    if (show == SHOW_CARRIER) {
+       yunit = gwy_lawn_get_si_unit_curve(lawn, carrier);
+       ylabel = gwy_lawn_get_curve_label(lawn, carrier);
+    } else {
+       yunit = gwy_lawn_get_si_unit_curve(lawn, quantity);
+       ylabel = gwy_lawn_get_curve_label(lawn, quantity);
+    }
+
+    g_object_set(gmodel,
+                 "si-unit-y", yunit,
+                 "axis-label-bottom", _("sample"),
+                 "axis-label-left", ylabel ? ylabel : _("Untitled"),
+                 NULL);
+}
+
+static void
+sanitise_one_param(GwyParams *params, gint id, gint min, gint max, gint defval)
+{
+    gint v;
+
+    v = gwy_params_get_int(params, id);
+    if (v >= min && v <= max) {
+        gwy_debug("param #%d is %d, i.e. within range [%d..%d]", id, v, min, max);
+        return;
+    }
+    gwy_debug("param #%d is %d, setting it to the default %d", id, v, defval);
+    gwy_params_set_int(params, id, defval);
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    GwyLawn *lawn = args->lawn;
+
+    sanitise_one_param(params, PARAM_XPOS, 0, gwy_lawn_get_xres(lawn)-1, gwy_lawn_get_xres(lawn)/2);
+    sanitise_one_param(params, PARAM_YPOS, 0, gwy_lawn_get_yres(lawn)-1, gwy_lawn_get_yres(lawn)/2);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

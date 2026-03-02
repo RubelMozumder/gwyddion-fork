@@ -1,0 +1,1311 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2016-2023 David Necas (Yeti).
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-nano-measuring-machine-spm">
+ *   <comment>Nano Measuring Machine data header</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="------------------------------------------"/>
+ *     <match type="string" offset="44" value="Scan procedure description file"/>
+ *   </magic>
+ *   <glob pattern="*.dsc"/>
+ *   <glob pattern="*.DSC"/>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-FILEMAGIC]
+ * # Nano Measuring Machine profiles header
+ * # Usually accompanied with unidentifiable data files.
+ * 0 string ------------------------------------------
+ * >44 string Scan\ procedure\ description\ file Nano Measuring Machine data header
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Nano Measuring Machine profile data
+ * .dsc + .dat
+ * Read[1]
+ * [1] XYZ data are interpolated to a regular grid upon import.
+ **/
+
+#include <stdlib.h>
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <libprocess/datafield.h>
+#include <libgwydgets/gwydgetutils.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils-file.h>
+
+#include "get.h"
+#include "err.h"
+
+#define EXTENSION ".dsc"
+#define DASHED_LINE "------------------------------------------"
+
+enum {
+    RESPONSE_ESTIMATE  = 105,
+};
+
+enum {
+    PARAM_XRES,
+    PARAM_YRES,
+    PARAM_PLOT_DENSITY,
+    PARAM_ALIGN_SCANLINES,
+    PARAM_XYMEASUREEQ,
+    PARAM_USE_XRES,
+    PARAM_XYRES_MODE,
+    PARAM_PHYSICALLY_SQUARE,
+    PARAM_DO_FILTER,
+    PARAM_ERROR_CHANNEL,
+    PARAM_ERROR_CHANNEL_ID,
+
+    INFO_NFILES,
+    INFO_NPOINTS,
+    INFO_POINTS_PER_PROFILE,
+    BUTTON_AUTO,
+
+    /* This has go last, even after labels, because it is the beginning of a potentially infinite block. */
+    PARAM_INCLUDE_CHANNEL0,
+};
+
+typedef enum {
+    NMM_XYMODE_NONSQUARE = 0,
+    NMM_XYMODE_USE_XRES = 1,
+    NMM_XYMODE_USE_YRES = 2,
+} NMMXYZMode;
+
+/* We need the array size represented as gsize; otherwise we could use GArray. Also inlining the code makes reading
+ * the huge data a bit faster. */
+typedef struct {
+    gdouble *data;
+    gsize len;
+    gsize size;
+} GwyDoubleArray;
+
+typedef struct {
+    guint id;
+    guint npts;
+    gchar *date;
+    gchar *short_name;
+    gchar *long_name;
+    gchar *settings_id;
+} NMMXYZProfileDesc;
+
+typedef struct {
+    const gchar *filename;
+    gsize nfiles;
+    gsize blocksize;
+    gsize ndata;
+    gdouble xmin;
+    gdouble xmax;
+    gdouble ymin;
+    gdouble ymax;
+} NMMXYZInfo;
+
+typedef struct {
+    GwyParams *params;
+    NMMXYZInfo *info;
+    GArray *dscs;
+    /* Cached. */
+    guint nincluded;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GwyParams *params;
+    GtkWidget *dialog;
+    GwyParamTable *table_options;
+    GwyParamTable *table_channels;
+} ModuleGUI;
+
+static gboolean         module_register             (void);
+static gint             nmmxyz_detect               (const GwyFileDetectInfo *fileinfo,
+                                                     gboolean only_name);
+static GwyContainer*    nmmxyz_load                 (const gchar *filename,
+                                                     GwyRunType mode,
+                                                     GError **error);
+static GwyDialogOutcome run_gui                     (ModuleArgs *args);
+static void             param_changed               (ModuleGUI *gui,
+                                                     gint id);
+static void             dialog_response             (ModuleGUI *gui,
+                                                     gint response);
+static gboolean         gather_data_files           (const gchar *filename,
+                                                     ModuleArgs *args,
+                                                     GwyDoubleArray *data,
+                                                     GError **error);
+static GwyXYZ*          create_points_with_xy       (GwyDoubleArray *data,
+                                                     guint nincluded);
+static void             rotate_points_xy            (GwyXYZ *points,
+                                                     guint ndata,
+                                                     gdouble angle);
+static void             create_data_field           (GwyContainer *container,
+                                                     GwyContainer *meta,
+                                                     ModuleArgs *args,
+                                                     GwyDoubleArray *data,
+                                                     GwyXYZ *points,
+                                                     guint i,
+                                                     gboolean null_offsets,
+                                                     gboolean plot_density);
+static void             find_data_range             (const GwyXYZ *points,
+                                                     NMMXYZInfo *info);
+static gint             read_data_file              (GwyDoubleArray *data,
+                                                     const gchar *filename,
+                                                     ModuleArgs *args,
+                                                     gint err_channel);
+static gboolean         profile_descriptions_match  (GArray *descs1,
+                                                     GArray *descs2);
+static void             read_profile_description    (const gchar *filename,
+                                                     GArray *dscs);
+static void             free_profile_descriptions   (GArray *dscs,
+                                                     gboolean free_array);
+static void             copy_profile_descriptions   (GArray *source,
+                                                     GArray *dest);
+static GwyContainer*    parse_dsc_file              (const gchar *filename);
+static GwyDoubleArray*  gwy_double_array_new        (gsize prealloc);
+static void             gwy_double_array_ensure_size(GwyDoubleArray *array,
+                                                     gsize n);
+static void             gwy_double_array_append     (GwyDoubleArray *array,
+                                                     const gdouble *values,
+                                                     gsize n);
+static gdouble*         gwy_double_array_free       (GwyDoubleArray *array,
+                                                     gboolean free_data);
+static void             update_nincluded            (ModuleArgs *args);
+static void             filter_using_error_channel  (GwyDoubleArray *data,
+                                                     gsize prevndata,
+                                                     guint nincluded,
+                                                     guint err_channel_index);
+static gchar*           sanitise_channel_id         (const gchar *s);
+static void             sanitise_params             (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports Nano Measuring Machine profile files."),
+    "Yeti <yeti@gwyddion.net>",
+    "2.1",
+    "David Nečas (Yeti)",
+    "2016",
+};
+
+GWY_MODULE_QUERY2(module_info, nmmxyz)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("nmmxyz",
+                           N_("Nano Measuring Machine files (*.dsc)"),
+                           (GwyFileDetectFunc)&nmmxyz_detect,
+                           (GwyFileLoadFunc)&nmmxyz_load,
+                           NULL,
+                           NULL);
+    return TRUE;
+}
+
+/* NB: Unlike almost all other modules, we use a dynamic file-dependent paramdef here and the caller must free it
+ * when done with it. */
+static GwyParamDef*
+define_module_params(GArray *dscs)
+{
+    static const GwyEnum xymodes[] = {
+        { N_("Non-square pixels"),   NMM_XYMODE_NONSQUARE, },
+        { N_("Specify X resolution"), NMM_XYMODE_USE_XRES,  },
+        { N_("Specify Y resolution"), NMM_XYMODE_USE_YRES,  },
+    };
+    GwyEnum *channels;
+    GwyParamDef *paramdef;
+    GString *str;
+    guint i, pfxlen;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_file_func_current());
+    gwy_param_def_add_int(paramdef, PARAM_XRES, "xres", _("_Horizontal size"), 2, 32768, 1200);
+    gwy_param_def_add_int(paramdef, PARAM_YRES, "yres", _("_Vertical size"), 2, 32768, 1200);
+    gwy_param_def_add_boolean(paramdef, PARAM_PLOT_DENSITY, "plot_density", _("Plot point density map"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_ALIGN_SCANLINES, "align_scanlines", _("Align scan lines with X axis"),
+                              TRUE);
+    gwy_param_def_add_boolean(paramdef, PARAM_XYMEASUREEQ, "xymeasureeq", _("Identical _measures"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_USE_XRES, "use_xres", NULL, TRUE);
+    /* We do not store this one, we store "xymeasureeq" and "use_xres" for backward compatibility. But we present
+     * this one to the user. */
+    gwy_param_def_add_gwyenum(paramdef, PARAM_XYRES_MODE, NULL, _("Pixel resolution mode"),
+                              xymodes, G_N_ELEMENTS(xymodes), NMM_XYMODE_NONSQUARE);
+    gwy_param_def_add_boolean(paramdef, PARAM_PHYSICALLY_SQUARE, "physically_square",
+                              _("_Display with physical aspect ratio"), TRUE);
+    gwy_param_def_add_boolean(paramdef, PARAM_DO_FILTER, "do_filter", _("_Filter out data using error channel"), FALSE);
+    /* We store the error channel as a string, but present in the GUI as an enum combo (defined at the end). Az0 is
+     * the usual channel in our data. No idea what other people might have. */
+    gwy_param_def_add_string(paramdef, PARAM_ERROR_CHANNEL, "error_channel", _("_Error channel"),
+                             GWY_PARAM_STRING_NULL_IS_EMPTY, NULL, "Az0");
+
+    channels = g_new(GwyEnum, dscs->len);
+    str = g_string_new("include_channel/");
+    pfxlen = str->len;
+    for (i = 0; i < dscs->len; i++) {
+        NMMXYZProfileDesc *dsc = &g_array_index(dscs, NMMXYZProfileDesc, i);
+
+        dsc->settings_id = sanitise_channel_id(dsc->short_name);
+        g_string_truncate(str, pfxlen);
+        g_string_append(str, dsc->settings_id);
+        g_free(dsc->settings_id);
+        /* Cannot free it here. GwyParamDef treats is as static. */
+        dsc->settings_id = g_strdup(str->str);
+        gwy_param_def_add_boolean(paramdef, PARAM_INCLUDE_CHANNEL0 + i, dsc->settings_id, dsc->long_name, i < 2);
+        channels[i].name = dsc->long_name;
+        channels[i].value = i;
+    }
+    g_string_free(str, TRUE);
+
+    gwy_param_def_add_gwyenum(paramdef, PARAM_ERROR_CHANNEL_ID, NULL, _("_Error channel"),
+                              channels, dscs->len, 2);
+    g_object_set_data(G_OBJECT(paramdef), "channel-enum", channels);
+
+    return paramdef;
+}
+
+static gint
+nmmxyz_detect(const GwyFileDetectInfo *fileinfo, gboolean only_name)
+{
+    gint score = 0;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 15 : 0;
+
+    if (g_str_has_prefix(fileinfo->head, DASHED_LINE)
+        && strstr(fileinfo->head, "Scan procedure description file"))
+        score = 80;
+
+    return score;
+}
+
+static GwyContainer*
+nmmxyz_load(const gchar *filename, GwyRunType mode, GError **error)
+{
+    const NMMXYZProfileDesc *dsc;
+    NMMXYZInfo info;
+    ModuleArgs args;
+    GwyParams *params;
+    GwyContainer *container = NULL, *meta = NULL;
+    GwyDialogOutcome outcome;
+    GwyParamDef *pardef = NULL;
+    GwyDoubleArray *data = NULL;
+    GArray *dscs = NULL;
+    GwyXYZ *points = NULL;
+    gboolean align_scanlines, plot_density, waiting = FALSE;
+    gint err_channel;
+    gdouble f, angle = 0.5*G_PI;
+    const guchar *s;
+    guint i, ntodo, skip_err_channel = G_MAXUINT;
+
+    /* In principle we can load data non-interactively, but it is going to take several minutes which is not good for
+     * previews... */
+    if (mode != GWY_RUN_INTERACTIVE) {
+        g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_INTERACTIVE,
+                    _("Nano Measuring Machine data import must be run as interactive."));
+        return NULL;
+    }
+    gwy_clear(&args, 1);
+    gwy_clear(&info, 1);
+
+    meta = parse_dsc_file(filename);
+    info.filename = filename;
+    args.info = &info;
+    args.dscs = dscs = g_array_new(FALSE, FALSE, sizeof(NMMXYZProfileDesc));
+    if (!gather_data_files(filename, &args, NULL, error))
+        goto fail;
+
+    gwy_debug("ndata from DSC files %lu", info.ndata);
+    if (!info.ndata) {
+        err_NO_DATA(error);
+        goto fail;
+    }
+
+    if (info.blocksize < 3) {
+        err_NO_DATA(error);
+        goto fail;
+    }
+
+    dsc = &g_array_index(dscs, NMMXYZProfileDesc, 0);
+    if (!gwy_strequal(dsc->short_name, "Lx"))
+        g_warning("First channel is not Lx.");
+
+    dsc = &g_array_index(dscs, NMMXYZProfileDesc, 1);
+    if (!gwy_strequal(dsc->short_name, "Ly"))
+        g_warning("Second channel is not Ly.");
+
+    pardef = define_module_params(dscs);
+    args.params = params = gwy_params_new_from_settings(pardef);
+    sanitise_params(&args);
+    update_nincluded(&args);
+
+    outcome = run_gui(&args);
+    gwy_params_save_to_settings(params);
+    if (outcome != GWY_DIALOG_PROCEED) {
+        err_CANCELLED(error);
+        goto fail;
+    }
+
+    /* Sneakily add the error channel to enabled channels – after saving setting. */
+    if (gwy_params_get_boolean(params, PARAM_DO_FILTER)) {
+        err_channel = gwy_params_get_int(params, PARAM_ERROR_CHANNEL_ID);
+        if (!gwy_params_get_boolean(params, PARAM_INCLUDE_CHANNEL0 + err_channel)) {
+            gwy_params_set_boolean(params, PARAM_INCLUDE_CHANNEL0 + err_channel, TRUE);
+            skip_err_channel = err_channel;
+            update_nincluded(&args);
+        }
+    }
+
+    waiting = TRUE;
+    gwy_app_wait_start(NULL, _("Reading files..."));
+
+    free_profile_descriptions(dscs, FALSE);
+    data = gwy_double_array_new(info.ndata*args.nincluded);
+    if (!gather_data_files(filename, &args, data, error))
+        goto fail;
+
+    if (!gwy_app_wait_set_message(_("Rendering surface..."))) {
+        err_CANCELLED(error);
+        goto fail;
+    }
+
+    points = create_points_with_xy(data, args.nincluded);
+    if (!gwy_app_wait_set_fraction(1.0/args.nincluded)) {
+        err_CANCELLED(error);
+        goto fail;
+    }
+
+    s = NULL;
+    align_scanlines = gwy_params_get_boolean(params, PARAM_ALIGN_SCANLINES);
+    if (align_scanlines && meta && gwy_container_gis_string_by_name(meta, "Scan field::Scan angle", &s)) {
+        /* The value should be in radians. */
+        angle = g_ascii_strtod(s, NULL);
+    }
+    rotate_points_xy(points, info.ndata, -0.5*G_PI + angle);
+
+    find_data_range(points, &info);
+    if (!gwy_app_wait_set_fraction(2.0/args.nincluded)) {
+        err_CANCELLED(error);
+        goto fail;
+    }
+
+    plot_density = gwy_params_get_boolean(params, PARAM_PLOT_DENSITY);
+    container = gwy_container_new();
+    ntodo = args.nincluded-2;
+    for (i = 2; i < info.blocksize; i++) {
+        if (gwy_params_get_boolean(params, PARAM_INCLUDE_CHANNEL0 + i) && i != skip_err_channel) {
+            create_data_field(container, meta, &args, data, points, i, align_scanlines, plot_density && ntodo == 1);
+            ntodo--;
+            f = 1.0 - (gdouble)ntodo/args.nincluded;
+            f = CLAMP(f, 0.0, 1.0);
+            if (!gwy_app_wait_set_fraction(f)) {
+                GWY_OBJECT_UNREF(container);
+                err_CANCELLED(error);
+                goto fail;
+            }
+        }
+    }
+
+fail:
+    if (waiting)
+        gwy_app_wait_finish();
+
+    if (pardef) {
+        g_free(g_object_get_data(G_OBJECT(pardef), "channel-enum"));
+        g_object_unref(pardef);
+    }
+    GWY_OBJECT_UNREF(meta);
+    g_free(points);
+    free_profile_descriptions(dscs, TRUE);
+    if (data)
+        gwy_double_array_free(data, TRUE);
+
+    return container;
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args)
+{
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    GtkWidget *hbox;
+    ModuleGUI gui;
+    guint i;
+    GString *str;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+
+    gui.dialog = gwy_dialog_new(_("Import NMM Profile Set"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(24);
+    gwy_dialog_add_content(dialog, hbox, TRUE, TRUE, 0);
+
+    table = gui.table_options = gwy_param_table_new(args->params);
+    gwy_param_table_append_header(table, -1, _("Information"));
+    str = g_string_new(NULL);
+    gwy_param_table_append_info(table, INFO_NFILES, _("Number of data files"));
+    g_string_printf(str, "%" G_GSIZE_FORMAT, args->info->nfiles);
+    gwy_param_table_info_set_valuestr(table, INFO_NFILES, str->str);
+    gwy_param_table_append_info(table, INFO_NPOINTS, _("Total number of points"));
+    g_string_printf(str, "%" G_GSIZE_FORMAT, args->info->ndata);
+    gwy_param_table_info_set_valuestr(table, INFO_NPOINTS, str->str);
+    gwy_param_table_append_info(table, INFO_POINTS_PER_PROFILE, _("Points per profile"));
+    g_string_printf(str, "%" G_GSIZE_FORMAT, args->info->ndata/args->info->nfiles);
+    gwy_param_table_info_set_valuestr(table, INFO_POINTS_PER_PROFILE, str->str);
+    g_string_free(str, TRUE);
+
+    gwy_param_table_append_header(table, -1, _("Resolution"));
+    gwy_param_table_append_radio(table, PARAM_XYRES_MODE);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_slider(table, PARAM_XRES);
+    gwy_param_table_set_unitstr(table, PARAM_XRES, _("px"));
+    gwy_param_table_slider_set_mapping(table, PARAM_XRES, GWY_SCALE_MAPPING_LOG);
+    gwy_param_table_append_slider(table, PARAM_YRES);
+    gwy_param_table_set_unitstr(table, PARAM_YRES, _("px"));
+    gwy_param_table_slider_set_mapping(table, PARAM_YRES, GWY_SCALE_MAPPING_LOG);
+    gwy_param_table_append_button(table, BUTTON_AUTO, -1, RESPONSE_ESTIMATE, _("_Auto"));
+
+    gwy_param_table_append_header(table, -1, _("Options"));
+    gwy_param_table_append_checkbox(table, PARAM_PLOT_DENSITY);
+    gwy_param_table_append_checkbox(table, PARAM_ALIGN_SCANLINES);
+    gwy_param_table_append_checkbox(table, PARAM_PHYSICALLY_SQUARE);
+
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_channels = gwy_param_table_new(args->params);
+    gwy_param_table_append_header(table, -1, _("Imported Channels"));
+    for (i = 2; i < args->info->blocksize; i++)
+        gwy_param_table_append_checkbox(table, PARAM_INCLUDE_CHANNEL0 + i);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_checkbox(table, PARAM_DO_FILTER);
+    gwy_param_table_append_combo(table, PARAM_ERROR_CHANNEL_ID);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    g_signal_connect_swapped(gui.table_options, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_channels, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(dialog, "response", G_CALLBACK(dialog_response), &gui);
+
+    return gwy_dialog_run(dialog);
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    NMMXYZMode mode = gwy_params_get_enum(params, PARAM_XYRES_MODE);
+
+    if (id < 0 || id >= PARAM_INCLUDE_CHANNEL0) {
+        update_nincluded(args);
+        /* XXX: We might want to just plot the density but this is not implemented by the regularisation function.  So
+         * require an actual channel to be selected. */
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, args->nincluded > 2);
+    }
+    if (mode == NMM_XYMODE_NONSQUARE) {
+        if (id == PARAM_XRES)
+            gwy_params_set_boolean(params, PARAM_USE_XRES, TRUE);
+        if (id == PARAM_YRES)
+            gwy_params_set_boolean(params, PARAM_USE_XRES, FALSE);
+    }
+    if (id < 0 || id == PARAM_XYRES_MODE) {
+        if (mode == NMM_XYMODE_NONSQUARE)
+            gwy_params_set_boolean(params, PARAM_XYMEASUREEQ, FALSE);
+        else {
+            gwy_params_set_boolean(params, PARAM_XYMEASUREEQ, TRUE);
+            gwy_params_set_boolean(params, PARAM_USE_XRES, mode == NMM_XYMODE_USE_XRES);
+        }
+        gwy_param_table_set_sensitive(gui->table_options, PARAM_XRES,
+                                      mode == NMM_XYMODE_NONSQUARE || mode == NMM_XYMODE_USE_XRES);
+        gwy_param_table_set_sensitive(gui->table_options, PARAM_YRES,
+                                      mode == NMM_XYMODE_NONSQUARE || mode == NMM_XYMODE_USE_YRES);
+    }
+    if (id < 0 || id == PARAM_DO_FILTER) {
+        gwy_param_table_set_sensitive(gui->table_channels, PARAM_ERROR_CHANNEL_ID,
+                                      gwy_params_get_boolean(params, PARAM_DO_FILTER));
+    }
+    if (id < 0 || id == PARAM_ERROR_CHANNEL_ID) {
+        gint i = gwy_params_get_int(params, PARAM_ERROR_CHANNEL_ID);
+        gwy_params_set_string(params, PARAM_ERROR_CHANNEL, g_array_index(args->dscs, NMMXYZProfileDesc, i).long_name);
+    }
+    /* NB: We cannot update the other pixel resolution because we do not know the real ranges yet. We need to
+     * read all the data first. */
+}
+
+static void
+dialog_response(ModuleGUI *gui, gint response)
+{
+    /* FIXME: This really only makes sense when ALIGN_SCANLINES is enabled. */
+    if (response == RESPONSE_ESTIMATE) {
+        ModuleArgs *args = gui->args;
+        NMMXYZMode mode = gwy_params_get_enum(args->params, PARAM_XYRES_MODE);
+        gsize n = args->info->ndata/args->info->nfiles;
+
+        if (mode == NMM_XYMODE_USE_YRES || mode == NMM_XYMODE_NONSQUARE)
+            gwy_param_table_set_int(gui->table_options, PARAM_YRES, args->info->nfiles);
+        if (mode == NMM_XYMODE_USE_XRES || mode == NMM_XYMODE_NONSQUARE) {
+            while (n > 1200 && n/11 > args->info->nfiles)
+                n /= 10;
+            gwy_param_table_set_int(gui->table_options, PARAM_XRES, n);
+        }
+    }
+}
+
+static GwyXYZ*
+create_points_with_xy(GwyDoubleArray *data, guint nincluded)
+{
+    GwyXYZ *points;
+    const gdouble *d;
+    gsize i, npts;
+
+    gwy_debug("data->len %u, included block size %u", (guint)data->len, nincluded);
+    d = data->data;
+    npts = data->len/nincluded;
+    points = g_new(GwyXYZ, npts);
+    gwy_debug("creating %lu XYZ points", npts);
+    for (i = 0; i < npts; i++) {
+        points[i].x = d[0];
+        points[i].y = d[1];
+        d += nincluded;
+    }
+
+    return points;
+}
+
+static void
+find_data_range(const GwyXYZ *points, NMMXYZInfo *info)
+{
+    gdouble xmin = G_MAXDOUBLE;
+    gdouble ymin = G_MAXDOUBLE;
+    gdouble xmax = -G_MAXDOUBLE;
+    gdouble ymax = -G_MAXDOUBLE;
+    guint i;
+
+    gwy_debug("finding the XY range from %lu records", info->ndata);
+    for (i = 0; i < info->ndata; i++) {
+        const gdouble x = points[i].x, y = points[i].y;
+        if (x < xmin)
+            xmin = x;
+        if (x > xmax)
+            xmax = x;
+        if (y < ymin)
+            ymin = y;
+        if (y > ymax)
+            ymax = y;
+    }
+
+    info->xmin = xmin;
+    info->xmax = xmax;
+    info->ymin = ymin;
+    info->ymax = ymax;
+    gwy_debug("full data range [%g,%g]x[%g,%g]", xmin, xmax, ymin, ymax);
+}
+
+static void
+rotate_points_xy(GwyXYZ *points, guint ndata, gdouble angle)
+{
+    gdouble ca, sa, x, y;
+    guint i;
+
+    if (!angle)
+        return;
+
+    ca = cos(angle);
+    sa = sin(angle);
+    for (i = 0; i < ndata; i++) {
+        x = ca*points[i].x - sa*points[i].y;
+        y = sa*points[i].x + ca*points[i].y;
+        points[i].x = x;
+        points[i].y = y;
+    }
+}
+
+static void
+create_data_field(GwyContainer *container,
+                  GwyContainer *meta,
+                  ModuleArgs *args,
+                  GwyDoubleArray *data,
+                  GwyXYZ *points,
+                  guint i,
+                  gboolean null_offsets,
+                  gboolean plot_density)
+{
+    GArray *dscs = args->dscs;
+    const NMMXYZProfileDesc *dsc = &g_array_index(dscs, NMMXYZProfileDesc, i);
+    const NMMXYZInfo *info = args->info;
+    gint xres = gwy_params_get_int(args->params, PARAM_XRES);
+    gint yres = gwy_params_get_int(args->params, PARAM_YRES);
+    gboolean physically_square = gwy_params_get_boolean(args->params, PARAM_PHYSICALLY_SQUARE);
+    GwyDataField *dfield, *density_map = NULL;
+    gsize k, ndata;
+    guint nincluded;
+    gint id;
+    const gdouble *d;
+    const gchar *zunit = NULL;
+    gdouble dx, dy, q = 1.0;
+
+    if (gwy_params_get_boolean(args->params, PARAM_XYMEASUREEQ)) {
+        if (gwy_params_get_boolean(args->params, PARAM_USE_XRES)) {
+            dx = (info->xmax - info->xmin)/xres;
+            yres = (guint)ceil((info->ymax - info->ymin)/dx);
+            gwy_debug("calculated yres = %d from xres = %d (dx = %g)", yres, xres, dx);
+            yres = CLAMP(yres, 2, 32768);
+            gwy_params_set_int(args->params, PARAM_YRES, yres);
+        }
+        else {
+            dy = (info->ymax - info->ymin)/yres;
+            xres = (guint)ceil((info->xmax - info->xmin)/dy);
+            gwy_debug("calculated xres = %d from yres = %d (dy = %g)", yres, xres, dy);
+            xres = CLAMP(xres, 2, 32768);
+            gwy_params_set_int(args->params, PARAM_XRES, xres);
+        }
+    }
+    gwy_debug("regularising field #%u %s (%s)", i, dsc->short_name, dsc->long_name);
+
+    /* Extend the image vertically by half a sample in each direction.  This is mostly useful when one enters yres
+     * = nprofiles.  We only do the x-axis extension for consistency; it is usually extremely small. */
+    dx = (info->xmax - info->xmin)*info->nfiles/info->ndata;
+    dy = (info->ymax - info->ymin)/info->nfiles;
+    dfield = gwy_data_field_new(xres, yres, info->xmax - info->xmin + dx, info->ymax - info->ymin + dy, FALSE);
+
+    gwy_data_field_set_xoffset(dfield, info->xmin - 0.5*dx);
+    gwy_data_field_set_yoffset(dfield, info->ymin - 0.5*dy);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(dfield), "m");
+
+    if (plot_density)
+        density_map = gwy_data_field_new_alike(dfield, FALSE);
+
+    if (gwy_stramong(dsc->short_name, "Lz", "Az", "Az0", "Az1", "-Lz+Az", "XY vector", NULL))
+        zunit = "m";
+    else if (gwy_stramong(dsc->short_name, "Ax", NULL)) {
+        zunit = "V";
+        q = 10.0/65536.0;
+    }
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(dfield), zunit);
+
+    /* Map i (column in data fields) to index in actually read blocks (which are only nincluded).  Do it by directly
+     * moving d to the first value of the requested channel. */
+    d = data->data;
+    for (k = 0; k < i; k++) {
+        if (gwy_params_get_boolean(args->params, PARAM_INCLUDE_CHANNEL0 + k))
+            d++;
+    }
+
+    nincluded = args->nincluded;
+    ndata = info->ndata;
+    for (k = 0; k < ndata; k++) {
+        points[k].z = *d;
+        d += nincluded;
+    }
+
+    /* FIXME: This has gint ndata argument. So no matter how we handle the arrays it will fail for > 2GB points. */
+    gwy_data_field_average_xyz(dfield, density_map, points, ndata);
+    if (q != 1.0)
+        gwy_data_field_multiply(dfield, q);
+
+    /* Do it now because gwy_data_field_average_xyz() needs the shifted origin. */
+    if (null_offsets) {
+        gwy_data_field_set_xoffset(dfield, 0.0);
+        gwy_data_field_set_yoffset(dfield, 0.0);
+    }
+
+    id = i-2;
+    gwy_container_pass_object(container, gwy_app_get_data_key_for_id(id), dfield);
+
+    if (physically_square)
+        gwy_container_set_boolean(container, gwy_app_get_data_real_square_key_for_id(id), TRUE);
+
+    gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(id), dsc->long_name);
+    gwy_file_channel_import_log_add(container, id, NULL, info->filename);
+
+    if (meta) {
+        meta = gwy_container_duplicate(meta);
+        gwy_container_pass_object(container, gwy_app_get_data_meta_key_for_id(id), meta);
+    }
+
+    if (!density_map)
+        return;
+
+    id++;
+
+    gwy_container_pass_object(container, gwy_app_get_data_key_for_id(id), density_map);
+
+    gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(id), _("Point density map"));
+    gwy_file_channel_import_log_add(container, id, NULL, info->filename);
+
+    if (meta) {
+        meta = gwy_container_duplicate(meta);
+        gwy_container_pass_object(container, gwy_app_get_data_meta_key_for_id(id), meta);
+    }
+}
+
+/*
+ * Fills nfiles, blocksize and ndata fields of @info.  When @data is %NULL
+ * the number of files and data is taken from headers.
+ *
+ * If non-NULL @data array is passed the raw data are immediately loaded.
+ */
+static gboolean
+gather_data_files(const gchar *filename,
+                  ModuleArgs *args,
+                  GwyDoubleArray *data,
+                  GError **error)
+{
+    NMMXYZInfo *info = args->info;
+    GArray *dscs = args->dscs;
+    const NMMXYZProfileDesc *dsc;
+    GArray *this_dscs = NULL;
+    GDir *dir = NULL;
+    const gchar *fname;
+    gchar *dirname = NULL, *basename = NULL, *s;
+    GString *str;
+    gboolean ok = FALSE;
+    guint oldblocksize, oldnfiles;
+    gchar *filenames[2] = { NULL, NULL };
+    gboolean do_filter = data ? gwy_params_get_boolean(args->params, PARAM_DO_FILTER) : FALSE;
+    gint err_channel = do_filter ? gwy_params_get_int(args->params, PARAM_ERROR_CHANNEL_ID) : -1;
+    gint err_channel_index;
+
+    oldblocksize = info->blocksize;
+    oldnfiles = info->nfiles;
+
+    info->nfiles = 0;
+    info->ndata = 0;
+    info->blocksize = 0;
+
+    dirname = g_path_get_dirname(filename);
+    basename = g_path_get_basename(filename);
+    str = g_string_new(basename);
+    g_free(basename);
+    if ((s = strrchr(str->str, '.'))) {
+        g_string_truncate(str, s - str->str);
+        g_string_append(str, "_");
+    }
+    basename = g_strdup(str->str);
+
+    gwy_debug("scanning dir <%s> for files <%s*%s>", dirname, basename, EXTENSION);
+    dir = g_dir_open(dirname, 0, NULL);
+    if (!dir)
+        goto fail;
+
+    this_dscs = g_array_new(FALSE, FALSE, sizeof(NMMXYZProfileDesc));
+    while ((fname = g_dir_read_name(dir))) {
+        gwy_debug("candidate file %s", fname);
+        if (!g_str_has_prefix(fname, basename) || !g_str_has_suffix(fname, EXTENSION))
+            continue;
+
+        s = g_build_filename(dirname, fname, NULL);
+        free_profile_descriptions(this_dscs, FALSE);
+        read_profile_description(s, this_dscs);
+        g_free(s);
+
+        gwy_debug("found DSC file %s (%u records)", fname, this_dscs->len);
+        if (!this_dscs->len)
+            continue;
+
+        /* Use the first reasonable .dsc file we find as the template and require all other to be compatible. */
+        if (!info->nfiles) {
+            if (oldblocksize && this_dscs->len != oldblocksize) {
+                g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_SPECIFIC,
+                            _("Something is changing the data files on disk."));
+                goto fail;
+            }
+            copy_profile_descriptions(this_dscs, dscs);
+            info->blocksize = this_dscs->len;
+        }
+        else {
+            if (!profile_descriptions_match(dscs, this_dscs)) {
+                gwy_debug("non-matching profile descriptions for %s", fname);
+                continue;
+            }
+        }
+
+        if (!data) {
+            if (!info->nfiles)
+                filenames[0] = g_strdup(fname);
+            else {
+                g_free(filenames[1]);
+                filenames[1] = g_strdup(fname);
+            }
+        }
+
+        info->nfiles++;
+
+        /* Read the data if requested. */
+        if (data) {
+            gdouble f;
+            gsize prevndata = data->len/args->nincluded;
+
+            s = g_build_filename(dirname, fname, NULL);
+            g_string_assign(str, s);
+            g_free(s);
+
+            if ((s = strrchr(str->str, '.'))) {
+                g_string_truncate(str, s - str->str);
+                g_string_append(str, ".dat");
+            }
+            err_channel_index = read_data_file(data, str->str, args, err_channel);
+            if (err_channel_index >= 0)
+                filter_using_error_channel(data, prevndata, args->nincluded, err_channel_index);
+            info->ndata = data->len/args->nincluded;
+
+            f = (gdouble)info->nfiles/oldnfiles;
+            f = CLAMP(f, 0.0, 1.0);
+            if (!gwy_app_wait_set_fraction(f)) {
+                err_CANCELLED(error);
+                goto fail;
+            }
+        }
+        else {
+            dsc = &g_array_index(this_dscs, NMMXYZProfileDesc, 0);
+            info->ndata += dsc->npts;
+        }
+    }
+
+    /* This may not be correct.  There are other checks to do... */
+    ok = TRUE;
+
+fail:
+    free_profile_descriptions(this_dscs, TRUE);
+    if (dir)
+        g_dir_close(dir);
+    g_string_free(str, TRUE);
+    g_free(basename);
+    g_free(dirname);
+
+    return ok;
+}
+
+static gint
+read_data_file(GwyDoubleArray *data, const gchar *filename, ModuleArgs *args, gint err_channel)
+{
+    static const gboolean floating_point_chars[] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1,
+    };
+
+    gchar *buffer = NULL, *line, *p, *end;
+    gdouble *rec = NULL;
+    gboolean *include_channel = NULL;
+    guint i, j, linecount = 0, nincluded = args->nincluded, nrec = args->info->blocksize;
+    gint err_channel_index = -1;
+    gsize size;
+
+    gwy_debug("reading data file %s", filename);
+    if (!g_file_get_contents(filename, &buffer, &size, NULL)) {
+        gwy_debug("cannot read file %s", filename);
+        goto fail;
+    }
+
+    rec = g_new(gdouble, nincluded);
+    include_channel = g_new(gboolean, nrec);
+    for (i = 0; i < nrec; i++)
+        include_channel[i] = gwy_params_get_boolean(args->params, PARAM_INCLUDE_CHANNEL0 + i);
+    if (err_channel >= 0) {
+        /* Figure out which of the actually read channels is the error channel (as opposed to err_channel which
+         * identifies it among all channels, including those not read). */
+        err_channel_index = 0;
+        for (i = 0; i < err_channel; i++) {
+            if (include_channel[i])
+                err_channel_index++;
+        }
+    }
+    p = buffer;
+
+    while ((line = gwy_str_next_line(&p))) {
+        /* Data channels. */
+        for (i = j = 0; i < nrec; i++) {
+            /* Only read channels that were selected.  This saves both memory and time. */
+            if (include_channel[i]) {
+                rec[j] = g_ascii_strtod(line, &end);
+                if (end == line) {
+                    gwy_debug("line %u terminated prematurely", linecount);
+                    goto fail;
+                }
+                line = end;
+                j++;
+            }
+            else {
+                /* Skip whitespace and the next number so we end up at the beggining of next whitespace or line end.
+                 * Or garbage. */
+                end = line;
+                while (g_ascii_isspace(*line))
+                    line++;
+                while ((guchar)(*line) < G_N_ELEMENTS(floating_point_chars) && floating_point_chars[(guchar)(*line)])
+                    line++;
+
+                if (end == line) {
+                    gwy_debug("line %u terminated prematurely", linecount);
+                    goto fail;
+                }
+            }
+        }
+        /* Now we have read a complete record so append it to the array. */
+        gwy_double_array_append(data, rec, nincluded);
+        linecount++;
+    }
+
+    gwy_debug("read %u records", linecount);
+
+fail:
+    g_free(rec);
+    g_free(include_channel);
+    g_free(buffer);
+
+    return err_channel_index;
+}
+
+static gboolean
+profile_descriptions_match(GArray *descs1, GArray *descs2)
+{
+    guint i;
+
+    if (descs1->len != descs2->len) {
+        gwy_debug("non-matching channel numbers %u vs %u", descs1->len, descs2->len);
+        return FALSE;
+    }
+
+    for (i = 0; i < descs1->len; i++) {
+        const NMMXYZProfileDesc *desc1 = &g_array_index(descs1, NMMXYZProfileDesc, i);
+        const NMMXYZProfileDesc *desc2 = &g_array_index(descs2, NMMXYZProfileDesc, i);
+
+        if (!gwy_strequal(desc1->short_name, desc2->short_name)) {
+            gwy_debug("non-matching channel names %s vs %s", desc1->short_name, desc2->short_name);
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
+static void
+read_profile_description(const gchar *filename, GArray *dscs)
+{
+    NMMXYZProfileDesc dsc;
+    gchar *buffer = NULL, *line, *p;
+    gchar **pieces = NULL;
+    gsize size;
+    guint i;
+
+    if (!g_file_get_contents(filename, &buffer, &size, NULL))
+        goto fail;
+
+    p = buffer;
+    if (!(line = gwy_str_next_line(&p)) || !gwy_strequal(line, DASHED_LINE))
+        goto fail;
+
+    g_assert(!dscs->len);
+    while ((line = gwy_str_next_line(&p))) {
+        if (gwy_strequal(line, DASHED_LINE))
+            break;
+
+        pieces = g_strsplit(line, " : ", -1);
+        if (g_strv_length(pieces) != 5)
+            goto fail;
+
+        gwy_clear(&dsc, 1);
+        dsc.id = atoi(pieces[0]);
+        dsc.date = g_strdup(pieces[1]);
+        dsc.short_name = g_strdup(pieces[2]);
+        dsc.npts = atoi(pieces[3]);
+        dsc.long_name = g_strdup(pieces[4]);
+        g_array_append_val(dscs, dsc);
+    }
+
+    /* The ids should match the line numbers. */
+    for (i = 0; i < dscs->len; i++) {
+        if (g_array_index(dscs, NMMXYZProfileDesc, i).id != i) {
+            gwy_debug("non-matching channel id #%u", i);
+            goto fail;
+        }
+    }
+
+    /* We cannot read files with different number of points for each channel. */
+    for (i = 1; i < dscs->len; i++) {
+        if (g_array_index(dscs, NMMXYZProfileDesc, i).npts != g_array_index(dscs, NMMXYZProfileDesc, i-1).npts) {
+            gwy_debug("non-matching number of points per channel #%u", i);
+            goto fail;
+        }
+    }
+
+fail:
+    g_free(buffer);
+    if (pieces)
+        g_strfreev(pieces);
+}
+
+static void
+free_profile_descriptions(GArray *dscs, gboolean free_array)
+{
+    guint i;
+
+    if (!dscs)
+        return;
+
+    for (i = 0; i < dscs->len; i++) {
+        NMMXYZProfileDesc *dsc = &g_array_index(dscs, NMMXYZProfileDesc, i);
+
+        g_free(dsc->date);
+        g_free(dsc->short_name);
+        g_free(dsc->long_name);
+        g_free(dsc->settings_id);
+    }
+
+    if (free_array)
+        g_array_free(dscs, TRUE);
+    else
+        g_array_set_size(dscs, 0);
+}
+
+static void
+copy_profile_descriptions(GArray *source, GArray *dest)
+{
+    guint i;
+
+    g_assert(source);
+    g_assert(dest);
+    g_assert(!dest->len);
+
+    for (i = 0; i < source->len; i++) {
+        NMMXYZProfileDesc dsc = g_array_index(source, NMMXYZProfileDesc, i);
+
+        dsc.date = g_strdup(dsc.date);
+        dsc.short_name = g_strdup(dsc.short_name);
+        dsc.long_name = g_strdup(dsc.long_name);
+        g_array_append_val(dest, dsc);
+    }
+}
+
+static GwyContainer*
+parse_dsc_file(const gchar *filename)
+{
+    GwyContainer *meta;
+    gchar *buffer, *line, *p, *colon, *section = NULL;
+    GError *err = NULL;
+    GString *str;
+    gint i, ncom = 0;
+
+    if (!g_file_get_contents(filename, &buffer, NULL, &err)) {
+        g_warning("Cannot read the main dsc file: %s", err->message);
+        g_clear_error(&err);
+        return NULL;
+    }
+
+    meta = gwy_container_new();
+    str = g_string_new(NULL);
+    p = buffer;
+    while ((line = gwy_str_next_line(&p))) {
+        if (!*line)
+            continue;
+
+        if (gwy_strequal(line, DASHED_LINE))
+            section = NULL;
+        else if (!section && sscanf(line, "%d. ", &i) == 1) {
+            section = strchr(line, '.') + 1;
+            g_strstrip(section);
+        }
+        else if (section && gwy_strequal(section, "Additional comments")) {
+            ncom++;
+            g_string_printf(str, "%s::%d", section, ncom);
+            gwy_container_set_const_string_by_name(meta, str->str, line);
+        }
+        else if (section && g_str_has_prefix(line, "  ") && (colon = strstr(line, " : "))) {
+            gchar *key = line + 2, *value = colon + 3;
+
+            *colon = '\0';
+            g_strstrip(key);
+            g_strstrip(value);
+            g_string_printf(str, "%s::%s", section, key);
+            gwy_container_set_const_string_by_name(meta, str->str, value);
+        }
+        else if (g_str_has_prefix(line, "Creation time     :")) {
+            gchar *value = line + strlen("Creation time     :");
+            gwy_container_set_const_string_by_name(meta, "Creation time", value);
+        }
+    }
+
+    g_free(buffer);
+    g_string_free(str, TRUE);
+
+    if (!gwy_container_get_n_items(meta))
+        GWY_OBJECT_UNREF(meta);
+
+    return meta;
+}
+
+static GwyDoubleArray*
+gwy_double_array_new(gsize nprealloc)
+{
+    GwyDoubleArray *array = g_slice_new0(GwyDoubleArray);
+
+    nprealloc = MAX(nprealloc, 16UL);
+    array->size = nprealloc;
+    array->data = g_new(gdouble, nprealloc);
+    return array;
+}
+
+static void
+gwy_double_array_ensure_size(GwyDoubleArray *array, gsize n)
+{
+    gsize size;
+
+    if (G_LIKELY(n <= array->size))
+        return;
+
+    /* size = 0 occurs when we shift the size out of the gsize variable. In such case we just abort.  */
+    for (size = 1; size && size < n; size <<= 1)
+        ;
+
+    g_assert(size);
+    array->size = size;
+    array->data = g_renew(gdouble, array->data, array->size);
+}
+
+static void
+gwy_double_array_append(GwyDoubleArray *array, const gdouble *values, gsize n)
+{
+    g_assert(G_MAXSIZE - array->len > n);
+    gwy_double_array_ensure_size(array, array->len + n);
+    gwy_assign(array->data + array->len, values, n);
+    array->len += n;
+}
+
+static gdouble*
+gwy_double_array_free(GwyDoubleArray *array, gboolean free_data)
+{
+    gdouble *retval = array->data;
+
+    if (free_data) {
+        g_free(array->data);
+        retval = NULL;
+    }
+    g_slice_free(GwyDoubleArray, array);
+
+    return retval;
+}
+
+static void
+update_nincluded(ModuleArgs *args)
+{
+    guint i, blocksize = args->info->blocksize;
+
+    args->nincluded = 0;
+    for (i = 0; i < blocksize; i++) {
+        if (gwy_params_get_boolean(args->params, PARAM_INCLUDE_CHANNEL0 + i))
+            args->nincluded++;
+    }
+}
+
+static void
+filter_using_error_channel(GwyDoubleArray *data, gsize prevndata, guint nincluded, guint err_channel_index)
+{
+    gsize i, j, n = data->len/nincluded - prevndata;
+    gdouble mu = 0.0, ra = 0.0;
+    gdouble *d, *newblock = data->data + prevndata*nincluded;
+    guint k;
+
+    g_return_if_fail(err_channel_index < nincluded);
+
+    d = newblock + err_channel_index;
+    for (i = 0; i < n; i++) {
+        mu += *d;
+        d += nincluded;
+    }
+    mu /= n;
+
+    d = newblock + err_channel_index;
+    for (i = 0; i < n; i++) {
+        ra += fabs(*d - mu);
+        d += nincluded;
+    }
+    ra /= n;
+    ra *= 5.0;
+
+    d = newblock;
+    for (i = j = 0; i < n; i++) {
+        if (fabs(d[i*nincluded + err_channel_index] - mu) <= ra) {
+            for (k = 0; k < nincluded; k++)
+                d[j*nincluded + k] = d[i*nincluded + k];
+            j++;
+        }
+    }
+
+    gwy_debug("excluded %lu points of %lu", (gulong)(n-j), (gulong)n);
+
+    data->len = (prevndata + j)*nincluded;
+}
+
+static gchar*
+sanitise_channel_id(const gchar *ss)
+{
+    gchar *s0 = g_strdup(ss);
+    gchar *s = s0, *t = s0;
+
+    while (*s) {
+        if (g_ascii_isalnum(*s) || *s == '-' || *s == '+' || *s == '_') {
+            *t = *s;
+            t++;
+        }
+        s++;
+    }
+    *t = '\0';
+
+    return s0;
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    GArray *dscs = args->dscs;
+    const gchar *err_channel = gwy_params_get_string(params, PARAM_ERROR_CHANNEL);
+    guint i;
+
+    gwy_params_set_boolean(params, PARAM_INCLUDE_CHANNEL0, TRUE);
+    gwy_params_set_boolean(params, PARAM_INCLUDE_CHANNEL0 + 1, TRUE);
+    gwy_params_set_enum(params, PARAM_XYRES_MODE, NMM_XYMODE_NONSQUARE);
+    if (gwy_params_get_boolean(params, PARAM_XYMEASUREEQ)) {
+        gwy_params_set_enum(params, PARAM_XYRES_MODE,
+                            gwy_params_get_boolean(params, PARAM_USE_XRES) ? NMM_XYMODE_USE_XRES : NMM_XYMODE_USE_YRES);
+    }
+
+    for (i = 0; i < dscs->len; i++) {
+        const NMMXYZProfileDesc *dsc = &g_array_index(dscs, NMMXYZProfileDesc, i);
+
+        if (gwy_strequal(dsc->long_name, err_channel)) {
+            gwy_params_set_enum(params, PARAM_ERROR_CHANNEL_ID, i);
+            break;
+        }
+    }
+    if (i == dscs->len) {
+        gwy_params_set_boolean(params, PARAM_DO_FILTER, FALSE);
+        gwy_params_set_enum(params, PARAM_ERROR_CHANNEL_ID, 2);
+    }
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,34 @@
+--- gtk+-2.24.32/gtk/gtkfilefilter.c.orig	2017-03-09 04:44:17.000000000 +0100
++++ gtk+-2.24.32/gtk/gtkfilefilter.c	2022-04-21 11:55:29.348330648 +0200
+@@ -379,11 +379,12 @@ gtk_file_filter_filter (GtkFileFilter
+           if (filter_info->mime_type != NULL)
+             {
+               gchar *filter_content_type, *rule_content_type;
+-              gboolean match;
++              gboolean match = FALSE;
+ 
+               filter_content_type = g_content_type_from_mime_type (filter_info->mime_type);
+               rule_content_type = g_content_type_from_mime_type (rule->u.mime_type);
+-              match = g_content_type_is_a (filter_content_type, rule_content_type);
++              if (filter_content_type && rule_content_type)
++                match = g_content_type_is_a (filter_content_type, rule_content_type);
+               g_free (filter_content_type);
+               g_free (rule_content_type);
+ 
+--- gtk+-2.24.32/gtk/gtkrecentfilter.c.orig	2017-03-09 04:42:47.000000000 +0100
++++ gtk+-2.24.32/gtk/gtkrecentfilter.c	2022-04-21 11:55:32.336290341 +0200
+@@ -488,11 +488,12 @@ gtk_recent_filter_filter (GtkRecentFilte
+           if (filter_info->mime_type != NULL)
+             {
+               gchar *filter_content_type, *rule_content_type;
+-              gboolean match;
++              gboolean match = FALSE;
+ 
+               filter_content_type = g_content_type_from_mime_type (filter_info->mime_type);
+               rule_content_type = g_content_type_from_mime_type (rule->u.mime_type);
+-              match = g_content_type_is_a (filter_content_type, rule_content_type);
++              if (filter_content_type && rule_content_type)
++                match = g_content_type_is_a (filter_content_type, rule_content_type);
+               g_free (filter_content_type);
+               g_free (rule_content_type);
+ 

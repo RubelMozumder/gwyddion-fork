@@ -1,0 +1,55 @@
+# This wrapper exists because there do not seem to exist universally available
+# XML-PO utils.  We either use xml2po from gnome-doc-utils or xml2pot and
+# po2xml from poxml.
+set -e
+abs_top_builddir="@abs_top_builddir@"
+tmpdir="$abs_top_builddir/xmlpo-tmp"
+XML2PO="@XML2PO@"
+XML2POT="@XML2POT@"
+PO2XML="@PO2XML@"
+MSGCAT="@MSGCAT@"
+mode="$1"
+shift
+
+case "$mode" in
+  extract)
+    if test -z "$XML2PO"; then
+      if test -d "$tmpdir"; then
+        rm -f "$tmpdir/"*
+      else
+        mkdir "$tmpdir"
+      fi
+    fi
+
+    if test -n "$XML2PO"; then
+      $XML2PO "$@"
+    elif test -n "$XML2POT"; then
+      # XML2POT cannot handle multiple files
+      polist=
+      for x in "$@"; do
+        $XML2POT "$x" >"$tmpdir/$x.pot"
+        polist="$polist $tmpdir/$x.pot"
+      done
+      msgcat $polist
+      rm -f "$polist"
+    else
+      echo "Need either xml2po or xml2pot!" 1>&2
+      exit 1
+    fi
+    ;;
+  translate)
+    if test -n "$XML2PO"; then
+      $XML2PO --po-file="$2" "$1"
+    elif test -n "$PO2XML"; then
+      $PO2XML "$1" "$2"
+    else
+      echo "Need either xml2po or po2xml!" 1>&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo "Bad mode.  Must be either extract or translate." 1>&2
+    exit 1
+    ;;
+esac
+# vim: set ts=2 sw=2 et :

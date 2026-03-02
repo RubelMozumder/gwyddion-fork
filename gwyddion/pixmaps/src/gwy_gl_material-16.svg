@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:cc="http://creativecommons.org/ns#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     width="16"
+     height="16"
+     viewBox="0 0 16 16"
+     id="svg8691"
+     version="1.1"
+     inkscape:version="0.92+devel unknown"
+     sodipodi:docname="gwy_gl_material-16.svg"
+     inkscape:export-filename="gwy_palettes-16.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90">
+    <sodipodi:namedview
+         id="base"
+         pagecolor="#ffffff"
+         bordercolor="#666666"
+         borderopacity="1.0"
+         inkscape:pageopacity="0.0"
+         inkscape:pageshadow="2"
+         inkscape:zoom="21.764465"
+         inkscape:cx="2.7330245"
+         inkscape:cy="5.1532646"
+         inkscape:document-units="px"
+         inkscape:current-layer="layer1"
+         showgrid="true"
+         inkscape:window-width="1379"
+         inkscape:window-height="1023"
+         inkscape:window-x="531"
+         inkscape:window-y="33"
+         inkscape:window-maximized="0"
+         units="px"
+         inkscape:document-rotation="0">
+        <inkscape:grid
+             visible="true"
+             enabled="true"
+             spacingy="1.0"
+             spacingx="1.0"
+             snapvisiblegridlinesonly="false"
+             dotted="false"
+             originy="0"
+             originx="0"
+             id="grid1px"
+             type="xygrid" />
+    </sodipodi:namedview>
+    <defs
+         id="defs8693">
+        <linearGradient
+             gradientTransform="translate(-224.02837,-448.99442)"
+             gradientUnits="userSpaceOnUse"
+             y2="452.99442"
+             x2="247.02837"
+             y1="452.99442"
+             x1="224.02837"
+             id="linearGradient8128-3"
+             xlink:href="#linearGradient8122-6"
+             inkscape:collect="always" />
+        <linearGradient
+             id="linearGradient8122-6"
+             inkscape:collect="always">
+            <stop
+                 id="stop8124-7"
+                 offset="0"
+                 style="stop-color:#000000;stop-opacity:1;" />
+            <stop
+                 id="stop8126-5"
+                 offset="1"
+                 style="stop-color:#ffffff;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <metadata
+         id="metadata8696">
+        <rdf:RDF>
+            <cc:Work
+                 rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type
+                     rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:title />
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <g
+         transform="translate(-224.02837,-456.99442)"
+         id="layer1"
+         inkscape:groupmode="layer"
+         inkscape:label="Layer 1">
+        <image
+             image-rendering="optimizeSpeed"
+             id="image144"
+             xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACvklEQVQ4y3WTPYgkRRzFf9Vd3b09
+3bszO3Pr7nkniicrB2KmnJGCgZkfnB+psZnBgYFccImBXHKioGKgiGCsJsohxiYaKQYnJwpy7vRM
+d091VXVXVxkseyx+/LMH7/d4wf8J/ude/vjdB0QUPdh3uuw36papm59vXnvb/dMnTotXPn0/ysri
+skzTN2MpHw3eMxiDaRrUcvXn5s7Rh2q5fOv7Dz7RJ0x8Cs63drY/L+e7V6dnFvvbsyl5USClBCB4
+X/pxfHJQ+qXpfee+vvPTL0uA6CQg2co+K3dnL8z39rjn4ICz955j/2Cf+WJOUZZk2RZJlpEUk8Mo
+jm/e/8Tj+3cDXvzoxqtpnj8/KQqm0x0Wu3MWO3Nm2zPKomQrzYjjGAEIIZBZdj6E8M7pBm/EcYSM
+ItJYkooYiSAGxOhhHAnO4QeHd47gPRAuF3uLh+TTV68cejc+PPYDzlqs6uhkSh9HaKXo6hrdbrBK
+0WuDMxbX93jvo+D9c3Lsh0ecsdiNQqU1CRGD6oiEwCpFXVU0R0u6dYNtW3ql6FWH6zTjMFyUtmkT
+U0yIpUSMHqc1TZoiQqDXBlU3tNUKVVXousE0LbZpMe0G78ZUdtXqtzhNIASc0eg6Q8YxwQecsRil
+6JoWXdd0qxq9WqNXa2zTAPwh1V/LH4CNd2PZT3LiJEEIQfCe0fb0WmM3CtO2mHVDV1WoZYWzPcB3
+cfXrbZfvzs4H7x9z/cCgNf1GYZoW3TToukava8xqfQwfVfTtBuAW8LoAWBxe2Esnkx/z3dlZmaUI
+ER03cAPOWHrVYdsWUzcM2kAIAXhm6PQ3d7dQnFlcSib5V0mez6NEQgiMg8NZy6ANzhi8cwABuDJ0
++vq/xpSWxUXgvUjKp46fBYIfCT6cWH4HXhs6/cV/rhEgmeQCuAQ8C1wAcuA28C3w5dBpe9r/Nxya
+icVQecKcAAAAAElFTkSuQmCC
+"
+             preserveAspectRatio="none"
+             height="16"
+             width="16"
+             x="224.02837"
+             y="456.99442" />
+    </g>
+</svg>

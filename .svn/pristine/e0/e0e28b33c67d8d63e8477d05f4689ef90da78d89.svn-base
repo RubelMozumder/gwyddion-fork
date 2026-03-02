@@ -1,0 +1,109 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-user-guide\n"
+"POT-Creation-Date: 2024-01-05 22:01+0400\n"
+"PO-Revision-Date: 2024-01-05 23:57+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: volume-stacks.xml:6(title)
+msgid "Volume Data Processing: Image stacks"
+msgstr "Обработка объёмных данных: Стеки изображений"
+
+#: volume-stacks.xml:7(para)
+msgid "Volume data can be also used to represent stacks of images, i.e. coming from high-speed Scanning Probe Microscopy, representing multiple measurements of the sample, either on the same place or when moving laterally. In this case the data should be loaded as stack of images along the <xi:include href=\"eqi-z.xml\"/> axis. Such data can be processed by specialized functions available in the <guimenu>Volume Data</guimenu> menu of the toolbox, mostly described in this part of the User Guide. On top of it, the general functions for handling Volume data can be used as well."
+msgstr "Объёмные данные также можно использовать для представления стеков изображений, например, тех, которые получаются в ходе измерений с помощью высокоскоростной сканирующей зондовой микроскопией, представляющих несколько измерений одного образца, либо одной и той же области, либо при латеральном смещении. В этом случае данные необходимо загрузить как стек изображений вдоль оси <xi:include href=\"eqi-z.xml\"/>. Подобные данные можно обрабатывать с помощью специальных функций из меню <guimenu>Объёмные данные</guimenu> окна инструментов, в основном описанных в этой части руководства пользователя. Помимо этого, также можно использовать общие функции для обработки объёмных данных."
+
+#: volume-stacks.xml:19(title)
+msgid "XY Plane Correction"
+msgstr "Выравнивание плоскостей XY"
+
+#: volume-stacks.xml:20(para)
+msgid "A few simple corrections or adjustments can be applied automatically to each <xi:include href=\"eqi-xy.xml\"/> plane in the volume data."
+msgstr "Несколько простых исправлений и настроек могут быть автоматически применены к каждой плоскости <xi:include href=\"eqi-xy.xml\"/> объёмных данных."
+
+#: volume-stacks.xml:24(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>XY Plane Level</guimenuitem></menuchoice> applies plane levelling to each plane. In other words, it subtracts the mean plane from all images formed by <xi:include href=\"eqi-xy.xml\"/> planes. Each plane is treated separately."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Выровнять плоскость XY</guimenuitem></menuchoice> применяет выравнивание плоскости к каждой плоскости. Другими словами, оно вычитает среднюю плоскость из всех изображений, сформированных плоскостями <xi:include href=\"eqi-xy.xml\"/>. Каждая плоскость обрабатывается отдельно."
+
+#: volume-stacks.xml:34(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>XY Mean Plane Level</guimenuitem></menuchoice> applies plane levelling using the same plane, the mean one, to each plane in the image stack. It calculates a single mean plane from all the images formed by <xi:include href=\"eqi-xy.xml\"/> planes, and subtracts the mean plane from all the images."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Выровнять среднюю плоскость XY</guimenuitem></menuchoice> применяет выравнивание плоскости используя одну и ту же плоскость, среднюю, к каждой плоскости в стеке изображений. Оно рассчитывает одну среднюю плоскость для всех изображений, сформированных плоскостями <xi:include href=\"eqi-xy.xml\"/>, и вычитает эту среднюю плоскость из всех изображений."
+
+#: volume-stacks.xml:45(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>XY Facet Level</guimenuitem></menuchoice> applies facet leveling to all the images formed by <xi:include href=\"eqi-xy.xml\"/> planes, see description of the <link linkend=\"facet-level\">Facet Level</link> algorithm for more details. Each plane is treated separately."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Выравнивание граней XY</guimenuitem></menuchoice> применяет выравнивание граней к каждому изображению, сформированному плоскостями <xi:include href=\"eqi-xy.xml\"/>. См. описание алгоритма <link linkend=\"facet-level\">Выравнивания граней</link> для дополнительной информации. Каждая плоскость обрабатывается отдельно."
+
+#: volume-stacks.xml:56(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>XY Flatten Base</guimenuitem></menuchoice> applies flatten base algorithm to all the images formed by <xi:include href=\"eqi-xy.xml\"/> planes, see description of the <link linkend=\"facet-level\">Flatten Base</link> algorithm fro more details. Each plane is treated separately."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Выровнять основание XY</guimenuitem></menuchoice> применяет алгоритм выравнивания основания к каждому изображению, сформированному плоскостями <xi:include href=\"eqi-xy.xml\"/>. См. описание алгоритма <link linkend=\"facet-level\">Выравнивания основания</link> для дополнительной информации. Каждая плоскость обрабатывается отдельно."
+
+#: volume-stacks.xml:67(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>Step Line Correction</guimenuitem></menuchoice> applies step line correction algorithm to all the images formed by <xi:include href=\"eqi-xy.xml\"/> planes, see description of the <link linkend=\"line-correction-step\">Step Line Correction module for images</link>. Each plane is treated separately."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Линейная коррекция ступеней</guimenuitem></menuchoice> применяет алгоритм линейной коррекции ступеней к каждому изображению, сформированному плоскостями <xi:include href=\"eqi-xy.xml\"/>. См. описание алгоритма <link linkend=\"line-correction-step\">модуля Линейной коррекции ступеней для изображений</link>. для дополнительной информации. Каждая плоскость обрабатывается отдельно."
+
+#: volume-stacks.xml:79(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>XY Plane Outliers</guimenuitem></menuchoice> replaces the outliers in each <xi:include href=\"eqi-xy.xml\"/> plane by the mean value of this plane. Outliers are defined here as values lying farther than three standard deviations from the mean."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Выпадающие плоскости XY</guimenuitem></menuchoice> заменяет выпадающие значения на каждом изображении, сформированном плоскостями <xi:include href=\"eqi-xy.xml\"/> средним значением для данной плоскости. Выпадающие здесь определяются как значения, лежащие дальше трёх стандартных отклонений от среднего."
+
+#: volume-stacks.xml:89(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>1D FFT Filtering</guimenuitem></menuchoice> performs 1D FFT filtering in each <xi:include href=\"eqi-xy.xml\"/> plane. The power spectrum shown in the graph can be calculated for every plane individually, or it can be averaged from all the planes. By changing the preview level, one can go through all the planes and cross-check the filtering impact. Mouse selection in the graph and the suppression methods have same logic as in the <link linkend=\"fft-filter-1d\">1D FFT Filtering module for images</link>."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Одномерная фильтрация БПФ</guimenuitem></menuchoice> применяет алгоритм одномерной фильтрации с помощью БПФ к каждому изображению, сформированному плоскостями <xi:include href=\"eqi-xy.xml\"/>. Спектр мощности, показываемый на графике, может быть рассчитан для каждой плоскости отдельно или может усредняться со всех плоскостей. Изменяя уровень, демонстрируемый в окне предпросмотра, можно просмотреть все плоскости и проверить влияние фильтрации на каждую из них. Выделение мышью в окне графика и методы подавления имеют ту же логику работы, что и <link linkend=\"fft-filter-1d\">модуль одномерной фильтрации БПФ для изображений</link>."
+
+#: volume-stacks.xml:102(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>Scars</guimenuitem></menuchoice> performs detection and removal of scars (fast scanning axis feedback loop errors) in each <xi:include href=\"eqi-xy.xml\"/> plane. Each plane is treated separately and preview z level can be used to go through them. Scars detection method is same as in the <link linkend=\"mark-scars\">Mark Scars module for images</link>."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Убрать царапины</guimenuitem></menuchoice> применяет алгоритм обнаружения и удаления царапин (ошибки цепи обратной связи в быстрой оси сканирования) к каждому изображению, сформированному плоскостями <xi:include href=\"eqi-xy.xml\"/>. Каждая плоскость обрабатывается отдельно и уровень z предпросмотра может использоваться для проверки каждой из них. Метод обнаружения царапин тот же, что используется в <link linkend=\"mark-scars\">модуле удаления царапин для изображений</link>."
+
+#: volume-stacks.xml:114(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>Estimate Drift</guimenuitem></menuchoice> performs detection and removal of drift in each <xi:include href=\"eqi-xy.xml\"/> plane. Drift is detected by cross-correlation which can be applied either to adjacent planes, one by one, which is optimal for larger drifts observed during the image stack acquisition, or an average plane can be used as a reference, which is optimal for small drifts or noisy data. Preview z level can be used to go through the planes, including visualisation of the cropped data after application of drift correction. On top of XYZ drift estimation, the images can be also rotated in given range, searching for the rotation angle which gives the best correlation score."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Оценить дрейф</guimenuitem></menuchoice> обнаруживает и удаляет дрейф для каждой плоскости <xi:include href=\"eqi-xy.xml\"/>. Дрейф обнаруживается кросс-корреляцией, которую можно применить или для соседних плоскостей, одна за одной, что будет оптимальным для больших значений дрейфа, наблюдаемых в ходе получения стека изображений, или в качестве опорного изображения может использоваться средняя плоскость, что оптимально для малых значений дрейфа или шумных данных. Уровень z предпросмотра может использоваться для работы с каждой из плоскостей, включая визуализацию обрезанных данных после применения коррекции дрейфа. Помимо оценки дрейфа XYZ, изображения также можно поворачивать в заданном диапазоне в поисках угла поворота, который дает наилучшую оценку корреляции."
+
+#: volume-stacks.xml:135(caption)
+msgid "Estimate drift dialogue showing detected drift and cropped data."
+msgstr "Диалоговое окно оценки дрейфа показывающее обнаруженный дрейф и обрезанные данные."
+
+#: volume-stacks.xml:142(title)
+msgid "Super-resolution methods"
+msgstr "Методы суперразрешения"
+
+#: volume-stacks.xml:143(para)
+msgid "When multiple images of the same surface area are measured and the image stack is stored as Volume data, they can be used for a super-resolution image calculation, e.g. using some hypothesis about sample statistical parameters."
+msgstr "Если измерено несколько изображений одного и того же участка поверхности и стек изображений сохранен как объёмные данные, их можно использовать для расчёта изображения со сверхразрешением, например, используя некоторую гипотезу о статистических параметрах образца."
+
+#: volume-stacks.xml:148(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>SPM Modes</guisubmenu><guimenuitem>Localization Merge</guimenuitem></menuchoice> performs the localisation algorithm [<link linkend=\"image-stacks-ref-1\">1</link>]. At every <xi:include href=\"eqi-xy.xml\"/> plane the local peaks are detected, a probability for peak location is expressed and summed across the planes. The method works best on biomolecules or similar objects consisting of resolvable peaks, lying on a flat surface, and can remove the tip convolution impact and provide a high resolution image from series of low resolution ones. An important assumption is that the tip touches slightly different parts of the object at each scan, making the method well suited to soft samples in liquid environment. Note that the individual frames have to be aligned to display the same area of the surface, for this, e.g. the <link linkend=\"volume-drift\">Estimate Drift</link> module can be used."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Объединение с локализацией</guimenuitem></menuchoice> применяет алгоритм локализации [<link linkend=\"image-stacks-ref-1\">1</link>]. На каждой плоскости <xi:include href=\"eqi-xy.xml\"/> обнаруживаются локальные пики, вероятность обнаружения выражается и суммируется по всем плоскостям. Метод лучше всего работает на биомолекулах или подобных объектах, состоящих из разрешимых пиков, лежащих на плоской поверхности, и может устранить влияние свертки с зондом и сгенерировать изображение с высоким разрешением на основе серии изображений с низким разрешением. Важным предположением является то, что наконечник зонда касается немного разных частей объекта при каждом сканировании, что делает этот метод хорошо подходящим для мягких образцов в жидкой среде. Обратите внимание, что отдельные плоскости должны быть выровнены для отображения одной и той же области поверхности, для этого, например, можно использовать модуль <link linkend=\"volume-drift\">Оценки дрейфа</link>."
+
+#: volume-stacks.xml:171(caption)
+msgid "A single high-speed AFM frame and a localisation microscopy algorithm result, data courtesy of George R. Heath and Simon Scheuring."
+msgstr "Один высокоскоростной кадр АСМ и результат алгоритма локализационной микроскопии, данные любезно предоставлены Джорджем Р. Хитом и Саймоном Шойрингом (George R. Heath and Simon Scheuring)."
+
+#: volume-stacks.xml:179(title)
+msgid "Stitching"
+msgstr "Сшивание"
+
+#: volume-stacks.xml:180(para)
+msgid "When the image stack represents different areas on the surface, a merged data representing larger area of the surface can be created. For this an information coming from sample coarse motion stage or from detected image overlaps can be used."
+msgstr "Когда стек изображений представляет разные области на поверхности, можно создать объединенные данные, представляющие более крупную область поверхности. Для этого можно использовать информацию, получаемую из движения грубой подвижки образца или из обнаруженных пересечений изображений."
+
+#: volume-stacks.xml:185(para)
+msgid "<menuchoice><guimenu>Volume Data</guimenu><guisubmenu>SPM Modes</guisubmenu><guimenuitem>XY Stitch</guimenuitem></menuchoice> performs stitching of a set of images represented as volume data, using the overlaps to minimize mutual offsets and using graphs of X and Y translations between the images. The X and Y translations are in base units (i.e. usually meters) and its X axis is treated as the frame number."
+msgstr "<menuchoice><guimenu>Объёмные данные</guimenu><guisubmenu>Исправить данные</guisubmenu><guimenuitem>Сшивание XY</guimenuitem></menuchoice> проводит сшивание набора изображений, представленных в форме объёмных данных, используя пересечения для минимизации взаимных смещений и используя графики сдвигов по X и Y между изображениями. Смещения по X и Y представлены в базовых единицах измерения (т.е. обычно в метрах) и их ось X интерпретируется как номер кадра."
+
+#: volume-stacks.xml:201(caption)
+msgid "Volume data stitching example, showing one of 32 images taken on MetExSPM project test sample (manufactured by PTB), coarse movement stage data in X axis and the stitched data preview in the module GUI."
+msgstr "Образец сшивки объёмных данных, показывающий одно из 32 изображений, полученных с тестового образца проекта MetExSPM (изготовленного PTB), данные грубой подвижки в оси X и предпросмотр сшитых данных в графическом интерфейсе данного модуля."
+
+#: volume-stacks.xml:210(title)
+msgid "References"
+msgstr "Источники"
+
+#: volume-stacks.xml:211(para)
+msgid "[1] G.R Heath, E. Kots, J.L. Robertson, et al.: Localization atomic force microscopy. Nature 594 (2021) 385–390, <ulink url=\"http://dx.doi.org/10.1038/s41586-021-03551-x\">10.1038/s41586-021-03551-x</ulink>"
+msgstr "[1] G.R Heath, E. Kots, J.L. Robertson, et al.: Localization atomic force microscopy. Nature 594 (2021) 385–390, <ulink url=\"http://dx.doi.org/10.1038/s41586-021-03551-x\">10.1038/s41586-021-03551-x</ulink>"

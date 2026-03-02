@@ -1,0 +1,455 @@
+/*
+ *  $Id: smm_apply.c 26327 2024-05-07 08:46:53Z klapetek $
+ *  Copyright (C) 2024 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <complex.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/gwyprocess.h>
+#include <libprocess/arithmetic.h>
+#include <libprocess/correlation.h>
+#include <libprocess/filters.h>
+#include <libprocess/stats.h>
+#include <libgwymodule/gwymodule-process.h>
+#include <app/gwymoduleutils.h>
+#include <app/gwyapp.h>
+
+#define RUN_MODES GWY_RUN_INTERACTIVE
+
+enum {
+    NFITS = 6,
+};
+
+typedef enum {
+    OUTPUT_CAPACITANCE     = 0,
+    OUTPUT_S11_REAL        = 1,
+    OUTPUT_S11_IMAGINARY   = 2,
+    OUTPUT_ZTIP_REAL       = 3,
+    OUTPUT_ZTIP_IMAGINARY  = 4,
+    OUTPUT_NTYPES
+} SMMapplyResult;
+
+typedef enum {
+    SMM_SIGNAL_REAL      = 0,
+    SMM_SIGNAL_IMAGINARY = 1,
+    SMM_SIGNAL_MAG       = 2,
+    SMM_SIGNAL_LOGMAG    = 3,
+    SMM_SIGNAL_PHASE     = 4,
+} SMMSignal;
+
+enum {
+    PARAM_IMAGE_A,
+    PARAM_SIGNAL_A,
+    PARAM_IMAGE_B,
+    PARAM_SIGNAL_B,
+    PARAM_REFIMP,
+    PARAM_FREQ,
+    PARAM_OUTPUT,
+    PARAM_ERR_0,
+};
+
+typedef struct {
+    GwyParams *params;
+    GwyDataField *field;
+    GwyDataField *mask;
+    GwyDataField *result[OUTPUT_NTYPES];
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table;
+    GtkWidget *channel_a;
+    GtkWidget *channel_b;
+    GtkWidget *err[NFITS];
+} ModuleGUI;
+
+static gboolean         module_register     (void);
+static GwyParamDef*     define_module_params(void);
+static void             smm_apply           (GwyContainer *data,
+                                             GwyRunType runtype);
+static gboolean         execute             (ModuleArgs *args);
+static GwyDialogOutcome run_gui             (ModuleArgs *args);
+static void             param_changed       (ModuleGUI *gui,
+                                             gint id);
+static gboolean         image_filter        (GwyContainer *data,
+                                             gint id,
+                                             gpointer user_data);
+
+static const GwyEnum outputs[] = {
+    { N_("Capacitance"), (1 << OUTPUT_CAPACITANCE),    },
+    { N_("Re(S11)"),     (1 << OUTPUT_S11_REAL),       },
+    { N_("Im(S11)"),     (1 << OUTPUT_S11_IMAGINARY),  },
+    { N_("Re(Ztip)"),    (1 << OUTPUT_ZTIP_REAL),      },
+    { N_("Im(Ztip)"),    (1 << OUTPUT_ZTIP_IMAGINARY), },
+};
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Applies SMM calibration"),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "Petr Klapetek & David Nečas (Yeti)",
+    "2024",
+};
+
+GWY_MODULE_QUERY2(module_info, smm_apply)
+
+static gboolean
+module_register(void)
+{
+    gwy_process_func_register("smm_apply",
+                              (GwyProcessFunc)&smm_apply,
+                              N_("/_SPM Modes/_Electrical/_Apply SMM Calibration..."),
+                              NULL,
+                              RUN_MODES,
+                              GWY_MENU_FLAG_DATA,
+                              N_("Apply SMM calibration coefficients"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+    static const GwyEnum signals[] = {
+        { N_("Re"),       SMM_SIGNAL_REAL,       },
+        { N_("Im"),       SMM_SIGNAL_IMAGINARY,  },
+        { N_("Mag"),      SMM_SIGNAL_MAG,        },
+        { N_("logMag"),   SMM_SIGNAL_LOGMAG,     },
+        { N_("Phase"),    SMM_SIGNAL_PHASE,      },
+    };
+
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_process_func_current());
+
+    gwy_param_def_add_image_id(paramdef, PARAM_IMAGE_A, "image_a", _("First channel"));
+    gwy_param_def_add_image_id(paramdef, PARAM_IMAGE_B, "image_b", _("Second channel"));
+    gwy_param_def_add_gwyenum(paramdef, PARAM_SIGNAL_A, "signal_a", "",
+                              signals, G_N_ELEMENTS(signals), SMM_SIGNAL_REAL);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_SIGNAL_B, "signal_b", "",
+                              signals, G_N_ELEMENTS(signals), SMM_SIGNAL_IMAGINARY);
+    gwy_param_def_add_double(paramdef, PARAM_REFIMP, "refimp", _("Reference impedance"), 0.001, 1000, 50);
+    gwy_param_def_add_double(paramdef, PARAM_FREQ, "freq", _("Frequency"), 0.1, 100, 6);
+    gwy_param_def_add_gwyflags(paramdef, PARAM_OUTPUT, "output", _("Output type"),
+                               outputs, G_N_ELEMENTS(outputs), (1 << OUTPUT_CAPACITANCE));
+
+    gwy_param_def_add_double(paramdef, PARAM_ERR_0, "e00r", _("Re(e00)"), -20, 20, 6.9);
+    gwy_param_def_add_double(paramdef, PARAM_ERR_0 + 1, "e00i", _("Im(e00)"), -20, 20, -7.2);
+    gwy_param_def_add_double(paramdef, PARAM_ERR_0 + 2, "e01r", _("Re(e01)"), -20, 20, -0.15);
+    gwy_param_def_add_double(paramdef, PARAM_ERR_0 + 3, "e01i", _("Im(e01)"), -20, 20, 5.35);
+    gwy_param_def_add_double(paramdef, PARAM_ERR_0 + 4, "e11r", _("Re(e11)"), -20, 20, 0.55);
+    gwy_param_def_add_double(paramdef, PARAM_ERR_0 + 5, "e11i", _("Im(e11)"), -20, 20, 0.35);
+
+    return paramdef;
+}
+
+static void
+smm_apply(GwyContainer *data, GwyRunType runtype)
+{
+    GwyDialogOutcome outcome;
+    GwyDataField *mask;
+    ModuleArgs args;
+    GwyAppDataId dataid;
+    gint id, newid;
+    guint i;
+
+    g_return_if_fail(runtype & RUN_MODES);
+    gwy_clear(&args, 1);
+    gwy_app_data_browser_get_current(GWY_APP_DATA_FIELD, &args.field,
+                                     GWY_APP_DATA_FIELD_ID, &id,
+                                     0);
+    g_return_if_fail(args.field);
+    args.params = gwy_params_new_from_settings(define_module_params());
+
+    dataid.datano = gwy_app_data_browser_get_number(data);
+    dataid.id = id;
+    gwy_params_set_image_id(args.params, PARAM_IMAGE_A, dataid);
+    gwy_params_set_image_id(args.params, PARAM_IMAGE_B, dataid);
+
+    outcome = run_gui(&args);
+    gwy_params_save_to_settings(args.params);
+    if (outcome == GWY_DIALOG_CANCEL)
+        goto end;
+
+    if (!execute(&args))
+        goto end;
+
+    for (i = 0; i < OUTPUT_NTYPES; i++) {
+        if (!args.result[i])
+            continue;
+
+        newid = gwy_app_data_browser_add_data_field(args.result[i], data, TRUE);
+        gwy_app_sync_data_items(data, data, id, newid, FALSE,
+                                GWY_DATA_ITEM_GRADIENT,
+                                GWY_DATA_ITEM_REAL_SQUARE,
+                                0);
+        gwy_app_set_data_field_title(data, newid, _(gwy_enum_to_string(1 << i, outputs, OUTPUT_NTYPES)));
+        if (args.mask) {
+            mask = gwy_data_field_duplicate(args.mask);
+            gwy_container_pass_object(data, gwy_app_get_mask_key_for_id(newid), mask);
+        }
+        gwy_app_channel_log_add_proc(data, id, newid);
+    }
+
+
+end:
+    g_object_unref(args.params);
+    GWY_OBJECT_UNREF(args.mask);
+    for (i = 0; i < OUTPUT_NTYPES; i++)
+        GWY_OBJECT_UNREF(args.result[i]);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args)
+{
+    ModuleGUI gui;
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    gint i;
+
+    gui.args = args;
+
+    gui.dialog = gwy_dialog_new(_("Apply SMM Calibration"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    table = gui.table = gwy_param_table_new(args->params);
+
+    gwy_param_table_append_image_id(table, PARAM_IMAGE_A);
+    gwy_param_table_append_radio_row(table, PARAM_SIGNAL_A);
+    gwy_param_table_append_image_id(table, PARAM_IMAGE_B);
+    gwy_param_table_data_id_set_filter(table, PARAM_IMAGE_B, image_filter, gui.args, NULL);
+    gwy_param_table_append_radio_row(table, PARAM_SIGNAL_B);
+
+    gwy_param_table_append_slider(table, PARAM_FREQ);
+    gwy_param_table_set_unitstr(table, PARAM_FREQ, "GHz");
+    gwy_param_table_append_slider(table, PARAM_REFIMP);
+    gwy_param_table_set_unitstr(table, PARAM_REFIMP, "Ω");
+
+    gwy_param_table_append_separator(table);
+
+    for (i = 0; i < NFITS; i++) {
+        gwy_param_table_append_slider(table, PARAM_ERR_0 + i);
+        gwy_param_table_slider_set_digits(table, PARAM_ERR_0 + i, 6);
+    }
+
+    gwy_param_table_append_separator(table);
+
+    gwy_param_table_append_checkboxes(table, PARAM_OUTPUT);
+
+    gwy_dialog_add_content(dialog, gwy_param_table_widget(table), FALSE, FALSE, 0);
+    gwy_dialog_add_param_table(dialog, table);
+
+    g_signal_connect_swapped(table, "param-changed", G_CALLBACK(param_changed), &gui);
+
+    return gwy_dialog_run(dialog);
+}
+
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    GwyParamTable *table = gui->table;
+    guint output = gwy_params_get_flags(params, PARAM_OUTPUT);
+    gint signala, signalb;
+    gboolean sens;
+
+    if (id < 0 || id == PARAM_OUTPUT) {
+        if (output & (1 << OUTPUT_CAPACITANCE))
+            sens = TRUE;
+        else
+            sens = FALSE;
+
+        gwy_param_table_set_sensitive(table, PARAM_FREQ, sens);
+        gwy_param_table_set_sensitive(table, PARAM_REFIMP, sens);
+    }
+
+    if (id < 0 || id == PARAM_SIGNAL_A || PARAM_SIGNAL_B) {
+        signala = gwy_params_get_enum(params, PARAM_SIGNAL_A);
+        signalb = gwy_params_get_enum(params, PARAM_SIGNAL_B);
+
+        sens = FALSE;
+        if (signala == SMM_SIGNAL_REAL && signalb == SMM_SIGNAL_IMAGINARY)
+            sens = TRUE;
+
+        if (signalb == SMM_SIGNAL_REAL && signala == SMM_SIGNAL_IMAGINARY)
+            sens = TRUE;
+
+        if (signalb == SMM_SIGNAL_PHASE
+            && (signala == SMM_SIGNAL_MAG || signala == SMM_SIGNAL_LOGMAG))
+            sens = TRUE;
+
+        if (signala == SMM_SIGNAL_PHASE
+            && (signalb == SMM_SIGNAL_MAG || signalb == SMM_SIGNAL_LOGMAG))
+            sens = TRUE;
+
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, sens);
+    }
+}
+
+static gboolean
+image_filter(GwyContainer *data, gint id, gpointer user_data)
+{
+    ModuleArgs *args = (ModuleArgs*)user_data;
+    GwyDataField *otherfield, *field = args->field;
+
+    if (!gwy_container_gis_object(data, gwy_app_get_data_key_for_id(id), &otherfield))
+        return FALSE;
+    return !gwy_data_field_check_compatibility(field, otherfield, GWY_DATA_COMPATIBILITY_RES);
+}
+
+static gboolean
+execute(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    GwyDataField *s11_re, *s11_im, *ztip_re, *ztip_im, *cap, *dfa, *dfb;
+    gdouble *s11redata, *s11imdata, *ztipredata, *ztipimdata, *capdata, *adata, *bdata;
+    double complex zr, s11, s11m, e00, e01, e11, ztip;
+    gint i, signala, signalb, xres, yres;
+    gdouble aval, bval, res11m, ims11m, omega, freq, refimp, mult;
+    guint output = gwy_params_get_flags(params, PARAM_OUTPUT);
+
+    dfa = gwy_params_get_image(params, PARAM_IMAGE_A);
+    dfb = gwy_params_get_image(params, PARAM_IMAGE_B);
+    signala = gwy_params_get_enum(params, PARAM_SIGNAL_A);
+    signalb = gwy_params_get_enum(params, PARAM_SIGNAL_B);
+    freq = gwy_params_get_double(params, PARAM_FREQ)*1e9;
+    refimp = gwy_params_get_double(params, PARAM_REFIMP);
+
+    zr = refimp;
+    omega = 2*G_PI*freq;
+
+    s11_re = gwy_data_field_new_alike(dfa, FALSE);
+    s11_im = gwy_data_field_new_alike(dfa, FALSE);
+    cap = gwy_data_field_new_alike(dfa, FALSE);
+    ztip_re = gwy_data_field_new_alike(dfa, FALSE);
+    ztip_im = gwy_data_field_new_alike(dfa, FALSE);
+
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(s11_re), NULL);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(s11_im), NULL);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(ztip_re), "Ω");
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(ztip_im), "Ω");
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(cap), "F");
+
+    xres = gwy_data_field_get_xres(dfa);
+    yres = gwy_data_field_get_yres(dfa);
+    adata = gwy_data_field_get_data(dfa);
+    bdata = gwy_data_field_get_data(dfb);
+    s11redata = gwy_data_field_get_data(s11_re);
+    s11imdata = gwy_data_field_get_data(s11_im);
+    capdata = gwy_data_field_get_data(cap);
+    ztipredata = gwy_data_field_get_data(ztip_re);
+    ztipimdata = gwy_data_field_get_data(ztip_im);
+
+    e00 = gwy_params_get_double(params, PARAM_ERR_0)
+          + I*gwy_params_get_double(params, PARAM_ERR_0 + 1);
+    e01 = gwy_params_get_double(params, PARAM_ERR_0 + 2)
+          + I*gwy_params_get_double(params, PARAM_ERR_0 + 3);
+    e11 = gwy_params_get_double(params, PARAM_ERR_0 + 4)
+          + I*gwy_params_get_double(params, PARAM_ERR_0 + 5);
+
+    //printf("crosscheck: %g %g %g %g %g %g\n", creal(e00), cimag(e00), creal(e01), cimag(e01), creal(e11), cimag(e11));
+
+    for (i = 0; i < xres*yres; i++) {
+        aval = adata[i];
+        bval = bdata[i];
+
+        if (signala == SMM_SIGNAL_REAL && signalb == SMM_SIGNAL_IMAGINARY) {
+            res11m = aval;
+            ims11m = bval;
+        } else if (signalb == SMM_SIGNAL_REAL && signala == SMM_SIGNAL_IMAGINARY) {
+            res11m = bval;
+            ims11m = aval;
+        } else if (signalb == SMM_SIGNAL_PHASE
+                   && (signala == SMM_SIGNAL_MAG || signala == SMM_SIGNAL_LOGMAG)) {
+            if (signala == SMM_SIGNAL_LOGMAG)
+                aval = pow(10, aval/20);
+
+            if (gwy_si_unit_equal_string(gwy_data_field_get_si_unit_z(dfb), "rad"))
+                mult = 1;
+            else
+                mult = G_PI/180;
+
+            res11m = aval*cos(bval*mult);
+            ims11m = aval*sin(bval*mult);
+        } else if (signala == SMM_SIGNAL_PHASE
+                   && (signalb == SMM_SIGNAL_MAG || signalb == SMM_SIGNAL_LOGMAG)) {
+            if (signalb == SMM_SIGNAL_LOGMAG)
+                bval = pow(10, bval/20);
+
+            if (gwy_si_unit_equal_string(gwy_data_field_get_si_unit_z(dfa), "rad"))
+                mult = 1;
+            else
+                mult = G_PI/180;
+
+            res11m = bval*cos(aval*mult);
+            ims11m = bval*sin(aval*mult);
+        } else { //should not be reached
+                res11m = 0;
+                ims11m = 0;
+        }
+
+        s11m = res11m + I*ims11m;
+
+        s11 = (s11m - e00)/(e01 + e11*(s11m - e00));
+        ztip = zr*(1 + s11)/(1 - s11);
+
+/*      if (col==62 && row==139)
+            printf("debug: a %g b %g  s11m %g %g  s11 %g %g ztip %g %g  cal %g\n",
+                   aval, bval, res11m, ims11m,
+                                        creal(s11), cimag(s11), creal(ztip), cimag(ztip), creal(1/(I*omega*ztip)));
+        */
+
+        s11redata[i] = creal(s11);
+        s11imdata[i] = cimag(s11);
+        ztipredata[i] = creal(ztip);
+        ztipimdata[i] = cimag(ztip);
+        capdata[i] = creal(1/(I*omega*ztip));
+    }
+
+    if (output & (1 << OUTPUT_S11_REAL))
+        args->result[OUTPUT_S11_REAL] = g_object_ref(s11_re);
+    if (output & (1 << OUTPUT_S11_IMAGINARY))
+        args->result[OUTPUT_S11_IMAGINARY] = g_object_ref(s11_im);
+    if (output & (1 << OUTPUT_ZTIP_REAL))
+        args->result[OUTPUT_ZTIP_REAL] = g_object_ref(ztip_re);
+    if (output & (1 << OUTPUT_ZTIP_IMAGINARY))
+        args->result[OUTPUT_ZTIP_IMAGINARY] = g_object_ref(ztip_im);
+    if (output & (1 << OUTPUT_CAPACITANCE))
+        args->result[OUTPUT_CAPACITANCE] = g_object_ref(cap);
+
+
+    gwy_object_unref(s11_re);
+    gwy_object_unref(s11_im);
+    gwy_object_unref(ztip_re);
+    gwy_object_unref(ztip_im);
+    gwy_object_unref(cap);
+
+    return TRUE;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

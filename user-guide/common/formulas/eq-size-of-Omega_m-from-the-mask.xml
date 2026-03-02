@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eq-size-of-Omega_m-from-the-mask.xml 23151 2021-02-13 09:13:08Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informalequation id='eq-size-of-Omega_m-from-the-mask'>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref='eq-size-of-Omega_m-from-the-mask.svg' format='SVG'/>
+    </imageobject>
+    <textobject role='tex'>
+      <phrase>
+<![CDATA[
+|\Omega_m| = \sum_{l=1}^N \sum_{k=1}^{M-m} c_{k+m,l} c_{k,l}
+]]>
+      </phrase>
+    </textobject>
+  </mediaobject>
+</informalequation>
+<!-- vim: set ts=2 sw=2 et : -->

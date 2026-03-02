@@ -1,0 +1,130 @@
+#!/bin/bash
+# @(#) $Id$
+projectdir=$PWD
+logdir=$projectdir/../buildlog
+tmplog=tmplog
+
+eval $(grep "^LANGUAGES=" configure.ac)
+source $HOME/.bashrc
+cd $logdir
+
+
+# XXX: Inkscape should not be printing the ffffffff message
+# because we explicitly set background to white and the background
+# is actually white.  But for some reason it prints it.
+cat >user_guide_xhtml.ignore <<':'
+^$
+^Writing xhtml/.*\.html .*
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Unimplemented style property .*$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Ignoring unrecognized CSS property: .*$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Fonts dir '[^']+' does not exist and will be ignored\.$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Failed to wrap object of type 'GtkRecentManager'\. Hint: this error is commonly caused by failing to call a library init\(\) function\.$
+
+^ConcreteInkscapeApplication<T>::create_window: Should not be called!$
+^Background RRGGBBAA: ffffff00$
+^Background RRGGBBAA: ffffffff$
+^Area [-+0-9.e]+:[-+0-9.e]+:[-+0-9.e]+:[-+0-9.e]+ exported to [0-9]+ x [0-9]+ pixels \([0-9]+ dpi\)$
+^Unable to init server: Could not connect: Connection refused$
+':'
+:
+
+
+cat >user_guide_pdf.ignore <<':'
+^$
+^  import md5
+^Build the book set list\.\.\.
+^Build the listings\.\.\.
+^XSLT stylesheets DocBook *- *LaTeX 2e \(0\.3\.[0-9]*\)
+^=+$
+^Build user-guide\.pdf
+^processing index /[-a-zA-Z/]+/pdf/user-guide\.idx\.\.\.
+^This is makeindex, version .*
+^Scanning style file /usr/share/dblatex/latex/scripts/doc\.ist\.\.\.\.done \([0-9]+ attributes redefined, 0 ignored\)\.
+^Scanning input file /[-a-zA-Z/]+/pdf/user-guide\.idx\.\.\.\.done \([0-9]+ entries accepted, 0 rejected\)\.
+^Sorting entries\.\.\.+done \([0-9]+ comparisons\)\.
+^Generating output file user-guide\.ind\.\.\.\.done \([0-9]+ lines written, 0 warnings\)\.
+^Output written in user-guide\.ind\.
+^Transcript written in user-guide\.ilg\.
+^'user-guide.pdf' successfully built
+^/[-a-zA-Z/]+/pdf not removed
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Unimplemented style property .*$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Ignoring unrecognized CSS property: .*$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Fonts dir '[^']+' does not exist and will be ignored\.$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.:]* *Failed to wrap object of type 'GtkRecentManager'\. Hint: this error is commonly caused by failing to call a library init\(\) function\.$
+^ConcreteInkscapeApplication<T>::create_window: Should not be called!$
+^Background RRGGBBAA: ffffff00$
+^Area 0:0:[0-9]+:[0-9]+ exported to [0-9]+ x [0-9]+ pixels \([0-9]+ dpi\)$
+^Unable to init server: Could not connect: Connection refused$
+':'
+:
+
+
+cat >user_guide_man.ignore <<':'
+Warn: AUTHOR sect\.: no personblurb|contrib for Yeti                gwyddion-thumbnailer
+Note: AUTHOR sect\.: see see http://docbook\.sf\.net/el/contrib       gwyddion-thumbnailer
+Note: AUTHOR sect\.: see see http://docbook\.sf\.net/el/personblurb   gwyddion-thumbnailer
+Note: Writing gwyddion-thumbnailer\.1
+Warn: AUTHOR sect\.: no personblurb|contrib for Yeti                gwyddion
+Note: AUTHOR sect\.: see see http://docbook\.sf\.net/el/contrib       gwyddion
+Note: AUTHOR sect\.: see see http://docbook\.sf\.net/el/personblurb   gwyddion
+Note: Writing gwyddion\.1
+':'
+:
+
+
+function printerr() {
+  f=$1
+  shift
+
+  test -s $f.err || return
+  cat --squeeze-blank $f.err \
+  | {
+    if test -s $f.ignore; then
+      grep --text -v -f $f.ignore
+    else
+      cat
+    fi
+  } | {
+    if test -n "$1"; then
+      $@
+    else
+      cat
+    fi
+  } >$tmplog
+  test -s $tmplog || return
+  echo "=====[ $f ]====="
+  cat $tmplog
+}
+
+function printerr_lang() {
+  f=$1
+  shift
+
+  for lang in $LANGUAGES; do
+    test -s $f-$lang.err || continue
+    cat --squeeze-blank $f-$lang.err \
+    | {
+      if test -s $f.ignore; then
+        grep --text -E -v -f $f.ignore
+      else
+        cat
+      fi
+    } | {
+      if test -n "$1"; then
+        $@
+      else
+        cat
+      fi
+    } >$tmplog
+    test -s $tmplog || continue
+    echo "=====[ $f-$lang ]====="
+    cat $tmplog
+  done
+}
+
+printerr user_guide_autostuff
+printerr_lang user_guide_xhtml
+printerr_lang user_guide_pdf
+printerr_lang user_guide_man
+
+rm *.ignore $tmplog

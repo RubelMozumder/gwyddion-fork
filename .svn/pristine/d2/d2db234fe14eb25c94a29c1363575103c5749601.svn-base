@@ -1,0 +1,1338 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-02-28 10:28+0400\n"
+"PO-Revision-Date: 2021-02-28 10:29+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: multidata.xml:6(title)
+msgid "Multiple Data"
+msgstr "Множественные данные"
+
+#: multidata.xml:8(title)
+msgid "Arithmetic <gwy:icon name=\"arithmetic\"/>"
+msgstr "Арифметика <gwy:icon name=\"arithmetic\"/>"
+
+#: multidata.xml:11(primary)
+msgid "arithmetic on data"
+msgstr "арифметика над данными"
+
+#: multidata.xml:14(guimenu) multidata.xml:184(guimenu)
+#: multidata.xml:246(guimenu) multidata.xml:325(guimenu)
+#: multidata.xml:404(guimenu) multidata.xml:426(guimenu)
+#: multidata.xml:458(guimenu) multidata.xml:503(guimenu)
+#: multidata.xml:584(guimenu) multidata.xml:695(guimenu)
+#: multidata.xml:839(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: multidata.xml:15(guisubmenu) multidata.xml:185(guisubmenu)
+#: multidata.xml:247(guisubmenu) multidata.xml:326(guisubmenu)
+#: multidata.xml:405(guisubmenu) multidata.xml:427(guisubmenu)
+#: multidata.xml:459(guisubmenu) multidata.xml:504(guisubmenu)
+#: multidata.xml:585(guisubmenu) multidata.xml:696(guisubmenu)
+#: multidata.xml:840(guisubmenu)
+msgid "Multidata"
+msgstr "Множественные данные"
+
+#: multidata.xml:16(guimenuitem)
+msgid "Arithmetic"
+msgstr "Арифметические операции"
+
+#: multidata.xml:19(para)
+msgid ""
+"Data Arithmetic module enables to perform arbitrary point-wise operations on "
+"a single image or on the corresponding points of several images (currently "
+"up to eight). And although it is not its primary function it can be also "
+"used as a calculator with immediate expression evaluation if a plain "
+"numerical expression is entered. The expression syntax is described in "
+"section <link linkend=\"expression-syntax\">Expressions</link>."
+msgstr ""
+"Модуль арифметики над данными позволяет проводить произвольные операции над "
+"точками отдельного поля данных или соответствующими точками нескольких полей "
+"данных (на текущий момент до восьми). И, хотя это не является его главным "
+"предназначением, он может использоваться как калькулятор с непосредственным "
+"расчётом выражений если ввести простое арифметическое выражение. Синтаксис "
+"выражений описан в разделе <link linkend=\"expression-syntax\">Выражения</"
+"link>."
+
+#: multidata.xml:28(para)
+msgid ""
+"The expression can contain the following variables representing values from "
+"the individual input images:"
+msgstr ""
+"Выражение может содержать следующие переменные, соответствующие значениям "
+"отдельных входных изображений:"
+
+#: multidata.xml:38(entry)
+msgid "Variable"
+msgstr "Переменная"
+
+#: multidata.xml:39(entry)
+msgid "Description"
+msgstr "Описание"
+
+#: multidata.xml:44(varname) multidata.xml:47(varname)
+msgid "d1"
+msgstr "d1"
+
+#: multidata.xml:44(varname)
+msgid "d8"
+msgstr "d8"
+
+#: multidata.xml:44(entry) multidata.xml:52(entry) multidata.xml:61(entry)
+#: multidata.xml:70(entry)
+msgid "<placeholder-1/>, …, <placeholder-2/>"
+msgstr "<placeholder-1/>, …, <placeholder-2/>"
+
+#: multidata.xml:45(entry)
+msgid ""
+"Data value at the pixel. The value is in base physical units, e.g. for "
+"height of 233 nm, the value of <placeholder-1/> is 2.33e-7."
+msgstr ""
+"Значение данных в точке. Значение записывается в основных физических "
+"единицах, например, для высоты в 233 нм, значение <placeholder-1/> равно "
+"2.33e-7."
+
+#: multidata.xml:52(varname)
+msgid "m1"
+msgstr "m1"
+
+#: multidata.xml:52(varname)
+msgid "m8"
+msgstr "m8"
+
+#: multidata.xml:53(entry)
+msgid ""
+"Mask value at the pixel. The mask value is either 0 (for unmasked pixels) or "
+"1 (for masked pixels). The mask variables can be used also if no mask is "
+"present; the value is then 0 for all pixels."
+msgstr ""
+"Значение маски в точке. Значение маски равно либо 0 (для немаскированных "
+"точек) либо 1 (для точек под маской). Переменные маски могут использоваться "
+"и если маска не задана, значение равно 0 во всех точках в этом случае."
+
+#: multidata.xml:61(varname)
+msgid "bx1"
+msgstr "bx1"
+
+#: multidata.xml:61(varname)
+msgid "bx8"
+msgstr "bx8"
+
+#: multidata.xml:62(entry)
+msgid ""
+"Horizontal derivative at the pixel. Again, the value is in physical units. "
+"The derivative is calculated as standard symmetrical derivative, except in "
+"edge pixels where one-side derivative is taken."
+msgstr ""
+"Производная по горизонтали в точке. Снова значение в физических единицах. "
+"Производная считается как стандартная симметричная производная, кроме точек "
+"на границе, где берётся производная только с одной стороны."
+
+#: multidata.xml:70(varname)
+msgid "by1"
+msgstr "by1"
+
+#: multidata.xml:70(varname)
+msgid "by8"
+msgstr "by8"
+
+#: multidata.xml:71(entry)
+msgid ""
+"Vertical derivative at the pixel, defined similarly to the horizontal "
+"derivative."
+msgstr ""
+"Производная по вертикали в точке, определяется так же, как и производная по "
+"горизонтали."
+
+#: multidata.xml:77(varname)
+msgid "x"
+msgstr "x"
+
+#: multidata.xml:78(entry)
+msgid ""
+"Horizontal coordinate of the pixel (in real units). It is the same in all "
+"images due to the compatibility requirement (see below)."
+msgstr ""
+"Горизонтальная координата точки (в физических единицах). Одинакова во всех "
+"полях из-за требования совместимости (см. ниже)."
+
+#: multidata.xml:85(varname)
+msgid "y"
+msgstr "y"
+
+#: multidata.xml:86(entry)
+msgid ""
+"Vertical coordinate of the pixel (in real units). It is the same in all "
+"images due to the compatibility requirement (see below)."
+msgstr ""
+"Вертикальная координата точки (в физических единицах). Одинакова во всех "
+"полях из-за требования совместимости (см. ниже)."
+
+#: multidata.xml:96(para)
+msgid ""
+"In addition, the constant <include href=\"eqi-pi.xml\"/> is available and "
+"can be typed either as <include href=\"eqi-pi.xml\"/> or <userinput>pi</"
+"userinput>."
+msgstr ""
+"В дополнение определяется константа <include href=\"eqi-pi.xml\"/>, которую "
+"можно набирать либо как <include href=\"eqi-pi.xml\"/>, либо как "
+"<userinput>pi</userinput>."
+
+#: multidata.xml:101(para)
+msgid ""
+"All images that appear in the expression have to be compatible. This means "
+"their dimensions (both pixel and physical) have to be identical. Other "
+"images, i.e. those not actually entering the expression, are irrelevant. The "
+"result is always put into a newly created image in the current file (which "
+"may be different from the files of all operands)."
+msgstr ""
+"Все изображения, которые реально используются в выражении должны быть "
+"совместимы. Это означает, что их размеры (как физические, так и в пикселях) "
+"должны быть идентичны. Другие поля данных (те, что не входят в выражения) ни "
+"на что не влияют. Результат всегда помещается в созданное заново изображение "
+"в текущем открытом файле (который может отличаться от файлов, содержащих все "
+"операнды)."
+
+#: multidata.xml:109(para)
+msgid ""
+"Since the evaluator does not automatically infer the correct physical units "
+"of the result the units have to be explicitly specified. This can be done by "
+"two means: either by selecting an image that has the same value units as the "
+"result should have, or by choosing option <guilabel>Specify units</guilabel> "
+"and typing the units manually."
+msgstr ""
+"Поскольку модуль расчёта не может автоматически вывести правильные "
+"физические единицы измерения результата, единицы должны быть явно указаны. "
+"Это можно сделать двумя путями: или выбрав поле данных с теми же единицами "
+"значений, что должны быть у результата, или выбрав опцию <guilabel>Задать "
+"единицы</guilabel> и введя единицы вручную."
+
+#: multidata.xml:116(para)
+msgid "The following table lists several simple expression examples:"
+msgstr "Следующая таблица содержит несколько простых примеров выражений:"
+
+#: multidata.xml:125(entry)
+msgid "Expression"
+msgstr "Выражение"
+
+#: multidata.xml:126(entry)
+msgid "Meaning"
+msgstr "Значение"
+
+#: multidata.xml:131(userinput)
+msgid "-d1"
+msgstr "-d1"
+
+#: multidata.xml:132(entry)
+msgid ""
+"Value inversion. The result is very similar to Invert Value, except that "
+"Invert Value reflects about the mean value while here we simply change all "
+"values to negative."
+msgstr ""
+"Инвертирует значение. Результат очень похож на Инвертировать значение, за "
+"исключением того, что последнее инвертирует значения относительно среднего в "
+"то время, как здесь мы просто меняем знак у значений,"
+
+#: multidata.xml:139(userinput)
+msgid "(d1 - d2)^2"
+msgstr "(d1 - d2)^2"
+
+#: multidata.xml:140(entry)
+msgid "Squared difference between two images."
+msgstr "Квадрат разницы между двумя полями данных."
+
+#: multidata.xml:145(userinput)
+msgid "d1 + m1*1e-8"
+msgstr "d1 + m1*1e-8"
+
+#: multidata.xml:148(superscript)
+msgid "−8"
+msgstr "−8"
+
+#: multidata.xml:146(entry)
+msgid ""
+"Modification of values under mask. Specifically, the value 10<placeholder-1/"
+"> is added to all masked pixels."
+msgstr ""
+"Модификация значений под маской. Конкретно в этом случае значение "
+"10<placeholder-1/> добавилось ко всем точкам под маской."
+
+#: multidata.xml:152(userinput)
+msgid "d1*m3 + d2*(1-m3)"
+msgstr "d1*m3 + d2*(1-m3)"
+
+#: multidata.xml:153(entry)
+msgid ""
+"Combination of two images. Pixels are taken either from image 1 or 2, "
+"depending on the mask on image 3."
+msgstr ""
+"Комбинация двух полей данных. Точки берутся либо из поля 1, либо из 2, в "
+"соответствии с маской, заданной на поле 3."
+
+#: multidata.xml:162(para)
+msgid ""
+"In the calculator mode the expression is immediately evaluated as it is "
+"typed and the result is displayed below Expression entry. No special action "
+"is necessary to switch between image expressions and calculator: expressions "
+"containing only numeric quantities are immediately evaluated, expressions "
+"referring to images are used to calculate a new image. The preview showing "
+"the result of an operation with images is not immediately updated as you "
+"type; you can update it either by clicking <guibutton>Update</guibutton> or "
+"just pressing <keycap>Enter</keycap> in the expression entry."
+msgstr ""
+"В режиме калькулятора выражение вычисляется сразу по мере его ввода и "
+"результат показывается под полем ввода выражения. Не требуется совершать "
+"специальных действий чтобы переключаться между выражениями над изображениями "
+"и калькулятором: выражения, содержащие только численные величины "
+"рассчитываются сразу, выражения, содержащие изображения используются чтобы "
+"рассчитать новое изображение. Изображение предпросмотра, показывающее "
+"результат операции с изображениями, не обновляется сразу следом за набором "
+"выражения; его можно обновить или нажатием на кнопку <guibutton>Обновить</"
+"guibutton> или нажатием <keycap>Enter</keycap> в поле ввода выражения."
+
+#: multidata.xml:175(title)
+msgid "Profiles from multiple images <gwy:icon name=\"profile_multiple\"/>"
+msgstr ""
+"Профили из нескольких изображений <gwy:icon name=\"profile_multiple\"/>"
+
+#: multidata.xml:179(primary)
+msgid "profile extraction"
+msgstr "извлечение профиля"
+
+#: multidata.xml:180(secondary)
+msgid "from multiple images"
+msgstr "из нескольких изображений"
+
+#: multidata.xml:186(guimenuitem)
+msgid "Multiprofile"
+msgstr "Множественный профиль"
+
+#: multidata.xml:189(para)
+msgid ""
+"It is often useful to compare the corresponding scan lines from different "
+"images – in particular trace and retrace. This can be done using "
+"Multiprofile and selecting the two images as 1 and 2 in the "
+"<guilabel>Images</guilabel> list. The selected scan line is displayed on the "
+"image. It can be moved around with mouse or the scan line number can be "
+"entered numerically using <guilabel>Scan line</guilabel>."
+msgstr ""
+"Нередко может быть полезно сравнить соответствующие линии скана на разных "
+"изображениях, в частности на прямом и обратном проходе. Это можно сделать "
+"используя опцию Множественный профиль и выбирая два изображения как 1 и 2 в "
+"списке <guilabel>Изображения</guilabel>. Выбранные линии скана будут "
+"показаны на изображении. Эту линию можно перемещать по изображению с помощью "
+"мыши или номер линиии скана можно ввести численно используя опцию "
+"<guilabel>Линия скана</guilabel>."
+
+#: multidata.xml:203(phrase)
+msgid "Multiprofile module dialog screenshot"
+msgstr "Снимок экрана диалогового окна модуля множественных профилей"
+
+#: multidata.xml:205(caption)
+msgid ""
+"Basic usage of multiprofile module, with trace and retrace images selected "
+"as 1 and 2 and a the corresponding pair of profiles displayed in the graph."
+msgstr ""
+"Основной тип использования модуля множественных профилей, где изображения "
+"прямого и обратного прохода сканирования выбраны в качестве 1 и 2 и "
+"соответствующая пара профилей показывается на графике."
+
+#: multidata.xml:212(para)
+msgid ""
+"The profiles can be read simultaneously from up to six images. Enable and "
+"disable individual images using the checkboxes next to the image number. Any "
+"of the enabled images can be displayed in the small preview, which is "
+"controlled by selecting them using <guilabel>Show</guilabel>."
+msgstr ""
+"Профили можно читать одновременно с нескольких изображений вплоть до шести. "
+"Можно включать и выключать отдельные изображения используя чекбоксы рядом с "
+"номером изображения. Любое из включенных изображений может показываться в "
+"маленьком окне предпросмотра, что управляется выбором их используя опцию "
+"<guilabel>Показать</guilabel>."
+
+#: multidata.xml:218(para)
+msgid ""
+"Since the graph shows mutually corresponding profiles, all images must have "
+"the same pixel and physical dimensions and must also represent the same "
+"physical quantity. Image 1 is special in this regard. It cannot be "
+"unselected and it defines the dimensions and other properties. In other "
+"words, all the other images must be compatible with image 1."
+msgstr ""
+"Поскольку график показывает взаимно соответствующие профили, все изображения "
+"должны иметь одинаковые размеры в пикселях и реальные, и должны представлять "
+"одну и ту же физическую величину. Изображение 1 рассматривается как особое в "
+"этом отношении. Оно не может быть не выбрано и оно задаёт разрешение и "
+"другие свойства. Другими словами, все остальные изображения должны быть "
+"совместимы с изображением 1."
+
+#: multidata.xml:225(para)
+msgid ""
+"Options in the lower right part include the standard thickness (averaging) "
+"control, the same as for the normal <link linkend=\"profile\">profile tool</"
+"link>, masking options and target graph for the extracted profiles. Masks "
+"can be either taken from the corresponding images, or the mask on the first "
+"image can be used for all – if <guilabel>Use first mask for all images</"
+"guilabel> is ticked."
+msgstr ""
+"Опции в нижней правой части окна включают стандартное управление шириной "
+"профиля (усреднением поперёк линии профиля), которая работает так же, как "
+"для обычного <link linkend=\"profile\">инструмента получения профиля</link>, "
+"опции работы с маской и график для извлечения профилей. Маски могут быть как "
+"взяты из соответствующих изображений, так и маска первого изображения может "
+"использоваться для всех, в том случае, если опция <guilabel>Использовать "
+"первую маску для всех изображений</guilabel> включена."
+
+#: multidata.xml:233(para)
+msgid ""
+"Instead of extracting the individual profiles, the module can also do simple "
+"statistics and plot summary curves – mean curve with lower and upper bounds. "
+"This is controlled by <guilabel>Mode</guilabel>."
+msgstr ""
+"Вместо того, чтобы извлекать отдельные профили, модуль может также "
+"рассчитывать простую статистику и строить сводные кривые - среднюю кривую с "
+"верхними и нижними границами. Это управляется опцией <guilabel>Режим</"
+"guilabel>."
+
+#: multidata.xml:240(title)
+msgid "Detail Immersion <gwy:icon name=\"immerse\"/>"
+msgstr "Встроить фрагмент <gwy:icon name=\"immerse\"/>"
+
+#: multidata.xml:243(primary)
+msgid "detail image immersion"
+msgstr "встраивание фрагмента"
+
+#: multidata.xml:248(guimenuitem)
+msgid "Immerse"
+msgstr "Встроить"
+
+#: multidata.xml:251(para)
+msgid ""
+"Immerse insets a detailed, high-resolution image into a larger image. The "
+"image the function was run on forms the large, base image."
+msgstr ""
+"Встраивание вставляет фрагмент, изображение с более высоким разрешением, "
+"внутрь более крупного изображения. Изображение, на котором была запущена "
+"функция формирует большое, базовое изображение."
+
+#: multidata.xml:255(para)
+msgid ""
+"The detail can be positioned manually on the large image with mouse. Button "
+"<guibutton>Improve</guibutton> can then be used to find the exact "
+"coordinates in the neighbourhood of the current position that give the "
+"maximum correlation between the detail and the large image. Or the best-"
+"match position can be searched through the whole image with "
+"<guibutton>Locate</guibutton>."
+msgstr ""
+"Положение фрагмента может быть задано вручную на большом изображении с "
+"помощью мыши. Кнопка <guibutton>Уточнить</guibutton> может быть затем "
+"использована для получения точных координат в окрестности текущей позиции, "
+"которые дают максимум корреляции между фрагментом и большим изображением. "
+"Или наиболее подходящее положение может быть найдено на всём изображении с "
+"помощью кнопки <guibutton>Найти</guibutton>."
+
+#: multidata.xml:263(para)
+msgid ""
+"It should be noted that correlation search is insensitive to value scales "
+"and offsets, therefore the automated matching is based solely on data "
+"features, absolute heights play no role."
+msgstr ""
+"Следует отметить, что корреляционный поиск не чувствителен к масштабу "
+"значений и смещений, следовательно, автоматический поиск соответствия "
+"основан исключительно на свойствах данных, абсолютные значения высоты не "
+"играют значения."
+
+#: multidata.xml:268(para)
+msgid ""
+"<guilabel>Result Sampling</guilabel> controls the size and resolution of the "
+"result image:"
+msgstr ""
+"<guilabel>Разрешение результата</guilabel> контролирует размер и разрешение "
+"результирующего изображения:"
+
+#: multidata.xml:275(guilabel)
+msgid "Upsample large image"
+msgstr "Увеличить разрешение большого изображения"
+
+#: multidata.xml:277(listitem)
+msgid ""
+"The resolution of the result is determined by the resolution of the inset "
+"detail. Therefore the large image is scaled up."
+msgstr ""
+"Разрешение результата определяется разрешением встраиваемого фрагмента. "
+"Следовательно, масштаб большого изображения увеличивается."
+
+#: multidata.xml:284(guilabel)
+msgid "Downsample detail"
+msgstr "Снизить разрешение фрагмента"
+
+#: multidata.xml:286(listitem)
+msgid ""
+"The resolution of the result is determined by the resolution of the large "
+"image. The detail is downsampled."
+msgstr ""
+"Разрешение результата определяется разрешением большого изображения. Масштаб "
+"фрагмента уменьшается. "
+
+#: multidata.xml:292(para)
+msgid ""
+"<guilabel>Detail Leveling</guilabel> selects the transform of the <include "
+"href=\"eqi-z.xml\"/> values of the detail:"
+msgstr ""
+"<guilabel>Выравнивание фрагмента</guilabel> выбирает преобразование значений "
+"<include href=\"eqi-z.xml\"/> фрагмента:"
+
+#: multidata.xml:299(guilabel)
+msgid "None"
+msgstr "Нет"
+
+#: multidata.xml:301(listitem)
+msgid "No <include href=\"eqi-z.xml\"/> value adjustment is performed."
+msgstr "Подстройка значений <include href=\"eqi-z.xml\"/> не производится."
+
+#: multidata.xml:307(guilabel)
+msgid "Mean value"
+msgstr "Среднее значение"
+
+#: multidata.xml:309(listitem)
+msgid ""
+"All values of the detail image are shifted by a constant to make its mean "
+"value match the mean value of the corresponding area of the large image."
+msgstr ""
+"Все значения изображения фрагмента сдвигаются на постоянную величину так, "
+"чтобы его среднее значение соответствовало среднему значению соответствующей "
+"области большого изображения."
+
+#: multidata.xml:318(title)
+msgid "Merging <gwy:icon name=\"merge\"/>"
+msgstr "Объединение <gwy:icon name=\"merge\"/>"
+
+#: multidata.xml:321(primary)
+msgid "merging images"
+msgstr "объединение изображений"
+
+#: multidata.xml:322(primary) multidata.xml:401(primary)
+msgid "joining images"
+msgstr "соединение изображений"
+
+#: multidata.xml:327(guimenuitem)
+msgid "Merge"
+msgstr "Объединить"
+
+#: multidata.xml:330(para)
+msgid ""
+"Images that form parts of a larger image can be merged together with Merge. "
+"The image the function was run on corresponds to the base image, the image "
+"selected with <guilabel>Merge with</guilabel> represents the second operand. "
+"The side of the base image the second one will be attached to is controlled "
+"with <guilabel>Put second operand</guilabel> selector."
+msgstr ""
+"Изображения, которые формируют части большего изображения, могут быть "
+"объединены вместе с помощью команды \"Объединить.\"  Изображение, на котором "
+"была запущена эта функция формирует базовое изображение, изображение, "
+"выбранное с помощью <guilabel>Объединить с</guilabel>, представляет второй "
+"операнд. Сторона базового изображения к которой будет присоединено второе "
+"управляется с помощью выпадающего меню <guilabel>Поместить второй операнд</"
+"guilabel>."
+
+#: multidata.xml:338(para)
+msgid ""
+"If the images match perfectly, they can be simply placed side by side with "
+"no adjustments. This behaviour is selected by option <guilabel>None</"
+"guilabel> of alignment control <guilabel>Align second operand</guilabel>."
+msgstr ""
+"Если изображения идеально соответствуют друг другу, они могут просто "
+"совмещены сторонами без подстройки. Этот вариант выбирается опцией "
+"<guilabel>Нет</guilabel> в управляющем выравниванием элементе "
+"<guilabel>Выровнять второй операнд</guilabel>."
+
+#: multidata.xml:344(para)
+msgid ""
+"However, usually adjustments are necessary. If the images are of the same "
+"size and aligned in direction pependicular to the merging direction the only "
+"degree of freedom is possible overlap. The <guilabel>Join</guilabel> "
+"aligment method can be used in this case. Unlike in the correlation search "
+"described below, the absolute data values are matched. This makes this "
+"option suitable for merging even very slowly varying images provided their "
+"absolute height values are well defined."
+msgstr ""
+"Однако, обычно необходимы подстройки. Если изображения имеют одинаковый "
+"размер и выровнены в направлении, перпендикулярном к направлению слияния, "
+"единственной степенью свободы будет возможное перекрытие. В данном случае "
+"может использоваться метод выравнивания <guilabel>объединение</guilabel>. В "
+"отличие от поиска корреляции, описанного ниже, сопоставляются абсолютные "
+"значения данных. Это делает данную опцию подходящей даже для слабо "
+"меняющихся изображений если их абсолютные значения высоты измерены точно."
+
+#: multidata.xml:354(para)
+msgid ""
+"Option <guilabel>Correlation</guilabel> selects automated alignment by "
+"correlation-based search of the best match. The search is performed both in "
+"the direction parallel to the attaching side and in the perpendicular "
+"direction. If a parallel shift is present, the result is expanded to contain "
+"both images fully (with undefined data filled with a background value)."
+msgstr ""
+"Опция <guilabel>Корреляция</guilabel> выбирает автоматическое выравнивание с "
+"помощью основанного на корреляции поиска наилучшего соответствия. Поиск "
+"производится как вдоль направления, параллельного присоединяемой стороне, "
+"так и в перпендикулярном ему. Если присутствует параллельный сдвиг, "
+"результат расширяется таким образом, чтобы в него полностью поместились оба "
+"изображения (отсутствующие значения заполняются значением фона)."
+
+#: multidata.xml:362(para)
+msgid ""
+"Option <guilabel>Boundary treatment</guilabel> is useful only for the latter "
+"case of imperfectly aligned images. It controls the treatment of overlapping "
+"areas in the source images:"
+msgstr ""
+"Опция <guilabel>Режим границы</guilabel> полезна только в последнем случае "
+"неточно выровненных изображений. Она управляет тем, что будет с "
+"пересекающейся частью обоих изображений:"
+
+#: multidata.xml:370(guilabel)
+msgid "First operand"
+msgstr "Первый операнд"
+
+#: multidata.xml:372(listitem)
+msgid "Values in overlapping areas are taken from the first, base image."
+msgstr ""
+"Значения в пересекающихся областях берутся из первого, базового изображения."
+
+#: multidata.xml:378(guilabel) multidata.xml:526(guilabel)
+msgid "Second operand"
+msgstr "Второй операнд"
+
+#: multidata.xml:380(listitem)
+msgid "Values in overlapping areas are taken from the second image."
+msgstr "Значения в пересекающихся областях берутся из второго изображения."
+
+#: multidata.xml:386(guilabel)
+msgid "Smooth"
+msgstr "Сгладить"
+
+#: multidata.xml:388(listitem)
+msgid ""
+"A smooth transition between the first and the second image is made through "
+"the overlapping area by using a weighted average with a suitable weighting "
+"function."
+msgstr ""
+"Гладкий переход между первым и вторым изображением производится на "
+"пересекающейся области используя взвешенное среднее с подходящей функцией "
+"веса."
+
+#: multidata.xml:397(title)
+msgid "Stitching <gwy:icon name=\"stitch\"/>"
+msgstr "Сшивание <gwy:icon name=\"stitch\"/>"
+
+#: multidata.xml:400(primary)
+msgid "stitching images"
+msgstr "сшивание изображений"
+
+#: multidata.xml:406(guimenuitem)
+msgid "Stitch"
+msgstr "Сшивание"
+
+#: multidata.xml:409(para)
+msgid ""
+"Stitching is an alternative to the merge module described above. It is "
+"mainly useful when the relative positions of the image parts are known "
+"exactly because the positions entered numerically. They are initialised "
+"using image offsets, so if these are correct, the stitched image is formed "
+"automatically. Buttons <guibutton>Restore</guibutton> for each part revert "
+"manually modified offsets to the initial ones."
+msgstr ""
+"Сшивание является альтернативой модулю объединения изображений, описанному "
+"выше. Оно в основном полезно если точно известны относительные положения "
+"частей изображения поскольку позиции вводятся численною Они инициализируются "
+"с использованием смещений изображения, таким образом, если они правильны, "
+"сшитое изображение формируется автоматически. Кнопки "
+"<guibutton>Восстановить</guibutton> для каждой части возвращают вручную "
+"измененные смещения к первоначальным."
+
+#: multidata.xml:419(title)
+msgid "Mutual Crop <gwy:icon name=\"mutual_crop\"/>"
+msgstr "Взаимно кадрировать <gwy:icon name=\"mutual_crop\"/>"
+
+#: multidata.xml:422(primary)
+msgid "mutual crop of two images"
+msgstr "взаимное кадрирование двух изображений"
+
+#: multidata.xml:423(primary)
+msgid "remove non-intersecting areas"
+msgstr "удаление непересекающихся областей"
+
+#: multidata.xml:428(guimenuitem)
+msgid "Mutual Crop"
+msgstr "Взаимное кадрирование"
+
+#: multidata.xml:431(para)
+msgid ""
+"Two slightly different images of the same area (for example, before and "
+"after some treatment) can be croped to intersecting area (or non-"
+"intersecting parts can be removed) with this module."
+msgstr ""
+"С помощью этого модуля можно кадрировать два слегка сдвинутых друг "
+"относительно друга изображения одной и той же области (например, до и после "
+"какого-то воздействия), или, другими словами, обрезать непересекающиеся "
+"части возле границы изображений."
+
+#: multidata.xml:436(para)
+msgid ""
+"Intersecting part is determined by correlation of larger image with center "
+"area of smaller image. Images resolution (pixels per linear unit) should be "
+"equal."
+msgstr ""
+"Общая область определяется корреляцией большего изображения с центральной "
+"частью меньшего. Разрешения обоих изображений (количество точек на единицу "
+"длины) должны быть одинаковы."
+
+#: multidata.xml:441(para)
+msgid ""
+"The only parameter now is <guilabel>Select second operand</guilabel> - "
+"correlation between it and current image will be calculated and both images "
+"will be cropped to remove non-intersecting near-border parts."
+msgstr ""
+"На текущий момент единственным параметром сейчас является <guilabel>Второй "
+"операнд</guilabel> - будет посчитана корреляция между ним и текущим активным "
+"изображением и оба изображения будут обрезаны чтобы удалить непересекающиеся "
+"области возле границы."
+
+#: multidata.xml:449(title)
+msgid "Relation <gwy:icon name=\"image_relation\"/>"
+msgstr "Взаимосвязь <gwy:icon name=\"image_relation\"/>"
+
+#: multidata.xml:453(primary)
+msgid "fitting"
+msgstr "аппроксимация"
+
+#: multidata.xml:454(secondary)
+msgid "relation between two images"
+msgstr "отношение между двумя изображениями"
+
+#: multidata.xml:460(guimenuitem)
+msgid "Relate"
+msgstr "Взаимосвязь"
+
+#: multidata.xml:463(para)
+msgid ""
+"When data in two images are related in a simple manner, for instance they "
+"differ by a constant calibration factor, this function helps finding the "
+"relation."
+msgstr ""
+"Когда данные двух изображений взаимосвязаны простым образом, например, они "
+"отличаются постоянным фактором калибровки, эта функция помогает найти такую "
+"взаимосвязь."
+
+#: multidata.xml:468(para)
+msgid ""
+"The graph in the left part shows pixel values of the second image (selected "
+"as <guilabel>Second image</guilabel>) plotted as a function of corresponding "
+"pixel values in the current image. When a simple relation between the values "
+"exist, all the points lie on a single curve. Note that for large images only "
+"a small, randomly selected subset of pixel values is plotted in the graph."
+msgstr ""
+"График в левой части показывает значения пикселей второго изображения "
+"(выбранного как <guilabel>Второе изображение</guilabel>) построенных как "
+"функцию соответствующих значений пикселей текущего изображения. Когда между "
+"данными существует простая взаимосвязь, все точки лежат на одной кривой. "
+"Следует отметить, что для больших изображений на графике строится только "
+"небольшая случайно выбранная подвыборка данных."
+
+#: multidata.xml:476(para)
+msgid ""
+"Several simple relations can be fitted to the point data, such as "
+"proportion, offset, linear relation or quadratic relation. The fit "
+"parameters are immediately evaluated and displayed in the table below and "
+"the corresponding relation plotted. All pixel values are used for fitting, "
+"even if only a subset is displayed."
+msgstr ""
+"Некоторые простые взаимосвязи могут аппроксимировать данные точек, среди них "
+"есть пропорциональная, смещение, линейная или квадратная связь. Параметры "
+"аппроксимации рассчитываются моментально и показываются в таблице снизу, при "
+"этом строится соответствующий график взаимосвязи. Все значения пикселей "
+"используются для аппроксимации даже если показывается небольшое подмножество."
+
+#: multidata.xml:489(phrase)
+msgid "Relation module dialog screenshot"
+msgstr "Снимок экрана диалогового окна модуля взаимосвязи"
+
+#: multidata.xml:491(caption)
+msgid ""
+"An almost-linear relation between two slices of volume MFM data at different "
+"heights, as displayed and fitted by the relation module."
+msgstr ""
+"Практически линейная взаимосвязь двух срезов объёмных данных МСМ полученных "
+"на разной высоте, показанная и аппроксимированная модулем определения "
+"взаимосвязи."
+
+#: multidata.xml:499(title)
+msgid "Cross-Correlation"
+msgstr "Взаимная корреляция"
+
+#: multidata.xml:500(primary)
+msgid "cross-correlation"
+msgstr "взаимная корреляция"
+
+#: multidata.xml:505(guimenuitem)
+msgid "Cross-correlation"
+msgstr "Взаимная корреляция"
+
+#: multidata.xml:508(para)
+msgid ""
+"This module finds local correlations between details on two different "
+"images. As an ideal output, the shift of every pixel on the first image as "
+"seen on the second image is returned. This can be used for determining local "
+"changes on the surface while imaged twice (shifts can be for example due to "
+"some sample deformation or microscope malfunction)."
+msgstr ""
+"Модуль находит локальные корреляции между фрагментами двух различных "
+"изображений. В идеальном случае выводится сдвиг каждого пикселя первого "
+"изображения как показано на втором. Это можно использовать для определения "
+"локальных изменений на поверхности, которую сняли дважды (сдвиг может "
+"существовать, например, при какой-то деформации образца или неправильной "
+"работе микроскопа)."
+
+#: multidata.xml:516(para)
+msgid ""
+"For every pixel on the first operand (actual window), the module takes its "
+"neighbourhood and searches for the best correlation in the second operand "
+"within defined area. The position of the correlation maximum is used to set "
+"up the value of shift for the mentioned pixel on the first operand."
+msgstr ""
+"Для каждого пикселя первого операнда (текущего окна) модуль берёт его "
+"окрестность и ищет наилучшую корреляцию с вторым операндом внутри заданной "
+"области. Положение максимума корреляции используется для задания значения "
+"сдвига для вышеупомянутого пикселя первого операнда."
+
+#: multidata.xml:528(listitem)
+msgid "Image to be used for comparison with the first operand - base image."
+msgstr ""
+"Изображение, которое будет использоваться для сравнения с первым операндом - "
+"базовое изображение."
+
+#: multidata.xml:534(guilabel)
+msgid "Search size"
+msgstr "Размер поиска"
+
+#: multidata.xml:536(listitem)
+msgid ""
+"Used to set the area whera algorithm will search for the local neighbourhood "
+"(on the second operand). Should be larger than window size. Increase this "
+"size if there are big differences between the compared images."
+msgstr ""
+"Используется для задания области, где алгоритм будет искать локальную "
+"окрестность (на втором операнде). Должно быть больше, чем размер окна. "
+"Необходимо увеличить размер, если между сравниваемыми изображениями есть "
+"большие различия."
+
+#: multidata.xml:545(guilabel)
+msgid "Window size"
+msgstr "Размер окна"
+
+#: multidata.xml:547(listitem)
+msgid ""
+"Used to set the local neighbourhood size (on the first operand). Should be "
+"smaller than search size. Increasing this value can improve the module "
+"functionality, but it will surely slow down the computation."
+msgstr ""
+"Используется для задания размера области локальной окрестности (на первом "
+"операнде). Должно быть меньше, чем размер поиска. Увеличение этого значения "
+"может улучшить работу модуля, но, разумеется, замедлит расчёт."
+
+#: multidata.xml:556(guilabel) multidata.xml:616(guilabel)
+msgid "Output type"
+msgstr "Тип вывода"
+
+#: multidata.xml:558(listitem)
+msgid "Determines the output (pixel shift) format."
+msgstr "Определяет выходной формат (пиксельного сдвига)."
+
+#: multidata.xml:564(guilabel)
+msgid "Add low score threshold mask"
+msgstr "Добавить маску порога низкой степени корреляции."
+
+#: multidata.xml:566(listitem)
+msgid ""
+"For some pixels (with not very pronounced neighbourhood) the correlation "
+"scores can be small everywhere, but the algorithm anyway picks some maximum "
+"value from the scores. To see these pixels and possibly remove them from any "
+"further considerations you can let the module to set mask of low-score pixel "
+"shifts that have larger probability to be not accurately determined."
+msgstr ""
+"Для некоторых пикселей (с не очень ярко выраженной окрестностью) степень "
+"корреляции будет низкой везде, но алгоритм всё равно будет выбирать "
+"некоторые максимальные значения этой степени. Чтобы увидеть эти точки и "
+"возможно убрать их из дальнейшего рассмотрения можно дать модулю установить "
+"маску сдвигов пикселей с низкой степенью корреляции, для которых вероятность "
+"того, что она определена правильно, невелика."
+
+#: multidata.xml:578(title)
+msgid "Correlation Search <gwy:icon name=\"correlation_mask\"/>"
+msgstr "Поиск по корреляции <gwy:icon name=\"correlation_mask\"/>"
+
+#: multidata.xml:581(primary)
+msgid "correlation search"
+msgstr "поиск корреляцией"
+
+#: multidata.xml:586(guimenuitem)
+msgid "Correlation Search"
+msgstr "Поиск по корреляции"
+
+#: multidata.xml:589(para)
+msgid ""
+"This module searches for a given detail within the image base. It can "
+"produce a correlation score image or mark resulting detail position using a "
+"mask on the base image."
+msgstr ""
+"Этот модуль ищет заданный фрагмент внутри базового изображения. Он может "
+"генерировать изображение уровня корреляции или пометить результирующее "
+"положение фрагмента с помощью маски на базовом изображении."
+
+#: multidata.xml:597(guilabel)
+msgid "Correlation kernel"
+msgstr "Ядро корреляции"
+
+#: multidata.xml:599(listitem)
+msgid ""
+"Detail image to be found on the base image. The dimensions of one pixel in "
+"both images must correspond."
+msgstr ""
+"Изображение фрагмента которое нужно найти на базовом изображении. Размеры "
+"пикселя на обоих изображениях должны соответствовать друг другу."
+
+#: multidata.xml:606(guilabel)
+msgid "Use mask"
+msgstr "Использовать маску"
+
+#: multidata.xml:608(listitem)
+msgid ""
+"If the detail image has a mask you can enable this option. Only the pixels "
+"covered by the mask then influence the search. This can help with marking of "
+"details that have irregular shape."
+msgstr ""
+"Если изображение фрагмента содержит маску, то можно включить эту опцию. "
+"Только пиксели под маской будут влиять тогда на результат поиска. Это может "
+"помочь для выделения фрагментов, которые имеют неправильную форму."
+
+#: multidata.xml:618(listitem)
+msgid ""
+"There are several possibilities what to output: local correlation maxima "
+"(single points), masks of kernel size for each correlation maximum (good for "
+"presentation purposes), or simply the correlation score."
+msgstr ""
+"Есть несколько вариантов того. что выводить: локальные максимумы корреляции "
+"(отдельные точки), маски с размером ядра для каждого максимума корреляции "
+"(хорошо подходят для презентаций) или просто степень корреляции."
+
+#: multidata.xml:627(guilabel)
+msgid "Correlation method"
+msgstr "Метод корреляции"
+
+#: multidata.xml:631(guilabel)
+msgid "Correlation"
+msgstr "Корреляции"
+
+#: multidata.xml:633(guilabel)
+msgid "Height difference"
+msgstr "Разницы высоты"
+
+#: multidata.xml:629(listitem)
+msgid ""
+"Several correlation score computation methods are available. There are two "
+"basic classes. For <placeholder-1/> the score is obtained by integrating the "
+"product of the kernel and base images. For <placeholder-2/> the score is "
+"obtained by integrating the squared difference between the kernel and base "
+"images (and then inverting the sign to make higher scores better). For both "
+"methods the image region compared to the kernel can be used as-is (raw), it "
+"can be levelled to the same mean value or it can be levelled to the same "
+"mean value and normalised to the same sum of squares, producing the score."
+msgstr ""
+"Доступно несколько методов расчёта степени корреляции. Есть два основных "
+"класса. Для <placeholder-1/> корреляция рассчитывается интегрированием "
+"произведения базового изображения и изображения ядра. Для <placeholder-2/> "
+"корреляция рассчитывается как квадрат расстояния между базовым изображением "
+"и ядром (с последующей инверсией знака чтобы сделать более высокую оценку "
+"лучше). Для обоих методов область изображения, сравниваемая с ядром может "
+"использоваться как есть (необработанной), может быть выровнена до общего "
+"среднего значения или она может быть выровнена до общего среднего значения и "
+"нормализована до одинаковой суммы квадратов, дающих оценку."
+
+#: multidata.xml:644(guilabel)
+msgid "Threshold"
+msgstr "Порог"
+
+#: multidata.xml:648(quote)
+msgid "detail found here"
+msgstr "фрагмент найден здесь"
+
+#: multidata.xml:646(listitem)
+msgid ""
+"Threshold for determining whether the local maximum will be treated as "
+"<placeholder-1/>."
+msgstr ""
+"Порог для определения, будет ли локальный максимум считаться <placeholder-1/"
+">."
+
+#: multidata.xml:653(guilabel)
+msgid "Regularization"
+msgstr "Регуляризация"
+
+#: multidata.xml:655(listitem)
+msgid ""
+"When the base image regions are locally normalised, very flat regions can "
+"lead to random matches with the detail image and other odd results. By "
+"increasing the regularization parameter flat regions are suppressed."
+msgstr ""
+"Когда области базового изображения локально нормализуются, очень плоские "
+"области могут приводить к случайным соответствиям изображению фрагмента и "
+"другим странным результатам. Путём увеличения параметра регуляризации вклад "
+"плоских участков подавляется."
+
+#: multidata.xml:665(title)
+msgid "Neural network processing"
+msgstr "Обработка нейросетью"
+
+#: multidata.xml:666(primary) multidata.xml:690(primary)
+#: multidata.xml:834(primary)
+msgid "neural network"
+msgstr "нейросеть"
+
+#: multidata.xml:667(para)
+msgid ""
+"Neural network processing can be used to calculate one kind of data from "
+"another even if the formula or relation between them is not explicitly "
+"known. The relation is built into the network implicitly by a process called "
+"training which employs pairs of known input and output data, usually called "
+"model and signal. In this process, the network is optimised to reproduce as "
+"well as possible the signal from model. A trained network can then be used "
+"to process model data for which the output signal is not available and "
+"obtain – usually somewhat approximately – what the signal would look like. "
+"Another possible application is the approximation of data processing methods "
+"that are exact but very time-consuming. In this case the signal is the "
+"output of the exact method and the network is trained to reproduce that."
+msgstr ""
+"Обработку с помощью нейросети можно использовать для расчёта одного типа "
+"данных из другого даже если формула или соотношение, описывающие связь между "
+"ними, не описаны в явном виде. Соотношение непосредственно встраивается в "
+"нейросеть на этапе, называемом обучением, который задействует пары известных "
+"входных и выходных данных, обычно называемых модель и сигнал. В этом "
+"процессе сеть оптимизируется таким образом, чтобы воспроизводить настолько "
+"точно, насколько это возможно сигнал из модели. Обученная нейросеть затем "
+"может быть использована для обработки данных модели, для которых выходной "
+"сигнал не известен и получать, обычно несколько приближенно, как сигнал "
+"должен выглядеть. Другим возможным применением может быть аппроксимация "
+"методов обработки данных, которые являются точными, но требующими "
+"значительного времени. В этом случае сигналом будут выходные данные точного "
+"метода, и нейросеть обучается воспроизводить их."
+
+#: multidata.xml:681(para)
+msgid ""
+"Since training and application are two disparate steps they are present as "
+"two different functions in Gwyddion."
+msgstr ""
+"Поскольку обучение нейросети и её применение это два совершенно различных "
+"шага, они реализованы в Gwyddion как две разные функции."
+
+#: multidata.xml:686(title)
+msgid "Training <gwy:icon name=\"neural_train\"/>"
+msgstr "Обучение нейросети <gwy:icon name=\"neural_train\"/>"
+
+#: multidata.xml:691(secondary)
+msgid "training"
+msgstr "обучение"
+
+#: multidata.xml:697(guimenuitem)
+msgid "Neural Network Training"
+msgstr "Обучение Нейросети"
+
+#: multidata.xml:705(guilabel)
+msgid "Model"
+msgstr "Модель"
+
+#: multidata.xml:706(listitem)
+msgid ""
+"Model data, i.e. input for training. Multiple models can be chosen "
+"sequentially for training (with corresponding signals)."
+msgstr ""
+"Данные модели, т.е. входные данные для обучения. Для обучения можно выбрать "
+"несколько моделей последовательно (с соответствующими сигналами)."
+
+#: multidata.xml:713(guilabel)
+msgid "Signal"
+msgstr "Сигнал"
+
+#: multidata.xml:714(listitem)
+msgid ""
+"Signal data for training, i.e. the output the trained network should "
+"produce. The signal image must be compatible with model image, i.e. it must "
+"have the same pixel and physical dimensions."
+msgstr ""
+"Данные сигнала для обучения, т.е. выходные данные, которые должна выдавать "
+"обученная нейросеть. Изображение сигнала должно быть совместимо с "
+"изображением модели, т.е. иметь одинаковые размеры в пикселях и физические."
+
+#: multidata.xml:722(guilabel)
+msgid "Training steps"
+msgstr "Шагов тренировки"
+
+#: multidata.xml:725(guibutton) multidata.xml:733(guibutton)
+msgid "Train"
+msgstr "Обучение"
+
+#: multidata.xml:723(listitem)
+msgid ""
+"Number of training steps to perform when <placeholder-1/> is pressed. Each "
+"step consists of one pass through the entire signal data. It is possible to "
+"set the number of training steps to zero; no training pass is performed then "
+"but the model is still evaluated with the network and you can observe the "
+"result."
+msgstr ""
+"Число шагов обучения, которое будет выполнено при нажатии <placeholder-1/>. "
+"Каждый шаг состоит из одного прохода по всем данным сигнала. Можно "
+"установить число шагов обучения равным нулю, при этом обучения не будет "
+"производиться, но модель будет рассчитана нейросетью, и можно будет "
+"наблюдать результат расчёта."
+
+#: multidata.xml:734(listitem)
+msgid ""
+"Starts training. This is a relatively slow process, especially if the data "
+"and/or window size are large."
+msgstr ""
+"Начинает обучение. Это сравнительно медленный процесс, особенно при больших "
+"размерах поля данных и окна."
+
+#: multidata.xml:740(guibutton)
+msgid "Reinitialize"
+msgstr "Переинициализация"
+
+#: multidata.xml:741(listitem)
+msgid ""
+"Reinitializes the neural network to an untrained state. More precisely, this "
+"means neuron weights are set to random numbers."
+msgstr ""
+"Заново инициализирует нейросеть в необученном состоянии. Точнее, это "
+"означает, что веса нейронов устанавливаются в случайные значения."
+
+#: multidata.xml:748(guilabel)
+msgid "Masking Mode"
+msgstr "Режим использования маски"
+
+#: multidata.xml:749(listitem)
+msgid ""
+"It is possible to train the network only on a subset of the signal, "
+"specified by a mask on the signal data. (Masking of model would be "
+"meaningless due to the window size.)"
+msgstr ""
+"Можно обучать нейросеть только на подмножестве сигнала, заданным маской на "
+"данных сигнала (использование маски на модели будет бессмысленным из-за "
+"размеров окна)."
+
+#: multidata.xml:700(para)
+msgid ""
+"The main functions that control the training process are contained in tab "
+"<guilabel>Training</guilabel>: <placeholder-1/>"
+msgstr ""
+"Основные функции, которые контролируют процесс обучения, содержатся во "
+"вкладке <guilabel>Обучение</guilabel>: <placeholder-1/>"
+
+#: multidata.xml:764(guilabel)
+msgid "Window width"
+msgstr "Ширина окна"
+
+#: multidata.xml:765(listitem)
+msgid ""
+"Horizontal size of the window. The input data for the network consists of an "
+"area around the model pixel, called window. The window is centered on the "
+"pixel so, odd sizes are usually preferred."
+msgstr ""
+"Горизонтальный размер окна. Входные данные для сети состоят из области "
+"вокруг пикселя модели, называемой окном. Окно центрируется на пикселе, "
+"поэтому предпочтительными являются нечётные размеры."
+
+#: multidata.xml:773(guilabel)
+msgid "Window height"
+msgstr "Высота окна"
+
+#: multidata.xml:774(listitem)
+msgid "Vertical size of the window."
+msgstr "Вертикальный размер окна."
+
+#: multidata.xml:779(guilabel)
+msgid "Hidden nodes"
+msgstr "Скрытые узлы"
+
+#: multidata.xml:781(quote)
+msgid "hidden"
+msgstr "скрытые"
+
+#: multidata.xml:780(listitem)
+msgid ""
+"Number of nodes in the <placeholder-1/> layer of the neural network. More "
+"nodes can lead to more capable network, on the other hand, it means slower "
+"training and application. Typically, this number is small compared to the "
+"number of pixels in the window."
+msgstr ""
+"Число узлов в <placeholder-1/> слое нейросети. Большее число узлов приводит "
+"к более универсальной сети, с другой стороны стороны, оно приводит к "
+"замедлению обучения и применения нейросети. Обычно это число является малым "
+"по сравнению с числом пикселей окна."
+
+#: multidata.xml:789(guilabel)
+msgid "Power of source XY"
+msgstr "Степень XY источника"
+
+#: multidata.xml:790(listitem)
+msgid ""
+"The power in which the model lateral dimensions units should appear in the "
+"signal. This is only used when the network is applied."
+msgstr ""
+"Степень, с которой единицы измерения пространственных размеров модели должны "
+"появляться в сигнале. Используется только при применении нейросети к данным."
+
+#: multidata.xml:797(guilabel)
+msgid "Power of source Z"
+msgstr "Степень Z источника"
+
+#: multidata.xml:799(quote)
+msgid "height"
+msgstr "высоты"
+
+#: multidata.xml:798(listitem)
+msgid ""
+"The power in which the model <placeholder-1/> units should appear in the "
+"signal. This is only used when the network is applied."
+msgstr ""
+"Степень, с которой единицы измерения <placeholder-1/> модели должны "
+"появляться в сигнале. Используется только при применении нейросети к данным."
+
+#: multidata.xml:805(guilabel)
+msgid "Fixed units"
+msgstr "Заданные единицы"
+
+#: multidata.xml:806(listitem)
+msgid ""
+"Fixed units of the result. They are combined with the other units parameters "
+"so if you want result units that are independent of input units you have to "
+"set both powers to 0. This is only used when the network is applied."
+msgstr ""
+"Фиксированные единицы измерения результата. Они комбинируются с другими "
+"параметрами единиц измерения, поэтому если вы хотите получить единицы "
+"измерения результата независимыми от входных, необходимо установить обе "
+"степени в ноль. Используются только при применении нейросети к данным."
+
+#: multidata.xml:757(para)
+msgid ""
+"Neural network parameters can be modified in tab <guilabel>Parameters</"
+"guilabel>. Changing either the window dimensions or the number of hidden "
+"nodes means the network is reinitialized (as if you pressed "
+"<guibutton>Reinitialize</guibutton>). <placeholder-1/>"
+msgstr ""
+"Параметры нейросети можно изменить на вкладке <guilabel>Параметры</"
+"guilabel>. Изменение как размеров окна, так и числа скрытых узлов означает "
+"переинициализацию неросети (как при нажатии кнопки "
+"<guibutton>Переинициализировать</guibutton>). <placeholder-1/>"
+
+#: multidata.xml:815(para)
+msgid ""
+"Trained neural network can be saved, loaded to be retrained on different "
+"data, etc. The network list management is similar to <link linkend=\"raw-"
+"file-import\">raw file presets</link>."
+msgstr ""
+"Обученную нейросеть можно сохранить. загрузить для переобучения на других "
+"данных и т.п. Управление списком сетей похоже на <link linkend=\"raw-file-"
+"import\">предустановки загрузки сырых данных</link>."
+
+#: multidata.xml:820(para)
+msgid ""
+"In addition to the networks in the list, there is one more unnamed network "
+"and that of the network currently in training. When you load a network the "
+"network in training becomes a copy of the loaded network. Training then does "
+"not change the named networks; to save the network after training (under "
+"existing or new name) you must explicitly use <guibutton>Store</guibutton>."
+msgstr ""
+"В дополнение к сетям в списке, существует ещё одна неназванная сеть, и это "
+"та сеть, которая обучается в текущий момент. Когда вы загружаете сеть, "
+"обучаемая сеть становится копией загруженной. Обучение затем не меняет "
+"именованные сети; чтобы сохранить сеть после обучения (под уже имеющимся или "
+"новым именем) необходимо явно использовать кнопку <guibutton>Сохранить</"
+"guibutton>."
+
+#: multidata.xml:830(title)
+msgid "Application <gwy:icon name=\"neural_apply\"/>"
+msgstr "Применение нейросети <gwy:icon name=\"neural_apply\"/>"
+
+#: multidata.xml:835(secondary)
+msgid "application"
+msgstr "применение"
+
+#: multidata.xml:841(guimenuitem)
+msgid "Apply Neural Network"
+msgstr "Применить нейросеть"
+
+#: multidata.xml:844(para)
+msgid ""
+"Application of a trained neural network is simple: just choose one from the "
+"list and press <guibutton>OK</guibutton>. The unnamed network currently in "
+"training is also present in the list under the label <quote>In training</"
+"quote>."
+msgstr ""
+"Применить обученную нейросеть просто: нужно выбрать одну из списка и нажать  "
+"<guibutton>OK</guibutton>. Неименнованная сеть, которая обучается в "
+"настоящии момент также присутствует в списке под названием <quote>Обучается</"
+"quote>."
+
+#: multidata.xml:850(para)
+msgid ""
+"Since neural networks process and produce normalised data, it does not "
+"perserve proportionality well, especially if the scale of training model "
+"differs considerably from the scale of real inputs. If the output is "
+"expected to scale with input you can enable option <guilabel>Scale "
+"proportionally to input</guilabel> that scales the output with the inverse "
+"ratio of actual and training input data ranges."
+msgstr ""
+"Поскольку нейросети обрабатывают и производят нормализованные данные, они не "
+"сохраняют хорошо соотношения сторон, особенно если масштаб модели, "
+"использованной при обучении, сильно отличается от масштаба реальных входных "
+"данных. Если выходные данные должны масштабироваться вместе со входными, "
+"необходимо включить опцию <guilabel>Масштабировать пропорционально входным "
+"данным</guilabel>, которая масштабирует выходные данные пропорционально "
+"обратному отношению диапазонов текущих данных и данных, использованных при "
+"обучении."
+
+#~ msgid "Relation"
+#~ msgstr "Взаимосвязь"
+
+#~ msgid "-8"
+#~ msgstr "-8"
+
+#~ msgid "Stitching"
+#~ msgstr "Сшивание"
+
+#~ msgid "Mask by Correlation"
+#~ msgstr "Пометить корреляцией"
+
+#~ msgid "Image to be found on the base image."
+#~ msgstr "Изображение, которое нужно найти в базовом."
+
+#~ msgid "Algorithm for computing correlation can be selected here."
+#~ msgstr "Здесь можно выбрать алгоритм расчёта корреляции."
+
+#~ msgid "Detail Immersion"
+#~ msgstr "Встраивание фрагмента"
+
+#~ msgid "Merging"
+#~ msgstr "Объединение"
+
+#~ msgid "Training"
+#~ msgstr "Обучение"
+
+#~ msgid "Application"
+#~ msgstr "Применение"

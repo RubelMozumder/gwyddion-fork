@@ -1,0 +1,45 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+set style line 28 dt 2 pt 65 ps 1 lw 1.5 lc rgb '#f06000'
+
+name = 'fitfunc-smooth-slanted-step'
+set samples 201
+set lmargin at screen 0.135
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+x0 = 1.91
+y0 = 0.0
+w = 0.7
+h = -3.0
+alpha = 0.05
+beta = -0.2
+
+fw(x,ww) = y0 + alpha*x + 0.5*beta*abs(x) + h*erf(x/ww)/2 + 0.5*beta*ww*exp(-abs(x)/ww)
+f(x) = fw(x,w)
+M5 = f(5 - x0)
+M0 = f(0 - x0)
+ymax = M5 > M0 ? M5 : M0
+ymin = M5 < M0 ? M5 : M0
+M = ymax - ymin
+
+unset grid
+set key top right Left reverse samplen 1.5
+set xtics out nomirror ('x₀−w' x0-w 0, 'x₀' x0 0, 'x₀+w' x0+w 0)
+set ytics out nomirror ('y₀−h/2' y0-0.5*h 0, 'y₀' y0 0, 'y₀+h/2' y0+0.5*h 0)
+set xrange [0:5]
+set yrange [ymin-0.15*M:ymax+0.3*M]
+set arrow from x0,ymin-0.15*M to x0,ymax+0.3*M nohead ls 10
+set arrow from x0-w,ymin-0.15*M to x0-w,f(-w) nohead ls 10
+set arrow from x0+w,ymin-0.15*M to x0+w,f(w) nohead ls 10
+set arrow from 0,y0 to x0,y0 nohead ls 10
+set arrow from 0,y0+0.5*h to x0,y0+0.5*h nohead ls 10
+set arrow from 0,y0-0.5*h to x0,y0-0.5*h nohead ls 10
+set output name.'.svg'
+
+plot \
+    f(x-x0) with lines title 'Smooth slanted step' linestyle 8, \
+    x < x0 ? fw(x-x0,0.0001) : 0/0 with lines notitle linestyle 28, \
+    x > x0 ? fw(x-x0,0.0001) : 0/0 with lines notitle linestyle 28
+

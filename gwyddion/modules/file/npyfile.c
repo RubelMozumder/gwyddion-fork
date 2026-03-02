@@ -1,0 +1,622 @@
+/*
+ *  $Id: npyfile.c 26356 2024-05-21 08:24:52Z yeti-dn $
+ *  Copyright (C) 2023 David Necas (Yeti).
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Numpy binary serialised array
+ * .npy
+ * Read
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Multiple numpy binary serialised arrays
+ * .npz
+ * Read
+ **/
+
+/**
+ * [FILE-MAGIC-MISSING]
+ * Avoding clash with a standard file format.
+ **/
+
+/* FIXME: We have a rudimentary Python pickle format implementation in npyfile.c. We might want to generalise it and
+ * use for other Python formats. However, plain numpy arrays do not require the pickling mechanics (although they can
+ * employ it). So currently we just implement the simple non-pickled data format here and hope for the best. */
+
+#include "config.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyutils.h>
+#include <libprocess/datafield.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwymoduleutils-file.h>
+#include <app/data-browser.h>
+#include "gwyzip.h"
+#include "get.h"
+#include "err.h"
+
+#define MAGIC "\x93NUMPY"
+#define MAGIC_SIZE (sizeof(MAGIC)-1)
+
+#define MAGICZ "PK\x03\x04"
+#define MAGICZ_SIZE (sizeof(MAGICZ)-1)
+
+#define EXTENSION ".npy"
+#define EXTENSIONZ ".npz"
+
+enum {
+    HEADER_SIZE_v1_0 = 10,
+    HEADER_SIZE_v2_0 = 12,
+    MIN_FILE_SIZE = 65,   /* Header + 1×1 image. */
+};
+
+typedef struct {
+    gchar magic[6];
+    gint major;
+    gint minor;
+    gint header_len;
+    gchar *header;
+    gchar *format;
+    gboolean fortran_order;
+    guint ndim;
+    guint *dims;
+    gsize expected_size;
+} NpyInfo;
+
+static gboolean      module_register      (void);
+static gint          npy_detect           (const GwyFileDetectInfo *fileinfo,
+                                           gboolean only_name);
+static GwyContainer* npy_load             (const gchar *filename,
+                                           GwyRunType mode,
+                                           GError **error);
+static gboolean      npy_export           (GwyContainer *data,
+                                           const gchar *filename,
+                                           GwyRunType mode,
+                                           GError **error);
+static gboolean      load_npy_from_memory (const guchar *buffer,
+                                           gsize size,
+                                           GwyContainer *container,
+                                           gint id,
+                                           const gchar *title,
+                                           GError **error);
+static gboolean      read_file_header     (NpyInfo *info,
+                                           const guchar **p,
+                                           gsize size,
+                                           GError **error);
+static gboolean      parse_header_dict    (NpyInfo *info,
+                                           GError **error);
+static gboolean      parse_numpy_data_type(const gchar *s,
+                                           GwyRawDataType *rawtype,
+                                           GwyByteOrder *byteorder);
+
+#ifdef HAVE_GWYZIP
+static gint          npz_detect           (const GwyFileDetectInfo *fileinfo,
+                                           gboolean only_name);
+static GwyContainer* npz_load             (const gchar *filename,
+                                           GwyRunType mode,
+                                           GError **error);
+#endif
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports and exports binary serialized numpy arrays (NPY, NPZ)."),
+    "Yeti <yeti@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti)",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, npyfile)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("npyfile",
+                           N_("Serialized numpy array (.npy)"),
+                           (GwyFileDetectFunc)&npy_detect,
+                           (GwyFileLoadFunc)&npy_load,
+                           NULL,
+                           (GwyFileSaveFunc)&npy_export);
+#ifdef HAVE_GWYZIP
+    gwy_file_func_register("npzfile",
+                           N_("Multiple serialized numpy arrays (.npz)"),
+                           (GwyFileDetectFunc)&npz_detect,
+                           (GwyFileLoadFunc)&npz_load,
+                           NULL,
+                           NULL);
+#endif
+
+    return TRUE;
+}
+
+static gint
+npy_detect(const GwyFileDetectInfo *fileinfo,
+           gboolean only_name)
+{
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 20 : 0;
+
+    if (fileinfo->buffer_len < MAX(MAGIC_SIZE, 65) || memcmp(fileinfo->head, MAGIC, MAGIC_SIZE))
+        return 0;
+
+    /* Do not return too high score from the generic loader. There may be specific NPY-based formats which will return
+     * a higher score. */
+    return 65;
+}
+
+#ifdef HAVE_GWYZIP
+static gint
+npz_detect(const GwyFileDetectInfo *fileinfo,
+           gboolean only_name)
+{
+    GwyZipFile zipfile;
+    gchar *filename;
+    gint score = 0;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSIONZ) ? 20 : 0;
+
+    /* Generic ZIP file. */
+    gwy_debug("magic?");
+    if (fileinfo->file_size < MAGICZ_SIZE || memcmp(fileinfo->head, MAGICZ, MAGICZ_SIZE) != 0)
+        return 0;
+
+    /* It must contains something.npy. */
+    gwy_debug(".npy?");
+    if (!gwy_memmem(fileinfo->head, fileinfo->buffer_len, ".npy", 4)
+        && !gwy_memmem(fileinfo->tail, fileinfo->buffer_len, ".npy", 4))
+        return 0;
+
+    /* Look inside if the first file has .npy extension. */
+    gwy_debug("open as ZIP?");
+    if ((zipfile = gwyzip_open(fileinfo->name, NULL))) {
+        gwy_debug("find a .npy file?");
+        if (gwyzip_first_file(zipfile, NULL)
+            && gwyzip_get_current_filename(zipfile, &filename, NULL)
+            && g_str_has_suffix(filename, ".npy")) {
+            g_free(filename);
+            /* Do not return too high score from the generic loader. There may be specific NPY-based formats which
+             * will return a higher score. */
+            score = 65;
+        }
+        gwyzip_close(zipfile);
+    }
+
+    return score;
+}
+#endif
+
+static GwyContainer*
+npy_load(const gchar *filename,
+          G_GNUC_UNUSED GwyRunType mode,
+          GError **error)
+{
+    GwyContainer *container = NULL;
+    guchar *buffer = NULL;
+    GError *err = NULL;
+    gsize size;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+
+    container = gwy_container_new();
+    if (!load_npy_from_memory(buffer, size, container, 0, NULL, error))
+        GWY_OBJECT_UNREF(container);
+
+    gwy_file_abandon_contents(buffer, size, NULL);
+
+    return container;
+}
+
+#ifdef HAVE_GWYZIP
+static GwyContainer*
+npz_load(const gchar *filename,
+         G_GNUC_UNUSED GwyRunType mode,
+         GError **error)
+{
+    GwyZipFile zipfile;
+    GwyContainer *container = NULL;
+    guchar *content;
+    gchar *title, *dot;
+    gsize size;
+    gint id = 0;
+
+    if (!(zipfile = gwyzip_open(filename, error)))
+        return NULL;
+    if (!gwyzip_first_file(zipfile, error))
+        goto fail;
+
+    container = gwy_container_new();
+    do {
+        if (!(content = gwyzip_get_file_content(zipfile, &size, error)))
+            goto fail;
+        if (!gwyzip_get_current_filename(zipfile, &title, error)) {
+            g_free(content);
+            goto fail;
+        }
+        gwy_debug("trying to load %s", title);
+        if ((dot = strrchr(title, '.')))
+            *dot = '\0';
+        if (load_npy_from_memory(content, size, container, id, *title ? title : NULL, NULL))
+            id++;
+        g_free(content);
+        g_free(title);
+    } while (gwyzip_next_file(zipfile, NULL));
+
+    if (!id) {
+        GWY_OBJECT_UNREF(container);
+        err_NO_DATA(error);
+    }
+
+fail:
+    gwyzip_close(zipfile);
+
+    return container;
+}
+#endif
+
+static gboolean
+load_npy_from_memory(const guchar *buffer, gsize size,
+                     GwyContainer *container, gint id, const gchar *title,
+                     GError **error)
+{
+    NpyInfo info;
+    GwyRawDataType rawtype;
+    GwyByteOrder byteorder;
+    GwyDataField *field;
+    const guchar *p;
+    gint xres, yres, header_size;
+    gboolean imported_data = FALSE;
+
+    gwy_clear(&info, 1);
+    p = buffer;
+    if (!read_file_header(&info, &p, size, error))
+        goto fail;
+    header_size = p - buffer;
+    if (!parse_header_dict(&info, error))
+        goto fail;
+    if (!parse_numpy_data_type(info.format, &rawtype, &byteorder)) {
+        err_UNSUPPORTED(error, "descr");
+        goto fail;
+    }
+    if (err_SIZE_MISMATCH(error, info.expected_size, size - header_size - info.header_len, FALSE))
+        goto fail;
+
+    if (info.ndim == 2 && !err_DIMENSION(NULL, info.dims[0]) && !err_DIMENSION(NULL, info.dims[1])) {
+        gwy_debug("data look like an image");
+
+        if (info.fortran_order) {
+            xres = info.dims[0];
+            yres = info.dims[1];
+        }
+        else {
+            xres = info.dims[1];
+            yres = info.dims[0];
+        }
+
+        field = gwy_data_field_new(xres, yres, xres, yres, FALSE);
+        gwy_convert_raw_data(p, xres*yres, 1, rawtype, byteorder, gwy_data_field_get_data(field), 1.0, 0.0);
+        gwy_container_pass_object(container, gwy_app_get_data_key_for_id(id), field);
+        if (title)
+            gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(id), title);
+        imported_data = TRUE;
+    }
+
+    if (!imported_data)
+        err_NO_DATA(error);
+
+fail:
+    g_free(info.header);
+    g_free(info.format);
+    g_free(info.dims);
+
+    return imported_data;
+}
+
+static gboolean
+parse_numpy_data_type(const gchar *s, GwyRawDataType *rawtype, GwyByteOrder *byteorder)
+{
+    static const GwyEnum known_types[] = {
+        { "b",  GWY_RAW_DATA_SINT8,  },
+        { "B",  GWY_RAW_DATA_UINT8,  },
+        { "i1", GWY_RAW_DATA_SINT8,  },
+        { "u1", GWY_RAW_DATA_UINT8,  },
+        { "i2", GWY_RAW_DATA_SINT16, },
+        { "u2", GWY_RAW_DATA_UINT16, },
+        { "i4", GWY_RAW_DATA_SINT32, },
+        { "u4", GWY_RAW_DATA_UINT32, },
+        { "i8", GWY_RAW_DATA_SINT64, },
+        { "u8", GWY_RAW_DATA_UINT64, },
+        { "f2", GWY_RAW_DATA_HALF,   },
+        { "f4", GWY_RAW_DATA_FLOAT,  },
+        { "f8", GWY_RAW_DATA_DOUBLE, },
+    };
+    gint rt;
+
+    *byteorder = GWY_BYTE_ORDER_NATIVE;
+    if (s[0] == '<') {
+        *byteorder = GWY_BYTE_ORDER_LITTLE_ENDIAN;
+        s++;
+    }
+    else if (s[0] == '>') {
+        *byteorder = GWY_BYTE_ORDER_BIG_ENDIAN;
+        s++;
+    }
+    else if (s[0] == '=') {
+        *byteorder = GWY_BYTE_ORDER_NATIVE;
+        s++;
+    }
+
+    rt = gwy_string_to_enum(s, known_types, G_N_ELEMENTS(known_types));
+    if (rt < 0)
+        return FALSE;
+
+    *rawtype = rt;
+    gwy_debug("raw type %d, byte order %d", *rawtype, *byteorder);
+    return TRUE;
+}
+
+static gboolean
+read_file_header(NpyInfo *info, const guchar **p, gsize size,
+                 GError **error)
+{
+    if (size < MIN_FILE_SIZE) {
+        err_FILE_TYPE(error, "NPY");
+        return FALSE;
+    }
+
+    get_CHARARRAY(info->magic, p);
+    if (memcmp(info->magic, MAGIC, MAGIC_SIZE)) {
+        err_FILE_TYPE(error, "NPY");
+        return FALSE;
+    }
+    gwy_debug("magic OK");
+    info->major = *((*p)++);
+    info->minor = *((*p)++);
+    gwy_debug("version %d.%d", info->major, info->minor);
+    if (info->major > 1) {
+        info->header_len = gwy_get_guint32_le(p);
+        gwy_debug("header_len %d", info->header_len);
+        if (info->header_len > size - HEADER_SIZE_v2_0) {
+            err_TRUNCATED_HEADER(error);
+            return FALSE;
+        }
+    }
+    else {
+        info->header_len = gwy_get_guint16_le(p);
+        gwy_debug("header_len %d", info->header_len);
+        if (info->header_len > size - HEADER_SIZE_v1_0) {
+            err_TRUNCATED_HEADER(error);
+            return FALSE;
+        }
+    }
+    /* This is not overflow by 1 because inequality > above. */
+    info->header = g_memdup(*p, info->header_len+1);
+    info->header[info->header_len] = '\0';
+    *p += info->header_len;
+    gwy_debug("text header %s", info->header);
+
+    return TRUE;
+}
+
+static gboolean
+err_NPY_ASCII_HEADER(GError **error)
+{
+    g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_DATA,
+                _("Cannot parse NPY ASCII header."));
+    return FALSE;
+}
+
+static gboolean
+parse_header_dict(NpyInfo *info, GError **error)
+{
+    GError *regexerr = NULL;
+    GMatchInfo *matchinfo = NULL;
+    gchar *name, *t, *s = info->header;
+    GRegex *regex;
+    gint start, end, len, delim;
+    guint i;
+    gchar **pieces;
+    gboolean ok = FALSE;
+
+    g_strstrip(s);
+    len = strlen(s);
+    if (s[0] != '{' || s[len-1] != '}')
+        return err_NPY_ASCII_HEADER(error);
+
+    s[0] = ' ';
+    s[len-1] = ' ';
+    g_strstrip(s);
+
+    /* XXX: This is simplistic/approximate. If people use apostrophes in dict keys we just fail to parse it and do
+     * not load their silly little files. */
+    regex = g_regex_new("(?P<delim>['\"])(?P<key>[^'\"]+)(?P=delim)\\s*:\\s*",
+                        G_REGEX_MULTILINE | G_REGEX_DOTALL | G_REGEX_ANCHORED,
+                        G_REGEX_MATCH_ANCHORED,
+                        &regexerr);
+    if (!regex) {
+        g_critical("Malformed regex: %s", regexerr->message);
+        g_clear_error(&regexerr);
+        return FALSE;
+    }
+    while (g_regex_match(regex, s, G_REGEX_MATCH_ANCHORED, &matchinfo)) {
+        name = g_match_info_fetch_named(matchinfo, "key");
+        g_match_info_fetch_pos(matchinfo, 0, &start, &end);
+        gwy_debug("matched dict key %s", name);
+        if (gwy_strequal(name, "descr")) {
+            start = end;
+            delim = s[start];
+            end = start+1;
+            while (s[end] && s[end] != delim)
+                end++;
+            if (!s[end]) {
+                err_NPY_ASCII_HEADER(error);
+                goto fail;
+            }
+            g_free(info->format);
+            info->format = g_strndup(s+start+1, end-start-1);
+            gwy_debug("format = %s", info->format);
+            s = s + end+1;
+        }
+        else if (gwy_strequal(name, "fortran_order")) {
+            if (g_str_has_prefix(s+end, "True")) {
+                info->fortran_order = TRUE;
+                s = s + end+4;
+            }
+            else if (g_str_has_prefix(s+end, "False")) {
+                info->fortran_order = FALSE;
+                s = s + end+5;
+            }
+            else {
+                err_NPY_ASCII_HEADER(error);
+                goto fail;
+            }
+            gwy_debug("fortran_order = %d", info->fortran_order);
+        }
+        else if (gwy_strequal(name, "shape")) {
+            start = end;
+            if (s[start] != '(') {
+                err_NPY_ASCII_HEADER(error);
+                goto fail;
+            }
+            end = start+1;
+            while (s[end] && s[end] != ')')
+                end++;
+            if (!s[end]) {
+                err_NPY_ASCII_HEADER(error);
+                goto fail;
+            }
+
+            t = g_strndup(s+start+1, end-start-1);
+            pieces = g_strsplit(t, ",", -1);
+            info->ndim = g_strv_length(pieces);
+            info->dims = g_new(gint, info->ndim);
+            info->expected_size = 1;
+            for (i = 0; i < info->ndim; i++) {
+                info->dims[i] = atoi(pieces[i]);
+                info->expected_size *= info->dims[i];
+                gwy_debug("dim[%u] = %u", i, info->dims[i]);
+            }
+            g_strfreev(pieces);
+            g_free(t);
+            s = s + end+1;
+        }
+        else {
+            gwy_debug("trying to skip unknown key %s", name);
+            /* Rely on the code below to try to sync on the next comma. */
+        }
+
+        g_free(name);
+        g_match_info_free(matchinfo);
+
+        while (*s && *s != ',')
+            s++;
+        if (*s == ',')
+            s++;
+        while (g_ascii_isspace(*s))
+            s++;
+
+        gwy_debug("remainder: [[%s]]", s);
+    }
+
+    if (!info->ndim)
+        err_MISSING_FIELD(error, "shape");
+    else if (!info->format)
+        err_MISSING_FIELD(error, "format");
+    else
+        ok = TRUE;
+
+fail:
+    g_match_info_free(matchinfo);
+    g_regex_unref(regex);
+
+    return ok;
+}
+
+static gboolean
+npy_export(G_GNUC_UNUSED GwyContainer *data,
+           const gchar *filename,
+           G_GNUC_UNUSED GwyRunType mode,
+           GError **error)
+{
+    GwyDataField *field;
+    guchar file_header[HEADER_SIZE_v1_0 + 1] = MAGIC "\x01\x00..";  /* Version 1.0 is good enough for us. */
+    GString *dictstr;
+    gint xres, yres, n;
+    const gdouble *d;
+    guint header_len;
+    FILE *fh;
+
+    gwy_app_data_browser_get_current(GWY_APP_DATA_FIELD, &field, 0);
+
+    if (!field) {
+        err_NO_CHANNEL_EXPORT(error);
+        return FALSE;
+    }
+
+    xres = gwy_data_field_get_xres(field);
+    yres = gwy_data_field_get_yres(field);
+    d = gwy_data_field_get_data_const(field);
+    n = xres*yres;
+
+    dictstr = g_string_new(NULL);
+    g_string_printf(dictstr, "{'descr': '<f8', 'fortran_order': False, 'shape': (%d, %d)}", yres, xres);
+
+    /* Terminate the header with \n as numpy itself does, while rounding its size up to a multiple of 64. */
+    header_len = HEADER_SIZE_v1_0 + dictstr->len + 1;
+    header_len = (header_len + 63)/64*64;
+    while (dictstr->len < header_len - (HEADER_SIZE_v1_0 + 1))
+        g_string_append_c(dictstr, ' ');
+    g_string_append_c(dictstr, '\n');
+
+    file_header[HEADER_SIZE_v1_0 - 2] = dictstr->len % 0x100;
+    file_header[HEADER_SIZE_v1_0 - 1] = dictstr->len/0x100;
+
+    if (!(fh = gwy_fopen(filename, "wb"))) {
+        err_OPEN_WRITE(error);
+        g_string_free(dictstr, TRUE);
+        return FALSE;
+    }
+
+    if (fwrite(file_header, 1, HEADER_SIZE_v1_0, fh) != HEADER_SIZE_v1_0)
+        goto fail;
+    if (fwrite(dictstr->str, 1, dictstr->len, fh) != dictstr->len)
+        goto fail;
+    if (fwrite(d, sizeof(gdouble), n, fh) != n)
+        goto fail;
+
+    fclose(fh);
+
+    g_string_free(dictstr, TRUE);
+    return TRUE;
+
+fail:
+    err_WRITE(error);
+    fclose(fh);
+    g_unlink(filename);
+    g_string_free(dictstr, TRUE);
+
+    return FALSE;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

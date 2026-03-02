@@ -1,0 +1,862 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='multidata' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Multiple Data</title>
+  <sect2 id='data-arithmetic'>
+    <title>
+      Arithmetic <gwy:icon name='arithmetic'/>
+    </title>
+    <indexterm><primary>arithmetic on data</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Arithmetic</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Data Arithmetic module enables to perform arbitrary point-wise operations
+      on a single image or on the corresponding points of several images
+      (currently up to eight).  And although it is not its primary
+      function it can be also used as a calculator with immediate expression
+      evaluation if a plain numerical expression is entered.  The expression
+      syntax is described in section
+      <link linkend='expression-syntax'>Expressions</link>.
+    </para>
+    <para>
+      The expression can contain the following variables representing
+      values from the individual input images:
+    </para>
+    <para>
+      <informaltable id='table-arithmetic-variables'>
+        <tgroup cols='2'>
+          <?dblatex lX?>
+          <thead>
+            <row>
+              <entry>Variable</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><varname>d1</varname>, …, <varname>d8</varname></entry>
+              <entry>
+                Data value at the pixel.  The value is in base physical units,
+                e.g. for height of 233 nm, the value of <varname>d1</varname>
+                is 2.33e-7.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>m1</varname>, …, <varname>m8</varname></entry>
+              <entry>
+                Mask value at the pixel.  The mask value is either 0 (for
+                unmasked pixels) or 1 (for masked pixels).  The mask variables
+                can be used also if no mask is present; the value is then 0 for
+                all pixels.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>bx1</varname>, …, <varname>bx8</varname></entry>
+              <entry>
+                Horizontal derivative at the pixel.  Again, the value is in
+                physical units.  The derivative is calculated as standard
+                symmetrical derivative, except in edge pixels where one-side
+                derivative is taken.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>by1</varname>, …, <varname>by8</varname></entry>
+              <entry>
+                Vertical derivative at the pixel, defined similarly to the
+                horizontal derivative.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>x</varname></entry>
+              <entry>
+                Horizontal coordinate of the pixel (in real units).  It is
+                the same in all images due to the compatibility requirement
+                (see below).
+              </entry>
+            </row>
+            <row>
+              <entry><varname>y</varname></entry>
+              <entry>
+                Vertical coordinate of the pixel (in real units).  It is
+                the same in all images due to the compatibility requirement
+                (see below).
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+    <para>
+      In addition, the constant <xi:include href="eqi-pi.xml"/> is available
+      and can be typed either as <xi:include href="eqi-pi.xml"/> or
+      <userinput>pi</userinput>.
+    </para>
+    <para>
+      All images that appear in the expression have to be compatible.
+      This means their dimensions (both pixel and physical) have to be
+      identical.  Other images, i.e. those not actually entering the
+      expression, are irrelevant.  The result is always put into a newly
+      created image in the current file (which may be different from
+      the files of all operands).
+    </para>
+    <para>
+      Since the evaluator does not automatically infer the correct physical
+      units of the result the units have to be explicitly specified.  This can
+      be done by two means: either by selecting an image that has the same
+      value units as the result should have, or by choosing option
+      <guilabel>Specify units</guilabel> and typing the units manually.
+    </para>
+    <para>
+      The following table lists several simple expression examples:
+    </para>
+    <para>
+      <informaltable id='table-arithmetic-examples'>
+        <tgroup cols='2'>
+          <?dblatex lX?>
+          <thead>
+            <row>
+              <entry>Expression</entry>
+              <entry>Meaning</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><userinput>-d1</userinput></entry>
+              <entry>
+                Value inversion.  The result is very similar to Invert Value,
+                except that Invert Value reflects about the mean value while
+                here we simply change all values to negative.
+              </entry>
+            </row>
+            <row>
+              <entry><userinput>(d1 - d2)^2</userinput></entry>
+              <entry>
+                Squared difference between two images.
+              </entry>
+            </row>
+            <row>
+              <entry><userinput>d1 + m1*1e-8</userinput></entry>
+              <entry>
+                Modification of values under mask.  Specifically, the value
+                10<superscript>−8</superscript> is added to all masked pixels.
+              </entry>
+            </row>
+            <row>
+              <entry><userinput>d1*m3 + d2*(1-m3)</userinput></entry>
+              <entry>
+                Combination of two images.  Pixels are taken either from
+                image 1 or 2, depending on the mask on image 3.
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+    <para>
+      In the calculator mode the expression is immediately evaluated as it is
+      typed and the result is displayed below Expression entry.  No special
+      action is necessary to switch between image expressions and
+      calculator: expressions containing only numeric quantities are
+      immediately evaluated, expressions referring to images are used to
+      calculate a new image.  The preview showing the result of an
+      operation with images is not immediately updated as you type; you can
+      update it either by clicking <guibutton>Update</guibutton> or just
+      pressing <keycap>Enter</keycap> in the expression entry.
+    </para>
+  </sect2>
+  <sect2 id='multiprofile'>
+    <title>
+      Profiles from multiple images <gwy:icon name='profile_multiple'/>
+    </title>
+    <indexterm>
+      <primary>profile extraction</primary>
+      <secondary>from multiple images</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Multiprofile</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      It is often useful to compare the corresponding scan lines from different
+      images – in particular trace and retrace.  This can be done using
+      Multiprofile and selecting the two images as 1 and 2 in the
+      <guilabel>Images</guilabel> list.  The selected scan line is displayed on
+      the image.  It can be moved around with mouse or the scan line number
+      can be entered numerically using <guilabel>Scan line</guilabel>.
+    </para>
+    <informalfigure id='fig-multiprofile'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='multiprofile.png' format='PNG'/>
+        </imageobject>
+        <textobject>
+          <phrase>Multiprofile module dialog screenshot</phrase>
+        </textobject>
+        <caption>
+          Basic usage of multiprofile module, with trace and retrace images
+          selected as 1 and 2 and a the corresponding pair of profiles
+          displayed in the graph.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      The profiles can be read simultaneously from up to six images.  Enable
+      and disable individual images using the checkboxes next to the image
+      number. Any of the enabled images can be displayed in the small preview,
+      which is controlled by selecting them using <guilabel>Show</guilabel>.
+    </para>
+    <para>
+      Since the graph shows mutually corresponding profiles, all images must
+      have the same pixel and physical dimensions and must also represent the
+      same physical quantity.  Image 1 is special in this regard. It cannot be
+      unselected and it defines the dimensions and other properties.  In other
+      words, all the other images must be compatible with image 1.
+    </para>
+    <para>
+      Options in the lower right part include the standard thickness
+      (averaging) control, the same as for the normal
+      <link linkend='profile'>profile tool</link>, masking options and
+      target graph for the extracted profiles.  Masks can be either taken from
+      the corresponding images, or the mask on the first image can be used for
+      all – if <guilabel>Use first mask for all images</guilabel> is ticked.
+    </para>
+    <para>
+      Instead of extracting the individual profiles, the module can also do
+      simple statistics and plot summary curves – mean curve with lower and
+      upper bounds.  This is controlled by <guilabel>Mode</guilabel>.
+    </para>
+  </sect2>
+  <sect2 id='immerse'>
+    <title>
+      Detail Immersion <gwy:icon name='immerse'/>
+    </title>
+    <indexterm><primary>detail image immersion</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Immerse</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Immerse insets a detailed, high-resolution image into a larger image.
+      The image the function was run on forms the large, base image.
+    </para>
+    <para>
+      The detail can be positioned manually on the large image with mouse.
+      Button <guibutton>Improve</guibutton> can then be used to find the
+      exact coordinates in the neighbourhood of the current position that give
+      the maximum correlation between the detail and the large image.
+      Or the best-match position can be searched through the whole image
+      with <guibutton>Locate</guibutton>.
+    </para>
+    <para>
+      It should be noted that correlation search is insensitive to value scales
+      and offsets, therefore the automated matching is based solely on
+      data features, absolute heights play no role.
+    </para>
+    <para>
+      <guilabel>Result Sampling</guilabel> controls the size and resolution
+      of the result image:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Upsample large image</guilabel>
+        </term>
+        <listitem>
+          The resolution of the result is determined by the resolution of
+          the inset detail.  Therefore the large image is scaled up.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Downsample detail</guilabel>
+        </term>
+        <listitem>
+          The resolution of the result is determined by the resolution of
+          the large image.  The detail is downsampled.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      <guilabel>Detail Leveling</guilabel> selects the transform of the
+      <xi:include href="eqi-z.xml"/> values of the detail:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>None</guilabel>
+        </term>
+        <listitem>
+          No <xi:include href="eqi-z.xml"/> value adjustment is performed.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Mean value</guilabel>
+        </term>
+        <listitem>
+          All values of the detail image are shifted by a constant to make
+          its mean value match the mean value of the corresponding area of
+          the large image.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='merge'>
+    <title>
+      Merging <gwy:icon name='merge'/>
+    </title>
+    <indexterm><primary>merging images</primary></indexterm>
+    <indexterm><primary>joining images</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Merge</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Images that form parts of a larger image can be merged together with
+      Merge.  The image the function was run on corresponds to the base
+      image, the image selected with <guilabel>Merge with</guilabel>
+      represents the second operand. The side of the base image the second one
+      will be attached to is controlled with
+      <guilabel>Put second operand</guilabel> selector.
+    </para>
+    <para>
+      If the images match perfectly, they can be simply placed side by side
+      with no adjustments.  This behaviour is selected by option
+      <guilabel>None</guilabel> of alignment control
+      <guilabel>Align second operand</guilabel>.
+    </para>
+    <para>
+      However, usually adjustments are necessary.  If the images are of the
+      same size and aligned in direction pependicular to the merging direction
+      the only degree of freedom is possible overlap.  The
+      <guilabel>Join</guilabel> aligment method can be used in this case.
+      Unlike in the correlation search described below, the absolute data
+      values are matched.  This makes this option suitable for merging even
+      very slowly varying images provided their absolute height values are
+      well defined.
+    </para>
+    <para>
+      Option <guilabel>Correlation</guilabel> selects automated alignment by
+      correlation-based search of the best match.  The search is performed both
+      in the direction parallel to the attaching side and in the perpendicular
+      direction.  If a parallel shift is present, the result is expanded to
+      contain both images fully (with undefined data filled with a background
+      value).
+    </para>
+    <para>
+      Option <guilabel>Boundary treatment</guilabel> is useful only for the
+      latter case of imperfectly aligned images.  It controls the treatment
+      of overlapping areas in the source images:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>First operand</guilabel>
+        </term>
+        <listitem>
+          Values in overlapping areas are taken from the first, base image.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Second operand</guilabel>
+        </term>
+        <listitem>
+          Values in overlapping areas are taken from the second image.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Smooth</guilabel>
+        </term>
+        <listitem>
+          A smooth transition between the first and the second image is made
+          through the overlapping area by using a weighted average with
+          a suitable weighting function.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='stitch'>
+    <title>
+      Stitching <gwy:icon name='stitch'/>
+    </title>
+    <indexterm><primary>stitching images</primary></indexterm>
+    <indexterm><primary>joining images</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Stitch</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Stitching is an alternative to the merge module described above.
+      It is mainly useful when the relative positions of the image parts are
+      known exactly because the positions entered numerically.  They are
+      initialised using image offsets, so if these are correct, the stitched
+      image is formed automatically.  Buttons <guibutton>Restore</guibutton>
+      for each part revert manually modified offsets to the initial ones.
+    </para>
+  </sect2>
+  <sect2 id='mutual-crop'>
+    <title>
+      Mutual Crop <gwy:icon name='mutual_crop'/>
+    </title>
+    <indexterm><primary>mutual crop of two images</primary></indexterm>
+    <indexterm><primary>remove non-intersecting areas</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Mutual Crop</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Two slightly different images of the same area (for example,
+      before and after some treatment) can be croped to intersecting
+      area (or non-intersecting parts can be removed) with this module.
+    </para>
+    <para>
+      Intersecting part is determined by correlation of larger image
+      with center area of smaller image. Images resolution (pixels per
+      linear unit) should be equal.
+    </para>
+    <para>
+      The only parameter now is <guilabel>Select second operand</guilabel> -
+      correlation between it and current image will be calculated and
+      both images will be cropped to remove non-intersecting
+      near-border parts.
+    </para>
+  </sect2>
+  <sect2 id='relate'>
+    <title>
+      Relation <gwy:icon name='image_relation'/>
+    </title>
+    <indexterm>
+      <primary>fitting</primary>
+      <secondary>relation between two images</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Relate</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      When data in two images are related in a simple manner, for instance
+      they differ by a constant calibration factor, this function helps finding
+      the relation.
+    </para>
+    <para>
+      The graph in the left part shows pixel values of the second image
+      (selected as <guilabel>Second image</guilabel>) plotted as a function of
+      corresponding pixel values in the current image.  When a simple relation
+      between the values exist, all the points lie on a single curve.  Note
+      that for large images only a small, randomly selected subset of pixel
+      values is plotted in the graph.
+    </para>
+    <para>
+      Several simple relations can be fitted to the point data, such as
+      proportion, offset, linear relation or quadratic relation.  The fit
+      parameters are immediately evaluated and displayed in the table below
+      and the corresponding relation plotted. All pixel values are used for
+      fitting, even if only a subset is displayed.
+    </para>
+    <informalfigure id='fig-relate-screenshot'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='relate-screenshot.png' format='PNG'/>
+        </imageobject>
+        <textobject>
+          <phrase>Relation module dialog screenshot</phrase>
+        </textobject>
+        <caption>
+          An almost-linear relation between two slices of volume MFM data at
+          different heights, as displayed and fitted by the relation module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='cross-correlation'>
+    <title>Cross-Correlation</title>
+    <indexterm><primary>cross-correlation</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Cross-correlation</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      This module finds local correlations between details on two different
+      images. As an ideal output, the shift of every pixel on the first image
+      as seen on the second image is returned. This can be used for
+      determining local changes on the surface while imaged twice (shifts can
+      be for example due to some sample deformation or microscope
+      malfunction).
+    </para>
+    <para>
+      For every pixel on the first operand (actual window), the module takes
+      its neighbourhood and searches for the best correlation in the second
+      operand within defined area. The position of the correlation maximum is
+      used to set up the value of shift for the mentioned pixel on the first
+      operand.
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Second operand</guilabel>
+        </term>
+        <listitem>
+          Image to be used for comparison with the first operand - base image.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Search size</guilabel>
+        </term>
+        <listitem>
+          Used to set the area whera algorithm will search for the local
+          neighbourhood (on the second operand). Should be larger than window
+          size. Increase this size if there are big differences between the
+          compared images.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Window size</guilabel>
+        </term>
+        <listitem>
+          Used to set the local neighbourhood size (on the first operand).
+          Should be smaller than search size. Increasing this value can
+          improve the module functionality, but it will surely slow down the
+          computation.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Output type</guilabel>
+        </term>
+        <listitem>
+          Determines the output (pixel shift) format.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Add low score threshold mask</guilabel>
+        </term>
+        <listitem>
+          For some pixels (with not very pronounced neighbourhood) the
+          correlation scores can be small everywhere, but the algorithm
+          anyway picks some maximum value from the scores. To see these
+          pixels and possibly remove them from any further considerations you
+          can let the module to set mask of low-score pixel shifts that have
+          larger probability to be not accurately determined.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='mask-by-correlation'>
+    <title>
+      Correlation Search <gwy:icon name='correlation_mask'/>
+    </title>
+    <indexterm><primary>correlation search</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Correlation Search</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      This module searches for a given detail within the image base.  It can
+      produce a correlation score image or mark resulting detail position using
+      a mask on the base image.
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Correlation kernel</guilabel>
+        </term>
+        <listitem>
+          Detail image to be found on the base image.  The dimensions of one
+          pixel in both images must correspond.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Use mask</guilabel>
+        </term>
+        <listitem>
+          If the detail image has a mask you can enable this option.  Only the
+          pixels covered by the mask then influence the search.  This can help
+          with marking of details that have irregular shape.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Output type</guilabel>
+        </term>
+        <listitem>
+          There are several possibilities what to output: local correlation
+          maxima (single points), masks of kernel size for each correlation
+          maximum (good for presentation purposes), or simply the correlation
+          score.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Correlation method</guilabel>
+        </term>
+        <listitem>
+          Several correlation score computation methods are available.  There
+          are two basic classes.  For <guilabel>Correlation</guilabel> the
+          score is obtained by integrating the product of the kernel and base
+          images.  For <guilabel>Height difference</guilabel> the score is
+          obtained by integrating the squared difference between the kernel
+          and base images (and then inverting the sign to make higher scores
+          better).  For both methods the image region compared to the kernel
+          can be used as-is (raw), it can be levelled to the same mean value or
+          it can be levelled to the same mean value and normalised to the same
+          sum of squares, producing the score.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Threshold</guilabel>
+        </term>
+        <listitem>
+          Threshold for determining whether the local maximum will be treated
+          as <quote>detail found here</quote>.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Regularization</guilabel>
+        </term>
+        <listitem>
+          When the base image regions are locally normalised, very flat regions
+          can lead to random matches with the detail image and other odd
+          results.  By increasing the regularization parameter flat regions are
+          suppressed.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='neural-network'>
+    <title>Neural network processing</title>
+    <indexterm><primary>neural network</primary></indexterm>
+    <para>
+      Neural network processing can be used to calculate one kind of data
+      from another even if the formula or relation between them is not
+      explicitly known.  The relation is built into the network implicitly by
+      a process called training which employs pairs of known input and output
+      data, usually called model and signal.  In this process, the network is
+      optimised to reproduce as well as possible the signal from model.
+      A trained network can then be used to process model data for which the
+      output signal is not available and obtain – usually somewhat
+      approximately – what the signal would look like.  Another possible
+      application is the approximation of data processing methods that are
+      exact but very time-consuming.  In this case the signal is the output
+      of the exact method and the network is trained to reproduce that.
+    </para>
+    <para>
+      Since training and application are two disparate steps they are present
+      as two different functions in Gwyddion.
+    </para>
+    <sect3 id='neural-network-training'>
+      <title>
+        Training <gwy:icon name='neural_train'/>
+      </title>
+      <indexterm>
+        <primary>neural network</primary>
+        <secondary>training</secondary>
+      </indexterm>
+      <para>
+        <menuchoice>
+          <guimenu>Data Process</guimenu>
+          <guisubmenu>Multidata</guisubmenu>
+          <guimenuitem>Neural Network Training</guimenuitem>
+        </menuchoice>
+      </para>
+      <para>
+        The main functions that control the training process are contained in
+        tab <guilabel>Training</guilabel>:
+        <variablelist>
+          <varlistentry>
+            <term><guilabel>Model</guilabel></term>
+            <listitem>
+              Model data, i.e. input for training.  Multiple models
+              can be chosen sequentially for training (with corresponding
+              signals).
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Signal</guilabel></term>
+            <listitem>
+              Signal data for training, i.e. the output the trained network
+              should produce.  The signal image must be compatible
+              with model image, i.e. it must have the same pixel and
+              physical dimensions.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Training steps</guilabel></term>
+            <listitem>
+              Number of training steps to perform when
+              <guibutton>Train</guibutton> is pressed.  Each step consists
+              of one pass through the entire signal data.  It is
+              possible to set the number of training steps to zero; no
+              training pass is performed then but the model is still
+              evaluated with the network and you can observe the result.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guibutton>Train</guibutton></term>
+            <listitem>
+              Starts training.  This is a relatively slow process,
+              especially if the data and/or window size are large.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guibutton>Reinitialize</guibutton></term>
+            <listitem>
+              Reinitializes the neural network to an untrained state.
+              More precisely, this means neuron weights are set to random
+              numbers.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Masking Mode</guilabel></term>
+            <listitem>
+              It is possible to train the network only on a subset of the
+              signal, specified by a mask on the signal data.  (Masking of
+              model would be meaningless due to the window size.)
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+      <para>
+        Neural network parameters can be modified in tab
+        <guilabel>Parameters</guilabel>.  Changing either the window
+        dimensions or the number of hidden nodes means the network is
+        reinitialized (as if you pressed <guibutton>Reinitialize</guibutton>).
+        <variablelist>
+          <varlistentry>
+            <term><guilabel>Window width</guilabel></term>
+            <listitem>
+              Horizontal size of the window.  The input data for the network
+              consists of an area around the model pixel, called window.
+              The window is centered on the pixel so, odd sizes are usually
+              preferred.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Window height</guilabel></term>
+            <listitem>
+              Vertical size of the window.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Hidden nodes</guilabel></term>
+            <listitem>
+              Number of nodes in the <quote>hidden</quote> layer of the
+              neural network. More nodes can lead to more capable network, on
+              the other hand, it means slower training and application.
+              Typically, this number is small compared to the number of
+              pixels in the window.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Power of source XY</guilabel></term>
+            <listitem>
+              The power in which the model lateral dimensions units should
+              appear in the signal.  This is only used when the network is
+              applied.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Power of source Z</guilabel></term>
+            <listitem>
+              The power in which the model <quote>height</quote> units should
+              appear in the signal.  This is only used when the network is
+              applied.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><guilabel>Fixed units</guilabel></term>
+            <listitem>
+              Fixed units of the result.  They are combined with the other
+              units parameters so if you want result units that are
+              independent of input units you have to set both powers to 0.
+              This is only used when the network is applied.
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+      <para>
+        Trained neural network can be saved, loaded to be retrained on
+        different data, etc.  The network list management is similar to
+        <link linkend='raw-file-import'>raw file presets</link>.
+      </para>
+      <para>
+        In addition to the networks in the list, there is one more unnamed
+        network and that of the network currently in training.  When you load
+        a network the network in training becomes a copy of the loaded
+        network.  Training then does not change the named networks; to save
+        the network after training (under existing or new name) you must
+        explicitly use <guibutton>Store</guibutton>.
+      </para>
+    </sect3>
+    <sect3>
+      <title>
+        Application <gwy:icon name='neural_apply'/>
+      </title>
+      <indexterm>
+        <primary>neural network</primary>
+        <secondary>application</secondary>
+      </indexterm>
+      <para>
+        <menuchoice>
+          <guimenu>Data Process</guimenu>
+          <guisubmenu>Multidata</guisubmenu>
+          <guimenuitem>Apply Neural Network</guimenuitem>
+        </menuchoice>
+      </para>
+      <para>
+        Application of a trained neural network is simple: just choose one
+        from the list and press <guibutton>OK</guibutton>.  The unnamed
+        network currently in training is also present in the list under the
+        label <quote>In training</quote>.
+      </para>
+      <para>
+        Since neural networks process and produce normalised data, it
+        does not perserve proportionality well, especially if the scale of
+        training model differs considerably from the scale of real inputs.  If
+        the output is expected to scale with input you can enable option
+        <guilabel>Scale proportionally to input</guilabel> that scales the
+        output with the inverse ratio of actual and training input data
+        ranges.
+      </para>
+    </sect3>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

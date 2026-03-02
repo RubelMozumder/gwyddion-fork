@@ -1,0 +1,37 @@
+--- gtkglext-1.2.0.orig/configure.in	2006-02-05 04:17:19.000000000 +0100
++++ gtkglext-1.2.0/configure.in	2010-11-18 22:48:43.000000000 +0100
+@@ -1,5 +1,6 @@
+ # required autoconf version
+ AC_PREREQ([2.54])
++AC_CONFIG_MACRO_DIR([m4])
+ 
+ #
+ # Making releases:
+@@ -59,10 +60,6 @@ m4_define([gmodule_required_version], [2
+ m4_define([pango_pkg], [pango])
+ m4_define([pango_required_version], [1.0.0])
+ 
+-# Pangox
+-m4_define([pangox_pkg], [pangox])
+-m4_define([pangox_required_version], [1.0.0])
+-
+ # PangoFT2
+ m4_define([pangoft2_pkg], [pangoft2])
+ m4_define([pangoft2_required_version], [1.0.0])
+@@ -349,7 +346,6 @@ PKG_CHECK_MODULES([BASE_DEPENDENCIES], [
+ gtk_pkg >= gtk_required_version \
+ gdk_pkg >= gdk_required_version \
+ pango_pkg >= pango_required_version \
+-pangox_pkg >= pangox_required_version \
+ gmodule_pkg >= gmodule_required_version \
+ ])
+ 
+@@ -794,7 +790,7 @@ LIBS="$save_LIBS"
+ # CFLAGS and LIBS
+ ##################################################
+ 
+-GDKGLEXT_PACKAGES="gdk_pkg pango_pkg pangox_pkg gmodule_pkg"
++GDKGLEXT_PACKAGES="gdk_pkg pango_pkg gmodule_pkg"
+ GDKGLEXT_EXTRA_CFLAGS="$GL_CFLAGS $GDKGLEXT_WIN_CFLAGS"
+ GDKGLEXT_EXTRA_LIBS="$GL_LIBS $GDKGLEXT_WIN_LIBS"
+ GDKGLEXT_DEP_CFLAGS="$GDKGLEXT_EXTRA_CFLAGS `$PKG_CONFIG --cflags $GDKGLEXT_PACKAGES`"

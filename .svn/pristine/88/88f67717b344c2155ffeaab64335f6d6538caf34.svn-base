@@ -1,0 +1,30 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+name = 'fitfunc-exponential'
+set samples 201
+set lmargin at screen 0.11
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+a = 1
+b = -1
+y0 = 0.15*a
+
+f(x) = y0 + a * exp(x/b)
+xm = -b
+M = f(0)
+
+unset grid
+set key top right Left reverse samplen 1.5
+set xtics out nomirror ('0' 0 0, '-b' xm 0)
+set ytics out nomirror ('0' 0 0, 'y₀' y0 0, 'y₀+a' M 0)
+set xrange [0:5]
+set yrange [0:1.1*M]
+set arrow from xm,0 to xm,f(xm) nohead ls 10
+set arrow from 0,y0 to 5,y0 nohead ls 10
+set output name.'.svg'
+
+plot \
+    f(x) with lines title 'Exponential' linestyle 1
+

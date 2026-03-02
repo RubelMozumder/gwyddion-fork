@@ -1,0 +1,1848 @@
+/*
+ *  $Id: facet_analysis.c 25681 2023-09-19 08:35:43Z yeti-dn $
+ *  Copyright (C) 2003-2017 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * Facet (angle) view uses a zoomed area-preserving projection of north hemisphere normal.  Coordinates on hemisphere
+ * are labeled (theta, phi), coordinates on the projection (x, y)
+ **/
+
+/* TODO:
+ * - Selecting a point recalls the corresponding mask on the image (if marked previously)???
+ * - Create multiple masks on output?  How exactly?
+ * - Add "Make (001)/(010)/(100)" which sets the selected point to direction of a crystal plane (NOT along an axis!).
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwythreads.h>
+#include <libprocess/stats.h>
+#include <libprocess/level.h>
+#include <libprocess/filters.h>
+#include <libprocess/grains.h>
+#include <libprocess/elliptic.h>
+#include <libgwydgets/gwyshader.h>
+#include <libgwydgets/gwynullstore.h>
+#include <libgwymodule/gwymodule-process.h>
+#include <app/gwymoduleutils.h>
+#include <app/gwyapp.h>
+#include "preview.h"
+
+#define RUN_MODES (GWY_RUN_IMMEDIATE | GWY_RUN_INTERACTIVE)
+
+#define FVIEW_GRADIENT "DFit"
+
+enum {
+    MAX_PLANE_SIZE = 7,  /* this is actually half */
+    FACETVIEW_SIZE = PREVIEW_HALF_SIZE | 1,
+    IMAGEVIEW_SIZE = (PREVIEW_SIZE + PREVIEW_SMALL_SIZE)/2,
+};
+
+typedef enum {
+    LATTICE_CUBIC        = 0,
+    LATTICE_RHOMBOHEDRAL = 1,
+    LATTICE_HEXAGONAL    = 2,
+    LATTICE_TETRAGONAL   = 3,
+    LATTICE_ORTHORHOMBIC = 4,
+    LATTICE_MONOCLINIC   = 5,
+    LATTICE_TRICLINIC    = 6,
+    LATTICE_NTYPES,
+} LatticeType;
+
+enum {
+    PARAM_KERNEL_SIZE,
+    PARAM_TOLERANCE,
+    PARAM_PHI0,
+    PARAM_THETA0,
+    PARAM_NUMBER_POINTS,
+    PARAM_REPORT_STYLE,
+    PARAM_COMBINE,
+    PARAM_COMBINE_TYPE,
+    PARAM_MASK_COLOR,
+
+    PARAM_LATTICE_TYPE,
+    /* Use PARAM_LATTICE_0 + a LatticeType value to get the parameter id. */
+    PARAM_LATTICE_0,
+    PARAM_ROT_THETA = PARAM_LATTICE_0 + LATTICE_NTYPES,
+    PARAM_ROT_PHI,
+    PARAM_ROT_ALPHA,
+
+    WIDGET_LIST_BUTTONS,
+    LABEL_MEAN_NORMAL,
+};
+
+typedef enum {
+    LATTICE_PARAM_A     = 0,
+    LATTICE_PARAM_B     = 1,
+    LATTICE_PARAM_C     = 2,
+    LATTICE_PARAM_ALPHA = 3,
+    LATTICE_PARAM_BETA  = 4,
+    LATTICE_PARAM_GAMMA = 5,
+    LATTICE_PARAM_NPARAMS,
+} LatticeParameterType;
+
+static const guint lattice_indep_params[LATTICE_NTYPES] = {
+    (1 << LATTICE_PARAM_A),
+    (1 << LATTICE_PARAM_A) | (1 << LATTICE_PARAM_GAMMA),
+    (1 << LATTICE_PARAM_A) | (1 << LATTICE_PARAM_C),
+    (1 << LATTICE_PARAM_A) | (1 << LATTICE_PARAM_C),
+    (1 << LATTICE_PARAM_A) | (1 << LATTICE_PARAM_B) | (1 << LATTICE_PARAM_C),
+    (1 << LATTICE_PARAM_A) | (1 << LATTICE_PARAM_C) | (1 << LATTICE_PARAM_BETA),
+    (1 << LATTICE_PARAM_A) | (1 << LATTICE_PARAM_B) | (1 << LATTICE_PARAM_C)
+        | (1 << LATTICE_PARAM_ALPHA) | (1 << LATTICE_PARAM_BETA) | (1 << LATTICE_PARAM_GAMMA),
+};
+
+enum {
+    FACET_COLUMN_N,
+    FACET_COLUMN_THETA,
+    FACET_COLUMN_PHI,
+    FACET_COLUMN_X,
+    FACET_COLUMN_Y,
+    FACET_COLUMN_Z,
+};
+
+typedef struct {
+    GwyParams *params;
+    GwyDataField *field;
+    GwyDataField *mask;
+    GwyDataField *theta;
+    GwyDataField *phi;
+    GwyDataField *result;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GwyContainer *args_data;
+    GtkWidget *dialog;
+    GtkWidget *view;
+    GtkWidget *fview;
+    GwyDataField *dist;
+    GwyDataField *mask;
+    GwyNullStore *store;
+    GwyParamTable *table_list;
+    GwyParamTable *table_facets;
+    GwyParamTable *table_rotation;
+    GwyParamTable *table_lattice;
+    GtkWidget *pointlist;
+    GtkWidget *clear;
+    GtkWidget *delete;
+    GtkWidget *refine;
+    GtkWidget *mark;
+    GtkWidget *theta_min_label;
+    GtkWidget *theta_0_label;
+    GtkWidget *theta_max_label;
+    GtkWidget *shader;
+    GtkWidget *reset_rotation;
+    GtkWidget *lattice_type;
+    GtkWidget *lattice_label[LATTICE_PARAM_NPARAMS];
+    GtkWidget *lattice_entry[LATTICE_PARAM_NPARAMS];
+    GtkWidget *lattice_units[LATTICE_PARAM_NPARAMS];
+    GtkWidget *create;
+    GwySelection *fselection0;
+    GwySelection *iselection;
+    GwySelection *fselection;
+    GwyContainer *data;
+    GwyContainer *fdata;
+    gchar *selkey;
+    gdouble q;
+    gint selid;
+    gboolean did_init;
+    gboolean is_rotating;
+    gboolean is_selecting_in_image;
+} ModuleGUI;
+
+static gboolean         module_register                  (void);
+static GwyParamDef*     define_module_params             (void);
+static void             facet_analyse                    (GwyContainer *data,
+                                                          GwyRunType run);
+static void             execute                          (ModuleArgs *args);
+static GwyDialogOutcome run_gui                          (ModuleArgs *args,
+                                                          GwyContainer *data,
+                                                          gint id);
+static void             param_changed                    (ModuleGUI *gui,
+                                                          gint id);
+static GtkWidget*       create_list_buttons              (gpointer user_data);
+static GtkWidget*       create_theta_box                 (ModuleGUI *gui);
+static GtkWidget*       create_facets_controls           (ModuleGUI *gui,
+                                                          GwyContainer *data,
+                                                          gint id);
+static GtkWidget*       create_rotation_controls         (ModuleGUI *gui);
+static GtkWidget*       create_lattice_controls          (ModuleGUI *gui);
+static void             create_point_list                (ModuleGUI *gui);
+static void             point_list_selection_changed     (GtkTreeSelection *treesel,
+                                                          ModuleGUI *gui);
+static void             render_id                        (GtkCellLayout *layout,
+                                                          GtkCellRenderer *renderer,
+                                                          GtkTreeModel *model,
+                                                          GtkTreeIter *iter,
+                                                          gpointer user_data);
+static void             render_facet_parameter           (GtkCellLayout *layout,
+                                                          GtkCellRenderer *renderer,
+                                                          GtkTreeModel *model,
+                                                          GtkTreeIter *iter,
+                                                          gpointer user_data);
+static void             clear_facet_selection            (ModuleGUI *gui);
+static void             delete_facet_selection           (ModuleGUI *gui);
+static void             refine_facet_selection           (ModuleGUI *gui);
+static void             mark_facet                       (ModuleGUI *gui);
+static gboolean         point_list_key_pressed           (ModuleGUI *gui,
+                                                          GdkEventKey *event);
+static gchar*           format_facet_table               (gpointer user_data);
+static void             save_facet_selection             (ModuleGUI *gui);
+static void             update_theta_range               (ModuleGUI *gui);
+static void             facet_view_select_angle          (ModuleGUI *gui,
+                                                          gdouble theta,
+                                                          gdouble phi);
+static void             facet_view_selection_updated     (GwySelection *selection,
+                                                          gint hint,
+                                                          ModuleGUI *gui);
+static void             recalculate_distribution         (ModuleGUI *gui);
+static void             update_average_angle             (ModuleGUI *gui,
+                                                          gboolean clearme);
+static void             preview_selection_updated        (GwySelection *selection,
+                                                          gint hint,
+                                                          ModuleGUI *gui);
+static void             update_latice_params             (ModuleGUI *gui);
+static void             lattice_parameter_changed        (GtkEntry *entry,
+                                                          ModuleGUI *gui);
+static void             create_lattice                   (ModuleGUI *gui);
+static void             rot_shader_changed               (ModuleGUI *gui,
+                                                          GwyShader *shader);
+static void             reset_rotation                   (ModuleGUI *gui);
+static void             gwy_data_field_mark_facets       (GwyDataField *dtheta,
+                                                          GwyDataField *dphi,
+                                                          gdouble theta0,
+                                                          gdouble phi0,
+                                                          gdouble tolerance,
+                                                          GwyDataField *mask);
+static void             calculate_average_angle          (GwyDataField *dtheta,
+                                                          GwyDataField *dphi,
+                                                          gdouble theta0, gdouble phi0, gdouble tolerance,
+                                                          gdouble *theta, gdouble *phi);
+static gdouble          gwy_data_field_facet_distribution(GwyDataField *field,
+                                                          GwyDataField *dtheta,
+                                                          GwyDataField *dphi,
+                                                          GwyDataField *dist,
+                                                          gint half_size);
+static void             compute_slopes                   (GwyDataField *field,
+                                                          gint kernel_size,
+                                                          GwyDataField *xder,
+                                                          GwyDataField *yder);
+static void             mark_fdata                       (GwyDataField *mask,
+                                                          gdouble q,
+                                                          gdouble theta0,
+                                                          gdouble phi0,
+                                                          gdouble tolerance);
+static void             apply_facet_selection_rotation   (ModuleGUI *gui);
+static void             make_unit_vector                 (GwyXYZ *v,
+                                                          gdouble theta,
+                                                          gdouble phi);
+static void             vector_angles                    (const GwyXYZ *v,
+                                                          gdouble *theta,
+                                                          gdouble *phi);
+static void             conform_to_lattice_type          (gdouble *params,
+                                                          LatticeType type);
+static void             make_lattice_vectors             (const gdouble *params,
+                                                          GwyXYZ *a,
+                                                          GwyXYZ *b,
+                                                          GwyXYZ *c);
+static void             make_inverse_lattice             (const GwyXYZ *a,
+                                                          const GwyXYZ *b,
+                                                          const GwyXYZ *c,
+                                                          GwyXYZ *ia,
+                                                          GwyXYZ *ib,
+                                                          GwyXYZ *ic);
+static void             rotate_vector                    (GwyXYZ *v,
+                                                          gdouble omega,
+                                                          gdouble theta,
+                                                          gdouble phi);
+static GwyDataField*    make_fdist_field                 (GwyDataField *field);
+static void             sanitise_params                  (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Visualizes, marks and measures facet orientation."),
+    "Yeti <yeti@gwyddion.net>",
+    "3.0",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2005",
+};
+
+GWY_MODULE_QUERY2(module_info, facet_analysis)
+
+static gboolean
+module_register(void)
+{
+    gwy_process_func_register("facet_analysis",
+                              (GwyProcessFunc)&facet_analyse,
+                              N_("/Measure _Features/Facet _Analysis..."),
+                              GWY_STOCK_FACET_ANALYSIS,
+                              RUN_MODES,
+                              GWY_MENU_FLAG_DATA,
+                              N_("Mark areas by 2D slope"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum lattices[] = {
+        { N_("lattice|Cubic"),        LATTICE_CUBIC,        },
+        { N_("lattice|Rhombohedral"), LATTICE_RHOMBOHEDRAL, },
+        { N_("lattice|Hexagonal"),    LATTICE_HEXAGONAL,    },
+        { N_("lattice|Tetragonal"),   LATTICE_TETRAGONAL,   },
+        { N_("lattice|Orthorhombic"), LATTICE_ORTHORHOMBIC, },
+        { N_("lattice|Monoclinic"),   LATTICE_MONOCLINIC,   },
+        { N_("lattice|Triclinic"),    LATTICE_TRICLINIC,    },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_process_func_current());
+    gwy_param_def_add_int(paramdef, PARAM_KERNEL_SIZE, "kernel-size", _("_Facet plane size"), 0, MAX_PLANE_SIZE, 3);
+    gwy_param_def_add_double(paramdef, PARAM_TOLERANCE, "tolerance", _("_Tolerance"), 0.0, G_PI/6.0, 3.0*G_PI/180.0);
+    gwy_param_def_add_angle(paramdef, PARAM_PHI0, "phi0", _("Selected φ"), FALSE, 1, 0.0);
+    /* The real folding is 4, not 2, but the facet map contains regions outside the possible angles. */
+    gwy_param_def_add_angle(paramdef, PARAM_THETA0, "theta0", _("Selected ϑ"), TRUE, 2, 0.0);
+    /* TRANSLATORS: Number is verb here. */
+    gwy_param_def_add_boolean(paramdef, PARAM_NUMBER_POINTS, "number_points", _("_Number points"), FALSE);
+    gwy_param_def_add_report_type(paramdef, PARAM_REPORT_STYLE, "report_style", _("Save Facet Vectors"),
+                                  GWY_RESULTS_EXPORT_TABULAR_DATA, GWY_RESULTS_REPORT_TABSEP);
+    gwy_param_def_add_boolean(paramdef, PARAM_COMBINE, "combine", NULL, FALSE);
+    gwy_param_def_add_enum(paramdef, PARAM_COMBINE_TYPE, "combine_type", NULL, GWY_TYPE_MERGE_TYPE, GWY_MERGE_UNION);
+    gwy_param_def_add_mask_color(paramdef, PARAM_MASK_COLOR, NULL, NULL);
+
+    gwy_param_def_add_gwyenum(paramdef, PARAM_LATTICE_TYPE, "lattice_type", _("_Lattice type"),
+                              lattices, G_N_ELEMENTS(lattices), LATTICE_CUBIC);
+    gwy_param_def_add_double(paramdef, PARAM_LATTICE_0 + LATTICE_PARAM_A,
+                             "lattice_a", "a", 1e3*G_MINDOUBLE, G_MAXDOUBLE/1e3, 1.0);
+    gwy_param_def_add_double(paramdef, PARAM_LATTICE_0 + LATTICE_PARAM_B,
+                             "lattice_b", "b", 1e3*G_MINDOUBLE, G_MAXDOUBLE/1e3, 1.0);
+    gwy_param_def_add_double(paramdef, PARAM_LATTICE_0 + LATTICE_PARAM_C,
+                             "lattice_c", "c", 1e3*G_MINDOUBLE, G_MAXDOUBLE/1e3, 1.0);
+    /* We restrict the ranges a bit in the GUI to avoid degenerate cases. */
+    gwy_param_def_add_angle(paramdef, PARAM_LATTICE_0 + LATTICE_PARAM_ALPHA, "lattice_alpha", "α", TRUE, 2, G_PI/2.0);
+    gwy_param_def_add_angle(paramdef, PARAM_LATTICE_0 + LATTICE_PARAM_BETA, "lattice_beta", "β", TRUE, 2, G_PI/2.0);
+    gwy_param_def_add_angle(paramdef, PARAM_LATTICE_0 + LATTICE_PARAM_GAMMA, "lattice_gamma", "γ", TRUE, 2, G_PI/2.0);
+    /* Interactive rotation, not saved. */
+    gwy_param_def_add_angle(paramdef, PARAM_ROT_THETA, NULL, "θ", TRUE, 4, 0.0);
+    gwy_param_def_add_angle(paramdef, PARAM_ROT_PHI, NULL, "φ", FALSE, 1, 0.0);
+    gwy_param_def_add_angle(paramdef, PARAM_ROT_ALPHA, NULL, "α", FALSE, 1, 0.0);
+
+    return paramdef;
+}
+
+static void
+facet_analyse(GwyContainer *data, GwyRunType run)
+{
+    GwyDialogOutcome outcome;
+    ModuleArgs args;
+    GwyDataField *fdist;
+    GQuark mquark;
+    gint id;
+
+    g_return_if_fail(run & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_app_data_browser_get_current(GWY_APP_DATA_FIELD, &args.field,
+                                     GWY_APP_MASK_FIELD, &args.mask,
+                                     GWY_APP_MASK_FIELD_KEY, &mquark,
+                                     GWY_APP_DATA_FIELD_ID, &id,
+                                     0);
+    g_return_if_fail(args.field && mquark);
+
+    if (!gwy_require_image_same_units(args.field, data, id, _("Facet Analysis")))
+        return;
+
+    args.result = gwy_data_field_new_alike(args.field, TRUE);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(args.result), NULL);
+    args.theta = gwy_data_field_new_alike(args.result, FALSE);
+    args.phi = gwy_data_field_new_alike(args.result, FALSE);
+    args.params = gwy_params_new_from_settings(define_module_params());
+    sanitise_params(&args);
+
+    if (run == GWY_RUN_IMMEDIATE) {
+        /* FIXME: Refactor for more meaningful non-interactive mode? */
+        fdist = make_fdist_field(args.field);
+        gwy_data_field_facet_distribution(args.field, args.theta, args.phi, fdist,
+                                          gwy_params_get_int(args.params, PARAM_KERNEL_SIZE));
+        execute(&args);
+        GWY_OBJECT_UNREF(fdist);
+    }
+    if (run == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, id);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+        if (outcome != GWY_DIALOG_HAVE_RESULT)
+            execute(&args);
+    }
+
+    gwy_app_undo_qcheckpointv(data, 1, &mquark);
+    if (gwy_data_field_get_max(args.result) > 0.0)
+        gwy_container_set_object(data, mquark, args.result);
+    else
+        gwy_container_remove(data, mquark);
+    gwy_app_channel_log_add_proc(data, id, id);
+
+    gwy_params_save_to_settings(args.params);
+
+end:
+    g_object_unref(args.theta);
+    g_object_unref(args.phi);
+    g_object_unref(args.result);
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    static const GwyRGBA facet_mask_color = { 0.56, 0.39, 0.07, 0.5 };
+
+    GtkWidget *hbox, *vbox, *scwin, *notebook, *align;
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    GwyDialogOutcome outcome;
+    ModuleGUI gui;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.selid = -1;
+    gui.args_data = data;
+    gui.selkey = g_strdup_printf("/%d/select/_facets", id);
+
+    gui.data = gwy_container_new();
+    gwy_container_set_object_by_name(gui.data, "/0/data", args->field);
+    gwy_container_set_object_by_name(gui.data, "/0/mask", args->result);
+    gwy_app_sync_data_items(data, gui.data, id, 0, FALSE,
+                            GWY_DATA_ITEM_PALETTE,
+                            GWY_DATA_ITEM_RANGE,
+                            GWY_DATA_ITEM_MASK_COLOR,
+                            GWY_DATA_ITEM_REAL_SQUARE,
+                            0);
+
+    gui.fdata = gwy_container_new();
+    gui.dist = make_fdist_field(args->field);
+    gui.mask = gwy_data_field_new_alike(gui.dist, TRUE);
+    gwy_container_set_object_by_name(gui.fdata, "/0/data", gui.dist);
+    gwy_container_set_object_by_name(gui.fdata, "/0/mask", gui.mask);
+    gwy_container_set_const_string_by_name(gui.fdata, "/0/base/palette", FVIEW_GRADIENT);
+    gwy_rgba_store_to_container(&facet_mask_color, gui.fdata, "/0/mask");
+
+    gui.dialog = gwy_dialog_new(_("Facet Analysis"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    /**** First row: Image + point list *****/
+    hbox = gwy_hbox_new(4);
+    gwy_dialog_add_content(dialog, hbox, FALSE, FALSE, 2);
+
+    gui.view = gwy_create_preview(gui.data, 0, IMAGEVIEW_SIZE, TRUE);
+    gtk_box_pack_start(GTK_BOX(hbox), gui.view, FALSE, FALSE, 4);
+    gui.iselection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(gui.view), 0, "Point", 1, TRUE);
+    g_signal_connect(gui.iselection, "changed", G_CALLBACK(preview_selection_updated), &gui);
+
+    vbox = gwy_vbox_new(2);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+
+    create_point_list(&gui);
+    scwin = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scwin), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(scwin), gui.pointlist);
+    gtk_box_pack_start(GTK_BOX(vbox), scwin, TRUE, TRUE, 0);
+
+    table = gui.table_list = gwy_param_table_new(args->params);
+    gwy_param_table_append_report(table, PARAM_REPORT_STYLE);
+    gwy_param_table_report_set_formatter(table, PARAM_REPORT_STYLE, format_facet_table, &gui, NULL);
+    gwy_param_table_append_checkbox(table, PARAM_NUMBER_POINTS);
+    gwy_param_table_append_foreign(table, WIDGET_LIST_BUTTONS, create_list_buttons, &gui, NULL);
+    gwy_param_table_append_info(table, LABEL_MEAN_NORMAL, _("Mean normal"));
+    gtk_box_pack_start(GTK_BOX(vbox), gwy_param_table_widget(table), FALSE, TRUE, 0);
+    gwy_dialog_add_param_table(dialog, table);
+
+    /**** Second row: Facet view + point gui *****/
+    hbox = gwy_hbox_new(4);
+    gwy_dialog_add_content(dialog, hbox, FALSE, FALSE, 2);
+
+    vbox = gwy_vbox_new(2);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 4);
+
+    gui.fview = gwy_create_preview(gui.fdata, 0, FACETVIEW_SIZE, TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), gui.fview, FALSE, FALSE, 0);
+    gui.fselection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(gui.fview), 0, "Point", 1024, TRUE);
+    gui.fselection0 = gwy_selection_duplicate(gui.fselection);
+    g_object_ref(gui.fselection);
+
+    gtk_box_pack_start(GTK_BOX(vbox), create_theta_box(&gui), FALSE, FALSE, 0);
+
+    align = gtk_alignment_new(0.0, 0.0, 1.0, 1.0);
+    gtk_box_pack_start(GTK_BOX(hbox), align, TRUE, TRUE, 4);
+    notebook = gtk_notebook_new();
+    gtk_container_add(GTK_CONTAINER(align), notebook);
+
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), create_facets_controls(&gui, data, id),
+                             gtk_label_new(_("Facets")));
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), create_rotation_controls(&gui), gtk_label_new(_("Rotation")));
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), create_lattice_controls(&gui), gtk_label_new(_("Lattice")));
+
+    g_signal_connect(gui.iselection, "changed", G_CALLBACK(preview_selection_updated), &gui);
+    g_signal_connect(gui.fselection, "changed", G_CALLBACK(facet_view_selection_updated), &gui);
+    g_signal_connect_swapped(gui.table_list, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_facets, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_rotation, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_lattice, "param-changed", G_CALLBACK(param_changed), &gui);
+    /* There is no preview() function; its role is mostly played by mark_facet(). */
+
+    outcome = gwy_dialog_run(dialog);
+
+    save_facet_selection(&gui);
+
+    g_object_unref(gui.fselection0);
+    g_object_unref(gui.fselection);
+    g_object_unref(gui.data);
+    g_object_unref(gui.fdata);
+    g_object_unref(gui.dist);
+    g_object_unref(gui.mask);
+    g_free(gui.selkey);
+
+    return outcome;
+}
+
+static void
+execute(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    gdouble theta0 = gwy_params_get_double(params, PARAM_THETA0);
+    gdouble phi0 = gwy_params_get_double(params, PARAM_PHI0);
+    gdouble tolerance = gwy_params_get_double(params, PARAM_TOLERANCE);
+    gboolean combine = gwy_params_get_boolean(params, PARAM_COMBINE);
+    GwyMergeType combine_type = gwy_params_get_enum(params, PARAM_COMBINE_TYPE);
+    GwyDataField *result = args->result, *mask = args->mask;
+
+    gwy_data_field_mark_facets(args->theta, args->phi, theta0, phi0, tolerance, result);
+    if (mask && combine) {
+        if (combine_type == GWY_MERGE_UNION)
+            gwy_data_field_grains_add(result, mask);
+        else if (combine_type == GWY_MERGE_INTERSECTION)
+            gwy_data_field_grains_intersect(result, mask);
+    }
+}
+
+static GtkWidget*
+create_list_buttons(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    GtkWidget *hbox;
+
+    hbox = gwy_hbox_new(0);
+
+    gui->clear = gwy_stock_like_button_new(_("_Clear"), GTK_STOCK_CLEAR);
+    gtk_box_pack_start(GTK_BOX(hbox), gui->clear, TRUE, TRUE, 0);
+    g_signal_connect_swapped(gui->clear, "clicked", G_CALLBACK(clear_facet_selection), gui);
+
+    gui->delete = gwy_stock_like_button_new(_("_Delete"), GTK_STOCK_DELETE);
+    gtk_box_pack_start(GTK_BOX(hbox), gui->delete, TRUE, TRUE, 0);
+    g_signal_connect_swapped(gui->delete, "clicked", G_CALLBACK(delete_facet_selection), gui);
+
+    gui->refine = gtk_button_new_with_mnemonic(_("_Refine"));
+    gtk_box_pack_start(GTK_BOX(hbox), gui->refine, TRUE, TRUE, 0);
+    g_signal_connect_swapped(gui->refine, "clicked", G_CALLBACK(refine_facet_selection), gui);
+
+    gui->mark = gtk_button_new_with_mnemonic(_("_Mark"));
+    gtk_box_pack_start(GTK_BOX(hbox), gui->mark, TRUE, TRUE, 0);
+    g_signal_connect_swapped(gui->mark, "clicked", G_CALLBACK(mark_facet), gui);
+
+    return hbox;
+}
+
+static GtkWidget*
+create_theta_box(ModuleGUI *gui)
+{
+    GtkWidget *thetabox = gwy_hbox_new(0);
+
+    gui->theta_min_label = gtk_label_new(NULL);
+    gtk_misc_set_alignment(GTK_MISC(gui->theta_min_label), 0.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(thetabox), gui->theta_min_label, TRUE, TRUE, 0);
+
+    gui->theta_0_label = gtk_label_new(NULL);
+    gtk_misc_set_alignment(GTK_MISC(gui->theta_0_label), 0.5, 0.5);
+    gtk_box_pack_start(GTK_BOX(thetabox), gui->theta_0_label, TRUE, TRUE, 0);
+
+    gui->theta_max_label = gtk_label_new(NULL);
+    gtk_misc_set_alignment(GTK_MISC(gui->theta_max_label), 1.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(thetabox), gui->theta_max_label, TRUE, TRUE, 0);
+
+    return thetabox;
+}
+
+static GtkWidget*
+create_facets_controls(ModuleGUI *gui, GwyContainer *data, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParamTable *table;
+
+    table = gui->table_facets = gwy_param_table_new(args->params);
+    gwy_param_table_append_slider(table, PARAM_KERNEL_SIZE);
+    gwy_param_table_set_unitstr(table, PARAM_KERNEL_SIZE, _("px"));
+    gwy_param_table_slider_set_mapping(table, PARAM_KERNEL_SIZE, GWY_SCALE_MAPPING_LINEAR);
+    gwy_param_table_append_slider(table, PARAM_TOLERANCE);
+    gwy_param_table_slider_set_factor(table, PARAM_TOLERANCE, 180.0/G_PI);
+    gwy_param_table_slider_set_digits(table, PARAM_TOLERANCE, 3);
+    gwy_param_table_set_unitstr(table, PARAM_TOLERANCE, _("deg"));
+    gwy_param_table_append_mask_color(table, PARAM_MASK_COLOR, gui->data, 0, data, id);
+    if (args->mask) {
+        gwy_param_table_append_radio_row(table, PARAM_COMBINE_TYPE);
+        gwy_param_table_add_enabler(table, PARAM_COMBINE, PARAM_COMBINE_TYPE);
+    }
+    gwy_dialog_add_param_table(GWY_DIALOG(gui->dialog), table);
+
+    return gwy_param_table_widget(table);
+}
+
+static GtkWidget*
+create_rotation_controls(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GwyParamTable *table;
+    GtkWidget *vbox, *hbox, *label;
+
+    vbox = gwy_vbox_new(0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
+
+    label = gtk_label_new(_("Rotate all points"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 2);
+
+    hbox = gwy_hbox_new(12);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+
+    gui->shader = gwy_shader_new(FVIEW_GRADIENT);
+    gwy_shader_set_angle(GWY_SHADER(gui->shader),
+                         gwy_params_get_double(args->params, PARAM_ROT_THETA),
+                         gwy_params_get_double(args->params, PARAM_ROT_PHI));
+    gtk_widget_set_size_request(gui->shader, 120, 120);
+    gtk_box_pack_start(GTK_BOX(hbox), gui->shader, FALSE, TRUE, 0);
+
+    table = gui->table_rotation = gwy_param_table_new(args->params);
+    gwy_param_table_append_slider(table, PARAM_ROT_THETA);
+    gwy_param_table_set_unitstr(table, PARAM_ROT_THETA, _("deg"));
+    gwy_param_table_append_slider(table, PARAM_ROT_PHI);
+    gwy_param_table_set_unitstr(table, PARAM_ROT_PHI, _("deg"));
+    gwy_param_table_append_slider(table, PARAM_ROT_ALPHA);
+    gwy_param_table_set_unitstr(table, PARAM_ROT_ALPHA, _("deg"));
+    gwy_dialog_add_param_table(GWY_DIALOG(gui->dialog), table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), TRUE, TRUE, 0);
+
+    hbox = gwy_hbox_new(0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 4);
+
+    gui->reset_rotation = gtk_button_new_with_mnemonic(_("Re_set Rotation"));
+    gtk_box_pack_start(GTK_BOX(hbox), gui->reset_rotation, FALSE, FALSE, 0);
+
+    g_signal_connect_swapped(gui->shader, "angle_changed", G_CALLBACK(rot_shader_changed), gui);
+    g_signal_connect_swapped(gui->reset_rotation, "clicked", G_CALLBACK(reset_rotation), gui);
+
+    return vbox;
+}
+
+static void
+attach_lattice_parameter(GtkTable *table, gint row, gint col,
+                         LatticeParameterType paramtype,
+                         const gchar *name, gboolean is_angle,
+                         ModuleGUI *gui)
+{
+    GtkWidget *label, *entry;
+
+    label = gtk_label_new(name);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_table_attach(table, label, col, col+1, row, row+1, GTK_FILL, 0, 0, 0);
+    gui->lattice_label[paramtype] = label;
+
+    entry = gtk_entry_new();
+    gtk_entry_set_width_chars(GTK_ENTRY(entry), 8);
+    gtk_table_attach(table, entry, col+1, col+2, row, row+1, GTK_FILL, 0, 0, 0);
+    gui->lattice_entry[paramtype] = entry;
+
+    label = gtk_label_new(is_angle ? _("deg") : NULL);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_table_attach(table, label, col+2, col+3, row, row+1, (is_angle ? GTK_EXPAND : 0) | GTK_FILL, 0, 0, 0);
+    gui->lattice_units[paramtype] = label;
+
+    g_object_set_data(G_OBJECT(entry), "id", GUINT_TO_POINTER(paramtype));
+    g_signal_connect(entry, "activate", G_CALLBACK(lattice_parameter_changed), gui);
+    gwy_widget_set_activate_on_unfocus(entry, TRUE);
+}
+
+static GtkWidget*
+create_lattice_controls(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GtkWidget *label, *vbox, *hbox;
+    GtkTable *table;
+    gint row;
+
+    vbox = gwy_vbox_new(0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
+
+    hbox = gwy_hbox_new(0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+    gui->table_lattice = gwy_param_table_new(args->params);
+    gwy_param_table_append_combo(gui->table_lattice, PARAM_LATTICE_TYPE);
+    gwy_dialog_add_param_table(GWY_DIALOG(gui->dialog), gui->table_lattice);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(gui->table_lattice), FALSE, FALSE, 0);
+
+    table = GTK_TABLE(gtk_table_new(4, 6, FALSE));
+    gtk_table_set_row_spacings(table, 2);
+    gtk_table_set_col_spacings(table, 6);
+    gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(table), FALSE, FALSE, 8);
+    row = 0;
+
+    label = gtk_label_new(_("Length"));
+    gtk_table_attach(table, label, 1, 2, row, row+1, GTK_FILL, 0, 0, 0);
+    label = gtk_label_new(_("Angle"));
+    gtk_table_attach(table, label, 4, 5, row, row+1, GTK_FILL, 0, 0, 0);
+    row++;
+
+    attach_lattice_parameter(table, row, 0, LATTICE_PARAM_A, "a:", FALSE, gui);
+    attach_lattice_parameter(table, row, 3, LATTICE_PARAM_ALPHA, "α:", TRUE, gui);
+    row++;
+
+    attach_lattice_parameter(table, row, 0, LATTICE_PARAM_B, "b:", FALSE, gui);
+    attach_lattice_parameter(table, row, 3, LATTICE_PARAM_BETA, "β:", TRUE, gui);
+    row++;
+
+    attach_lattice_parameter(table, row, 0, LATTICE_PARAM_C, "c:", FALSE, gui);
+    attach_lattice_parameter(table, row, 3, LATTICE_PARAM_GAMMA, "γ:", TRUE, gui);
+    row++;
+
+    hbox = gwy_hbox_new(6);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+
+    gui->create = gtk_button_new_with_mnemonic(_("Create _Points"));
+    gtk_box_pack_start(GTK_BOX(hbox), gui->create, FALSE, FALSE, 0);
+    g_signal_connect_swapped(gui->create, "clicked", G_CALLBACK(create_lattice), gui);
+
+    return vbox;
+}
+
+static inline void
+slopes_to_angles(gdouble xder, gdouble yder,
+                 gdouble *theta, gdouble *phi)
+{
+    *phi = atan2(yder, -xder);
+    *theta = atan(sqrt(xder*xder + yder*yder));
+}
+
+static inline void
+angles_to_slopes(gdouble theta, gdouble phi,
+                 gdouble *xder, gdouble *yder)
+{
+    *xder = -tan(theta)*cos(phi);
+    *yder = tan(theta)*sin(phi);
+}
+
+/* Transforms (ϑ, φ) to Cartesian selection coordinates [0,2q], which is [0,2] for the full range of angles. */
+static inline void
+angles_to_xy(gdouble theta, gdouble phi, gdouble q,
+             gdouble *x, gdouble *y)
+{
+    gdouble rho = G_SQRT2*sin(theta/2.0);
+    gdouble c = cos(phi), s = sin(phi);
+
+    *x = rho*c + q;
+    *y = -rho*s + q;
+}
+
+static inline void
+xy_to_angles(gdouble x, gdouble y, gdouble q,
+             gdouble *theta, gdouble *phi)
+{
+    gdouble s = hypot(x - q, y - q)/G_SQRT2;
+
+    *phi = atan2(q - y, x - q);
+    if (s <= 1.0)
+        *theta = 2.0*asin(s);
+    else
+        *theta = G_PI - 2.0*asin(2.0 - s);
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    gdouble theta = gwy_params_get_double(params, PARAM_THETA0);
+    gdouble phi = gwy_params_get_double(params, PARAM_PHI0);
+
+    gwy_debug("param_changed %d", id);
+    if (id < 0 || id == PARAM_KERNEL_SIZE)
+        recalculate_distribution(gui);
+
+    /* This requires gui->q already calculated because we set selection on the facet view.  Life would be easier
+     * if selections used offset coordinates. */
+    if (id < 0 && !gui->did_init) {
+        GwyContainer *data = gui->args_data;
+        GwySelection *sel;
+        gdouble xy[2];
+
+        gui->did_init = TRUE;
+        if (gwy_container_gis_object_by_name(data, gui->selkey, &sel) && gwy_selection_get_object(sel, 0, xy) > 0)
+            slopes_to_angles(xy[0], xy[1], &theta, &phi);
+        /* XXX: recursion? */
+        facet_view_select_angle(gui, theta, phi);
+    }
+    if (id < 0 || id == PARAM_NUMBER_POINTS) {
+        g_object_set(gwy_data_view_get_top_layer(GWY_DATA_VIEW(gui->fview)),
+                     "point-numbers", gwy_params_get_boolean(params, PARAM_NUMBER_POINTS),
+                     NULL);
+    }
+    if (id < 0 || id == PARAM_LATTICE_TYPE) {
+        LatticeType lattice_type = gwy_params_get_enum(params, PARAM_LATTICE_TYPE);
+        guint indep_params = lattice_indep_params[lattice_type];
+        LatticeParameterType i;
+        gboolean sens;
+
+        for (i = 0; i < LATTICE_PARAM_NPARAMS; i++) {
+            sens = (indep_params & (1 << i));
+            gtk_widget_set_sensitive(gui->lattice_label[i], sens);
+            gtk_widget_set_sensitive(gui->lattice_entry[i], sens);
+            gtk_widget_set_sensitive(gui->lattice_units[i], sens);
+        }
+        update_latice_params(gui);
+    }
+    if (id < 0 || id == PARAM_ROT_THETA)
+        gwy_shader_set_theta(GWY_SHADER(gui->shader), gwy_params_get_double(params, PARAM_ROT_THETA));
+    if (id < 0 || id == PARAM_ROT_PHI)
+        gwy_shader_set_phi(GWY_SHADER(gui->shader), gwy_params_get_double(params, PARAM_ROT_PHI));
+    if (id == PARAM_ROT_THETA || id == PARAM_ROT_PHI || id == PARAM_ROT_ALPHA) {
+        gui->is_rotating = TRUE;
+        apply_facet_selection_rotation(gui);
+        gui->is_rotating = FALSE;
+    }
+
+    if (id != PARAM_REPORT_STYLE && id != PARAM_MASK_COLOR && !(id >= PARAM_LATTICE_TYPE && id <= PARAM_ROT_ALPHA))
+        gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+save_facet_selection(ModuleGUI *gui)
+{
+    GwySelection *selection;
+    gdouble theta, phi, xy[2];
+
+    if (!gwy_selection_get_data(gui->fselection, NULL)) {
+        gwy_container_remove_by_name(gui->args_data, gui->selkey);
+        return;
+    }
+
+    gwy_selection_get_object(gui->fselection, 0, xy);
+    xy_to_angles(xy[0], xy[1], gui->q, &theta, &phi);
+    angles_to_slopes(theta, phi, xy+0, xy+1);
+    /* Create a new object.  We have signals connected to the old one. */
+    selection = g_object_new(g_type_from_name("GwySelectionPoint"), "max-objects", 1, NULL);
+    gwy_selection_set_data(selection, 1, xy);
+    gwy_container_pass_object_by_name(gui->args_data, gui->selkey, selection);
+}
+
+static void
+create_point_list_column(GtkTreeView *treeview, GtkCellRenderer *renderer,
+                         ModuleGUI *gui,
+                         const gchar *name, const gchar *units,
+                         guint facet_column)
+{
+    GtkTreeViewColumn *column;
+    GtkCellLayoutDataFunc cellfunc;
+    GtkWidget *label;
+    gchar *s;
+
+    column = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_expand(column, TRUE);
+    gtk_tree_view_column_set_alignment(column, 0.5);
+    g_object_set_data(G_OBJECT(column), "id", GUINT_TO_POINTER(facet_column));
+
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(column), renderer, TRUE);
+    if (facet_column == FACET_COLUMN_N)
+        cellfunc = render_id;
+    else
+        cellfunc = render_facet_parameter;
+    gtk_cell_layout_set_cell_data_func(GTK_CELL_LAYOUT(column), renderer, cellfunc, gui, NULL);
+
+    label = gtk_label_new(NULL);
+    if (units && strlen(units))
+        s = g_strdup_printf("<b>%s</b> [%s]", name, units);
+    else
+        s = g_strdup_printf("<b>%s</b>", name);
+    gtk_label_set_markup(GTK_LABEL(label), s);
+    g_free(s);
+    gtk_tree_view_column_set_widget(column, label);
+    gtk_widget_show(label);
+    gtk_tree_view_append_column(treeview, column);
+}
+
+static void
+create_point_list(ModuleGUI *gui)
+{
+    GtkTreeView *treeview;
+    GtkCellRenderer *renderer;
+    GtkTreeSelection *treesel;
+
+    gui->store = gwy_null_store_new(0);
+    gui->pointlist = gtk_tree_view_new_with_model(GTK_TREE_MODEL(gui->store));
+    treeview = GTK_TREE_VIEW(gui->pointlist);
+
+    renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "xalign", 1.0, NULL);
+
+    create_point_list_column(treeview, renderer, gui, "n", NULL, FACET_COLUMN_N);
+    create_point_list_column(treeview, renderer, gui, "θ", _("deg"), FACET_COLUMN_THETA);
+    create_point_list_column(treeview, renderer, gui, "φ", _("deg"), FACET_COLUMN_PHI);
+    create_point_list_column(treeview, renderer, gui, "x", NULL, FACET_COLUMN_X);
+    create_point_list_column(treeview, renderer, gui, "y", NULL, FACET_COLUMN_Y);
+    create_point_list_column(treeview, renderer, gui, "z", NULL, FACET_COLUMN_Z);
+
+    treesel = gtk_tree_view_get_selection(treeview);
+    gtk_tree_selection_set_mode(treesel, GTK_SELECTION_BROWSE);
+    g_signal_connect(treesel, "changed", G_CALLBACK(point_list_selection_changed), gui);
+    g_signal_connect_swapped(treeview, "key-press-event", G_CALLBACK(point_list_key_pressed), gui);
+
+    g_object_unref(gui->store);
+}
+
+static void
+point_list_selection_changed(GtkTreeSelection *treesel,
+                             ModuleGUI *gui)
+{
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    gboolean sens;
+
+    if ((sens = gtk_tree_selection_get_selected(treesel, &model, &iter)))
+        gtk_tree_model_get(model, &iter, 0, &gui->selid, -1);
+    else
+        gui->selid = -1;
+
+    gtk_widget_set_sensitive(gui->delete, sens);
+    gtk_widget_set_sensitive(gui->refine, sens);
+    gtk_widget_set_sensitive(gui->mark, sens);
+}
+
+static void
+render_id(G_GNUC_UNUSED GtkCellLayout *layout,
+          GtkCellRenderer *renderer,
+          GtkTreeModel *model,
+          GtkTreeIter *iter,
+          G_GNUC_UNUSED gpointer user_data)
+{
+    gchar buf[16];
+    guint i;
+
+    gtk_tree_model_get(model, iter, 0, &i, -1);
+    g_snprintf(buf, sizeof(buf), "%d", i + 1);
+    g_object_set(renderer, "text", buf, NULL);
+}
+
+static void
+render_facet_parameter(GtkCellLayout *layout,
+                       GtkCellRenderer *renderer,
+                       GtkTreeModel *model,
+                       GtkTreeIter *iter,
+                       gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    gdouble theta, phi;
+    GwyXYZ v;
+    gchar buf[16];
+    gdouble point[2];
+    guint i, id;
+    gdouble u;
+
+    id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(layout), "id"));
+    gtk_tree_model_get(model, iter, 0, &i, -1);
+    gwy_selection_get_object(gui->fselection, i, point);
+
+    xy_to_angles(point[0], point[1], gui->q, &theta, &phi);
+    if (id == FACET_COLUMN_THETA || id == FACET_COLUMN_PHI) {
+        u = (id == FACET_COLUMN_THETA) ? theta : phi;
+        g_snprintf(buf, sizeof(buf), "%.2f", 180.0/G_PI*u);
+    }
+    else {
+        make_unit_vector(&v, theta, phi);
+        if (id == FACET_COLUMN_X)
+            u = v.x;
+        else if (id == FACET_COLUMN_Y)
+            u = v.y;
+        else
+            u = v.z;
+        g_snprintf(buf, sizeof(buf), "%.3f", u);
+    }
+    g_object_set(renderer, "text", buf, NULL);
+}
+
+static void
+clear_facet_selection(ModuleGUI *gui)
+{
+    gwy_selection_clear(gui->fselection);
+}
+
+static void
+delete_facet_selection(ModuleGUI *gui)
+{
+    if (gui->fselection && gui->selid > -1)
+        gwy_selection_delete_object(gui->fselection, gui->selid);
+}
+
+static void
+refine_facet_selection(ModuleGUI *gui)
+{
+    gdouble tolerance = gwy_params_get_double(gui->args->params, PARAM_TOLERANCE);
+    gdouble xy[2], theta, phi, x, y, h;
+    gint range;
+
+    if (gui->selid == -1)
+        return;
+    if (!gwy_selection_get_object(gui->fselection, gui->selid, xy))
+        return;
+
+    xy_to_angles(xy[0], xy[1], gui->q, &theta, &phi);
+    h = gwy_data_field_get_dx(gui->dist);
+    range = GWY_ROUND(gwy_data_field_get_xres(gui->dist)/gui->q * 0.5/G_SQRT2 * cos(0.5*theta) * tolerance);
+    x = xy[0]/h;
+    y = xy[1]/h;
+    gwy_data_field_local_maximum(gui->dist, &x, &y, range, range);
+    xy[0] = x*h;
+    xy[1] = y*h;
+    gwy_selection_set_object(gui->fselection, gui->selid, xy);
+}
+
+/* This is basically our preview() because it does the primary action, but we do not call it that way. */
+static void
+mark_facet(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    gdouble tolerance = gwy_params_get_double(args->params, PARAM_TOLERANCE);
+    gdouble xy[2], theta, phi;
+
+    if (gui->selid == -1)
+        return;
+    if (!gwy_selection_get_object(gui->fselection, gui->selid, xy))
+        return;
+
+    xy_to_angles(xy[0], xy[1], gui->q, &theta, &phi);
+    /* XXX: facet_measure updated theta0 and phi0 every time the selection changes, so it *reads* them from params
+     * here. Here we update them only when marking, so we *write* them to params. Unify the behaviour? */
+    gwy_params_set_double(args->params, PARAM_THETA0, theta);
+    gwy_params_set_double(args->params, PARAM_PHI0, phi);
+
+    execute(args);
+    gwy_data_field_data_changed(args->result);
+    mark_fdata(gui->mask, gui->q, theta, phi, tolerance);
+    update_average_angle(gui, FALSE);
+    gwy_dialog_have_result(GWY_DIALOG(gui->dialog));
+}
+
+static gboolean
+point_list_key_pressed(ModuleGUI *gui, GdkEventKey *event)
+{
+    if (event->keyval == GDK_Delete) {
+        delete_facet_selection(gui);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static gchar*
+format_facet_table(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    GwyParams *params = gui->args->params;
+    GwyResultsReportType report_style = gwy_params_get_report_type(params, PARAM_REPORT_STYLE);
+    gdouble theta, phi, point[2];
+    GString *str;
+    guint n, i;
+    GwyXYZ v;
+
+    if (!(n = gwy_null_store_get_n_rows(gui->store)))
+        return NULL;
+
+    str = g_string_new(NULL);
+
+    if (!(report_style & GWY_RESULTS_REPORT_MACHINE))
+        gwy_format_result_table_strings(str, report_style, 5, "ϑ [deg]", "φ [deg]", "x", "y", "z");
+    else
+        gwy_format_result_table_strings(str, report_style, 5, "ϑ", "φ", "x", "y", "z");
+
+    for (i = 0; i < n; i++) {
+        gwy_selection_get_object(gui->fselection, i, point);
+        xy_to_angles(point[0], point[1], gui->q, &theta, &phi);
+        make_unit_vector(&v, theta, phi);
+        if (!(report_style & GWY_RESULTS_REPORT_MACHINE)) {
+            theta *= 180.0/G_PI;
+            phi *= 180.0/G_PI;
+        }
+        gwy_format_result_table_row(str, report_style, 5, theta, phi, v.x, v.y, v.z);
+    }
+    return g_string_free(str, FALSE);
+}
+
+static void
+recalculate_distribution(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    guint i, n, kernel_size = gwy_params_get_int(args->params, PARAM_KERNEL_SIZE);
+    GwySelection *selection;
+    gdouble *xy;
+
+    gwy_debug("recalculating distribution");
+    selection = gui->fselection;
+    n = gwy_selection_get_data(selection, NULL);
+    xy = g_new(gdouble, 2*n);
+    gwy_selection_get_data(selection, xy);
+    for (i = 0; i < n; i++)
+        xy_to_angles(xy[2*i], xy[2*i+1], gui->q, xy + 2*i, xy + 2*i+1);
+
+    if (GTK_WIDGET_REALIZED(gui->dialog))
+        gwy_app_wait_cursor_start(GTK_WINDOW(gui->dialog));
+    gui->q = gwy_data_field_facet_distribution(args->field, args->theta, args->phi, gui->dist, kernel_size);
+
+    gwy_data_field_clear(gui->mask);
+    gwy_data_field_data_changed(gui->mask);
+    gwy_data_field_data_changed(gui->dist);
+    update_theta_range(gui);
+
+    for (i = 0; i < n; i++)
+        angles_to_xy(xy[2*i], xy[2*i+1], gui->q, xy + 2*i, xy + 2*i+1);
+    gwy_selection_set_data(selection, n, xy);
+    g_free(xy);
+    if (GTK_WIDGET_REALIZED(gui->dialog))
+        gwy_app_wait_cursor_finish(GTK_WINDOW(gui->dialog));
+}
+
+static void
+update_theta_range(ModuleGUI *gui)
+{
+    gdouble x, y, theta, phi;
+    gchar buf[32];
+
+    x = gui->q;
+    y = 0.0;
+    xy_to_angles(x, y, gui->q, &theta, &phi);
+    g_snprintf(buf, sizeof(buf), "%.1f %s", -180.0/G_PI*theta, _("deg"));
+    gtk_label_set_text(GTK_LABEL(gui->theta_min_label), buf);
+    g_snprintf(buf, sizeof(buf), "0 %s", _("deg"));
+    gtk_label_set_text(GTK_LABEL(gui->theta_0_label), buf);
+    g_snprintf(buf, sizeof(buf), "%.1f %s", 180.0/G_PI*theta, _("deg"));
+    gtk_label_set_text(GTK_LABEL(gui->theta_max_label), buf);
+    gwy_debug("theta range ±%g", theta);
+}
+
+static void
+facet_view_select_angle(ModuleGUI *gui,
+                        gdouble theta,
+                        gdouble phi)
+{
+    gdouble xy[2];
+    gint n, i;
+
+    angles_to_xy(theta, phi, gui->q, xy+0, xy+1);
+    n = gwy_selection_get_data(gui->fselection, NULL);
+    i = (!n || gui->selid == -1) ? n : gui->selid;
+    gwy_selection_set_object(gui->fselection, i, xy);
+}
+
+static void
+facet_view_selection_updated(GwySelection *selection,
+                             gint hint,
+                             ModuleGUI *gui)
+{
+    GtkTreeSelection *treesel;
+    GtkTreeIter iter;
+    gint n, nold;
+
+    n = gwy_selection_get_data(selection, NULL);
+    nold = gwy_null_store_get_n_rows(gui->store);
+    if (hint == -1 || n != nold) {
+        gwy_null_store_set_n_rows(gui->store, n);
+        if (n == nold+1)
+            hint = n-1;
+        n = MIN(n, nold);
+        if (n > 0)
+            gwy_null_store_rows_changed(gui->store, 0, n-1);
+    }
+    else {
+        g_return_if_fail(hint >= 0);
+        gwy_null_store_row_changed(gui->store, hint);
+    }
+
+    treesel = gtk_tree_view_get_selection(GTK_TREE_VIEW(gui->pointlist));
+    if (hint != gui->selid) {
+        if (hint >= 0) {
+            gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(gui->store), &iter, NULL, hint);
+            gtk_tree_selection_select_iter(treesel, &iter);
+        }
+        else
+            gtk_tree_selection_unselect_all(treesel);
+    }
+
+    if (!gui->is_selecting_in_image) {
+        if (gwy_selection_get_data(gui->iselection, NULL))
+            gwy_selection_clear(gui->iselection);
+    }
+
+    /* The user can either control the points using the shader (rotation) or by moving the points.  These are
+     * exclusive. If we are not rotating, always save the current selection as the base for the rotation.  When we are
+     * rotating, do not touch fselection0. */
+    if (!gui->is_rotating) {
+        gwy_selection_assign(gui->fselection0, gui->fselection);
+        gwy_param_table_reset(gui->table_rotation);
+    }
+}
+
+static void
+update_average_angle(ModuleGUI *gui, gboolean clearme)
+{
+    ModuleArgs *args = gui->args;
+    gdouble theta0 = gwy_params_get_double(args->params, PARAM_THETA0);
+    gdouble phi0 = gwy_params_get_double(args->params, PARAM_PHI0);
+    gdouble tolerance = gwy_params_get_double(args->params, PARAM_TOLERANCE);
+    gdouble theta, phi;
+    gchar *s;
+
+    if (clearme || gui->selid < 0) {
+        gwy_param_table_info_set_valuestr(gui->table_list, LABEL_MEAN_NORMAL, "");
+        return;
+    }
+    calculate_average_angle(args->theta, args->phi, theta0, phi0, tolerance, &theta, &phi);
+    s = g_strdup_printf(_("θ = %.2f deg, φ = %.2f deg"), 180.0/G_PI*theta, 180.0/G_PI*phi);
+    gwy_param_table_info_set_valuestr(gui->table_list, LABEL_MEAN_NORMAL, s);
+    g_free(s);
+}
+
+static void
+preview_selection_updated(GwySelection *selection,
+                          gint hint,
+                          ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GwyDataField *field = args->field, *dtheta = args->theta, *dphi = args->phi;
+    gdouble theta, phi, xy[2];
+    gint i, j;
+
+    if (hint != 0)
+        return;
+
+    gwy_selection_get_object(selection, 0, xy);
+    j = gwy_data_field_rtoj(field, xy[0]);
+    i = gwy_data_field_rtoi(field, xy[1]);
+    theta = gwy_data_field_get_val(dtheta, j, i);
+    phi = gwy_data_field_get_val(dphi, j, i);
+    gui->is_selecting_in_image = TRUE;
+    facet_view_select_angle(gui, theta, phi);
+    gui->is_selecting_in_image = FALSE;
+}
+
+static void
+gwy_data_field_mark_facets(GwyDataField *dtheta,
+                           GwyDataField *dphi,
+                           gdouble theta0,
+                           gdouble phi0,
+                           gdouble tolerance,
+                           GwyDataField *mask)
+{
+    gdouble cr, cth0, sth0;
+    const gdouble *td, *fd;
+    gdouble *md;
+    guint i, n;
+
+    cr = cos(tolerance);
+    cth0 = cos(theta0);
+    sth0 = sin(theta0);
+
+    td = gwy_data_field_get_data_const(dtheta);
+    fd = gwy_data_field_get_data_const(dphi);
+    md = gwy_data_field_get_data(mask);
+    n = gwy_data_field_get_xres(dtheta)*gwy_data_field_get_yres(dtheta);
+#ifdef _OPENMP
+#pragma omp parallel for if(gwy_threads_are_enabled()) default(none) \
+            private(i) \
+            shared(td,fd,md,n,cth0,sth0,phi0,cr)
+#endif
+    for (i = 0; i < n; i++) {
+        gdouble cro = cth0*cos(td[i]) + sth0*sin(td[i])*cos(fd[i] - phi0);
+        md[i] = (cro >= cr);
+    }
+}
+
+static void
+calculate_average_angle(GwyDataField *dtheta, GwyDataField *dphi,
+                        gdouble theta0, gdouble phi0, gdouble tolerance,
+                        gdouble *theta, gdouble *phi)
+{
+    gdouble sx, sy, sz, cth0, sth0, ctol;
+    const gdouble *td, *pd;
+    gint i, n, count;
+    GwyXYZ s;
+
+    cth0 = cos(theta0);
+    sth0 = sin(theta0);
+    ctol = cos(tolerance);
+
+    td = gwy_data_field_get_data_const(dtheta);
+    pd = gwy_data_field_get_data_const(dphi);
+    n = gwy_data_field_get_xres(dtheta)*gwy_data_field_get_yres(dtheta);
+    count = 0;
+    sx = sy = sz = 0.0;
+
+#ifdef _OPENMP
+#pragma omp parallel for if(gwy_threads_are_enabled()) default(none) \
+            reduction(+:count,sx,sy,sz) \
+            private(i) \
+            shared(td,pd,n,cth0,sth0,phi0,ctol)
+#endif
+    for (i = 0; i < n; i++) {
+        gdouble cro = cth0*cos(td[i]) + sth0*sin(td[i]) * cos(pd[i] - phi0);
+        if (cro >= ctol) {
+            GwyXYZ v;
+
+            make_unit_vector(&v, td[i], pd[i]);
+            sx += v.x;
+            sy += v.y;
+            sz += v.z;
+            count++;
+        }
+    }
+    s.x = sx;
+    s.y = sy;
+    s.z = sz;
+
+    if (!count)
+        *theta = *phi = 0.0;
+    else
+        vector_angles(&s, theta, phi);
+}
+
+static gdouble
+gwy_data_field_facet_distribution(GwyDataField *field,
+                                  GwyDataField *dtheta, GwyDataField *dphi, GwyDataField *dist,
+                                  gint half_size)
+{
+    gdouble *xd, *yd, *data;
+    const gdouble *xdc, *ydc;
+    gdouble q, x, y;
+    gint hres, i, xres, yres, n, fres;
+
+    compute_slopes(field, 2*half_size + 1, dtheta, dphi);
+    xres = gwy_data_field_get_xres(field);
+    yres = gwy_data_field_get_yres(field);
+    xd = gwy_data_field_get_data(dtheta);
+    yd = gwy_data_field_get_data(dphi);
+    n = xres*yres;
+
+#ifdef _OPENMP
+#pragma omp parallel for if(gwy_threads_are_enabled()) default(none) \
+            private(i) \
+            shared(xd,yd,n)
+#endif
+    for (i = 0; i < n; i++) {
+        gdouble theta, phi;
+
+        slopes_to_angles(xd[i], yd[i], &theta, &phi);
+        xd[i] = theta;
+        yd[i] = phi;
+    }
+    q = gwy_data_field_get_max(dtheta);
+    q = MIN(q*1.05, 1.001*G_PI/2.0);
+    q = G_SQRT2*sin(q/2.0);
+
+    gwy_data_field_clear(dist);
+    gwy_data_field_set_xreal(dist, 2.0*q);
+    gwy_data_field_set_yreal(dist, 2.0*q);
+    gwy_data_field_set_xoffset(dist, -q);
+    gwy_data_field_set_yoffset(dist, -q);
+
+    fres = gwy_data_field_get_xres(dist);
+    hres = (fres - 1)/2;
+
+    data = gwy_data_field_get_data(dist);
+    xdc = gwy_data_field_get_data_const(dtheta);
+    ydc = gwy_data_field_get_data_const(dphi);
+    for (i = 0; i < n; i++) {
+        gint xx, yy;
+
+        angles_to_xy(xdc[i], ydc[i], q, &x, &y);
+        x *= hres/q;
+        y *= hres/q;
+        xx = (gint)floor(x - 0.5);
+        yy = (gint)floor(y - 0.5);
+
+        if (G_UNLIKELY(xx < 0)) {
+            xx = 0;
+            x = 0.0;
+        }
+        else if (G_UNLIKELY(xx >= fres-1)) {
+            xx = fres-2;
+            x = 1.0;
+        }
+        else
+            x = x - (xx + 0.5);
+
+        if (G_UNLIKELY(yy < 0)) {
+            yy = 0;
+            y = 0.0;
+        }
+        else if (G_UNLIKELY(yy >= fres-1)) {
+            yy = fres-2;
+            y = 1.0;
+        }
+        else
+            y = y - (yy + 0.5);
+
+        data[yy*fres + xx] += (1.0 - x)*(1.0 - y);
+        data[yy*fres + xx+1] += x*(1.0 - y);
+        data[yy*fres+fres + xx] += (1.0 - x)*y;
+        data[yy*fres+fres + xx+1] += x*y;
+    }
+
+    /* Transform values for visualisation. */
+    for (i = fres*fres; i; i--, data++)
+        *data = cbrt(*data);
+
+    return q;
+}
+
+static void
+compute_slopes(GwyDataField *field, gint kernel_size,
+               GwyDataField *xder, GwyDataField *yder)
+{
+    GwyPlaneFitQuantity quantites[] = { GWY_PLANE_FIT_BX, GWY_PLANE_FIT_BY };
+    GwyDataField *fields[2];
+    gint xres, yres;
+
+    xres = gwy_data_field_get_xres(field);
+    yres = gwy_data_field_get_yres(field);
+    if (kernel_size > 1) {
+        fields[0] = xder;
+        fields[1] = yder;
+        gwy_data_field_fit_local_planes(field, kernel_size, 2, quantites, fields);
+        gwy_data_field_multiply(xder, xres/gwy_data_field_get_xreal(field));
+        gwy_data_field_multiply(yder, yres/gwy_data_field_get_yreal(field));
+    }
+    else
+        gwy_data_field_filter_slope(field, xder, yder);
+}
+
+static void
+update_latice_params(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    LatticeType lattice_type = gwy_params_get_enum(args->params, PARAM_LATTICE_TYPE);
+    gdouble lattice_params[LATTICE_PARAM_NPARAMS];
+    LatticeParameterType i;
+    gchar *s;
+    gdouble v;
+
+    for (i = 0; i < LATTICE_PARAM_NPARAMS; i++)
+        lattice_params[i] = gwy_params_get_double(args->params, PARAM_LATTICE_0 + i);
+    conform_to_lattice_type(lattice_params, lattice_type);
+    for (i = 0; i < LATTICE_PARAM_NPARAMS; i++)
+        gwy_params_set_double(args->params, PARAM_LATTICE_0 + i, lattice_params[i]);
+
+    for (i = 0; i < LATTICE_PARAM_NPARAMS; i++) {
+        /* Update all because we need to normalise the nonsense the user entered as well. */
+        v = gwy_params_get_double(args->params, PARAM_LATTICE_0 + i);
+        if (i >= LATTICE_PARAM_ALPHA)
+            v *= 180.0/G_PI;
+        s = g_strdup_printf("%g", v);
+        gtk_entry_set_text(GTK_ENTRY(gui->lattice_entry[i]), s);
+        g_free(s);
+    }
+}
+
+static void
+lattice_parameter_changed(GtkEntry *entry, ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    LatticeType lattice_type = gwy_params_get_enum(args->params, PARAM_LATTICE_TYPE);
+    LatticeParameterType paramtype = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(entry), "id"));
+    guint indep_params = lattice_indep_params[lattice_type];
+    const gchar *value;
+    gchar *endp;
+    gdouble v;
+
+    if (!(indep_params & (1 << paramtype)))
+        return;
+
+    value = gtk_entry_get_text(entry);
+    v = g_strtod(value, &endp);
+    if (v != 0.0 && endp != value) {
+        if (paramtype >= LATTICE_PARAM_ALPHA) {
+            v *= G_PI/180.0;
+            v = CLAMP(v, 0.001, G_PI-0.001);
+        }
+        else {
+            v = CLAMP(v, 1e-38, 1e38);
+        }
+        gwy_params_set_double(args->params, PARAM_LATTICE_0 + paramtype, v);
+        update_latice_params(gui);
+    }
+}
+
+static gint
+gcd(gint a, gint b)
+{
+    a = ABS(a);
+    b = ABS(b);
+    GWY_ORDER(gint, b, a);
+
+    /* This also handles that gcd(x, 0) = x, by definition. */
+    while (b) {
+        a %= b;
+        GWY_SWAP(gint, a, b);
+    }
+
+    return a;
+}
+
+static gint
+gcd3(gint a, gint b, gint c)
+{
+    return gcd(gcd(a, b), c);
+}
+
+static void
+create_lattice(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GwyXYZ a, b, c, ia, ib, ic, v;
+    gint i, j, k, f;
+    GArray *array;
+    gdouble theta, phi, xy[2];
+    gdouble lattice_params[LATTICE_PARAM_NPARAMS];
+
+    for (i = 0; i < LATTICE_PARAM_NPARAMS; i++)
+        lattice_params[i] = gwy_params_get_double(args->params, PARAM_LATTICE_0 + i);
+
+    make_lattice_vectors(lattice_params, &a, &b, &c);
+    make_inverse_lattice(&a, &b, &c, &ia, &ib, &ic);
+    array = g_array_new(FALSE, FALSE, sizeof(gdouble));
+    /* FIXME: Let the user control this somehow.  Also the default rules which points to include may not be always
+     * useful... We may also want to special-case hexagonal lattices. */
+    for (i = -2; i <= 2; i++) {
+        for (j = -2; j <= 2; j++) {
+            for (k = -2; k <= 2; k++) {
+                f = ABS(i) + ABS(j) + ABS(k);
+                /* Omit the zero vector. */
+                if (!f)
+                    continue;
+                /* Omit planes with too high indices. */
+                if (f > 2)
+                    continue;
+                /* Omit planes clearly from below. */
+                if (i < 0)
+                    continue;
+                /* Omit planes with the same direction as other planes. */
+                if (gcd3(i, j, k) != 1)
+                    continue;
+
+                v.x = i*ia.x + j*ib.x + k*ic.x;
+                v.y = i*ia.y + j*ib.y + k*ic.y;
+                v.z = i*ia.z + j*ib.z + k*ic.z;
+                vector_angles(&v, &theta, &phi);
+                angles_to_xy(theta, phi, gui->q, xy+0, xy+1);
+                g_array_append_vals(array, xy, 2);
+            }
+        }
+    }
+
+    gwy_selection_set_data(gui->fselection, array->len/2, (gdouble*)array->data);
+    g_array_free(array, TRUE);
+}
+
+static void
+apply_facet_selection_rotation(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    gdouble rot_theta = gwy_params_get_double(args->params, PARAM_ROT_THETA);
+    gdouble rot_phi = gwy_params_get_double(args->params, PARAM_ROT_PHI);
+    gdouble rot_alpha = gwy_params_get_double(args->params, PARAM_ROT_ALPHA);
+    gdouble theta, phi;
+    guint n, i;
+    gdouble *xy;
+    GwyXYZ v;
+
+    n = gwy_selection_get_data(gui->fselection0, NULL);
+    if (!n)
+        return;
+
+    g_return_if_fail(gwy_selection_get_data(gui->fselection, NULL) == n);
+    gui->is_rotating = TRUE;
+
+    xy = g_new(gdouble, 2*n);
+    gwy_selection_get_data(gui->fselection0, xy);
+
+    for (i = 0; i < n; i++) {
+        xy_to_angles(xy[2*i], xy[2*i+1], gui->q, &theta, &phi);
+        make_unit_vector(&v, theta, phi);
+        rotate_vector(&v, rot_alpha, rot_theta, rot_phi);
+        vector_angles(&v, &theta, &phi);
+        angles_to_xy(theta, phi, gui->q, xy + 2*i, xy + 2*i+1);
+    }
+    gwy_selection_set_data(gui->fselection, n, xy);
+    g_free(xy);
+
+    gui->is_rotating = FALSE;
+}
+
+static void
+rot_shader_changed(ModuleGUI *gui, GwyShader *shader)
+{
+    gdouble theta, phi;
+
+    theta = 180.0/G_PI*gwy_shader_get_theta(shader);
+    phi = 180.0/G_PI*gwy_shader_get_phi(shader);
+    if (phi > 180.0)
+        phi -= 360.0;
+
+    gwy_params_set_double(gui->args->params, PARAM_ROT_THETA, theta);
+    gwy_params_set_double(gui->args->params, PARAM_ROT_PHI, phi);
+    gwy_param_table_param_changed(gui->table_rotation, PARAM_ROT_THETA);
+}
+
+static void
+reset_rotation(ModuleGUI *gui)
+{
+    gwy_param_table_reset(gui->table_rotation);
+}
+
+static void
+mark_fdata(GwyDataField *mask, gdouble q, gdouble theta0, gdouble phi0, gdouble tolerance)
+{
+    gdouble r, r2, cr, cro, cth0, sth0, cphi0, sphi0;
+    gint fres, hres, i, j;
+    gdouble *m;
+
+    cr = cos(tolerance);
+    cth0 = cos(theta0);
+    sth0 = sin(theta0);
+    cphi0 = cos(phi0);
+    sphi0 = sin(phi0);
+    fres = gwy_data_field_get_xres(mask);
+    g_assert(gwy_data_field_get_yres(mask) == fres);
+    hres = (fres - 1)/2;
+    m = gwy_data_field_get_data(mask);
+
+#ifdef _OPENMP
+#pragma omp parallel for if(gwy_threads_are_enabled()) default(none) \
+            private(i,j,r2,r,cro) \
+            shared(m,fres,hres,cth0,sth0,cphi0,sphi0,q,cr)
+#endif
+    for (i = 0; i < fres; i++) {
+        gdouble y = -q*(i/(gdouble)hres - 1.0);
+
+        for (j = 0; j < fres; j++) {
+            gdouble x = q*(j/(gdouble)hres - 1.0);
+
+            /**
+             * Orthodromic distance computed directly from x, y:
+             * cos(theta) = 1 - r^2
+             * sin(theta) = r*sqrt(1 - r^2/2)
+             * cos(phi) = x/r
+             * sin(phi) = y/r
+             * where r = hypot(x, y)
+             **/
+            r2 = x*x + y*y;
+            r = sqrt(r2);
+            cro = cth0*(1.0 - r2) + sth0*G_SQRT2*r*sqrt(1.0 - r2/2.0)*(x/r*cphi0 + y/r*sphi0);
+            m[i*fres + j] = (cro >= cr);
+        }
+    }
+}
+
+static void
+conform_to_lattice_type(gdouble *params, LatticeType type)
+{
+    if (type == LATTICE_CUBIC) {
+        params[LATTICE_PARAM_B] = params[LATTICE_PARAM_A];
+        params[LATTICE_PARAM_C] = params[LATTICE_PARAM_A];
+        params[LATTICE_PARAM_ALPHA] = 0.5*G_PI;
+        params[LATTICE_PARAM_BETA] = 0.5*G_PI;
+        params[LATTICE_PARAM_GAMMA] = 0.5*G_PI;
+    }
+    else if (type == LATTICE_RHOMBOHEDRAL) {
+        params[LATTICE_PARAM_B] = params[LATTICE_PARAM_A];
+        params[LATTICE_PARAM_C] = params[LATTICE_PARAM_A];
+        params[LATTICE_PARAM_ALPHA] = 0.5*G_PI;
+        params[LATTICE_PARAM_BETA] = 0.5*G_PI;
+    }
+    else if (type == LATTICE_HEXAGONAL) {
+        params[LATTICE_PARAM_B] = params[LATTICE_PARAM_A];
+        params[LATTICE_PARAM_ALPHA] = 0.5*G_PI;
+        params[LATTICE_PARAM_BETA] = 0.5*G_PI;
+        params[LATTICE_PARAM_GAMMA] = 2.0*G_PI/3.0;
+    }
+    else if (type == LATTICE_TETRAGONAL) {
+        params[LATTICE_PARAM_B] = params[LATTICE_PARAM_A];
+        params[LATTICE_PARAM_ALPHA] = 0.5*G_PI;
+        params[LATTICE_PARAM_BETA] = 0.5*G_PI;
+        params[LATTICE_PARAM_GAMMA] = 0.5*G_PI;
+    }
+    else if (type == LATTICE_ORTHORHOMBIC) {
+        params[LATTICE_PARAM_ALPHA] = 0.5*G_PI;
+        params[LATTICE_PARAM_BETA] = 0.5*G_PI;
+        params[LATTICE_PARAM_GAMMA] = 0.5*G_PI;
+    }
+    else if (type == LATTICE_MONOCLINIC) {
+        params[LATTICE_PARAM_B] = params[LATTICE_PARAM_A];
+        params[LATTICE_PARAM_ALPHA] = 0.5*G_PI;
+        params[LATTICE_PARAM_GAMMA] = 0.5*G_PI;
+    }
+    else {
+        g_assert(type == LATTICE_TRICLINIC);
+    }
+}
+
+/* Make lattice vectors with @a oriented along the z axis.  Maybe we want @c along the z axis.  Maybe we want to
+ * choose -- this can be done by cyclic rotations of (A, B, C) and (γ, α, β). */
+static void
+make_lattice_vectors(const gdouble *params, GwyXYZ *a, GwyXYZ *b, GwyXYZ *c)
+{
+    gdouble calpha = cos(params[LATTICE_PARAM_ALPHA]);
+    gdouble cbeta = cos(params[LATTICE_PARAM_BETA]);
+    gdouble sbeta = sin(params[LATTICE_PARAM_BETA]);
+    gdouble cgamma = cos(params[LATTICE_PARAM_GAMMA]);
+    gdouble sgamma = sin(params[LATTICE_PARAM_GAMMA]);
+    gdouble cphi, sphi;
+
+    a->x = a->y = b->y = 0.0;
+    a->z = 1.0;
+    b->x = sgamma;
+    b->z = cgamma;
+    cphi = (calpha - cgamma*cbeta)/(sgamma*sbeta);
+    /* FIXME: Check sign acording to handeness. */
+    sphi = sqrt(CLAMP(1.0 - cphi*cphi, 0.0, 1.0));
+    c->x = cphi*sbeta;
+    c->y = sphi*sbeta;
+    c->z = cbeta;
+
+    a->x *= params[LATTICE_PARAM_A];
+    a->y *= params[LATTICE_PARAM_A];
+    a->z *= params[LATTICE_PARAM_A];
+    b->x *= params[LATTICE_PARAM_B];
+    b->y *= params[LATTICE_PARAM_B];
+    b->z *= params[LATTICE_PARAM_B];
+    c->x *= params[LATTICE_PARAM_C];
+    c->y *= params[LATTICE_PARAM_C];
+    c->z *= params[LATTICE_PARAM_C];
+}
+
+static inline void
+vector_product(const GwyXYZ *a, const GwyXYZ *b, GwyXYZ *r)
+{
+    gdouble x = a->y*b->z - a->z*b->y;
+    gdouble y = a->z*b->x - a->x*b->z;
+    gdouble z = a->x*b->y - a->y*b->x;
+
+    r->x = x;
+    r->y = y;
+    r->z = z;
+}
+
+/* NB: We do not care about absolute length because at the end we reduce the vectors to directions.  So we can avoid
+ * the 2π/Det(a,b,c) factor and hence never produce infinities. */
+static void
+make_inverse_lattice(const GwyXYZ *a, const GwyXYZ *b, const GwyXYZ *c,
+                     GwyXYZ *ia, GwyXYZ *ib, GwyXYZ *ic)
+{
+    vector_product(a, b, ic);
+    vector_product(b, c, ia);
+    vector_product(c, a, ib);
+}
+
+/* Rotate the coordinate system around the z axis by ω, then rotate the z axis straight to the direction given by
+ * ϑ and φ. */
+static inline void
+rotate_vector(GwyXYZ *v, gdouble omega, gdouble theta, gdouble phi)
+{
+    gdouble c, s, v1, v2;
+
+    c = cos(omega - phi);
+    s = sin(omega - phi);
+    v1 = c*v->x - s*v->y;
+    v2 = s*v->x + c*v->y;
+    v->x = v1;
+    v->y = v2;
+
+    c = cos(theta);
+    s = sin(theta);
+    v1 = c*v->x + s*v->z;
+    v2 = -s*v->x + c*v->z;
+    v->x = v1;
+    v->z = v2;
+
+    c = cos(phi);
+    s = sin(phi);
+    v1 = c*v->x - s*v->y;
+    v2 = s*v->x + c*v->y;
+    v->x = v1;
+    v->y = v2;
+}
+
+static inline void
+make_unit_vector(GwyXYZ *v, gdouble theta, gdouble phi)
+{
+    v->x = sin(theta)*cos(phi);
+    v->y = sin(theta)*sin(phi);
+    v->z = cos(theta);
+}
+
+static inline void
+vector_angles(const GwyXYZ *v, gdouble *theta, gdouble *phi)
+{
+    *theta = atan2(sqrt(v->x*v->x + v->y*v->y), v->z);
+    *phi = atan2(v->y, v->x);
+}
+
+static GwyDataField*
+make_fdist_field(GwyDataField *field)
+{
+    gint n = gwy_data_field_get_xres(field)*gwy_data_field_get_yres(field);
+    gint fres = 2*GWY_ROUND(cbrt(3.49*n)) + 1;
+    GwyDataField *fdist;
+
+    fdist = gwy_data_field_new(fres, fres, 1.0, 1.0, FALSE);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(fdist), NULL);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(fdist), NULL);
+    return fdist;
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    gdouble theta;
+
+    if ((theta = gwy_params_get_double(params, PARAM_THETA0)) >= 0.25*G_PI)
+        gwy_params_set_double(params, PARAM_THETA0, (theta = 0.0));
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informaltable id='table-grain-quantities'>
+  <tgroup cols='3'>
+    <?dblatex lll?>
+    <thead>
+      <row>
+        <entry>Symbole</entry>
+        <entry>Groupe</entry>
+        <entry>Nom</entry>
+      </row>
+    </thead>
+    <tbody>
+      <row>
+        <entry><varname>x_c</varname></entry>
+        <entry>Position</entry>
+        <entry>Centre x</entry>
+      </row>
+      <row>
+        <entry><varname>y_c</varname></entry>
+        <entry>Position</entry>
+        <entry>Centre y</entry>
+      </row>
+      <row>
+        <entry><varname>z_min</varname></entry>
+        <entry>Valeur</entry>
+        <entry>Valeur minimum</entry>
+      </row>
+      <row>
+        <entry><varname>z_max</varname></entry>
+        <entry>Valeur</entry>
+        <entry>Valeur maximum</entry>
+      </row>
+      <row>
+        <entry><varname>z_m</varname></entry>
+        <entry>Valeur</entry>
+        <entry>Valeur moyenne</entry>
+      </row>
+      <row>
+        <entry><varname>z_med</varname></entry>
+        <entry>Valeur</entry>
+        <entry>Valeur médiane</entry>
+      </row>
+      <row>
+        <entry><varname>b_min</varname></entry>
+        <entry>Valeur</entry>
+        <entry>Valeur minimale sur le contour</entry>
+      </row>
+      <row>
+        <entry><varname>b_max</varname></entry>
+        <entry>Valeur</entry>
+        <entry>Valeur maximale sur le contour</entry>
+      </row>
+      <row>
+        <entry><varname>A_0</varname></entry>
+        <entry>Surface</entry>
+        <entry>Surface projetée</entry>
+      </row>
+      <row>
+        <entry><varname>A_s</varname></entry>
+        <entry>Aire</entry>
+        <entry>Surface</entry>
+      </row>
+      <row>
+        <entry><varname>a_eq</varname></entry>
+        <entry>Surface</entry>
+        <entry>Côté équivalent</entry>
+      </row>
+      <row>
+        <entry><varname>r_eq</varname></entry>
+        <entry>Surface</entry>
+        <entry>Rayon équivalent</entry>
+      </row>
+      <row>
+        <entry><varname>A_h</varname></entry>
+        <entry>Surface</entry>
+        <entry>Surface au-dessus de la mi-hauteur</entry>
+      </row>
+      <row>
+        <entry><varname>A_c</varname></entry>
+        <entry>Surface</entry>
+        <entry>Surface de l'enveloppe convexe</entry>
+      </row>
+      <row>
+        <entry><varname>V_0</varname></entry>
+        <entry>Volume</entry>
+        <entry>Volume (base : zéro)</entry>
+      </row>
+      <row>
+        <entry><varname>V_min</varname></entry>
+        <entry>Volume</entry>
+        <entry>Volume (base : minimum du grain)</entry>
+      </row>
+      <row>
+        <entry><varname>V_L</varname></entry>
+        <entry>Volume</entry>
+        <entry>Volume (base : arrière-plan Laplacien)</entry>
+      </row>
+      <row>
+        <entry><varname>L_b0</varname></entry>
+        <entry>Boundary</entry>
+        <entry>Périmètre projeté</entry>
+      </row>
+      <row>
+        <entry><varname>D_min</varname></entry>
+        <entry>Limite</entry>
+        <entry>Largeur</entry>
+      </row>
+      <row>
+        <entry><varname>phi_min</varname></entry>
+        <entry>Limite</entry>
+        <entry>Orientation de la largeur</entry>
+      </row>
+      <row>
+        <entry><varname>D_max</varname></entry>
+        <entry>Limite</entry>
+        <entry>Longueur</entry>
+      </row>
+      <row>
+        <entry><varname>phi_max</varname></entry>
+        <entry>Limite</entry>
+        <entry>Orientation de la longueur</entry>
+      </row>
+      <row>
+        <entry><varname>R_i</varname></entry>
+        <entry>Limite</entry>
+        <entry>Rayon du disque inscrit</entry>
+      </row>
+      <row>
+        <entry><varname>x_i</varname></entry>
+        <entry>Limite</entry>
+        <entry>Position x du centre du disque inscrit</entry>
+      </row>
+      <row>
+        <entry><varname>y_i</varname></entry>
+        <entry>Limite</entry>
+        <entry>Position y du centre du disque inscrit</entry>
+      </row>
+      <row>
+        <entry><varname>R_e</varname></entry>
+        <entry>Limite</entry>
+        <entry>Rayon du cercle circonscrit</entry>
+      </row>
+      <row>
+        <entry><varname>x_e</varname></entry>
+        <entry>Limite</entry>
+        <entry>Position x du centre du cercle circonscrit</entry>
+      </row>
+      <row>
+        <entry><varname>y_e</varname></entry>
+        <entry>Limite</entry>
+        <entry>Position x du centre du cercle circonscrit</entry>
+      </row>
+      <row>
+        <entry><varname>R_m</varname></entry>
+        <entry>Limite</entry>
+        <entry>Rayon moyen</entry>
+      </row>
+      <row>
+        <entry><varname>theta</varname></entry>
+        <entry>Pente</entry>
+        <entry>Inclinaison θ</entry>
+      </row>
+      <row>
+        <entry><varname>phi</varname></entry>
+        <entry>Pente</entry>
+        <entry>Inclinaison φ</entry>
+      </row>
+      <row>
+        <entry><varname>x_0</varname></entry>
+        <entry>Courbure</entry>
+        <entry>Position x du centre de courbure</entry>
+      </row>
+      <row>
+        <entry><varname>y_0</varname></entry>
+        <entry>Courbure</entry>
+        <entry>Position y du centre de courbure</entry>
+      </row>
+      <row>
+        <entry><varname>z_0</varname></entry>
+        <entry>Courbure</entry>
+        <entry>Position z du centre de courbure</entry>
+      </row>
+      <row>
+        <entry><varname>kappa_1</varname></entry>
+        <entry>Courbure</entry>
+        <entry>Courbure 1</entry>
+      </row>
+      <row>
+        <entry><varname>kappa_2</varname></entry>
+        <entry>Courbure</entry>
+        <entry>Courbure 2</entry>
+      </row>
+      <row>
+        <entry><varname>phi_1</varname></entry>
+        <entry>Courbure</entry>
+        <entry>Orientation de la courbure 1</entry>
+      </row>
+      <row>
+        <entry><varname>phi_2</varname></entry>
+        <entry>Courbure</entry>
+        <entry>Orientation de la courbure 2</entry>
+      </row>
+      <row>
+        <entry><varname>a_e1</varname></entry>
+        <entry>Moment</entry>
+        <entry>Demi-grand axe de l'ellipse équivalente</entry>
+      </row>
+      <row>
+        <entry><varname>a_e2</varname></entry>
+        <entry>Moment</entry>
+        <entry>Demi-petit axe de l'ellipse équivalente</entry>
+      </row>
+      <row>
+        <entry><varname>phi_e1</varname></entry>
+        <entry>Moment</entry>
+        <entry>Orientation de l'ellipse équivalente</entry>
+      </row>
+    </tbody>
+  </tgroup>
+</informaltable>

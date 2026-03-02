@@ -1,0 +1,99 @@
+(define-boxed XY
+  (c-name "GwyXY")
+  (gtype-id "GWY_TYPE_XY")
+  (fields
+    '("gdouble" "x")
+    '("gdouble" "y")
+  )
+)
+
+(define-boxed XYZ
+  (c-name "GwyXYZ")
+  (gtype-id "GWY_TYPE_XYZ")
+  (fields
+    '("gdouble" "x")
+    '("gdouble" "y")
+    '("gdouble" "z")
+  )
+)
+
+(define-boxed RGBA
+  (c-name "GwyRGBA")
+  (gtype-id "GWY_TYPE_RGBA")
+  (fields
+    '("gdouble" "r")
+    '("gdouble" "g")
+    '("gdouble" "b")
+    '("gdouble" "a")
+  )
+)
+
+(define-boxed AppDataId
+  (c-name "GwyAppDataId")
+  (gtype-id "GWY_TYPE_APP_DATA_ID")
+  (fields
+    '("gint" "datano")
+    '("gint" "id")
+  )
+)
+
+(define-boxed SIValueFormat
+  (c-name "GwySIValueFormat")
+  (gtype-id "GWY_TYPE_SI_VALUE_FORMAT")
+  (fields
+    '("gdouble" "magnitude")
+    '("gint" "precision")
+    '("const-gchar*" "units")
+  )
+)
+
+(define-boxed Peaks
+  (c-name "GwyPeaks")
+  (gtype-id "GWY_TYPE_PEAKS")
+)
+
+(define-boxed Spline
+  (c-name "GwySpline")
+  (gtype-id "GWY_TYPE_SPLINE")
+)
+
+(define-method set_string_by_name
+  (of-object "GwyContainer")
+  (c-name "gwy_container_set_const_string_by_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method set_string
+  (of-object "GwyContainer")
+  (c-name "gwy_container_set_const_string")
+  (return-type "none")
+  (parameters
+    '("GQuark" "key")
+    '("const-gchar*" "value")
+  )
+)
+
+(define-enum CWT2DWaveletType
+  (in-module "Gwy")
+  (c-name "Gwy2DCWTWaveletType")
+  (gtype-id "GWY_TYPE_2D_CWT_WAVELET_TYPE")
+  (values
+    '("gauss" "GWY_2DCWT_GAUSS")
+    '("hat" "GWY_2DCWT_HAT")
+  )
+)
+
+(define-pointer ComputationState
+  (c-name "GwyComputationState")
+  (gtype-id "GWY_TYPE_COMPUTATION_STATE")
+)
+
+(define-pointer TipModelPreset
+  (c-name "GwyTipModelPreset")
+  (gtype-id "GWY_TYPE_TIP_MODEL_PRESET")
+)
+

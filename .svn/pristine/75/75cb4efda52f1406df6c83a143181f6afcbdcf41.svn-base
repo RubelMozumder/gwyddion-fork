@@ -1,0 +1,1087 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2017 David Necas (Yeti), Daniil Bratashov (dn2010).
+ *  E-mail: dn2010@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+ /*
+  * LZW Compression is unimplemented now.
+  *
+  * It is based on LSMfile description from:
+  * http://ibb.gsf.de/homepage/karsten.rodenacker/IDL/Lsmfile.doc
+  * Please note that it has incorrect TIF_CZ_LSMINFO tag layout,
+  * 3 elements of type gdouble with X, Y and Z offsets are skipped
+  * there.
+  *
+  * Also BioImage XD source code was used as more modern reference about format features.
+  */
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-zeiss-lsm-spm">
+ *   <comment>Carl Zeiss CLSM images</comment>
+ *   <glob pattern="*.lsm"/>
+ *   <glob pattern="*.LSM"/>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Carl Zeiss CLSM images
+ * .lsm
+ * Read Volume
+ **/
+
+#include "config.h"
+#include <stdlib.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/arithmetic.h>
+#include <libprocess/stats.h>
+#include <app/gwymoduleutils-file.h>
+#include <app/data-browser.h>
+#include "err.h"
+#include "gwytiff.h"
+
+#define EXTENSION ".lsm"
+
+enum {
+    ZEISS_LSM_HEADER_TAG = 34412,
+};
+
+enum {
+    ZEISS_LSM_HEADER_TAG_MIN_SIZE = 152,
+};
+
+typedef enum {
+    LSM_TIFF_SUB_FILE_TYPE_IMAGE     = 0,
+    LSM_TIFF_SUB_FILE_TYPE_THUMBNAIL = 1,
+} LSMTIFFSubFileType;
+
+typedef enum {
+    LSM_SCANTYPE_XYZ                 = 0,
+    LSM_SCANTYPE_XZ                  = 1,
+    LSM_SCANTYPE_LINE                = 2,
+    LSM_SCANTYPE_TIMESERIES_XY       = 3,
+    LSM_SCANTYPE_TIMESERIES_XZ       = 4,
+    LSM_SCANTYPE_TIMESERIES_MEAN_ROI = 5,
+    LSM_SCANTYPE_TIMESERIES_XYZ      = 6,
+    LSM_SCANTYPE_SPLINE              = 7,
+    LSM_SCANTYPE_SPLINE_XZ           = 8,
+    LSM_SCANTYPE_TIMESERIES_SPLINE   = 9,
+    LSM_SCANTYPE_TIMESERIES_POINT    = 10,
+} LSMHeaderScanType;
+
+typedef enum {
+    LSM_LUT_NORMAL   = 0,
+    LSM_LUT_ORIGINAL = 1,
+    LSM_LUT_RAMP     = 2,
+    LSM_LUT_POLYLINE = 3,
+    LSM_LUT_SPLINE   = 4,
+    LSM_LUT_GAMMA    = 5,
+} LSMLUTType;
+
+typedef enum {
+    LSM_SUBBLOCK_RECORDING              = 0x10000000,
+    LSM_SUBBLOCK_LASERS                 = 0x30000000,
+    LSM_SUBBLOCK_LASER                  = 0x50000000,
+    LSM_SUBBLOCK_TRACKS                 = 0x20000000,
+    LSM_SUBBLOCK_TRACK                  = 0x40000000,
+    LSM_SUBBLOCK_DETECTION_CHANNELS     = 0x60000000,
+    LSM_SUBBLOCK_DETECTION_CHANNEL      = 0x70000000,
+    LSM_SUBBLOCK_ILLUMINATION_CHANNELS  = 0x80000000,
+    LSM_SUBBLOCK_ILLUMINATION_CHANNEL   = 0x90000000,
+    LSM_SUBBLOCK_BEAM_SPLITTERS         = 0xA0000000,
+    LSM_SUBBLOCK_BEAM_SPLITTER          = 0xB0000000,
+    LSM_SUBBLOCK_DATA_CHANNELS          = 0xC0000000,
+    LSM_SUBBLOCK_DATA_CHANNEL           = 0xD0000000,
+    LSM_SUBBLOCK_TIMERS                 = 0x11000000,
+    LSM_SUBBLOCK_TIMER                  = 0x12000000,
+    LSM_SUBBLOCK_MARKERS                = 0x13000000,
+    LSM_SUBBLOCK_MARKER                 = 0x14000000,
+    LSM_SUBBLOCK_END                    = 0xFFFFFFFF,
+} LSMScanInfoEntry;
+
+typedef enum {
+    LSM_RECORDING_ENTRY_NAME                    = 0x10000001,
+    LSM_RECORDING_ENTRY_DESCRIPTION             = 0x10000002,
+    LSM_RECORDING_ENTRY_NOTES                   = 0x10000003,
+    LSM_RECORDING_ENTRY_OBJECTIVE               = 0x10000004,
+    LSM_RECORDING_ENTRY_PROCESSING_SUMMARY      = 0x10000005,
+    LSM_RECORDING_ENTRY_SPECIAL_SCAN_MODE       = 0x10000006,
+    LSM_RECORDING_ENTRY_SCAN_TYPE               = 0x10000007,
+    LSM_RECORDING_ENTRY_SCAN_MODE               = 0x10000008,
+    LSM_RECORDING_ENTRY_NUMBER_OF_STACKS        = 0x10000009,
+    LSM_RECORDING_ENTRY_LINES_PER_PLANE         = 0x1000000A,
+    LSM_RECORDING_ENTRY_SAMPLES_PER_LINE        = 0x1000000B,
+    LSM_RECORDING_ENTRY_PLANES_PER_VOLUME       = 0x1000000C,
+    LSM_RECORDING_ENTRY_IMAGES_WIDTH            = 0x1000000D,
+    LSM_RECORDING_ENTRY_IMAGES_HEIGHT           = 0x1000000E,
+    LSM_RECORDING_ENTRY_IMAGES_NUMBER_PLANES    = 0x1000000F,
+    LSM_RECORDING_ENTRY_IMAGES_NUMBER_STACKS    = 0x10000010,
+    LSM_RECORDING_ENTRY_IMAGES_NUMBER_CHANNELS  = 0x10000011,
+    LSM_RECORDING_ENTRY_LINSCAN_XY_SIZE         = 0x10000012,
+    LSM_RECORDING_ENTRY_SCAN_DIRECTION          = 0x10000013,
+    LSM_RECORDING_ENTRY_TIME_SERIES             = 0x10000014,
+    LSM_RECORDING_ENTRY_ORIGINAL_SCAN_DATA      = 0x10000015,
+    LSM_RECORDING_ENTRY_ZOOM_X                  = 0x10000016,
+    LSM_RECORDING_ENTRY_ZOOM_Y                  = 0x10000017,
+    LSM_RECORDING_ENTRY_ZOOM_Z                  = 0x10000018,
+    LSM_RECORDING_ENTRY_SAMPLE_0X               = 0x10000019,
+    LSM_RECORDING_ENTRY_SAMPLE_0Y               = 0x1000001A,
+    LSM_RECORDING_ENTRY_SAMPLE_0Z               = 0x1000001B,
+    LSM_RECORDING_ENTRY_SAMPLE_SPACING          = 0x1000001C,
+    LSM_RECORDING_ENTRY_LINE_SPACING            = 0x1000001D,
+    LSM_RECORDING_ENTRY_PLANE_SPACING           = 0x1000001E,
+    LSM_RECORDING_ENTRY_PLANE_WIDTH             = 0x1000001F,
+    LSM_RECORDING_ENTRY_PLANE_HEIGHT            = 0x10000020,
+    LSM_RECORDING_ENTRY_VOLUME_DEPTH            = 0x10000021,
+    LSM_RECORDING_ENTRY_ROTATION                = 0x10000034,
+    LSM_RECORDING_ENTRY_NUTATION                = 0x10000023,
+    LSM_RECORDING_ENTRY_PRECESSION              = 0x10000035,
+    LSM_RECORDING_ENTRY_SAMPLE_0TIME            = 0x10000036,
+    LSM_RECORDING_ENTRY_START_SCAN_TRIGGER_IN   = 0x10000037,
+    LSM_RECORDING_ENTRY_START_SCAN_TRIGGER_OUT  = 0x10000038,
+    LSM_RECORDING_ENTRY_START_SCAN_EVENT        = 0x10000039,
+    LSM_RECORDING_ENTRY_START_SCAN_TIME         = 0x10000040,
+    LSM_RECORDING_ENTRY_STOP_SCAN_TRIGGER_IN    = 0x10000041,
+    LSM_RECORDING_ENTRY_STOP_SCAN_TRIGGER_OUT   = 0x10000042,
+    LSM_RECORDING_ENTRY_STOP_SCAN_EVENT         = 0x10000043,
+    LSM_RECORDING_ENTRY_STOP_SCAN_TIME          = 0x10000044,
+    LSM_RECORDING_ENTRY_USE_ROIS                = 0x10000045,
+    LSM_RECORDING_ENTRY_USE_REDUCED_MEMORY_ROIS,
+} LSMEntryRecordingMarkers;
+
+typedef enum {
+    LSM_TRACK_ENTRY_MULTIPLEX_TYPE              = 0x40000001,
+    LSM_TRACK_ENTRY_MULTIPLEX_ORDER             = 0x40000002,
+    LSM_TRACK_ENTRY_SAMPLING_MODE               = 0x40000003,
+    LSM_TRACK_ENTRY_SAMPLING_METHOD             = 0x40000004,
+    LSM_TRACK_ENTRY_SAMPLING_NUMBER             = 0x40000005,
+    LSM_TRACK_ENTRY_ACQUIRE                     = 0x40000006,
+    LSM_TRACK_ENTRY_SAMPLE_OBSERVATION_TIME     = 0x40000007,
+    LSM_TRACK_ENTRY_TIME_BETWEEN_STACKS         = 0x4000000B,
+    LSM_TRACK_ENTRY_NAME                        = 0x4000000C,
+    LSM_TRACK_ENTRY_COLLIMATOR1_NAME            = 0x4000000D,
+    LSM_TRACK_ENTRY_COLLIMATOR1_POSITION        = 0x4000000E,
+    LSM_TRACK_ENTRY_COLLIMATOR2_NAME            = 0x4000000F,
+    LSM_TRACK_ENTRY_COLLIMATOR2_POSITION        = 0x40000010,
+    LSM_TRACK_ENTRY_IS_BLEACH_TRACK             = 0x40000011,
+    LSM_TRACK_ENTRY_IS_BLEACH_AFTER_SCAN_NUMBER = 0x40000012,
+    LSM_TRACK_ENTRY_BLEACH_SCAN_NUMBER          = 0x40000013,
+    LSM_TRACK_ENTRY_TRIGGER_IN                  = 0x40000014,
+    LSM_TRACK_ENTRY_TRIGGER_OUT                 = 0x40000015,
+    LSM_TRACK_ENTRY_IS_RATIO_TRACK              = 0x40000016,
+    LSM_TRACK_ENTRY_BLEACH_COUNT                = 0x40000017,
+} LSMTrackMarkers;
+
+typedef enum {
+    LSM_LASER_ENTRY_NAME                        = 0x50000001,
+    LSM_LASER_ENTRY_ACQUIRE                     = 0x50000002,
+    LSM_LASER_ENTRY_POWER                       = 0x50000003,
+} LSMLaserMarkers;
+
+typedef enum {
+    LSM_DETCHANNEL_ENTRY_INTEGRATION_MODE       = 0x70000001,
+    LSM_DETCHANNEL_ENTRY_SPECIAL_MODE           = 0x70000002,
+    LSM_DETCHANNEL_ENTRY_DETECTOR_GAIN_FIRST    = 0x70000003,
+    LSM_DETCHANNEL_ENTRY_DETECTOR_GAIN_LAST     = 0x70000004,
+    LSM_DETCHANNEL_ENTRY_AMPLIFIER_GAIN_FIRST   = 0x70000005,
+    LSM_DETCHANNEL_ENTRY_AMPLIFIER_GAIN_LAST    = 0x70000006,
+    LSM_DETCHANNEL_ENTRY_AMPLIFIER_OFFS_FIRST   = 0x70000007,
+    LSM_DETCHANNEL_ENTRY_AMPLIFIER_OFFS_LAST    = 0x70000008,
+    LSM_DETCHANNEL_ENTRY_PINHOLE_DIAMETER       = 0x70000009,
+    LSM_DETCHANNEL_ENTRY_COUNTING_TRIGGER       = 0x7000000A,
+    LSM_DETCHANNEL_ENTRY_ACQUIRE                = 0x7000000B,
+    LSM_DETCHANNEL_POINT_DETECTOR_NAME          = 0x7000000C,
+    LSM_DETCHANNEL_AMPLIFIER_NAME               = 0x7000000D,
+    LSM_DETCHANNEL_PINHOLE_NAME                 = 0x7000000E,
+    LSM_DETCHANNEL_FILTER_SET_NAME              = 0x7000000F,
+    LSM_DETCHANNEL_FILTER_NAME                  = 0x70000010,
+    LSM_DETCHANNEL_INTEGRATOR_NAME              = 0x70000013,
+    LSM_DETCHANNEL_DETECTION_CHANNEL_NAME       = 0x70000014,
+} LSMDetectorMarkers;
+
+typedef enum {
+    LSM_TYPE_SUBBLOCK = 0,
+    LSM_TYPE_LONG     = 4,
+    LSM_TYPE_RATIONAL = 5,
+    LSM_TYPE_ASCII    = 2,
+} LSMScanInfoType;
+
+typedef struct {
+    guint32 magic_number;
+    gint32  size;
+    gint32  xres;
+    gint32  yres;
+    gint32  zres;
+    gint32  channels;
+    gint32  time_res;
+    gint32  intensity_datatype;
+    gint32  thumbnail_xres;
+    gint32  thumbnail_yres;
+    gdouble x_voxel_size;
+    gdouble y_voxel_size;
+    gdouble z_voxel_size;
+    gdouble x_origin;
+    gdouble y_origin;
+    gdouble z_origin;
+    guint32 scan_type;
+    guint32 datatype;
+    guint32 offset_vector_overlay;
+    guint32 offset_input_lut;
+    guint32 offset_output_lut;
+    guint32 offset_channel_colors_names;
+    gdouble time_interval;
+    guint32 offset_channel_data_types;
+    guint32 offset_scan_information;
+    guint32 offset_ks_data;
+    guint32 offset_timestamps;
+    guint32 offset_events_list;
+    guint32 offset_roi;
+    guint32 offset_bleach_roi;
+    guint32 offset_next_recording;
+    guint32 reserved[90]; /* Must be zeros */
+} LSMHeaderTag;
+
+typedef struct {
+    gint32 block_size;
+    gint32 numcolors;
+    gint32 numnames;
+    gint32 offset_colors;
+    gint32 offset_names;
+    gint32 mono;
+    GArray *colors;
+    GPtrArray *names;
+} LSMNamesColors;
+
+typedef struct {
+    guint32 block_size;
+    guint32 number_of_subblocks;
+    guint32 channels_number;
+    LSMLUTType lut_type; /* guint32 */
+    guint32 advanced;
+    guint32 actual_channel;
+    guint32 reserved[9];
+} LSMLookupTable;
+
+typedef struct {
+    guint32          entry; /* guint32 */
+    LSMScanInfoType  type;  /* guint32 */
+    guint32          size;
+    gpointer         data;
+} LSMEntry;
+
+typedef struct {
+    gchar *name;
+    gchar *description;
+    gchar *notes;
+    gchar *objective;
+    gchar *processing_summary;
+    gchar *special_scan_mode;
+    gchar *scan_mode;
+    guint32 number_of_stacks;
+    guint32 lines_per_plane;
+    guint32 samples_per_line;
+    guint32 planes_per_volume;
+    guint32 images_width;
+    guint32 images_height;
+    guint32 images_number_planes;
+    guint32 images_number_stacks;
+    guint32 images_number_channels;
+    guint32 linscan_xy_size;
+    guint32 scan_direction;
+    guint32 time_series;
+    guint32 original_scan_data;
+    gdouble zoomx;
+    gdouble zoomy;
+    gdouble zoomz;
+    gdouble sample0x;
+    gdouble sample0y;
+    gdouble sample0z;
+    gdouble sample_spacing;
+    gdouble line_spacing;
+    gdouble plane_spacing;
+    gdouble plane_width;
+    gdouble plane_height;
+    gdouble volume_depth;
+    gdouble rotation;
+    gdouble nutation;
+    gdouble precession;
+    gdouble sample0_time;
+    gchar *start_scan_trigger_in;
+    gchar *start_scan_trigger_out;
+    guint32 start_scan_event;
+    gdouble start_scan_time;
+    gchar *stop_scan_trigger_in;
+    gchar *stop_scan_trigger_out;
+    guint32 stop_scan_event;
+    gdouble stop_scan_time;
+    guint32 use_rois;
+    guint32 use_reduced_memory_rois;
+    gchar *laser_name;
+    guint32 laser_acquire;
+    gdouble laser_power;
+} LSMEntryRecording;
+
+static gboolean           module_register       (void);
+static gint               lsm_detect            (const GwyFileDetectInfo *fileinfo,
+                                                 gboolean only_name);
+static GwyContainer*      lsm_load              (const gchar *filename,
+                                                 GwyRunType mode,
+                                                 GError **error);
+static GwyContainer*      lsm_load_tiff         (const GwyTIFF *tiff,
+                                                 const gchar *filename,
+                                                 GError **error);
+static LSMHeaderTag*      lsm_read_header_tag   (const GwyTIFF *tiff,
+                                                 const GwyTIFFEntry *tag,
+                                                 GError **error);
+static LSMNamesColors*    lsm_read_names_colors (const GwyTIFF *tiff,
+                                                 guint32 offset,
+                                                 GError **error);
+static LSMEntryRecording* lsm_read_recording    (const GwyTIFF *tiff,
+                                                 GwyContainer *meta,
+                                                 guint32 offset,
+                                                 GError **error);
+static LSMEntry*          lsm_read_entry        (const GwyTIFF *tiff,
+                                                 guint32 offset,
+                                                 GError **error);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    module_register,
+    N_("Imports Carl Zeiss CLSM images."),
+    "Daniil Bratashov <dn2010@gwyddion.net>",
+    "0.4",
+    "Daniil Bratashov (dn2010), David Nečas (Yeti)",
+    "2017",
+};
+
+GWY_MODULE_QUERY2(module_info, zeisslsm)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("zeisslsm",
+                           N_("Carl Zeiss CLSM images (.lsm)"),
+                           (GwyFileDetectFunc)&lsm_detect,
+                           (GwyFileLoadFunc)&lsm_load,
+                           NULL,
+                           NULL);
+
+    return TRUE;
+}
+
+static gint
+lsm_detect(const GwyFileDetectInfo *fileinfo, gboolean only_name)
+{
+    GwyTIFF *tiff = NULL;
+    gint score = 0;
+    GwyTIFFVersion version = GWY_TIFF_CLASSIC;
+    guint byteorder = G_LITTLE_ENDIAN;
+    const GwyTIFFEntry *lsm_tag = NULL;
+
+    if (only_name)
+        return (g_str_has_suffix(fileinfo->name_lowercase, EXTENSION)) ? 20 : 0;
+
+    /* Weed out non-TIFFs */
+    if (!gwy_tiff_detect(fileinfo->head, fileinfo->buffer_len, &version, &byteorder))
+        return 0;
+
+    if ((tiff = gwy_tiff_load(fileinfo->name, NULL))
+        && (lsm_tag = gwy_tiff_find_tag(tiff, 0, ZEISS_LSM_HEADER_TAG))) {
+        score = 100;
+    }
+
+    if (tiff)
+        gwy_tiff_free(tiff);
+
+    return score;
+}
+
+static GwyContainer*
+lsm_load(const gchar *filename,
+         G_GNUC_UNUSED GwyRunType mode,
+         GError **error)
+{
+
+    GwyTIFF *tiff;
+    GwyContainer *container = NULL;
+
+    tiff = gwy_tiff_load(filename, error);
+    if (!tiff)
+        return NULL;
+
+    container = lsm_load_tiff(tiff, filename, error);
+
+    gwy_tiff_free(tiff);
+
+    return container;
+}
+
+static const gchar*
+palette_name_for_colour_num(guint32 colour)
+{
+    if (colour == 255)
+        return "RGB-Red";
+    if (colour == 65280)
+        return "RGB-Green";
+    if (colour == 16711680)
+        return "RGB-Blue";
+    return "Gray";
+}
+
+static const gchar*
+palette_name_for_photometric(const GwyTIFFImageReader *reader, guint i)
+{
+    if (reader->photometric == GWY_TIFF_PHOTOMETRIC_RGB) {
+        if (i == 0)
+            return "RGB-Red";
+        if (i == 1)
+            return "RGB-Green";
+        if (i == 2)
+            return "RGB-Blue";
+    }
+    return "Gray";
+}
+
+static GwyContainer*
+lsm_load_tiff(const GwyTIFF *tiff,
+              const gchar *filename,
+              GError **error)
+{
+    GwyContainer *container = NULL, *meta = NULL;
+    GwyDataLine *dataline = NULL;
+    GwyGraphCurveModel *gcmodel;
+    GwyGraphModel *gmodel = NULL;
+    GwyDataField *dfield = NULL;
+    GwyBrick *brick;
+    GwySIUnit *siunit;
+    gint i, j, k, l, volumes, ndirs, z, xres = 0, yres = 0, zres = 0;
+    gdouble xreal = 1.0, yreal = 1.0, zreal = 1.0;
+    gchar *name;
+    const gchar *lutname;
+    const GwyTIFFEntry *lsm_tag;
+    gdouble *data;
+    GwyTIFFImageReader *reader = NULL;
+    LSMHeaderTag *header_tag = NULL;
+    LSMNamesColors *names_colors = NULL;
+    LSMEntryRecording *recording = NULL;
+    gboolean is_image = FALSE, is_volume = FALSE, is_line = FALSE;
+    GArray *bricks, *bricks_preview;
+
+    if (!(lsm_tag = gwy_tiff_find_tag(tiff, 0, ZEISS_LSM_HEADER_TAG))) {
+        err_FILE_TYPE(error, "Carl Zeiss LSM");
+        goto fail;
+    }
+
+    if (!(header_tag = lsm_read_header_tag(tiff, lsm_tag, error))) {
+        err_FILE_TYPE(error, "Carl Zeiss LSM");
+        goto fail;
+    }
+
+    names_colors = lsm_read_names_colors(tiff, header_tag->offset_channel_colors_names, error);
+    meta = gwy_container_new();
+    recording = lsm_read_recording(tiff, meta, header_tag->offset_scan_information, error);
+
+    ndirs = gwy_tiff_get_n_dirs(tiff);
+    gwy_debug("ndirs=%u", ndirs);
+
+    container = gwy_container_new();
+    k = 0; /* number of images in resulting file */
+    volumes = 0;
+
+    is_image = FALSE;
+    is_volume = FALSE;
+    is_line = FALSE;
+    bricks = g_array_new(FALSE, FALSE, sizeof(GwyBrick*));
+    bricks_preview = g_array_new(FALSE, FALSE, sizeof(GwyBrick*));
+
+    for (i = 0; i < ndirs; i++) {
+        gwy_debug("directory #%u", i);
+        if (!(reader = gwy_tiff_get_image_reader(tiff, i, G_MAXUINT, error)))
+            goto fail;
+
+        xres = reader->width;
+        yres = reader->height;
+
+        switch (header_tag->scan_type) {
+            case LSM_SCANTYPE_XYZ:
+                zres = header_tag->zres;
+                xreal = xres * header_tag->x_voxel_size;
+                yreal = yres * header_tag->y_voxel_size;
+                zreal = zres * header_tag->z_voxel_size;
+                if (xres != header_tag->xres) {
+                    xreal = header_tag->xres * header_tag->x_voxel_size;
+                    yreal = header_tag->yres * header_tag->y_voxel_size;
+                }
+                if (header_tag->zres > 1)
+                    is_volume = TRUE;
+                else
+                    is_image = TRUE;
+            break;
+
+            case LSM_SCANTYPE_XZ:
+                xreal = xres * header_tag->x_voxel_size;
+                yreal = yres * header_tag->z_voxel_size;
+                if (xres != header_tag->xres) {
+                    xreal = header_tag->xres * header_tag->x_voxel_size;
+                    yreal = header_tag->zres * header_tag->z_voxel_size;
+                }
+                is_image = TRUE;
+            break;
+
+            case LSM_SCANTYPE_LINE:
+                xreal = xres * header_tag->x_voxel_size;
+                yreal = 1.0;
+                if (xres != header_tag->xres)
+                    xreal = header_tag->xres * header_tag->x_voxel_size;
+                is_line = TRUE;
+                siunit = gwy_si_unit_new("m");
+                gmodel = g_object_new(GWY_TYPE_GRAPH_MODEL,
+                                      "si-unit-x", siunit,
+                                      NULL);
+                g_object_unref(siunit);
+            break;
+
+            case LSM_SCANTYPE_TIMESERIES_XY:
+                zres = ndirs / 2;
+                xreal = xres * header_tag->x_voxel_size;
+                yreal = yres * header_tag->y_voxel_size;
+                if (xres != header_tag->xres) {
+                    xreal = header_tag->xres * header_tag->x_voxel_size;
+                    yreal = header_tag->yres * header_tag->y_voxel_size;
+                }
+                zreal = ndirs / 2 * header_tag->time_interval;
+                is_volume = TRUE;
+            break;
+
+            case LSM_SCANTYPE_TIMESERIES_XZ:
+                zres = ndirs / 2;
+                xreal = xres * header_tag->x_voxel_size;
+                yreal = yres * header_tag->z_voxel_size;
+                zreal = ndirs / 2 * header_tag->time_interval;
+                if (xres != header_tag->xres) {
+                    xreal = header_tag->xres * header_tag->x_voxel_size;
+                    yreal = header_tag->zres * header_tag->z_voxel_size;
+                }
+                is_volume = TRUE;
+            break;
+
+            case LSM_SCANTYPE_TIMESERIES_MEAN_ROI:
+                xreal = xres;
+                yreal = yres * header_tag->time_interval;
+                is_image = TRUE;
+            break;
+
+            default:
+                // FIXME: there is files with broken scantype
+                zres = header_tag->zres;
+                xreal = xres * header_tag->x_voxel_size;
+                yreal = yres * header_tag->y_voxel_size;
+                zreal = zres * header_tag->z_voxel_size;
+                if (xres != header_tag->xres) {
+                    xreal = header_tag->xres * header_tag->x_voxel_size;
+                    yreal = header_tag->yres * header_tag->y_voxel_size;
+                }
+                if (header_tag->zres > 1)
+                    is_volume = TRUE;
+                else
+                    is_image = TRUE;
+            break;
+        }
+
+        for (j = 0; j < reader->samples_per_pixel; j++) {
+            /* FIXME: If we allow compression (using gwy_tiff_allow_compressed()) we need to check return values from
+             * gwy_tiff_read_image_row() because it can then fail. Without compression a succesfully created reader
+             * can never fail. */
+            if (is_image || is_volume) {
+                dfield = gwy_data_field_new(xres, yres, xreal, yreal, TRUE);
+                data = gwy_data_field_get_data(dfield);
+                for (l = 0; l < yres; l++)
+                    gwy_tiff_read_image_row(tiff, reader, j, l, 1.0, 0.0, data + l*xres);
+            }
+            else if (is_line) {
+                dataline = gwy_data_line_new(xres, xreal, TRUE);
+                data = gwy_data_line_get_data(dataline);
+                /* FIXME: I do not see yres == 1 checked or enforced elsewhere. Perhaps we could do this in a cycle
+                 * and create more curves? Just read the single image row for now to be on the safe side. */
+                gwy_tiff_read_image_row(tiff, reader, j, 0, 1.0, 0.0, data);
+            }
+            else {
+                err_FILE_TYPE(error, "Carl Zeiss LSM");
+                goto fail;
+            }
+
+            if (is_line) {
+                gcmodel = g_object_new(GWY_TYPE_GRAPH_CURVE_MODEL,
+                                       "mode", GWY_GRAPH_CURVE_LINE,
+                                       "color", gwy_graph_get_preset_color(k),
+                                       NULL);
+                gwy_graph_curve_model_set_data_from_dataline(gcmodel, dataline, 0, 0);
+                gwy_graph_model_add_curve(gmodel, gcmodel);
+                g_object_unref(gcmodel);
+            }
+
+            if (is_image) {
+                gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(dfield), "m");
+                gwy_container_pass_object(container, gwy_app_get_data_key_for_id(k), dfield);
+                if (gwy_container_get_n_items(meta)) {
+                    gwy_container_pass_object(container, gwy_app_get_data_meta_key_for_id(k),
+                                              gwy_container_duplicate(meta));
+                }
+                gwy_file_channel_import_log_add(container, k, NULL, filename);
+
+                if (names_colors && (i % 2 == 0)) {
+                    name = (gchar*)g_ptr_array_index(names_colors->names, j);
+                    gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(k), name);
+
+                    lutname = "Gray";
+                    if (j < names_colors->colors->len)
+                        lutname = palette_name_for_colour_num(g_array_index(names_colors->colors, gint32, j));
+                    gwy_container_set_const_string(container, gwy_app_get_data_palette_key_for_id(k), lutname);
+                }
+                else {
+                    gwy_container_set_string(container, gwy_app_get_data_title_key_for_id(k),
+                                             g_strdup_printf("LSM Image %u (channel %u)", i/2, j));
+
+                    lutname = palette_name_for_photometric(reader, j);
+                    gwy_container_set_const_string(container, gwy_app_get_data_palette_key_for_id(k), lutname);
+                } /* else */
+            }
+
+            if (is_volume) {
+                if (i % (zres*2) == 0 || i % (zres*2) == 1) {
+                    brick = gwy_brick_new(xres, yres, zres, xreal, yreal, zreal, TRUE);
+
+                    gwy_si_unit_set_from_string(gwy_brick_get_si_unit_x(brick), "m");
+                    gwy_si_unit_set_from_string(gwy_brick_get_si_unit_y(brick), "m");
+                    if (header_tag->scan_type == LSM_SCANTYPE_XYZ) {
+                        gwy_si_unit_set_from_string(gwy_brick_get_si_unit_x(brick), "m");
+                    }
+                    else {
+                        gwy_si_unit_set_from_string(gwy_brick_get_si_unit_x(brick), "s");
+                    }
+
+                    if (i % (zres * 2) == 0)
+                        g_array_insert_val(bricks, j, brick);
+                    else
+                        g_array_insert_val(bricks_preview, j, brick);
+
+                    gwy_container_pass_object(container, gwy_app_get_brick_key_for_id(volumes+1), brick);
+                    if (gwy_container_get_n_items(meta)) {
+                        gwy_container_pass_object(container, gwy_app_get_brick_meta_key_for_id(volumes+1),
+                                                  gwy_container_duplicate(meta));
+                    }
+                    gwy_file_volume_import_log_add(container, volumes+1, NULL, filename);
+
+                    if (names_colors && (i % 2 == 0)) {
+                        name = (gchar *)g_ptr_array_index(names_colors->names, j);
+                        gwy_container_set_const_string(container, gwy_app_get_brick_title_key_for_id(volumes+1), name);
+
+                        lutname = "Gray";
+                        if (j < names_colors->colors->len)
+                            lutname = palette_name_for_colour_num(g_array_index(names_colors->colors, gint32, j));
+                        gwy_container_set_const_string(container, gwy_app_get_brick_palette_key_for_id(volumes+1),
+                                                       lutname);
+                    }
+                    else {
+                        gwy_container_set_string(container, gwy_app_get_brick_title_key_for_id(volumes+1),
+                                                 g_strdup_printf("LSM Volume %d (channel %u)", i/2/zres, j));
+
+                        lutname = palette_name_for_photometric(reader, j);
+                        gwy_container_set_const_string(container, gwy_app_get_brick_palette_key_for_id(volumes+1),
+                                                       lutname);
+                    } /* else */
+                    volumes++;
+                }
+
+                z = (i % zres) / 2;
+                if (i % 2)
+                    brick = g_array_index(bricks_preview, GwyBrick*, j);
+                else
+                    brick = g_array_index(bricks, GwyBrick*, j);
+
+                if (gwy_data_field_check_compatibility_with_brick_xy(dfield, brick, GWY_DATA_COMPATIBILITY_RES)) {
+                    g_object_unref(dfield);
+                    /* TODO: A more meaningful error. */
+                    err_FILE_TYPE(error, "Carl Zeiss LSM");
+                    goto fail;
+                }
+                gwy_brick_set_xy_plane(brick, dfield, z);
+                g_object_unref(dfield);
+            }
+            k++;
+        } /* for j */
+
+        reader = gwy_tiff_image_reader_free(reader);
+    } /* for i */
+
+    g_array_free(bricks, TRUE);
+    g_array_free(bricks_preview, TRUE);
+
+    if (is_line)
+        gwy_container_pass_object(container, gwy_app_get_graph_key_for_id(1), gmodel);
+
+fail:
+    reader = gwy_tiff_image_reader_free(reader);
+    GWY_OBJECT_UNREF(meta);
+    g_free(header_tag);
+    if (names_colors) {
+        g_array_free(names_colors->colors, TRUE);
+        for (i = 0; i < names_colors->names->len; i++)
+            g_free(g_ptr_array_index(names_colors->names, i));
+        g_ptr_array_free(names_colors->names, TRUE);
+        g_free(names_colors);
+    }
+    /* The strings are already eaten by meta. */
+    g_free(recording);
+
+    return container;
+}
+
+static LSMHeaderTag*
+lsm_read_header_tag(const GwyTIFF *tiff,
+                    const GwyTIFFEntry *tag, GError **error)
+{
+    LSMHeaderTag *header_tag;
+    const guchar *p;
+
+    if (tag->type != GWY_TIFF_BYTE || tag->count < ZEISS_LSM_HEADER_TAG_MIN_SIZE) {
+        err_FILE_TYPE(error, "Carl Zeiss LSM");
+        return NULL;
+    }
+    p = gwy_tiff_entry_get_data_pointer(tiff, tag);
+    header_tag = g_new0(LSMHeaderTag, 1);
+    header_tag->magic_number = gwy_get_guint32_le(&p);
+    if ((header_tag->magic_number != 0x00300494C) && (header_tag->magic_number != 0x00400494C)) {
+        err_FILE_TYPE(error, "Carl Zeiss LSM");
+        g_free(header_tag);
+        return NULL;
+    }
+    gwy_debug("magic=%x", header_tag->magic_number);
+    header_tag->size = gwy_get_gint32_le(&p);
+    header_tag->xres = gwy_get_gint32_le(&p);
+    header_tag->yres = gwy_get_gint32_le(&p);
+    header_tag->zres = gwy_get_gint32_le(&p);
+    header_tag->channels = gwy_get_gint32_le(&p);
+    header_tag->time_res = gwy_get_gint32_le(&p);
+    header_tag->intensity_datatype = gwy_get_gint32_le(&p);
+    header_tag->thumbnail_xres = gwy_get_gint32_le(&p);
+    header_tag->thumbnail_yres = gwy_get_gint32_le(&p);
+    header_tag->x_voxel_size = gwy_get_gdouble_le(&p);
+    header_tag->y_voxel_size = gwy_get_gdouble_le(&p);
+    header_tag->z_voxel_size = gwy_get_gdouble_le(&p);
+    header_tag->x_origin = gwy_get_gdouble_le(&p);
+    header_tag->y_origin = gwy_get_gdouble_le(&p);
+    header_tag->z_origin = gwy_get_gdouble_le(&p);
+    header_tag->scan_type = gwy_get_guint32_le(&p);
+    header_tag->datatype = gwy_get_guint32_le(&p);
+    header_tag->offset_vector_overlay = gwy_get_guint32_le(&p);
+    header_tag->offset_input_lut = gwy_get_guint32_le(&p);
+    header_tag->offset_output_lut = gwy_get_guint32_le(&p);
+    header_tag->offset_channel_colors_names = gwy_get_guint32_le(&p);
+    header_tag->time_interval = gwy_get_gdouble_le(&p);
+    header_tag->offset_channel_data_types = gwy_get_guint32_le(&p);
+    header_tag->offset_scan_information = gwy_get_guint32_le(&p);
+    header_tag->offset_ks_data = gwy_get_guint32_le(&p);
+    header_tag->offset_timestamps = gwy_get_guint32_le(&p);
+    header_tag->offset_events_list = gwy_get_guint32_le(&p);
+    header_tag->offset_roi = gwy_get_guint32_le(&p);
+    header_tag->offset_bleach_roi = gwy_get_guint32_le(&p);
+    header_tag->offset_next_recording = gwy_get_guint32_le(&p);
+
+    gwy_debug("channels=%d", header_tag->channels);
+    gwy_debug("scan type=%u", header_tag->scan_type);
+    gwy_debug("xres=%d yres=%d zres=%d",
+              header_tag->xres,
+              header_tag->yres,
+              header_tag->zres);
+    gwy_debug("xsize=%g, ysize=%g zsize=%g timesize=%g",
+              header_tag->x_voxel_size,
+              header_tag->y_voxel_size,
+              header_tag->z_voxel_size,
+              header_tag->time_interval);
+    return header_tag;
+}
+
+static LSMNamesColors *
+lsm_read_names_colors(const GwyTIFF *tiff,
+                      guint32 offset,
+                      G_GNUC_UNUSED GError **error)
+{
+    LSMNamesColors *names_colors;
+    const guchar *p;
+    gchar *name, *nameu;
+    gint32 color;
+    gint i;
+    gsize len, size;
+
+    if (offset == 0) {
+        gwy_debug("No names and colors structure");
+        return NULL;
+    }
+    p = tiff->data + offset;
+    if (!gwy_tiff_data_fits(tiff, offset, 1, 6*4))
+        return NULL;
+
+    names_colors = g_new0(LSMNamesColors, 1);
+    names_colors->block_size = gwy_get_gint32_le(&p);
+    names_colors->numcolors = gwy_get_gint32_le(&p);
+    names_colors->numnames = gwy_get_gint32_le(&p);
+    names_colors->offset_colors = gwy_get_gint32_le(&p);
+    names_colors->offset_names = gwy_get_gint32_le(&p);
+    names_colors->mono = gwy_get_gint32_le(&p);
+    if (!gwy_tiff_data_fits(tiff, offset + names_colors->offset_colors, 1, names_colors->block_size)
+        || !gwy_tiff_data_fits(tiff, offset + names_colors->offset_colors, 1, names_colors->numcolors*4)
+        || names_colors->offset_names > names_colors->block_size) {
+        g_free(names_colors);
+        return NULL;
+    }
+    names_colors->colors = g_array_sized_new(FALSE, TRUE, sizeof(gint32), names_colors->numcolors);
+    p = tiff->data + offset + names_colors->offset_colors;
+    for (i = 0; i < names_colors->numcolors; i++) {
+        color = gwy_get_gint32_le(&p);
+        g_array_append_val (names_colors->colors, color);
+        gwy_debug("color [%d] = %d", i, color);
+    }
+    p = tiff->data + offset + names_colors->offset_names;
+    names_colors->names = g_ptr_array_sized_new(names_colors->numnames);
+    gwy_debug("num names=%d", names_colors->numnames);
+    len = 0;
+    size = names_colors->block_size - names_colors->offset_names - len;
+    name = g_new0(gchar, size + 1);
+    for (i = 0; i < names_colors->numnames; i++) {
+        while ((*(p++) < 32) && ((len++) < size))
+            ;
+        while ((*p) && (len < size)) {
+            *(name + (len++)) = *(p++);
+        }
+        name[len] = '\0';
+        gwy_debug("name[%d]=%s", i, name);
+        nameu = gwy_convert_to_utf8(name, len, "ISO-8859-1");
+        g_ptr_array_add(names_colors->names, (gpointer)nameu);
+    }
+    g_free(name);
+
+    return names_colors;
+}
+
+static gchar*
+set_meta_string(const LSMEntry *entry, const gchar *name, GwyContainer *meta)
+{
+    gchar *s = gwy_convert_to_utf8(entry->data, entry->size, "ISO-8859-1");
+
+    gwy_container_set_string_by_name(meta, name, s);
+    return s;
+}
+
+static guint
+set_meta_int(const LSMEntry *entry, const gchar *name, GwyContainer *meta)
+{
+    const guchar *p = entry->data;
+    guint value = gwy_get_guint32_le(&p);
+
+    gwy_container_set_string_by_name(meta, name, g_strdup_printf("%d", value));
+    return value;
+}
+
+static gdouble
+set_meta_double(const LSMEntry *entry, const gchar *name, const gchar *unit, GwyContainer *meta)
+{
+    const guchar *p = entry->data;
+    gdouble value = gwy_get_gdouble_le(&p);
+
+    gwy_container_set_string_by_name(meta, name, g_strdup_printf("%g%s%s", value, unit ? " " : "", unit ? unit : ""));
+    return value;
+}
+
+static LSMEntryRecording*
+lsm_read_recording(const GwyTIFF *tiff,
+                   GwyContainer *meta,
+                   guint32 offset,
+                   G_GNUC_UNUSED GError **error)
+{
+    LSMEntryRecording *recording;
+    LSMEntry *entry;
+    const guchar *p;
+
+    if (offset == 0) {
+        gwy_debug("No recordings");
+        return NULL;
+    }
+
+    p = tiff->data + offset;
+    entry = g_new0(LSMEntry, 1);
+    recording = g_new0(LSMEntryRecording, 1);
+    while (entry->entry != LSM_SUBBLOCK_END) {
+        if (entry)
+            g_free(entry);
+        entry = lsm_read_entry(tiff, offset, error);
+
+        gwy_debug("entry = 0x%x type=%d size=%d", entry->entry, entry->type, entry->size);
+        if (entry->entry == LSM_RECORDING_ENTRY_NAME)
+            recording->name = set_meta_string(entry, "Name", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_DESCRIPTION)
+            recording->description = set_meta_string(entry, "Description", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_NOTES)
+            recording->notes = set_meta_string(entry, "Notes", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_OBJECTIVE)
+            recording->objective = set_meta_string(entry, "Objective", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_PROCESSING_SUMMARY)
+            recording->processing_summary = set_meta_string(entry, "Processing summary", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SPECIAL_SCAN_MODE)
+            recording->special_scan_mode = set_meta_string(entry, "Special scan mode", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SCAN_TYPE) {
+            /* Should be empty string */
+        }
+        else if (entry->entry == LSM_RECORDING_ENTRY_SCAN_MODE)
+            recording->scan_mode = set_meta_string(entry, "Scan mode", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_NUMBER_OF_STACKS)
+            recording->number_of_stacks = set_meta_int(entry, "Number of stacks", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_LINES_PER_PLANE)
+            recording->lines_per_plane = set_meta_int(entry, "Lines per plane", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SAMPLES_PER_LINE)
+            recording->samples_per_line = set_meta_int(entry, "Samples per line", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_PLANES_PER_VOLUME)
+            recording->planes_per_volume = set_meta_int(entry, "Planes per volume", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_IMAGES_WIDTH)
+            recording->images_width = set_meta_int(entry, "Images width", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_IMAGES_HEIGHT)
+            recording->images_height = set_meta_int(entry, "Images height", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_IMAGES_NUMBER_PLANES)
+            recording->images_number_planes = set_meta_int(entry, "Images number of planes", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_IMAGES_NUMBER_STACKS)
+            recording->images_number_stacks = set_meta_int(entry, "Images number of stacks", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_IMAGES_NUMBER_CHANNELS)
+            recording->images_number_channels = set_meta_int(entry, "Images number of channels", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_LINSCAN_XY_SIZE)
+            recording->linscan_xy_size = set_meta_int(entry, "Linescan XY size", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SCAN_DIRECTION) {
+            p = entry->data;
+            recording->scan_direction = gwy_get_guint32_le(&p);
+            gwy_container_set_const_string_by_name(meta, "Scan direction",
+                                                   recording->scan_direction ? "Bidirectional" : "Unidirectional");
+        }
+        else if (entry->entry == LSM_RECORDING_ENTRY_TIME_SERIES) {
+            p = entry->data;
+            recording->time_series = gwy_get_guint32_le(&p);
+            gwy_container_set_const_string_by_name(meta, "Time series", recording->time_series ? "True" : "False");
+        }
+        else if (entry->entry == LSM_RECORDING_ENTRY_ORIGINAL_SCAN_DATA) {
+            p = entry->data;
+            recording->original_scan_data = gwy_get_guint32_le(&p);
+            gwy_container_set_const_string_by_name(meta, "Original scan data",
+                                                   recording->original_scan_data ? "Original" : "Modified");
+        }
+        else if (entry->entry == LSM_RECORDING_ENTRY_ZOOM_X)
+            recording->zoomx = set_meta_double(entry, "X zoom", NULL, meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_ZOOM_Y)
+            recording->zoomy = set_meta_double(entry, "Y zoom", NULL, meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_ZOOM_Z)
+            recording->zoomz = set_meta_double(entry, "Z zoom", NULL, meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SAMPLE_0X)
+            recording->sample0x = set_meta_double(entry, "Sample 0 X", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SAMPLE_0Y)
+            recording->sample0y = set_meta_double(entry, "Sample 0 Y", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SAMPLE_0Z)
+            recording->sample0z = set_meta_double(entry, "Sample 0 Z", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_SAMPLE_SPACING)
+            recording->sample_spacing = set_meta_double(entry, "Sample spacing", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_LINE_SPACING)
+            recording->line_spacing = set_meta_double(entry, "Line spacing", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_PLANE_SPACING)
+            recording->plane_spacing = set_meta_double(entry, "Plane spacing", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_PLANE_WIDTH)
+            recording->plane_width = set_meta_double(entry, "Plane width", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_PLANE_HEIGHT)
+            recording->plane_height = set_meta_double(entry, "Plane height", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_VOLUME_DEPTH)
+            recording->volume_depth = set_meta_double(entry, "Volume depth", "mkm", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_ROTATION)
+            recording->rotation = set_meta_double(entry, "Rotation", "degrees", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_NUTATION) {
+            p = entry->data;
+            recording->nutation = gwy_get_gdouble_le(&p);
+        }
+        else if (entry->entry == LSM_RECORDING_ENTRY_PRECESSION) {
+            p = entry->data;
+            recording->precession = gwy_get_gdouble_le(&p);
+        }
+        else if (entry->entry == LSM_RECORDING_ENTRY_SAMPLE_0TIME)
+            recording->sample0_time = set_meta_double(entry, "Sample 0 time", NULL, meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_START_SCAN_TRIGGER_IN)
+            recording->start_scan_trigger_in = set_meta_string(entry, "Start scan trigger in", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_START_SCAN_TRIGGER_OUT)
+            recording->start_scan_trigger_out = set_meta_string(entry, "Start scan trigger out", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_START_SCAN_EVENT)
+            recording->start_scan_event = set_meta_int(entry, "Start scan event", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_START_SCAN_TIME)
+            recording->start_scan_time = set_meta_double(entry, "Start scan time", NULL, meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_STOP_SCAN_TRIGGER_IN)
+            recording->stop_scan_trigger_in = set_meta_string(entry, "Stop scan trigger in", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_STOP_SCAN_TRIGGER_OUT)
+            recording->stop_scan_trigger_out = set_meta_string(entry, "Stop scan trigger out", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_STOP_SCAN_EVENT)
+            recording->stop_scan_event = set_meta_int(entry, "Stop scan event", meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_STOP_SCAN_TIME)
+            recording->stop_scan_time = set_meta_double(entry, "Stop scan time", NULL, meta);
+        else if (entry->entry == LSM_RECORDING_ENTRY_USE_ROIS) {
+            p = entry->data;
+            recording->use_rois = gwy_get_guint32_le(&p);
+        }
+        else if (entry->entry == LSM_RECORDING_ENTRY_USE_REDUCED_MEMORY_ROIS) {
+            p = entry->data;
+            recording->use_reduced_memory_rois = gwy_get_guint32_le(&p);
+        }
+        else if (entry->entry == LSM_LASER_ENTRY_NAME)
+            recording->laser_name = set_meta_string(entry, "Laser name", meta);
+        else if (entry->entry == LSM_LASER_ENTRY_ACQUIRE) {
+            p = entry->data;
+            recording->laser_acquire = gwy_get_guint32_le(&p);
+            gwy_container_set_const_string_by_name(meta, "Laser acquire",
+                                                   recording->laser_acquire ? "Enabled" : "Disabled");
+        }
+        else if (entry->entry == LSM_LASER_ENTRY_POWER)
+            recording->laser_power = set_meta_double(entry, "Laser power", "mW", meta);
+
+        offset += 12 + entry->size;
+    }
+
+
+    if (entry) {
+        g_free(entry);
+    }
+
+    return recording;
+}
+
+static LSMEntry*
+lsm_read_entry(const GwyTIFF *tiff,
+               guint32 offset,
+               G_GNUC_UNUSED GError **error)
+{
+    LSMEntry *entry;
+    const guchar *p;
+
+    entry = g_new0(LSMEntry, 1);
+    p = tiff->data + offset;
+    entry->entry = gwy_get_guint32_le(&p);
+    entry->type = gwy_get_guint32_le(&p);
+    entry->size = gwy_get_guint32_le(&p);
+    entry->data = (gpointer)p;
+
+    return entry;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

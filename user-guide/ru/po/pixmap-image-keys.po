@@ -1,0 +1,261 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2019-01-05 16:02+0400\n"
+"PO-Revision-Date: 2019-01-05 16:03+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: pixmap-image-keys.xml:6(title)
+msgid "High-Depth Image Formats"
+msgstr "Форматы изображений с большой глубиной цвета"
+
+#: pixmap-image-keys.xml:7(para)
+msgid ""
+"Gwyddion can export data to 16bit greyscale PNG, PNM and TIFF images and to "
+"OpenEXR images with half, float and 32bit data types. In case of 16bit "
+"images the full data range is always stretched to the full greyscale range; "
+"OpenEXR export permits to specify the value scaling factor."
+msgstr ""
+"Gwyddion может экспортировать данные в 16битные изображения в градациях "
+"серого в форматах PNG, PNM и TIFF и в формат OpenEXR в варианте типа данных "
+"с плавающей точкой половинной и одинарной точности и 32битным целым типом. В "
+"случае 16битных изображений полный диапазон значений данных растягивается на "
+"всю шкалу серого; OpenEXR позволяет указать множитель масштабирования "
+"значений."
+
+#: pixmap-image-keys.xml:14(para)
+msgid ""
+"When data are exported to a high-depth image additional information is "
+"stored to the file to enable automated loading back to Gwyddion without "
+"having to specify the dimensions and scales manually. By storing this "
+"additional information to image files you create in other programs, you can "
+"also make them directly loadable to Gwyddion with correct dimensions and "
+"scales. The information is organised as key-value pairs, stored using "
+"individual format-specific means for each format, described in the following "
+"table."
+msgstr ""
+"Когда данные экспортируются в изображения с большой глубиной цвета, в файл "
+"сохраняется дополнительная информация чтобы его можно было автоматически "
+"загрузить обратно в Gwyddion не задавая вручную размеры и масштабы. Если "
+"добавить эту дополнительную информацию к файлам изображений, которые "
+"создаются другими программами, можно сделать их загружаемыми напрямую в "
+"Gwyddion с корректными размерами и масштабами. Информация организована в "
+"виде пар ключ-значение, сохранённых используя индивидуальные для каждого "
+"формата способы, описанные в следующей таблице."
+
+#: pixmap-image-keys.xml:30(entry)
+msgid "Format"
+msgstr "Формат"
+
+#: pixmap-image-keys.xml:31(entry)
+msgid "Method"
+msgstr "Метод"
+
+#: pixmap-image-keys.xml:36(entry)
+msgid "PNG"
+msgstr "PNG"
+
+#: pixmap-image-keys.xml:37(varname)
+msgid "tEXt"
+msgstr "tEXt"
+
+#: pixmap-image-keys.xml:37(entry)
+msgid "<placeholder-1/> chunks"
+msgstr "блоки <placeholder-1/>"
+
+#: pixmap-image-keys.xml:40(entry)
+msgid "OpenEXR"
+msgstr "OpenEXR"
+
+#: pixmap-image-keys.xml:41(entry)
+msgid "named attributes"
+msgstr "именованные аттрибуты"
+
+#: pixmap-image-keys.xml:44(entry)
+msgid "PNM"
+msgstr "PNM"
+
+#: pixmap-image-keys.xml:46(literal)
+msgid "# key: value"
+msgstr "# ключ: значение"
+
+#: pixmap-image-keys.xml:45(entry)
+msgid "header comments of the form <placeholder-1/>"
+msgstr "комментарии заголовка в форме <placeholder-1/>"
+
+#: pixmap-image-keys.xml:53(para)
+msgid ""
+"Most keys are identical to those used in <link linkend=\"gsf\">Gwyddion "
+"Simple Fields</link>, except for the added <literal>Gwy::</literal> prefix, "
+"so see also GSF description for more details. Floating point values are "
+"stored directly if the format permits it (OpenEXR), otherwise a text "
+"representation of the number is used (in the C format). The keys are listed "
+"below."
+msgstr ""
+"Большая часть ключей идентична тем. что используются в <link linkend=\"gsf"
+"\">файлах Gwyddion с простым полем</link>, за исключением добавленных "
+"префиксов <literal>Gwy::</literal>, поэтому дополнительная информация "
+"доступна в описании GSF. Значения с плавающей точкой сохраняются напрямую, "
+"если формат это позволяет (OpenEXR), либо используется текстовое "
+"представление данных (в C-формате). Ключи перечислены ниже."
+
+#: pixmap-image-keys.xml:67(entry)
+msgid "Key"
+msgstr "Ключ"
+
+#: pixmap-image-keys.xml:68(entry)
+msgid "Type"
+msgstr "Тип"
+
+#: pixmap-image-keys.xml:69(entry)
+msgid "Meaning"
+msgstr "Значение"
+
+#: pixmap-image-keys.xml:74(literal)
+msgid "Gwy::XReal"
+msgstr "Gwy::XReal"
+
+#: pixmap-image-keys.xml:75(entry) pixmap-image-keys.xml:83(entry)
+#: pixmap-image-keys.xml:91(entry) pixmap-image-keys.xml:99(entry)
+#: pixmap-image-keys.xml:107(entry) pixmap-image-keys.xml:118(entry)
+#: pixmap-image-keys.xml:126(entry)
+msgid "floating point"
+msgstr "с плавающей точкой"
+
+#: pixmap-image-keys.xml:78(literal) pixmap-image-keys.xml:86(literal)
+#: pixmap-image-keys.xml:94(literal) pixmap-image-keys.xml:102(literal)
+msgid "XYUnits"
+msgstr "XYUnits"
+
+#: pixmap-image-keys.xml:76(entry)
+msgid ""
+"Horizontal size in physical units (given by <placeholder-1/>), a positive "
+"floating point number."
+msgstr ""
+"Горизонтальный размер в физических единицах (заданных <placeholder-1/>), "
+"положительное число с плавающей точкой."
+
+#: pixmap-image-keys.xml:82(literal)
+msgid "Gwy::YReal"
+msgstr "Gwy::YReal"
+
+#: pixmap-image-keys.xml:84(entry)
+msgid ""
+"Vertical size in physical units (given by <placeholder-1/>), a positive "
+"floating point number."
+msgstr ""
+"Вертикальный размер в физических единицах (заданных <placeholder-1/>), "
+"положительное число с плавающей точкой."
+
+#: pixmap-image-keys.xml:90(literal)
+msgid "Gwy::XOffset"
+msgstr "Gwy::XOffset"
+
+#: pixmap-image-keys.xml:92(entry)
+msgid "Horizontal offset in physical units (given by <placeholder-1/>)."
+msgstr ""
+"Горизонтальное смещение в физических единицах (заданных <placeholder-1/>)."
+
+#: pixmap-image-keys.xml:98(literal)
+msgid "Gwy::YOffset"
+msgstr "Gwy::YOffset"
+
+#: pixmap-image-keys.xml:100(entry)
+msgid "Vertical offset in physical units (given by <placeholder-1/>)."
+msgstr ""
+"Вертикальное смещение в физических единицах (заданных <placeholder-1/>)."
+
+#: pixmap-image-keys.xml:106(literal)
+msgid "Gwy::ZScale"
+msgstr "Gwy::ZScale"
+
+#: pixmap-image-keys.xml:112(literal) pixmap-image-keys.xml:117(literal)
+msgid "Gwy::ZMin"
+msgstr "Gwy::ZMin"
+
+#: pixmap-image-keys.xml:113(literal) pixmap-image-keys.xml:125(literal)
+msgid "Gwy::ZMax"
+msgstr "Gwy::ZMax"
+
+#: pixmap-image-keys.xml:108(entry)
+msgid ""
+"Value scaling factor. Image data are to be multiplied by this factor to "
+"obtain physical values. This parameter is usually used with limited-range "
+"floating point formats such as half. For integer data, <placeholder-1/> and "
+"<placeholder-2/> is usually used."
+msgstr ""
+"Множитель масштабирования значений. Данные изображения должны быть умножены "
+"на этот множитель чтобы получить физические значения. Этот параметр обычно "
+"используется в форматах с плавающей точкой с ограниченным диапазоном "
+"значений, например, с половинной точностью. Для целочисленных данных обычно "
+"используются <placeholder-1/> и <placeholder-2/>."
+
+#: pixmap-image-keys.xml:119(entry)
+msgid ""
+"Value in physical units corresponding to the minimum value representable in "
+"the image (normally 0)."
+msgstr ""
+"Значение в физических единицах, соответствующее минимальному значению, "
+"представленному на изображении (обычно 0)."
+
+#: pixmap-image-keys.xml:127(entry)
+msgid ""
+"Value in physical units corresponding to the maximum value representable in "
+"the image."
+msgstr ""
+"Значение в физических единицах, соответствующее максимальному значению, "
+"представленному на изображении."
+
+#: pixmap-image-keys.xml:133(literal)
+msgid "Gwy::XYUnits"
+msgstr "Gwy::XYUnits"
+
+#: pixmap-image-keys.xml:134(entry) pixmap-image-keys.xml:141(entry)
+#: pixmap-image-keys.xml:148(entry)
+msgid "string"
+msgstr "строка"
+
+#: pixmap-image-keys.xml:135(entry)
+msgid "Lateral units, i.e. units of physical sizes and offsets."
+msgstr ""
+"Горизонтальные единицы измерения, т.е. единицы физических размеров и "
+"смещений."
+
+#: pixmap-image-keys.xml:140(literal)
+msgid "Gwy::ZUnits"
+msgstr "Gwy::ZUnits"
+
+#: pixmap-image-keys.xml:142(entry)
+msgid "Value units, i.e. units of data values."
+msgstr "Единицы значений, т.е. единицы измерения значений данных."
+
+#: pixmap-image-keys.xml:147(literal)
+msgid "Gwy::Title"
+msgstr "Gwy::Title"
+
+#: pixmap-image-keys.xml:149(entry)
+msgid "Data/channel title."
+msgstr "Заголовок канала/данных."
+
+#: pixmap-image-keys.xml:157(para)
+msgid ""
+"In case of PNG, the scaling information is also stored in the standard "
+"<varname>sCAL</varname> and <varname>pCAL</varname> chunks (with linear "
+"scaling formula). Conversely, if these chunks are present (and the Gwyddion-"
+"specific are absent) the information from them is used in import. See the "
+"<ulink url=\"http://www.libpng.org/pub/png/spec/\">PNG specifiation</ulink> "
+"for the chunk description."
+msgstr ""
+"В случае PNG, информация о масштабировании также сохраняется в стандартных "
+"блоках <varname>sCAL</varname> и <varname>pCAL</varname> (с линейной "
+"формулой масштабирования). И наоборот, если эти блоки присутствуют (и "
+"отсутствуют специфичные для Gwyddion), информация оттуда используется при "
+"импорте. См. <ulink url=\"http://www.libpng.org/pub/png/spec/\">спецификацию "
+"формата PNG </ulink> для описания этих блоков."

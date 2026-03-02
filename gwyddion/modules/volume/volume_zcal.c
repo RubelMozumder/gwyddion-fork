@@ -1,0 +1,482 @@
+/*
+ *  $Id: volume_zcal.c 25530 2023-06-30 15:03:18Z yeti-dn $
+ *  Copyright (C) 2015-2023 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/brick.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwygraph.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+#include "../process/preview.h"
+
+#define RUN_MODES (GWY_RUN_IMMEDIATE | GWY_RUN_INTERACTIVE)
+
+enum {
+    PARAM_MODE,
+    PARAM_SOURCE,
+    PARAM_FILENAME,
+
+    MESSAGE_ERROR,
+};
+
+typedef enum {
+    ZCAL_EXTRACT = 0,
+    ZCAL_REMOVE  = 1,
+    ZCAL_ATTACH  = 2,
+    ZCAL_ANOTHER = 3,
+} ZCalActionType;
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    GwyDataLine *calibration;
+    GwyDataLine *filecalibration;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table;
+    GtkWidget *filebutton;
+    GwyGraphModel *gmodel;
+    gboolean has_source;
+} ModuleGUI;
+
+static gboolean         module_register             (void);
+static GwyParamDef*     define_module_params        (void);
+static void             zcal                        (GwyContainer *data,
+                                                     GwyRunType run);
+static void             execute                     (ModuleArgs *args,
+                                                     GwyContainer *data);
+static GwyDialogOutcome run_gui                     (ModuleArgs *args);
+static void             param_changed               (ModuleGUI *gui,
+                                                     gint id);
+static void             preview                     (gpointer user_data);
+static GtkWidget*       create_filename_chooser     (gpointer user_data);
+static gboolean         filter_source_bricks        (GwyContainer *data,
+                                                     gint id,
+                                                     gpointer user_data);
+static void             file_selected               (GtkFileChooser *chooser,
+                                                     ModuleGUI *gui);
+static void             setup_graph_from_calibration(ModuleGUI *gui);
+static void             extract_graph               (GwyGraphModel *gmodel,
+                                                     GwyDataLine *calibration,
+                                                     const gchar *title);
+static GwyDataLine*     load_calibration_from_file  (const gchar *filename,
+                                                     GwyBrick *brick,
+                                                     gchar **errmessage);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Attaches, extracts and removes volume data z-axis calibration."),
+    "Yeti <yeti@gwyddion.net>",
+    "2.0",
+    "David Nečas (Yeti)",
+    "2015",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_zcal)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_zcal",
+                             (GwyVolumeFunc)&zcal,
+                             N_("/_Basic Operations/_Z-Calibration..."),
+                             GWY_STOCK_VOLUME_CALIBRATE,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("Manage z-axis calibration"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum modes[] = {
+        { N_("_Extract to a graph"), ZCAL_EXTRACT, },
+        { N_("_Remove"),             ZCAL_REMOVE,  },
+        { N_("Attach from _file"),   ZCAL_ATTACH,  },
+        { N_("Copy from _another"),  ZCAL_ANOTHER, },
+    };
+
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_gwyenum(paramdef, PARAM_MODE, "mode", _("Z-calibration action"),
+                              modes, G_N_ELEMENTS(modes), ZCAL_ATTACH);
+    gwy_param_def_add_volume_id(paramdef, PARAM_SOURCE, "source", _("Volume Z Calibration"));
+    gwy_param_def_add_string(paramdef, PARAM_FILENAME, "filename", _("Volume Z Calibration"),
+                             GWY_PARAM_STRING_NULL_IS_EMPTY, NULL, "");
+    return paramdef;
+}
+
+static void
+zcal(GwyContainer *data, GwyRunType run)
+{
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    ModuleArgs args;
+    ZCalActionType mode;
+    gboolean mode_needs_zcal;
+
+    g_return_if_fail(run & RUN_MODES);
+    gwy_clear(&args, 1);
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &args.brick, 0);
+    g_return_if_fail(GWY_IS_BRICK(args.brick));
+    args.calibration = gwy_brick_get_zcalibration(args.brick);
+    if (args.calibration)
+        g_object_ref(args.calibration);
+    args.params = gwy_params_new_from_settings(define_module_params());
+    mode = gwy_params_get_enum(args.params, PARAM_MODE);
+    mode_needs_zcal = (mode == ZCAL_REMOVE || mode == ZCAL_EXTRACT);
+
+    if (run == GWY_RUN_INTERACTIVE) {
+        if (mode_needs_zcal && !args.calibration)
+            gwy_params_set_enum(args.params, PARAM_MODE, ZCAL_ATTACH);
+        outcome = run_gui(&args);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto fail;
+    }
+    else {
+        /* Carefully avoid actions that may not be possible now. */
+        if (mode_needs_zcal && !args.calibration)
+            goto fail;
+    }
+
+    /* For ZCAL_ATTACH, this can still fail if the file is not available or compatible with the brick: zcal_do() must
+     * deal with it. */
+    execute(&args, data);
+
+fail:
+    GWY_OBJECT_UNREF(args.calibration);
+    GWY_OBJECT_UNREF(args.filecalibration);
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args)
+{
+    const gchar *filename = gwy_params_get_string(args->params, PARAM_FILENAME);
+    GtkWidget *hbox, *graph;
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    GwyDialogOutcome outcome;
+    ModuleGUI gui;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.has_source = TRUE;
+
+    gui.dialog = gwy_dialog_new(_("Volume Z Calibration"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(20);
+    gwy_dialog_add_content(dialog, hbox, TRUE, TRUE, 0);
+
+    table = gui.table = gwy_param_table_new(args->params);
+    gwy_param_table_append_radio_header(table, PARAM_MODE);
+    gwy_param_table_append_radio_item(table, PARAM_MODE, ZCAL_EXTRACT);
+    gwy_param_table_append_radio_item(table, PARAM_MODE, ZCAL_REMOVE);
+    gwy_param_table_append_radio_item(table, PARAM_MODE, ZCAL_ATTACH);
+    gwy_param_table_append_foreign(table, PARAM_FILENAME, create_filename_chooser, &gui, NULL);
+    gwy_param_table_append_message(table, MESSAGE_ERROR, NULL);
+    gwy_param_table_message_set_type(table, MESSAGE_ERROR, GTK_MESSAGE_ERROR);
+    gwy_param_table_append_radio_item(table, PARAM_MODE, ZCAL_ANOTHER);
+    gwy_param_table_append_volume_id(table, PARAM_SOURCE);
+    gwy_param_table_data_id_set_filter(table, PARAM_SOURCE, filter_source_bricks, args->brick, NULL);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    gwy_param_table_radio_set_sensitive(table, PARAM_MODE, ZCAL_REMOVE, !!args->calibration);
+    gwy_param_table_radio_set_sensitive(table, PARAM_MODE, ZCAL_EXTRACT, !!args->calibration);
+    if (gwy_params_data_id_is_none(args->params, PARAM_SOURCE)) {
+        gui.has_source = FALSE;
+        gwy_param_table_radio_set_sensitive(table, PARAM_MODE, ZCAL_ANOTHER, FALSE);
+        gwy_param_table_set_sensitive(table, PARAM_SOURCE, FALSE);
+        gwy_param_table_set_enum(table, PARAM_MODE, ZCAL_ATTACH);    /* The only always available action. */
+    }
+
+    gui.gmodel = gwy_graph_model_new();
+    graph = gwy_graph_new(gui.gmodel);
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gtk_widget_set_size_request(graph, 3*PREVIEW_SIZE/2, PREVIEW_SIZE);
+    gtk_box_pack_start(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+
+    g_signal_connect_swapped(table, "param-changed", G_CALLBACK(param_changed), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+    if (filename)
+        gtk_file_chooser_select_filename(GTK_FILE_CHOOSER(gui.filebutton), filename);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.gmodel);
+
+    return outcome;
+}
+
+static GtkWidget*
+create_filename_chooser(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+
+    gui->filebutton = gtk_file_chooser_button_new(_("Volume Z Calibration"), GTK_FILE_CHOOSER_ACTION_OPEN);
+    gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(gui->filebutton), TRUE);
+    g_signal_connect(gui->filebutton, "file-set", G_CALLBACK(file_selected), gui);
+    return gui->filebutton;
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    ZCalActionType mode = gwy_params_get_enum(params, PARAM_MODE);
+    gboolean is_attach = (mode == ZCAL_ATTACH);
+    gboolean is_source = (gui->has_source && mode == ZCAL_ANOTHER);
+    gchar *errmessage = NULL;
+
+    if (id < 0 || id == PARAM_MODE) {
+        gwy_param_table_set_sensitive(gui->table, PARAM_FILENAME, is_attach);
+        gwy_param_table_set_sensitive(gui->table, MESSAGE_ERROR, is_attach);
+        gwy_param_table_set_sensitive(gui->table, PARAM_SOURCE, is_source);
+    }
+    if (id < 0 || id == PARAM_FILENAME) {
+        GWY_OBJECT_UNREF(args->filecalibration);
+        args->filecalibration = load_calibration_from_file(gwy_params_get_string(params, PARAM_FILENAME),
+                                                           args->brick, &errmessage);
+        gwy_param_table_set_label(gui->table, MESSAGE_ERROR, errmessage);
+        g_free(errmessage);
+    }
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK,
+                                      mode != ZCAL_ATTACH || !!args->filecalibration);
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static gboolean
+filter_source_bricks(GwyContainer *data, gint id, gpointer user_data)
+{
+    GwyBrick *brick = GWY_BRICK(user_data);
+    GwyBrick *source = gwy_container_get_object(data, gwy_app_get_brick_key_for_id(id));
+
+    if (source == brick)
+        return FALSE;
+    if (!gwy_brick_get_zcalibration(source))
+        return FALSE;
+    if (gwy_brick_get_zres(source) != gwy_brick_get_zres(brick))
+        return FALSE;
+
+    return TRUE;
+}
+
+static void
+file_selected(GtkFileChooser *chooser, ModuleGUI *gui)
+{
+    gwy_params_set_string(gui->args->params, PARAM_FILENAME, gtk_file_chooser_get_filename(chooser));
+    gwy_param_table_param_changed(gui->table, PARAM_FILENAME);
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    ModuleArgs *args = gui->args;
+    ZCalActionType mode = gwy_params_get_enum(args->params, PARAM_MODE);
+    GwyBrick *source = gwy_params_get_volume(args->params, PARAM_SOURCE);
+
+    GWY_OBJECT_UNREF(args->calibration);
+
+    if (mode == ZCAL_ATTACH)
+        args->calibration = args->filecalibration;
+    else if (mode == ZCAL_ANOTHER) {
+        if (source)
+            args->calibration = gwy_brick_get_zcalibration(source);
+    }
+    else
+        args->calibration = gwy_brick_get_zcalibration(args->brick);
+
+    if (args->calibration)
+        g_object_ref(args->calibration);
+
+    setup_graph_from_calibration(gui);
+}
+
+static void
+setup_graph_from_calibration(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    ZCalActionType mode = gwy_params_get_enum(args->params, PARAM_MODE);
+    const gchar *title;
+
+    title = (mode == ZCAL_ATTACH ? _("Calibration from file") : _("Z-calibration curve"));
+    extract_graph(gui->gmodel, args->calibration, title);
+}
+
+static void
+extract_graph(GwyGraphModel *gmodel,
+              GwyDataLine *calibration,
+              const gchar *title)
+{
+    GwyGraphCurveModel *gcmodel;
+    const gdouble *ydata;
+    gdouble *xdata;
+    gint res, i;
+
+    if (!calibration) {
+        gwy_graph_model_remove_all_curves(gmodel);
+        return;
+    }
+
+    if (!gwy_graph_model_get_n_curves(gmodel)) {
+        gcmodel = gwy_graph_curve_model_new();
+        g_object_set(gcmodel, "mode", GWY_GRAPH_CURVE_LINE, NULL);
+        gwy_graph_model_add_curve(gmodel, gcmodel);
+        g_object_unref(gcmodel);
+    }
+    else
+        gcmodel = gwy_graph_model_get_curve(gmodel, 0);
+
+    g_object_set(gcmodel, "description", title, NULL);
+
+    res = gwy_data_line_get_res(calibration);
+    ydata = gwy_data_line_get_data_const(calibration);
+    xdata = g_new(gdouble, res);
+    for (i = 0; i < res; i++)
+        xdata[i] = i;
+    gwy_graph_curve_model_set_data(gcmodel, xdata, ydata, res);
+    g_free(xdata);
+
+    g_object_set(gmodel,
+                 "axis-label-bottom", _("Index"),
+                 "axis-label-left", _("Z axis value"),
+                 "si-unit-y", gwy_data_line_get_si_unit_y(calibration),
+                 "title", title,
+                 NULL);
+}
+
+static void
+execute(ModuleArgs *args, GwyContainer *data)
+{
+    ZCalActionType mode = gwy_params_get_enum(args->params, PARAM_MODE);
+    const gchar *filename = gwy_params_get_string(args->params, PARAM_FILENAME);
+    GwyBrick *source = gwy_params_get_volume(args->params, PARAM_SOURCE);
+
+    if (mode == ZCAL_ATTACH) {
+        if (filename) {
+            gchar *errmessage = NULL;
+            GwyDataLine *dline;
+
+            dline = load_calibration_from_file(filename, args->brick, &errmessage);
+            if (dline) {
+                gwy_brick_set_zcalibration(args->brick, dline);
+                gwy_brick_data_changed(args->brick);
+                g_object_unref(dline);
+            }
+            else
+                g_free(errmessage);
+        }
+    }
+    else if (mode == ZCAL_REMOVE) {
+        gwy_brick_set_zcalibration(args->brick, NULL);
+        gwy_brick_data_changed(args->brick);
+    }
+    else if (mode == ZCAL_EXTRACT) {
+        GwyDataLine *calibration = gwy_brick_get_zcalibration(args->brick);
+
+        if (calibration) {
+            GwyGraphModel *gmodel = gwy_graph_model_new();
+            extract_graph(gmodel, calibration, _("Z-calibration curve"));
+            gwy_app_data_browser_add_graph_model(gmodel, data, TRUE);
+            g_object_unref(gmodel);
+        }
+    }
+    else if (mode == ZCAL_ANOTHER) {
+        if (source) {
+            GwyDataLine *calibration = gwy_data_line_duplicate(gwy_brick_get_zcalibration(source));
+            gwy_brick_set_zcalibration(args->brick, calibration);
+            gwy_brick_data_changed(args->brick);
+            g_object_unref(calibration);
+        }
+    }
+    else {
+        g_assert_not_reached();
+    }
+}
+
+static GwyDataLine*
+load_calibration_from_file(const gchar *filename, GwyBrick *brick, gchar **errmessage)
+{
+    GwyDataLine *dline, *calibration;
+    GError *err = NULL;
+    gdouble *data = NULL;
+    gint nrows = -1, ncols = 1;
+    gsize size;
+    guchar *buffer;
+
+    if (!filename || !*filename)
+        return NULL;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        *errmessage = g_strdup(err->message);
+        g_clear_error(&err);
+        return NULL;
+    }
+
+    /* We could parse directly to a dataline, but that would not lead to an error when there are too many values. */
+    data = gwy_parse_doubles(buffer, NULL, 0, &nrows, &ncols, NULL, &err);
+    gwy_file_abandon_contents(buffer, size, NULL);
+    if (!data) {
+        *errmessage = g_strdup(err->message);
+        g_clear_error(&err);
+        return NULL;
+    }
+
+    if (nrows != brick->zres) {
+        *errmessage = g_strdup_printf(_("The number of data file values %d differs from the number of planes %d."),
+                                      nrows, brick->zres);
+        g_free(data);
+        return NULL;
+    }
+
+    gwy_math_sort(nrows, data);
+    dline = gwy_data_line_new(brick->zres, brick->zreal, FALSE);
+    gwy_assign(dline->data, data, nrows);
+    g_free(data);
+
+    gwy_si_unit_assign(gwy_data_line_get_si_unit_x(dline), gwy_brick_get_si_unit_z(brick));
+    /* Set the value unit either to the unit of existing calibration or again the same as the z-unit of the brick. */
+    calibration = gwy_brick_get_zcalibration(brick);
+    gwy_si_unit_assign(gwy_data_line_get_si_unit_y(dline),
+                       (calibration ? gwy_data_line_get_si_unit_y(calibration) : gwy_brick_get_si_unit_z(brick)));
+
+    return dline;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

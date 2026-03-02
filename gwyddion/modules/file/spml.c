@@ -1,0 +1,1041 @@
+/*
+ *  $Id: spml.c 26163 2024-02-06 16:56:55Z yeti-dn $
+ *  Copyright (C) 2006-2022 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+/* TODO: Rewrite to report errors via GError and abort instead of printing g_warnings() and then continuing, probably
+ * towards a crash!
+ *
+ * check/write allocation/deallocation
+ * change GArray to GPtrArray where possible */
+
+/* XXX: The typical length of a XML declaration is about 40 bytes.  So while there can be more stuff before <SPML than
+ * 60 bytes, we have to find a compromise between generality and efficiency.  It's the SPML guys' fight, they should
+ * have created a more easily detectable format... */
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-spml-spm">
+ *   <comment>SPML data</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="&lt;?xml">
+ *       <match type="string" offset="20:60" value="&lt;SPML"/>
+ *     </match>
+ *   </magic>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-FILEMAGIC]
+ * # SPML
+ * # XML-based, look for a SPML tag.
+ * 0 string \x3c?xml
+ * >&0 search/80 \x3cSPML
+ * >>&0 search/160 http://spml.net/SPML Scanning Probe Microscopy Markup Language
+ * >>>&0 regex [0-9.]+ version %s
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * SPML (Scanning Probe Microscopy Markup Language)
+ * .xml
+ * Read
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <libgwyddion/gwyutils.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <libprocess/datafield.h>
+
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwyutils.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils-file.h>
+
+#include <libxml/xmlreader.h>
+#include "gwyzlib.h"
+
+#define EXTENSION ".xml"
+
+/* Extra possible input data formats in SPML (in addition to GwyRawDataType) -- these are not implemented anyway. */
+enum {
+    STRING = -1,
+    UNKNOWN_DATAFORMAT = -666,
+};
+
+/* Possible data coding in SPML */
+typedef enum {
+    UNKNOWN_CODING,
+    ZLIB_COMPR_BASE64,
+    BASE64,
+    HEX,
+    ASCII,
+    BINARY
+} CodingType;
+
+typedef enum {
+    SKIP_STATE,
+    IN_DATACHANNELS,
+    IN_DATACHANNELGROUP,
+    READ_COMPLETE
+} DatachannelListParserStates;
+
+/**
+ * Structure contain information about one datachannel group.
+ * Each datachannel group has unique name and it contain list of relevant datachannels.
+ */
+typedef struct {
+    xmlChar *name;
+    GList *datachannels;
+} DataChannelGroup;
+
+static gboolean      module_register(void);
+static gint          spml_detect    (const GwyFileDetectInfo * fileinfo,
+                                     gboolean only_name);
+static GwyContainer* spml_load      (const gchar *filename);
+static int           get_axis       (const gchar *filename,
+                                     const gchar *datachannel_name,
+                                     GArray **axes,
+                                     GArray **units,
+                                     GArray **names);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Loads SPML (Scanning Probe Microscopy Markup Language) "
+       "data files."),
+    "Jan Hořák <xhorak@gmail.com>",
+    "0.2",
+    "Jan Hořák",
+    "2006",
+};
+
+GWY_MODULE_QUERY(module_info)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("spml",
+                           N_("SPML files (.xml)"),
+                           (GwyFileDetectFunc) &spml_detect,
+                           (GwyFileLoadFunc) &spml_load,
+                           NULL,
+                           NULL);
+    return TRUE;
+}
+
+static void
+free_datachannel_group(DataChannelGroup *dc_group)
+{
+    GList *l = dc_group->datachannels;
+
+    while (l) {
+        xmlFree(l->data);
+        l = g_list_next(l);
+    }
+    g_list_free(dc_group->datachannels);
+    xmlFree(dc_group->name);
+    g_free(dc_group);
+}
+
+/* Free memory obtained from libxml. */
+static void
+free_xmlpointer_array(GArray **array)
+{
+    guint i, n;
+
+    if (!*array)
+        return;
+
+    n = (*array)->len;
+    for (i = 0; i < n; i++)
+        xmlFree(g_array_index(*array, gpointer, i));
+    g_array_free(*array, TRUE);
+    *array = NULL;
+}
+
+static void
+free_array_array(GArray **array)
+{
+    guint i, n;
+
+    if (!*array)
+        return;
+
+    n = (*array)->len;
+    for (i = 0; i < n; i++)
+        g_array_free(g_array_index(*array, GArray*, i), TRUE);
+    g_array_free(*array, TRUE);
+    *array = NULL;
+}
+
+static GList*
+get_list_of_datachannels(const gchar *filename)
+{
+    const xmlChar *name;        /*, *value; */
+    DatachannelListParserStates state = SKIP_STATE;
+    int ret;
+    GList *channel_groups = NULL;
+    DataChannelGroup *data_channel_group = NULL;
+    xmlTextReaderPtr reader;
+
+    gwy_debug("filename = %s", filename);
+
+    reader = xmlReaderForFile(filename, NULL, 0);
+
+    if (reader != NULL) {
+        ret = xmlTextReaderRead(reader);
+        while (ret == 1) {
+            /* process node */
+            name = xmlTextReaderConstName(reader);
+            switch (state) {
+                case SKIP_STATE:
+                    if (xmlTextReaderNodeType(reader) == XML_READER_TYPE_ELEMENT
+                        && gwy_strequal(name, "DataChannels")) {
+                        /* start of datachannels */
+                        gwy_debug("Switch to datachannels");
+                        state = IN_DATACHANNELS;
+                    }
+                    break;
+                case IN_DATACHANNELS:
+                    if (xmlTextReaderNodeType(reader) == XML_READER_TYPE_ELEMENT
+                        && gwy_strequal(name, "DataChannelGroup")) {
+                        /* datachannelgroup, get and set name of datachannelgroup
+                           data_channel_group is dynammicaly allocated, and it must be freed only when returned list
+                           is going to be disposed because GList does not create copy of data_channel_group. */
+                        if (data_channel_group) {
+                            g_warning("Starting ANOTHER data channel group.");
+                            free_datachannel_group(data_channel_group);
+                        }
+                        data_channel_group = g_new(DataChannelGroup, 1);
+                        data_channel_group->name = xmlTextReaderGetAttribute(reader, "name");
+                        data_channel_group->datachannels = NULL;
+                        gwy_debug("Switch to datachannelGroup '%s'", data_channel_group->name);
+                        state = IN_DATACHANNELGROUP;
+                    }
+                    else if (xmlTextReaderNodeType(reader) == XML_READER_TYPE_END_ELEMENT
+                             && gwy_strequal(name, "DataChannels")) {
+                        /* after datachannels, return possible? */
+                        gwy_debug("Datachannels end, read complete.");
+                        state = READ_COMPLETE;
+                    }
+                    break;
+                case IN_DATACHANNELGROUP:
+                    if (xmlTextReaderNodeType(reader) == XML_READER_TYPE_ELEMENT
+                        && gwy_strequal(name, "DataChannel")
+                        && data_channel_group) {
+                        /* datachannelgroup, get and set name of datachannelgroup */
+                        data_channel_group->datachannels = g_list_append(data_channel_group->datachannels,
+                                                                         xmlTextReaderGetAttribute(reader, "name"));
+                        gwy_debug("Read info about datachannel.");
+                        /* stay in current state */
+                    }
+                    else if (xmlTextReaderNodeType(reader) == XML_READER_TYPE_END_ELEMENT
+                             && gwy_strequal(name, "DataChannelGroup")
+                             && data_channel_group) {
+                        channel_groups = g_list_append(channel_groups, data_channel_group);
+                        data_channel_group = NULL;
+                        /* end of channel group, save current data_channel_group to list */
+                        gwy_debug("End of datachannelgroup");
+                        state = IN_DATACHANNELS;
+                    }
+                    break;
+                case READ_COMPLETE:    /* blank state */
+                    break;
+            }
+            if (state == READ_COMPLETE) {       /* read is complete, we can leave reading cycle */
+                break;
+            }
+            /* end process node */
+            ret = xmlTextReaderRead(reader);
+        }
+        xmlFreeTextReader(reader);
+    }
+    else {
+        g_warning("Unable to open %s!", filename);
+        return NULL;
+    }
+    if (data_channel_group)
+        free_datachannel_group(data_channel_group);
+    return channel_groups;
+}
+
+/* FIXME FIXME FIXME: This must set an GError, not print some silly warnings. */
+static int
+decode_data(double **data, const xmlChar * input, gint data_format,
+            CodingType coding, GwyByteOrder byte_order, gint max_input_len)
+{
+    gchar *debase64_buf;
+    guchar *raw_data;
+    gint ncols = -1, data_count = 0;
+    gsize debase64_len, raw_size = 0;
+    GError *err = NULL;
+    gboolean ok;
+
+    gwy_debug("start.");
+
+    *data = NULL;
+    if (input == NULL) {
+        g_warning("NULL input");
+        return 0;
+    }
+
+    if (data_format == UNKNOWN_DATAFORMAT) {
+        g_warning("Unknown data format");
+        return 0;
+    }
+    if (data_format == STRING) {
+        g_warning("Data format 'String' not supported.");
+        return 0;
+    }
+
+    if (coding == ASCII) {
+        data_count = max_input_len;
+        *data = gwy_parse_doubles((const gchar*)input, NULL, GWY_PARSE_DOUBLES_FREE_FORM,
+                                   &data_count, &ncols, NULL, NULL);
+        return data_count > 0;
+    }
+
+    if (coding == ZLIB_COMPR_BASE64) {
+        debase64_buf = g_base64_decode((const gchar*)input, &debase64_len);
+        /* FIXME: We actually need a function which works with unknown output size. */
+        raw_data = gwyzlib_unpack_compressed_data(debase64_buf, &debase64_len, NULL, &raw_size, &err);
+        g_free(debase64_buf);
+        if (!raw_data) {
+            g_warning("Cannot inflate compressed data: %s", err->message);
+            g_clear_error(&err);
+            return 0;
+        }
+    }
+    else if (coding == BASE64)
+        raw_data = g_base64_decode((const gchar*)input, &raw_size);
+    else {
+        g_warning("Data coding not supported.");
+        return 0;
+    }
+
+    data_count = raw_size/gwy_raw_data_size(data_format);
+    if (max_input_len != -1 && data_count != max_input_len) {
+        g_warning("Input has not the same length as declared in dimensions\n"
+                  "(max:%d vs read:%d). Has the channel attribute\n"
+                  "'channelReadMethodName'? The channel may be one\n"
+                  "dimensional data used for axis values but not as\n"
+                  "a source of data for Gwyddion.",
+                  max_input_len, data_count);
+        ok = FALSE;
+    }
+    else {
+        *data = g_new(gdouble, data_count);
+        gwy_convert_raw_data(raw_data, data_count, 1, data_format, byte_order, *data, 1.0, 0.0);
+        ok = TRUE;
+    }
+    g_free(raw_data);
+
+    gwy_debug("Datacount: %d", data_count);
+    return ok ? data_count : 0;
+}
+
+static gint
+get_data_format(char *value)
+{
+    static const GwyEnum formats[] = {
+        { "FLOAT32", GWY_RAW_DATA_FLOAT,  },
+        { "FLOAT64", GWY_RAW_DATA_DOUBLE, },
+        { "INT8",    GWY_RAW_DATA_SINT8,  },
+        { "UINT8",   GWY_RAW_DATA_UINT8,  },
+        { "INT16",   GWY_RAW_DATA_SINT16, },
+        { "UINT16",  GWY_RAW_DATA_UINT16, },
+        { "INT32",   GWY_RAW_DATA_SINT32, },
+        { "UINT32",  GWY_RAW_DATA_UINT32, },
+        { "STRING",  STRING,              },
+    };
+    gint ret = UNKNOWN_DATAFORMAT;
+
+    if (!value)
+        g_warning("SPML: Unknown dataformat for datachannel.");
+    else {
+        if ((ret = gwy_string_to_enum(value, formats, G_N_ELEMENTS(formats))) == -1) {
+            g_warning("SPML: Data coding for datachannel not recognized.");
+            ret = UNKNOWN_DATAFORMAT;
+        }
+        gwy_debug("Dataformat read.");
+        g_free(value);
+    }
+    return ret;
+}
+
+static CodingType
+get_data_coding(char *value)
+{
+    static const GwyEnum codings[] = {
+        { "ZLIB-COMPR-BASE64", ZLIB_COMPR_BASE64, },
+        { "BASE64",            BASE64,            },
+        { "HEX",               HEX,               },
+        { "ASCII",             ASCII,             },
+        { "BINARY",            BINARY,            },
+    };
+    CodingType ret = UNKNOWN_CODING;
+
+    if (!value)
+        g_warning("SPML: Unknown coding type for datachannel.");
+    else {
+        if ((ret = gwy_string_to_enum(value, codings, G_N_ELEMENTS(codings))) == -1) {
+            g_warning("SPML: Data coding for datachannel not recognized.");
+            ret = UNKNOWN_CODING;
+        }
+        gwy_debug("coding read.");
+        g_free(value);
+    }
+    return ret;
+}
+
+static GwyByteOrder
+get_byteorder(char *value)
+{
+    GwyByteOrder ret = GWY_BYTE_ORDER_NATIVE;
+
+    if (value) {
+        if (strcmp(value, "BIG-ENDIAN") == 0) {
+            ret = GWY_BYTE_ORDER_BIG_ENDIAN;
+        }
+        else if (strcmp(value, "LITTLE-ENDIAN") == 0) {
+            ret = GWY_BYTE_ORDER_LITTLE_ENDIAN;
+        }
+        else {
+            g_warning("Byte order for datachannel not recognized.");
+        }
+        gwy_debug("byteorder read.");
+        g_free(value);
+    }
+    else {
+        g_warning("SPML: Unknown byteorder of datachannel.");
+    }
+    return ret;
+}
+
+static int
+get_data(gboolean read_data_only, const gchar *filename, const gchar *datachannel_name,
+         double **data, int **dimensions, char **unit,
+         G_GNUC_UNUSED gboolean *scattered)
+{
+    gint format = UNKNOWN_DATAFORMAT;
+    CodingType coding = UNKNOWN_CODING;
+    GwyByteOrder byte_order = GWY_BYTE_ORDER_NATIVE;
+    int ret, i;
+    int state = 0;
+    GArray *axes, *names, *units, *axis;
+    const xmlChar *name, *value, *read_method_name;
+    xmlChar *id;
+    xmlTextReaderPtr reader;
+    int data_dimension = -1;
+    int out_len;
+    int max_input_len = 1;
+
+    gwy_debug("read only: %d, channel name==%s", read_data_only, datachannel_name);
+    *dimensions = NULL;
+
+    reader = xmlReaderForFile(filename, NULL, 0);
+
+    if (reader != NULL) {
+        ret = xmlTextReaderRead(reader);
+        while (ret == 1) {
+            /* process node */
+            name = xmlTextReaderConstName(reader);
+            if (name == NULL) {
+                /* no datachannels */
+                return -1;
+            }
+            if (state == 0
+                && xmlTextReaderNodeType(reader) == XML_READER_TYPE_ELEMENT
+                && gwy_strequal(name, "DataChannel")) {
+                id = xmlTextReaderGetAttribute(reader, "name");
+                if (id && strcmp(id, datachannel_name) == 0) {
+                    format = get_data_format(xmlTextReaderGetAttribute(reader, "dataFormat"));
+                    coding = get_data_coding(xmlTextReaderGetAttribute(reader, "coding"));
+                    byte_order = get_byteorder(xmlTextReaderGetAttribute(reader, "byteOrder"));
+                    if (read_data_only == FALSE) {
+                        /* when read_data_only is true, we skip dimensions array to prevent
+                           infinite cycle when calling from get_axis to get non equidistant axis from
+                           datachannel */
+                        read_method_name = xmlTextReaderGetAttribute(reader, "channelReadMethodName");
+                        if (read_method_name == NULL) {
+                            /* sequence of one dimensional values */
+                            *dimensions = NULL;
+                        }
+                        else {
+                            g_free((char*)read_method_name);
+                            /* get axes */
+                            data_dimension = get_axis(filename, datachannel_name, &axes, &names, &units);
+                            if (data_dimension != 2) {
+                                g_warning("Input data are in %d dimension(s).", data_dimension);
+                            }
+                            /* one dimension array */
+                            if (data_dimension > 0) {
+                                *dimensions = g_new(int, data_dimension);
+                                for (i = 0; i < data_dimension; i++) {
+                                    axis = g_array_index(axes, GArray*, i);
+                                    (*dimensions)[i] = axis[0].len;
+                                    max_input_len *= axis[0].len;
+                                }
+                            }
+                            else {
+                                *dimensions = NULL;
+                            }
+                            free_array_array(&axes);
+                            free_xmlpointer_array(&names);
+                            free_xmlpointer_array(&units);
+                        }
+                    }
+                    else {
+                        /* in the first member of dimension array store number of elements */
+                        max_input_len = -1;     /* we don't know the max_input_len */
+                    }
+
+                    *unit = xmlTextReaderGetAttribute(reader, "unit");
+
+                    gwy_debug("Datachannel summary: format %d, coding %d, order %d.", format, coding, byte_order);
+                    state = 1;
+                }
+                if (id) {
+                    g_free(id);
+                }
+            }
+            else if (state == 1) {
+                value = xmlTextReaderConstValue(reader);
+                if (value == NULL) {
+                    g_warning("No data available for datachannel '%s'", datachannel_name);
+                    *data = NULL;
+                    break;
+                }
+                out_len = decode_data(data, value, format, coding, byte_order, max_input_len);
+                if (out_len == 0 || *data == NULL) {
+                    g_warning("No input data available for datachannel '%s'.", datachannel_name);
+
+                }
+                else if (read_data_only == TRUE) {
+                    *dimensions = g_new(int, 1);
+                    (*dimensions)[0] = out_len;
+                    data_dimension = 1;
+                }
+                break;
+            }
+            /* end process node */
+            ret = xmlTextReaderRead(reader);
+        }  /* end while (ret == 1) */
+    }
+    else {
+        g_warning("Unable to open %s.", filename);
+        return -1;
+    }
+    xmlFreeTextReader(reader);
+
+    return data_dimension;
+}
+
+/**
+ * Find node of given name in parent's children
+ * @param parent node
+ * @return NULL when children by given name not found otherwise
+ * return pointer to first children of specified name
+ */
+static xmlNodePtr
+get_node_ptr(xmlNodePtr parent, xmlChar * name)
+{
+    xmlNodePtr node;
+
+    gwy_debug("name = %s", name);
+    if (parent == NULL) {
+        return NULL;
+    }
+
+    node = parent->children;
+
+    while (node != NULL) {
+        if (!xmlStrcmp(node->name, name)
+            && node->type == XML_ELEMENT_NODE) {
+            return node;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
+
+/**
+ * Find next after previous node of given name
+ * @param prev previous node
+ * @return NULL when next node by given name not found otherwise
+ * return pointer to first next node to prev of specified name
+ */
+static xmlNodePtr
+get_next_node_ptr(xmlNodePtr prev, xmlChar * name)
+{
+    xmlNodePtr node;
+
+    gwy_debug("name = %s", name);
+    if (prev == NULL) {
+        return NULL;
+    }
+
+    node = prev->next;
+
+    while (node != NULL) {
+        if (!xmlStrcmp(node->name, name)
+            && node->type == XML_ELEMENT_NODE) {
+            return node;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
+
+static xmlChar *
+get_attribute_value_of_named_node(xmlNodePtr node,
+                                  const xmlChar *datachannel_name,
+                                  const xmlChar *attr_name)
+{
+    xmlChar *tmp_ch;
+
+    gwy_debug("datachannel name = %s, attr name = %s", datachannel_name, attr_name);
+    tmp_ch = xmlGetProp(node, (const xmlChar*)"name");
+    if (tmp_ch) {
+        if (!xmlStrcmp(datachannel_name, tmp_ch)) {
+            /* found Datachannel of given name */
+            g_free(tmp_ch);
+            return xmlGetProp(node, attr_name);
+        }
+        g_free(tmp_ch);
+    }
+    return NULL;
+}
+
+static GArray *
+get_axis_datapoints(const gchar *filename, xmlNodePtr axis_node)
+{
+    int j;
+    GArray *axes_values;
+    xmlChar *ch;
+    int num_of_dimensions;
+    double step, start, size;
+    double *data, value;
+    int *dimensions;
+    char *unit;
+    gboolean scattered;
+
+    gwy_debug("axis node name = %s", axis_node->name);
+    if (axis_node == NULL) {
+        return NULL;
+    }
+    ch = xmlGetProp(axis_node, "dataChannelName");
+    if (ch) {
+        /* points are saved in datachannel */
+        /* TODO: load points from datachannel */
+        num_of_dimensions = get_data(TRUE, filename, ch, &data, &dimensions, &unit, &scattered);
+        if (num_of_dimensions == 1) {
+            axes_values = g_array_new(TRUE, FALSE, sizeof(double));
+            axes_values = g_array_append_vals(axes_values, data, dimensions[0]);
+            return axes_values;
+        }
+        g_warning("Loading scattered data.");
+        return NULL;
+    }
+    else {
+        /* points will be computed from start step and size attribute */
+        ch = xmlGetProp(axis_node, "start");
+        if (ch) {
+            start = g_ascii_strtod(ch, NULL);
+            g_free(ch);
+        }
+        else
+            return NULL;
+        ch = xmlGetProp(axis_node, "step");
+        if (ch) {
+            step = g_ascii_strtod(ch, NULL);
+            g_free(ch);
+        }
+        else
+            return NULL;
+        ch = xmlGetProp(axis_node, "size");
+        if (ch) {
+            size = g_ascii_strtod(ch, NULL);
+            g_free(ch);
+        }
+        else
+            return NULL;
+        gwy_debug("step: %e, start:%e", step, start);
+        axes_values = g_array_new(TRUE, FALSE, sizeof(double));
+        for (j = 0; j < size; j++) {
+            value = j * step + start;
+            g_array_append_val(axes_values, value);
+        }
+        return axes_values;
+    }
+    return NULL;
+}
+
+
+static int
+get_axis(const gchar *filename, const gchar *datachannel_name,
+         GArray **axes, GArray **units, GArray **names)
+{
+/*    <DataChannel> => channelReadMethodName =>readMethod=>ReadAxis
+        name=> Axis =>array_of_values unit, nr of elements.
+*/
+    int i;
+    int axis_count = 0;
+    xmlDocPtr doc;
+    xmlNodePtr cur, sub_node, axes_node, datachannels_node;
+    xmlChar *channelReadMethodName = NULL;
+    xmlChar *tmp_ch, *tmp_ch2, *read_method_name;
+    GArray *read_method_axes = NULL, *axis_values = NULL;
+
+    *axes = *units = *names = NULL;
+
+    gwy_debug("datachannel name == %s", datachannel_name);
+    doc = xmlParseFile(filename);
+    if (doc == NULL) {
+        g_warning("Input file was not parsed successfully.");
+        return 0;
+    }
+    /* get pointer to Axes and DataChannels elements */
+    cur = xmlDocGetRootElement(doc);
+    axes_node = get_node_ptr(cur, "Axes");
+    datachannels_node = get_node_ptr(cur, "DataChannels");
+
+    if (axes_node == NULL || datachannels_node == NULL) {
+        /* incomplete xml file */
+        g_warning("incomplete file, missing Axes or Datachannels tags.");
+        xmlFreeDoc(doc);
+        return 0;
+    }
+
+    /* get channelReadMethodName     */
+    cur = get_node_ptr(datachannels_node, "DataChannelGroup");
+    while (cur != NULL) {
+        sub_node = get_node_ptr(cur, "DataChannel");
+        while (sub_node != NULL) {
+            channelReadMethodName = get_attribute_value_of_named_node(sub_node, datachannel_name,
+                                                                      "channelReadMethodName");
+            if (channelReadMethodName) {
+                /* channelReadMethodName found, leave searching */
+                break;
+
+            }
+            sub_node = get_next_node_ptr(sub_node, "DataChannel");
+        }
+        if (channelReadMethodName) {
+            /* channelReadMethodName found, leave searching  */
+            break;
+        }
+        cur = get_next_node_ptr(cur, "DataChannelGroup");
+    }
+
+    if (channelReadMethodName == NULL) {
+        g_warning("Datachannel '%s' not found.", datachannel_name);
+        xmlFreeDoc(doc);
+        return 0;
+    }
+
+    /* get readMethod from DataChannels */
+    read_method_axes = g_array_new(TRUE, FALSE, sizeof(xmlChar*));
+    cur = get_node_ptr(datachannels_node, "ReadMethod");
+    while (cur != NULL) {
+        tmp_ch = xmlGetProp(cur, "name");
+        if (tmp_ch) {
+            /* found ReadMethod according to selected datachannel_name */
+            if (!xmlStrcmp(tmp_ch, channelReadMethodName)) {
+                sub_node = get_node_ptr(cur, "ReadAxis");
+                while (sub_node != NULL) {
+                    read_method_name = xmlGetProp(sub_node, "name");
+                    if (read_method_name)
+                        g_array_append_val(read_method_axes, read_method_name);
+                    sub_node = get_next_node_ptr(sub_node, "ReadAxis");
+                }
+            }
+            g_free(tmp_ch);
+        }
+
+        cur = get_next_node_ptr(cur, "ReadMethod");
+    }
+    if (!read_method_axes->len) {
+        /* ReadMethod mentioned in selected DataChannel not found in ReadMethod section */
+        g_warning("ReadMethod '%s' for datachannel '%s' not found.",
+                  channelReadMethodName, datachannel_name);
+        xmlFreeDoc(doc);
+        free_xmlpointer_array(&read_method_axes);
+        g_free(channelReadMethodName);
+        return 0;
+    }
+
+    /* We have name of axes for given datachannel_name in GArray read_method_axes. */
+    /* Time to load axes and fill output arrays. */
+    *names = g_array_new(TRUE, FALSE, sizeof(xmlChar*));
+    *units = g_array_new(TRUE, FALSE, sizeof(xmlChar*));
+    *axes = g_array_new(FALSE, FALSE, sizeof(GArray*));
+    cur = get_node_ptr(axes_node, "AxisGroup");
+    while (cur != NULL) {
+        sub_node = get_node_ptr(cur, "Axis");
+        while (sub_node != NULL) {
+            tmp_ch2 = xmlGetProp(sub_node, "name");
+            if (tmp_ch2) {
+                for (i = 0; (read_method_name = g_array_index(read_method_axes, xmlChar*, i)) != NULL; i++) {
+                    if (!xmlStrcmp(read_method_name, tmp_ch2)) {
+                        /* we found axis we are searching for add name to *names array */
+                        tmp_ch = xmlGetProp(sub_node, "name");
+                        g_array_append_val(*names, tmp_ch);
+                        /* add units to *units array */
+                        tmp_ch = xmlGetProp(sub_node, "unit");
+                        if (tmp_ch != NULL) {
+                            g_array_append_val(*units, tmp_ch);
+                        }
+                        else {
+                            g_warning("unknown unit for axis.");
+                            tmp_ch = g_strdup("");
+                            g_array_append_val(*units, tmp_ch);
+                        }
+                        /* get axis values */
+                        axis_values = get_axis_datapoints(filename, sub_node);
+                        if (axis_values != NULL) {
+                            gwy_debug("Axis len: %d.", axis_values->len);
+                            g_array_append_val(*axes, axis_values);
+                            axis_count++;
+                        }
+                        else {
+                            g_warning("Cannot compute or read axis data.");
+                            /* g_array_free(*axes, TRUE); */
+                            free_xmlpointer_array(units);
+                            free_xmlpointer_array(names);
+                            free_array_array(axes);
+                            free_xmlpointer_array(&read_method_axes);
+                            xmlFreeDoc(doc);
+                            g_free(channelReadMethodName);
+                            return 0;
+                        }
+                    }
+                }
+                g_free(tmp_ch2);
+            }
+            sub_node = get_next_node_ptr(sub_node, "Axis");
+        }
+        cur = get_next_node_ptr(cur, "AxisGroup");
+    }
+    free_xmlpointer_array(&read_method_axes);
+    xmlFreeDoc(doc);
+    g_free(channelReadMethodName);
+    return axis_count;
+}
+
+static GArray *
+get_dimensions(GArray * axes)
+{
+    unsigned int i;
+    double width;
+    GArray *axis, *out_array = NULL;
+
+    gwy_debug("start");
+    if (axes == NULL)
+        return NULL;
+
+    out_array = g_array_new(FALSE, FALSE, sizeof(double));
+    for (i = 0; i < axes->len; i++) {
+        axis = g_array_index(axes, GArray *, i);
+        if (axis->len > 1) {
+            width = (g_array_index(axis, double, 1) - g_array_index(axis, double, 0)) * axis->len;
+            g_array_append_val(out_array, width);
+            gwy_debug("Start: %e, step: %e, count: %d, width: %e",
+                      g_array_index(axis, double, 0),
+                      g_array_index(axis, double, 1) - g_array_index(axis, double, 0),
+                      axis->len,
+                      width
+                     );
+        }
+        else {
+            g_array_free(out_array, TRUE);
+            gwy_debug("Axis values count lesser than 2");
+            return NULL;
+        }
+        /*
+        start = g_array_index(axis, double, 0);
+        end = g_array_index(axis, double, axis->len - 1);
+
+        width = end - start;
+        g_array_append_val(out_array, width);
+        gwy_debug("Start: %e End: %e Width: %e\n", start, end, width);
+        */
+    }
+    return out_array;
+
+}
+
+static GwyContainer *
+spml_load(const gchar *filename)
+{
+    GwyContainer *object = NULL;
+    gdouble *gwy_data;
+    GwySIUnit *siunit;
+    int i, j, *dimensions, scattered, channel_number = 0;
+    GwyDataField *dfield = NULL;
+    char *channel_name, *unit;
+    GArray *axes, *axes_units, *names, *real_width_height;
+    double x_dimen, y_dimen, *data = NULL;
+    gint z_power10, x_power10, y_power10;
+    GList *list_of_datagroups, *l, *sub_l;
+    DataChannelGroup *dc_group;
+    int rotate = 90;
+
+    gwy_debug("file = %s", filename);
+
+    /* get list of datagroups and datachannels */
+    l = list_of_datagroups = get_list_of_datachannels(filename);
+    while (l) {
+        dc_group = (DataChannelGroup*)l->data;
+        sub_l = dc_group->datachannels;
+        while (sub_l != NULL) {
+            gwy_debug("freeing");
+
+            channel_name = unit = NULL;
+            data = NULL;
+            dimensions = NULL;
+            axes = axes_units = names = real_width_height = NULL;
+
+            channel_name = sub_l->data;
+            gwy_debug("Channelgroup: %s, channelname: %s", dc_group->name, channel_name);
+            /* Check individual things sequentially to avoid not knowing where we terminated. */
+            if (!channel_name)
+                goto finish;
+            /* get data and check it is 2 or more dimensional array */
+            if (get_data(FALSE, (char*)filename, channel_name, &data, &dimensions, &unit, &scattered) < 2 || !data)
+                goto finish;
+            /* get axes and check we get 2 or more axes */
+            if (get_axis(filename, channel_name, &axes, &axes_units, &names) < 2 || !axes)
+                goto finish;
+            /* get width and height of 2D acording to axes */
+            if (!(real_width_height = get_dimensions(axes)) || real_width_height->len < 2)
+                goto finish;
+
+            x_dimen = g_array_index(real_width_height, double, 0);
+            y_dimen = g_array_index(real_width_height, double, 1);
+
+            /* parse unit and return power of 10 according to unit */
+            siunit = gwy_si_unit_new_parse(g_array_index(axes_units, xmlChar*, 0), &x_power10);
+            g_object_unref(siunit);
+
+            siunit = gwy_si_unit_new_parse(g_array_index(axes_units, xmlChar*, 1), &y_power10);
+            /* create and allocate datafield of given dimensions and given physical
+               dimensions */
+            if (rotate == 90) {
+                dfield = gwy_data_field_new(dimensions[1], dimensions[0],
+                                            y_dimen * pow10(y_power10), x_dimen * pow10(x_power10),
+                                            FALSE);
+            }
+            else {
+                dfield = gwy_data_field_new(dimensions[0], dimensions[1],
+                                            x_dimen * pow10(x_power10), y_dimen * pow10(y_power10),
+                                            FALSE);
+            }
+            gwy_debug("X real width: %f", x_dimen * pow10(x_power10));
+            gwy_debug("X real_width_height: %f", x_dimen);
+            gwy_data = gwy_data_field_get_data(dfield);
+            /* copy raw array of doubles extracted from spml file to Gwyddion's
+               datafield
+               rotate -90 degrees: */
+            if (rotate == 90) {
+                for (i = 0; i < dimensions[0]; i++) {
+                    for (j = 0; j < dimensions[1]; j++) {
+                        gwy_data[j+i*dimensions[1]] = data[i+j*dimensions[0]];
+                    }
+                }
+            } else {
+                memcpy(gwy_data, data,
+                       dimensions[0] * dimensions[1] * sizeof(double));
+            }
+            gwy_debug("Dimensions: %dx%d", dimensions[0], dimensions[1]);
+            gwy_si_unit_assign(gwy_data_field_get_si_unit_xy(dfield), siunit);
+            g_object_unref(siunit);
+
+            /* set unit for Z axis */
+            gwy_si_unit_set_from_string_parse(gwy_data_field_get_si_unit_z(dfield), unit, &z_power10);
+            gwy_data_field_multiply(dfield, pow10(z_power10));
+
+            /* set offset to match axes */
+            siunit = gwy_si_unit_new_parse(g_array_index(axes_units, xmlChar*, 0), &z_power10);
+            g_object_unref(siunit);
+            gwy_data_field_set_xoffset(dfield,
+                                       pow10(z_power10)*g_array_index(g_array_index(axes, GArray*, 0), double, 0));
+
+            siunit = gwy_si_unit_new_parse(g_array_index(axes_units, xmlChar*, 1), &z_power10);
+            g_object_unref(siunit);
+            gwy_data_field_set_yoffset(dfield,
+                                       pow10(z_power10)*g_array_index(g_array_index(axes, GArray*, 1), double, 0));
+
+            if (object == NULL) {
+                /* create gwyddion container */
+                object = gwy_container_new();
+            }
+            /* put datachannel into container */
+            gwy_container_pass_object(object, gwy_app_get_data_key_for_id(channel_number), dfield);
+
+            /* set name of datachannel to store in container */
+            gwy_container_set_const_string(object, gwy_app_get_data_title_key_for_id(channel_number), channel_name);
+
+            gwy_file_channel_import_log_add(object, channel_number, NULL, filename);
+            channel_number++;
+
+finish:
+            /* Free possibly allocated memory */
+            g_free(data);
+            g_free(dimensions);
+            g_free(unit);
+            free_array_array(&axes);
+            free_xmlpointer_array(&axes_units);
+            free_xmlpointer_array(&names);
+            if (real_width_height)
+                g_array_free(real_width_height, TRUE);
+            sub_l = g_list_next(sub_l);
+        }
+        l = g_list_next(l);
+    }
+
+    for (l = list_of_datagroups; l; l = g_list_next(l))
+        free_datachannel_group(l->data);
+    g_list_free(list_of_datagroups);
+
+    return (GwyContainer*)object;
+}
+
+static gint
+spml_detect(const GwyFileDetectInfo * fileinfo, gboolean only_name)
+{
+    gint score = 0;
+
+    gwy_debug("%s: %s", fileinfo->name_lowercase, (only_name) ? "only_name" : "content");
+    if (only_name) {
+        if (g_str_has_suffix(fileinfo->name_lowercase, ".xml")) {
+            score += 50;
+            gwy_debug("Score += 50");
+        }
+    }
+    else {
+        if (fileinfo->head != NULL) {
+            gwy_debug("head not null");
+            if (strstr(fileinfo->head, "<SPML") != NULL) {
+                gwy_debug("Score += 100");
+                score += 100;
+            }
+        }
+    }
+    return score;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

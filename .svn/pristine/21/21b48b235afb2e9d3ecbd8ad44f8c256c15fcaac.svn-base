@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: filters.xml 22636 2019-10-30 14:30:58Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 xmlns:xi="http://www.w3.org/2001/XInclude" id="filters">
+  <title>Фильтры</title>
+  <sect2 id="basic-filters">
+    <title>Инструмент основные фильтры <gwy:icon name="filter"/></title>
+    <para>Инструмент <link linkend="tool-filters">основные фильтры</link> позволяет применить к вашему изображению несколько простых фильтров. Это может быть весьма полезно для удаления шума с данных; однако, реально измеренные данные изменяются в процессе применения фильтра, и требуется особая аккуратность чтобы не удалить с изображения важные детали.</para>
+    <para>Все фильтры меняют данные на основе значений в некоторой окрестности фильтруемого пикселя. Для некоторых фильтров размер и форма окрестности являются фиксированными. Для большинства, однако, размер может контролироваться параметром <guilabel>размер</guilabel>. Размер определяет диаметр окрестности для всех фильтров, кроме основанных на гауссовой функции (описанных ниже). Следовательно, рекомендуется использовать фильтры нечётного размера поскольку их действие будет симметричным.</para>
+    <variablelist>
+      <varlistentry id="filter-mean">
+        <term>Среднее значение</term>
+        <listitem><indexterm><primary>среднее</primary><secondary>фильтр</secondary></indexterm><indexterm><primary>удаление шума</primary><secondary>фильтр среднего</secondary></indexterm> Значение после фильтра это среднее значение точек окружения исходного пикселя.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-median">
+        <term>Срединное значение</term>
+        <listitem><indexterm><primary>срединное</primary><secondary>фильтр</secondary></indexterm><indexterm><primary>удаление шума</primary><secondary>фильтр срединного</secondary></indexterm> Значение после фильтра это срединное значение точек окружения исходного пикселя.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-conservative-denoise">
+        <term>Выборочная уборка шума</term>
+        <listitem><indexterm><primary>фильтр выборочной уборки шума</primary></indexterm><indexterm><primary>удаление шума</primary><secondary>выборочная</secondary></indexterm> Фильтр  проверяет, не является ли значение экстремумом в окрестности. Значения, не являющиеся экстремумами, сохраняются. Значения экстремумов заменяются следующим наибольшим (наименьшим) значением.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-minimum">
+        <term>Минимум</term>
+        <listitem><indexterm><primary>минимум</primary><secondary>фильтр</secondary></indexterm><indexterm><primary>эрозия</primary><secondary>фильтр</secondary></indexterm> Также известен как фильтр эрозии, заменяет значение минимальным в окрестности. Точнее, эрозия проводится с помощью плоского диска заданного диаметра.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-maximum">
+        <term>Максимум</term>
+        <listitem><indexterm><primary>максимум</primary><secondary>фильтр</secondary></indexterm><indexterm><primary>расширение</primary><secondary>фильтр</secondary></indexterm> Также известен как фильтр расширения, заменяет значение максимальным в окрестности. Точнее, расширение проводится с помощью плоского диска заданного диаметра.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-opening">
+        <term>Размыкание</term>
+        <listitem><indexterm><primary>размыкание</primary><secondary>фильтр</secondary></indexterm> Фильтр размыкания – эрозия, за которой следует расширение. Положительные выступы при этом удаляются с поверхности, в то время как гладкие области и впадины в той или иной мере сохраняются.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-closing">
+        <term>Замыкание</term>
+        <listitem><indexterm><primary>замыкание</primary><secondary>фильтр</secondary></indexterm> Фильтр замыкания – расширение, за которым следует эрозия. Отрицательные выступы при этом удаляются с поверхности, в то время как гладкие области и выступы в той или иной мере сохраняются.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-asf-opening">
+        <term>ППФ размыкания</term>
+        <listitem><indexterm><primary>переменный последовательный фильтр</primary><secondary>замыкание-размыкание</secondary></indexterm> Простой фильтр размыкания или замыкания может быть слишком грубым для коррекции дефектов переменного размера. Переменный последовательный фильтр (ППФ) состоит из последовательности операций замыкания и размыкания с последовательно увеличивающимся диском до заданного размера. Он лучше сохраняет форму особых деталей, которые не должны удаляться размыканием. Последней операцией фильтра является размыкание.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-asf-closing">
+        <term>ППФ замыкания</term>
+        <listitem><indexterm><primary>переменный последовательный фильтр</primary><secondary>размыкание-замыкание</secondary></indexterm> Переменный последовательный фильтр замыкания отличается от фильтра размыкания только порядком базовых операций. Последней операцией данного фильтра будет замыкание.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-kuwahara">
+        <term>Кувахара</term>
+        <listitem><indexterm><primary>фильтр Кувахары</primary></indexterm><indexterm><primary>удаление шума</primary><secondary>фильтр Кувахары</secondary></indexterm> Фильтр Кувахары – сохраняющий кромки сглаживающий фильтр.</listitem>
+      </varlistentry>
+      <varlistentry id="filter-dechecker">
+        <term>Убрать "шахматную доску"</term>
+        <listitem><indexterm><primary>фильтр, убирающий шахматную доску</primary></indexterm><indexterm><primary>фильтр, убирающий шахматную текстуру</primary></indexterm> Сглаживающий фильтр, специально предназначенный для удаления текстур, напоминающих шахматную доску, с изображений при сохранении других особенностей. Это фильтр свёртки с ядром <xi:include href="eq-filters-dechecker.xml"/></listitem>
+      </varlistentry>
+      <varlistentry id="filter-gaussian">
+        <term>Гауссов</term>
+        <listitem><indexterm><primary>гауссов фильтр</primary></indexterm><indexterm><primary>удаление шума</primary><secondary>гауссов фильтр</secondary></indexterm> Гауссов фильтр – сглаживающий фильтр, параметр размера определяет полную ширину на половинной высоте гауссовой кривой. Соотношение между полной шириной на половинной высоте и <xi:include href="eqi-sigma.xml"/>: <xi:include href="eq-gaussian-fwhm.xml"/></listitem>
+      </varlistentry>
+      <varlistentry id="filter-sharpen">
+        <term>Сделать резким</term>
+        <listitem><indexterm><primary>фильтр повышения контраста</primary></indexterm> Простая операция повышения контраста, которая является обратной гауссову фильтру. Сначала он дополнительно сглаживает изображение соответствующим гауссовым фильтром. Результат затем экстраполируется обратно чтобы получить оценку более резкого изображения.</listitem>
+      </varlistentry>
+    </variablelist>
+    <para>По умолчанию, эти фильтры будут применяться ко всему изображению. Но можно применить фильтр к отдельной области, выбрав её мышью. Это может быть полезно для коррекции плохо промеренных областей в хорошем изображении.</para>
+    <para>Также можно ограничить область применения фильтра с помощью маски. В этом случае маска задаёт активные пиксели, значение которых будет изменяться фильтром. Пиксели в окрестности активной области могут по прежнему участвовать в расчёте пассивно, т.е. их значения будут влиять на результат.</para>
+    <para>Несколько основных фильтров можно использовать для простого удаления шума и дефектов. Дальнейшая работа с функциями выделения дефектов и их удаления описана в разделе <link linkend="editing-correction">редактирование данных</link>, в качестве примера можно привести <link linkend="mask-of-outliers">маску выпадающего</link> и <link linkend="remove-data-under-mask">интерполировать данные под маской</link>. Более продвинутые функции удаления шума в Gwyddion, например, удаление шума с помощью дискретного вейвлет-преобразования (DWT) и Фурье-фильтрации, описаны в разделе <link linkend="edit-extended">расширенное редактирование данных</link>.</para>
+    <informalfigure id="fig-filters-screenshot">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="filter.png" format="PNG"/>
+        </imageobject>
+        <caption>Снимок экрана инструмента фильтрации с применением фильтра среднего к прямоугольной выделенной области.</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="convolution-filter">
+    <title>Фильтр свёртки <gwy:icon name="convolution"/></title>
+    <indexterm>
+      <primary>свёртка</primary>
+      <secondary>с заданным ядром</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Обработка данных</guimenu>
+        <guisubmenu>Интегральные преобразования</guisubmenu>
+        <guisubmenu>Фильтр свёртки</guisubmenu>
+      </menuchoice>
+    </para>
+    <para>Дискретные свёртки с произвольным ядром до <xi:include href="eqi-9x9.xml"/> могут производиться используя фильтр свёртки (см. <link linkend="convolve">свёртку изображений</link> для операции свёртки двух изображений).</para>
+    <para>Текстовое поле <guilabel>Делитель</guilabel> представляет собой общий множитель, на который делятся все коэффициенты перед применением фильтра. Это позволяет использовать ненормализованные коэффициенты, которые нередко представляются круглыми числами. Нормализация также может быть посчитана автоматически когда установлен флаг <guilabel>автоматически</guilabel>. Если сумма коэффициентов ненулевая, это делает фильтр сохраняющим сумму, т.е. она является множителем, который нормализует сумму коэффициентов к единице. Когда сумма коэффициентов равна нулю, автоматический фактор просто становится равным 1.</para>
+    <para>Поскольку многие практически используемые фильтры проявляют различные формы симметрии, коэффициенты могут быть автоматически дополнены в соответствии с выбранным типом симметрии (четные, нечетные). Дополнение происходит при нажатии <keycap>Enter</keycap> в поле ввода коэффициента.</para>
+    <para>Сразу после установки доступен только пример фильтра Identity (тождественность, он не слишком полезен, т.к. ничего не делает). этот фильтр не может быть изменён, чтобы создать новый используйте кнопку <guilabel>Новый</guilabel> на вкладке <guilabel>Предустановки</guilabel>.</para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

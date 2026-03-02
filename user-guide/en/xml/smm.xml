@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: interpolation.xml 22944 2020-09-23 07:49:10Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='smm' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Scanning Microwave Microscopy</title>
+  <indexterm><primary>smm</primary></indexterm>
+  <para>
+    Scanning Microwave Microscopy is based on measurement of reflection
+    coefficients of microwaves applied to a conductive tip. Using 
+    vector network analyzer or similar hardware we want to obtain 
+    the reflection coefficient <xi:include href="eqi-S11.xml"/> and, out of it,
+    to determine tip-sample impedance, capacitance, or any other quantity related
+    to it.
+  </para>
+  <para>
+    Here, we describe two modules implementing modified short-open-load
+    calibration procedure described in Ref. [<link linkend='smm-ref-1'>1</link>].
+    It is based on measurement of a sample with areas of known capacitances,
+    e.g. small capacitors acting as reference samples[<link linkend='smm-ref-2'>2</link>],
+    and by comparison of theoretical and measurement reflection coefficients
+    it establishes complex calibration coefficients that can be used for SMM calibration,
+    i.e. to convert measurement on unknown samples to quantitative results.
+  </para>
+  <sect2 id='smm-calibration'>
+    <title>
+      SMM calibration
+    </title>
+    <para>
+      Goal of this module is to use data measured on a known sample to determine
+      three complex calibration coefficients <xi:include href="eqi-e00.xml"/>, <xi:include href="eqi-e01.xml"/> 
+      and <xi:include href="eqi-e11.xml"/> containing infomration about directivity, reflection tracking, 
+      source match, merged with information about the local electrical conditions around the 
+      tip apex[<link linkend='smm-ref-3'>3</link>]. The coefficients relate the measured reflection
+      coefficients <xi:include href="eqi-S11m.xml"/> to intrinstic reflection coefficients 
+      <xi:include href="eqi-S11.xml"/> as
+    </para>
+    <para>
+       <xi:include href="eq-smm-direct.xml"/>
+    </para>
+    <para>
+      The intrinstic reflection coefficients are related to complex tip-sample impedance <xi:include href="eqi-ztip.xml"/>
+      and reference impedance <xi:include href="eqi-zref.xml"/> as
+    </para>
+    <para>
+       <xi:include href="eq-smm-ztip.xml"/>
+    </para>
+    <para>
+      For a capacitor reference sample, the tip-sample impedance can be calculated from its known capacitance
+      (obtained from sample manufacturer or via numerical modeling) and angular frequency of the microwaves as 
+    </para> 
+    <para>
+       <xi:include href="eq-smm-cap.xml"/>
+    </para>
+    <para>
+      The module uses the above three equations to determine the calibration coefficients, either by
+      direct solution of the equations for three complex measurements (when only three sets are provided)
+      or by fitting all the available data (when more sets are provided). Direct solution is also used 
+      for an estimate, using the minimum, maximum and middle of the provided capacitances.
+    </para>
+    <para>
+      Apart of two images representing complex data from VNA (either a pair of real + imaginary or module + phase
+      images), user has to provide masks covering the 
+      individual surface areas where the capacitance is known and values of this capacitance. These masks
+      have to be set up before running the module, either using thresholding or some of the mask edit tools,
+      followed by mask extraction, so it resides in the Data Browser as an individual channel. User can 
+      check which of the provided sets (mask + capacitance) will be used for calculation or fitting
+      of the calibration coefficients.
+    </para>
+    <informalfigure id='fig-smm'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='smm.png' format='PNG'/>
+        </imageobject>
+        <textobject>
+          <phrase>SMM calibration module</phrase>
+        </textobject>
+        <caption>
+          SMM calibration module graphical user interface
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      To test the module, use a
+      <ulink url="https://sourceforge.net/projects/gwyddion/files/sample-data/user-guide-examples/smm_user_guide_example.gwy/download">
+      sample file</ulink> with pre-processed data, including with few extracted masks, corresponding to capacitances in the
+      above figure. This sample file is based on measurements performed by Damien Richert, Laboratoire national de métrologie et d'essais
+      and shows MC2 capacitance sample.
+    </para>
+  </sect2>
+  <sect2 id='smm-apply'>
+    <title>
+      Apply SMM Coefficients
+    </title>
+    <para>
+      This module applies known complex calibration coefficients to the measured data, using the same methodology 
+      and equations as discussed in the preceding section. As an input, complex data from VNA 
+      (either a pair of real + imaginary or module + phase images) are used.
+      When data should be converted to capacitance, the 
+      microwave frequency and reference impedance has to be supplied.
+    </para>
+    <informalfigure id='fig-smm-apply'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='smm_apply.png' format='PNG'/>
+        </imageobject>
+        <textobject>
+          <phrase>Apply SMM calibration module</phrase>
+        </textobject>
+        <caption>
+          SMM calibration application module graphical user interface
+        </caption>
+      </mediaobject>
+    </informalfigure>
+   </sect2>
+  <sect2 id='smm-ref'>
+    <title>References</title>
+    <para id='smm-ref-1'>
+      [1] Hoffmann, J.; Wollensack, M.; Zeier, M.; Niegemann, J.; Huber, H. A Calibration Algorithm for Nearfield Scanning Microwave
+      Microscopes. In Proceedings of the 12th IEEE International Conference on Nanotechnology, IEEE-NANO, Birmingham, UK,
+      20–23 August 2012; pp. 1–4.
+     <ulink url='https://doi.org/10.1109/NANO.2012.6322116'>doi:10.1109/NANO.2012.6322116</ulink>
+    </para>
+    <para id='smm-ref-2'>
+      [2] Piquemal, F.; Morán-Meza, J.; Delvallée, A.; Richert, D.; Kaja, K., Progress in Traceable Nanoscale Capacitance Measurements 
+      Using Scanning Microwave Microscopy. Nanomaterials 2021, 11, 820.
+     <ulink url='https://doi.org/10.3390/nano11030820'>doi:10.3390/nano11030820</ulink>
+    </para>
+    <para>
+     [3] A. Buchter, J. Hoffmann, A. Delvallée, E. Brinciotti, D. Hapiuk, Ch. Licitra, K. Louarn, A. Arnoult, 
+     G. Almuneau, F. Piquemal, M. Zeier, F. Kienberger, Review of Scientific Instruments 89, 023704 (2018).
+     <ulink url='https://doi.org/10.1063/1.5015966'>doi:10.1063/1.5015966</ulink>
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

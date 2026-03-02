@@ -1,0 +1,683 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2021 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwythreads.h>
+#include <libprocess/lawn.h>
+#include <libprocess/stats.h>
+#include <libprocess/correct.h>
+#include <libprocess/gwyprocesstypes.h>
+#include <libgwydgets/gwydataview.h>
+#include <libgwydgets/gwygraph.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-cmap.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+#include "libgwyddion/gwyomp.h"
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+};
+
+typedef enum {
+    OUTPUT_QUANTITY   = 0,
+    OUTPUT_PREVIEW    = 1,
+} PosSearchOutput;
+
+typedef enum {
+    DIR_LR    = 0,
+    DIR_RL    = 1,
+} PosSearchDir;
+
+typedef enum {
+    METHOD_BELOW    = 0,
+    METHOD_ABOVE    = 1,
+} PosSearchMethod;
+
+enum {
+    PARAM_METHOD,
+    PARAM_DIR,
+    PARAM_PICK_CURVE,
+    PARAM_SEARCH_CURVE,
+    PARAM_THRESHOLD,
+    PARAM_SEGMENT,
+    PARAM_ENABLE_SEGMENT,
+    PARAM_XPOS,
+    PARAM_YPOS,
+    PARAM_OUTPUT,
+};
+
+typedef struct {
+    GwyParams *params;
+    GwyLawn *lawn;
+    GwyDataField *field;
+    GwyDataField *mask;
+    GwySIValueFormat *vf;
+    /* Cached input data properties. */
+    gint nsegments;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table;
+    GwyParamTable *table_output;
+    GwyContainer *data;
+    GwySelection *selection;
+    GwySelection *graph_selection;
+    GwyGraphModel *gmodel;
+} ModuleGUI;
+
+static gboolean         module_register         (void);
+static GwyParamDef*     define_module_params    (void);
+static void             possearch               (GwyContainer *data,
+                                                 GwyRunType runtype);
+static void             execute                 (ModuleArgs *args);
+static GwyDialogOutcome run_gui                 (ModuleArgs *args,
+                                                 GwyContainer *data,
+                                                 gint id);
+static void             param_changed           (ModuleGUI *gui,
+                                                 gint id);
+static void             preview                 (gpointer user_data);
+static void             set_selection           (ModuleGUI *gui);
+static void             point_selection_changed (ModuleGUI *gui,
+                                                 gint id,
+                                                 GwySelection *selection);
+static gboolean         locate_in_one_curve     (GwyLawn *lawn,
+                                                 gint col,
+                                                 gint row,
+                                                 gint pick_curve,
+                                                 gint search_curve,
+                                                 gint segment,
+                                                 PosSearchMethod method,
+                                                 PosSearchDir dir,
+                                                 gdouble threshold,
+                                                 gdouble *result);
+static void             extract_one_curve       (GwyLawn *lawn,
+                                                 GwyGraphCurveModel *gcmodel,
+                                                 gint col,
+                                                 gint row,
+                                                 gint segment,
+                                                 GwyParams *params);
+static void             update_graph_model_props(GwyGraphModel *gmodel,
+                                                 ModuleArgs *args);
+static void             sanitise_params         (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Picks a quantity at some threshold position."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2022",
+};
+
+GWY_MODULE_QUERY2(module_info, cmap_possearch)
+
+static gboolean
+module_register(void)
+{
+    gwy_curve_map_func_register("cmap_possearch",
+                                (GwyCurveMapFunc)&possearch,
+                                N_("/_Position Search..."),
+                                NULL,
+                                RUN_MODES,
+                                GWY_MENU_FLAG_CURVE_MAP,
+                                N_("Search for a threshold"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum methods[] = {
+        { N_("Below threshold"),    METHOD_BELOW,    },
+        { N_("Above threshold"),    METHOD_ABOVE,    },
+    };
+    static const GwyEnum dirs[] = {
+        { N_("Left to right"),    DIR_LR,    },
+        { N_("Right to left"),    DIR_RL,    },
+    };
+     static const GwyEnum outputs[] = {
+        { N_("Extract quantity"),   (1 << OUTPUT_QUANTITY),   },
+        { N_("Set preview"),        (1 << OUTPUT_PREVIEW),    },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_curve_map_func_current());
+    gwy_param_def_add_gwyenum(paramdef, PARAM_METHOD, "method", _("Method"),
+                              methods, G_N_ELEMENTS(methods), METHOD_ABOVE);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_DIR, "direction", _("Direction"),
+                              dirs, G_N_ELEMENTS(dirs), DIR_RL);
+    gwy_param_def_add_lawn_curve(paramdef, PARAM_PICK_CURVE, "pick_curve", _("Pick value curve"));
+    gwy_param_def_add_lawn_curve(paramdef, PARAM_SEARCH_CURVE, "search_curve", _("Search curve"));
+    gwy_param_def_add_double(paramdef, PARAM_THRESHOLD, "threshold", _("Threshold"), -G_MAXDOUBLE, G_MAXDOUBLE, 0);
+    gwy_param_def_add_lawn_segment(paramdef, PARAM_SEGMENT, "segment", NULL);
+    gwy_param_def_add_boolean(paramdef, PARAM_ENABLE_SEGMENT, "enable_segment", NULL, FALSE);
+    gwy_param_def_add_int(paramdef, PARAM_XPOS, "xpos", NULL, -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_YPOS, "ypos", NULL, -1, G_MAXINT, -1);
+    gwy_param_def_add_gwyflags(paramdef, PARAM_OUTPUT, "output", _("Output _type"),
+                               outputs, G_N_ELEMENTS(outputs), (1 << OUTPUT_QUANTITY));
+    return paramdef;
+}
+
+static void
+possearch(GwyContainer *data, GwyRunType runtype)
+{
+    ModuleArgs args;
+    GwyLawn *lawn = NULL;
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    PosSearchOutput output;
+    GwyDataField *field;
+    gint id, newid;
+    const guchar *gradient;
+
+    g_return_if_fail(runtype & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_clear(&args, 1);
+    gwy_app_data_browser_get_current(GWY_APP_LAWN, &lawn,
+                                     GWY_APP_LAWN_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_LAWN(lawn));
+    args.lawn = lawn;
+    args.nsegments = gwy_lawn_get_n_segments(lawn);
+    args.params = gwy_params_new_from_settings(define_module_params());
+    sanitise_params(&args);
+
+    args.vf = gwy_lawn_get_value_format_curve(lawn, 0, GWY_SI_UNIT_FORMAT_VFMARKUP, NULL);
+
+    args.field = gwy_data_field_new(gwy_lawn_get_xres(lawn), gwy_lawn_get_yres(lawn),
+                                    gwy_lawn_get_xreal(lawn), gwy_lawn_get_yreal(lawn), TRUE);
+    gwy_data_field_set_xoffset(args.field, gwy_lawn_get_xoffset(lawn));
+    gwy_data_field_set_yoffset(args.field, gwy_lawn_get_yoffset(lawn));
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_xy(args.field), gwy_lawn_get_si_unit_xy(lawn));
+    args.mask = gwy_data_field_new_alike(args.field, TRUE);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(args.mask), NULL);
+
+    if (runtype == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, id);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+    }
+    if (outcome != GWY_DIALOG_HAVE_RESULT)
+        execute(&args);
+
+    output = gwy_params_get_flags(args.params, PARAM_OUTPUT);
+    if (output & (1 << OUTPUT_PREVIEW)) {
+        field = gwy_container_get_object(data, gwy_app_get_lawn_preview_key_for_id(id));
+        gwy_data_field_assign(field, args.field);
+        gwy_data_field_data_changed(field);
+    }
+    if (output & (1 << OUTPUT_QUANTITY)) {
+        newid = gwy_app_data_browser_add_data_field(args.field, data, TRUE);
+        gwy_app_set_data_field_title(data, newid, _("Position"));
+        if (gwy_data_field_get_max(args.mask) > 0.0)
+            gwy_container_set_object(data, gwy_app_get_mask_key_for_id(newid), args.mask);
+
+        if (gwy_container_gis_string(data, gwy_app_get_lawn_palette_key_for_id(id), &gradient)) {
+            gwy_container_set_const_string(data,
+                                           gwy_app_get_data_palette_key_for_id(newid), gradient);
+        }
+
+        gwy_app_channel_log_add(data, -1, newid, "cmap::cmap_possearch", NULL);
+    }
+
+end:
+    g_object_unref(args.mask);
+    g_object_unref(args.field);
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GtkWidget *hbox, *graph, *dataview, *align, *area;
+    GwyParamTable *table;
+    GwyDialog *dialog;
+    ModuleGUI gui;
+    GwyDataField *field = args->field;
+    GwyDialogOutcome outcome;
+    GwyGraphCurveModel *gcmodel;
+    GwyVectorLayer *vlayer = NULL;
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.data = gwy_container_new();
+    //field = gwy_container_get_object(data, gwy_app_get_lawn_preview_key_for_id(id));
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), field);
+    if (gwy_container_gis_string(data, gwy_app_get_lawn_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.dialog = gwy_dialog_new(_("Search for threshold"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(0);
+    gwy_dialog_add_content(GWY_DIALOG(gui.dialog), hbox, TRUE, TRUE, 0);
+
+    align = gtk_alignment_new(0.0, 0.0, 0.0, 0.0);
+    gtk_box_pack_start(GTK_BOX(hbox), align, FALSE, FALSE, 0);
+
+    dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    gtk_container_add(GTK_CONTAINER(align), dataview);
+    vlayer = g_object_new(g_type_from_name("GwyLayerPoint"), NULL);
+    gwy_vector_layer_set_selection_key(vlayer, "/0/select/pointer");
+    gwy_data_view_set_top_layer(GWY_DATA_VIEW(dataview), vlayer);
+    gui.selection = gwy_vector_layer_ensure_selection(vlayer);
+    set_selection(&gui);
+
+    gui.gmodel = gwy_graph_model_new();
+    gcmodel = gwy_graph_curve_model_new();
+    g_object_set(gcmodel,
+                 "mode", GWY_GRAPH_CURVE_LINE,
+                 "color", gwy_graph_get_preset_color(0),
+                 NULL);
+    gwy_graph_model_add_curve(gui.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+    graph = gwy_graph_new(gui.gmodel);
+    area = gwy_graph_get_area(GWY_GRAPH(graph));
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gwy_graph_area_set_status(GWY_GRAPH_AREA(area), GWY_GRAPH_STATUS_XLINES);
+    gwy_graph_area_set_selection_editable(GWY_GRAPH_AREA(area), FALSE);
+    gui.graph_selection = gwy_graph_area_get_selection(GWY_GRAPH_AREA(area), GWY_GRAPH_STATUS_XLINES);
+    gtk_widget_set_size_request(graph, PREVIEW_SIZE, PREVIEW_SIZE);
+    gtk_box_pack_start(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+
+    hbox = gwy_hbox_new(20);
+    gwy_dialog_add_content(GWY_DIALOG(gui.dialog), hbox, TRUE, TRUE, 4);
+
+    table = gui.table = gwy_param_table_new(args->params);
+   gwy_param_table_append_lawn_curve(table, PARAM_SEARCH_CURVE, args->lawn);
+    gwy_param_table_append_lawn_curve(table, PARAM_PICK_CURVE, args->lawn);
+    if (args->nsegments) {
+        gwy_param_table_append_lawn_segment(table, PARAM_SEGMENT, args->lawn);
+        gwy_param_table_add_enabler(table, PARAM_ENABLE_SEGMENT, PARAM_SEGMENT);
+    }
+    gwy_param_table_append_combo(table, PARAM_METHOD);
+    gwy_param_table_append_combo(table, PARAM_DIR);
+    gwy_param_table_append_slider(table, PARAM_THRESHOLD);
+    gwy_param_table_slider_set_digits(table, PARAM_THRESHOLD, 5);
+
+    //this is to prevent slider to expand infinitely
+    gwy_param_table_slider_restrict_range(gui.table, PARAM_THRESHOLD, -1.0, 1.0);
+
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_output = gwy_param_table_new(args->params);
+    gwy_param_table_append_checkboxes(table, PARAM_OUTPUT);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    g_signal_connect_swapped(gui.table, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_output, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.selection, "changed", G_CALLBACK(point_selection_changed), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.gmodel);
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = gui->args->params;
+
+    if (id < 0 || id == PARAM_OUTPUT) {
+        PosSearchOutput output = gwy_params_get_flags(params, PARAM_OUTPUT);
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, !!output);
+    }
+    if (id < 0 || id == PARAM_SEARCH_CURVE) {
+        gint curve = gwy_params_get_int(args->params, PARAM_SEARCH_CURVE);
+        const gdouble *cdata;
+        gint col, row, i, ndata;
+        gint xres = gwy_lawn_get_xres(args->lawn);
+        gint yres = gwy_lawn_get_yres(args->lawn);
+        gdouble min, max;
+
+        args->vf = gwy_lawn_get_value_format_curve(args->lawn, curve, GWY_SI_UNIT_FORMAT_VFMARKUP, args->vf);
+
+        min = G_MAXDOUBLE;
+        max = -G_MAXDOUBLE;
+        for (col = 0; col < xres; col++) {
+            for (row = 0; row < yres; row++) {
+                cdata = gwy_lawn_get_curve_data_const(args->lawn, col, row, curve, &ndata);
+                for (i = 0; i < ndata; i++) {
+                   if (cdata[i] > max)
+                       max = cdata[i];
+                   if (cdata[i] < min)
+                       min = cdata[i];
+                }
+            }
+        }
+
+        gwy_param_table_slider_restrict_range(gui->table, PARAM_THRESHOLD,
+                                              min/args->vf->magnitude, max/args->vf->magnitude);
+        gwy_param_table_set_unitstr(gui->table, PARAM_THRESHOLD, args->vf->units);
+
+    }
+     if (id != PARAM_OUTPUT)
+        gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+set_selection(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    gint col = gwy_params_get_int(args->params, PARAM_XPOS);
+    gint row = gwy_params_get_int(args->params, PARAM_YPOS);
+    gdouble xy[2];
+
+    xy[0] = (col + 0.5)*gwy_lawn_get_dx(args->lawn);
+    xy[1] = (row + 0.5)*gwy_lawn_get_dy(args->lawn);
+    gwy_selection_set_object(gui->selection, 0, xy);
+}
+
+static void
+point_selection_changed(ModuleGUI *gui, gint id, GwySelection *selection)
+{
+    ModuleArgs *args = gui->args;
+    GwyLawn *lawn = args->lawn;
+    gint i, xres = gwy_lawn_get_xres(lawn), yres = gwy_lawn_get_yres(lawn);
+    gdouble xy[2];
+
+    gwy_selection_get_object(selection, id, xy);
+    i = GWY_ROUND(floor(xy[0]/gwy_lawn_get_dx(lawn)));
+    gwy_params_set_int(args->params, PARAM_XPOS, CLAMP(i, 0, xres-1));
+    i = GWY_ROUND(floor(xy[1]/gwy_lawn_get_dy(lawn)));
+    gwy_params_set_int(args->params, PARAM_YPOS, CLAMP(i, 0, yres-1));
+
+    gwy_param_table_param_changed(gui->table, PARAM_XPOS);
+    gwy_param_table_param_changed(gui->table, PARAM_YPOS);
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    gboolean segment_enabled = args->nsegments ? gwy_params_get_boolean(params, PARAM_ENABLE_SEGMENT) : FALSE;
+    gint segment = segment_enabled ? gwy_params_get_int(params, PARAM_SEGMENT) : -1;
+    gint col = gwy_params_get_int(params, PARAM_XPOS);
+    gint row = gwy_params_get_int(params, PARAM_YPOS);
+    gint pick_curve = gwy_params_get_int(params, PARAM_PICK_CURVE);
+    gint search_curve = gwy_params_get_int(params, PARAM_SEARCH_CURVE);
+    PosSearchMethod method = gwy_params_get_enum(params, PARAM_METHOD);
+    PosSearchDir dir = gwy_params_get_enum(params, PARAM_DIR);
+    gdouble threshold = gwy_params_get_double(params, PARAM_THRESHOLD)*args->vf->magnitude;
+    gdouble x;
+
+    execute(args);
+    gwy_data_field_data_changed(args->field);
+
+
+    extract_one_curve(args->lawn, gwy_graph_model_get_curve(gui->gmodel, 0), col, row, segment, params);
+    update_graph_model_props(gui->gmodel, args);
+
+    if (locate_in_one_curve(args->lawn, col, row, pick_curve, search_curve, segment, method, dir, threshold, &x))
+        gwy_selection_set_data(gui->graph_selection, 1, &x);
+    else
+        gwy_selection_clear(gui->graph_selection);
+}
+
+static void
+execute(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    gboolean segment_enabled = args->nsegments ? gwy_params_get_boolean(params, PARAM_ENABLE_SEGMENT) : FALSE;
+    gint segment = segment_enabled ? gwy_params_get_int(params, PARAM_SEGMENT) : -1;
+    gint pick_curve = gwy_params_get_int(params, PARAM_PICK_CURVE);
+    gint search_curve = gwy_params_get_int(params, PARAM_SEARCH_CURVE);
+    PosSearchMethod method = gwy_params_get_enum(params, PARAM_METHOD);
+    PosSearchDir dir = gwy_params_get_enum(params, PARAM_DIR);
+    gdouble threshold = gwy_params_get_double(params, PARAM_THRESHOLD)*args->vf->magnitude;
+    GwyLawn *lawn = args->lawn;
+    GwyDataField *field = args->field, *mask = args->mask;
+    gint xres = gwy_lawn_get_xres(lawn), yres = gwy_lawn_get_yres(lawn);
+    gdouble *data, *mdata;
+
+    /* First locate the point in all data.  This allows interpolating the failed ones. */
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_z(field), gwy_lawn_get_si_unit_curve(lawn, pick_curve));
+    gwy_data_field_clear(mask);
+    data = gwy_data_field_get_data(field);
+    mdata = gwy_data_field_get_data(mask);
+
+    /*
+#ifdef _OPENMP
+#pragma omp parallel if(gwy_threads_are_enabled()) default(none) \
+            shared(lawn,xres,yres,abscissa,ordinate,segment,data,mdata,method)
+#endif(*/
+    {
+        guint kfrom = gwy_omp_chunk_start(xres*yres);
+        guint kto = gwy_omp_chunk_end(xres*yres);
+        guint k, col, row;
+        gdouble x;
+
+        for (k = kfrom; k < kto; k++) {
+            col = k % xres;
+            row = k/xres;
+            if (locate_in_one_curve(lawn, col, row, pick_curve, search_curve, segment, method, dir, threshold, &x))
+                data[k] = x;
+            else
+                mdata[k] = 1.0;
+        }
+    }
+
+    if (gwy_data_field_get_max(mask) > 0.0)
+        gwy_data_field_laplace_solve(field, mask, -1, 1.0);
+}
+
+static gboolean
+locate_below(const gdouble *xdata, const gdouble *ydata, gint ndata,
+             PosSearchDir dir, gdouble threshold, gdouble *result)
+{
+    gint i, im;
+    gboolean found = TRUE;
+
+    if (!ndata) {
+        *result = 0.0;
+        return FALSE;
+    }
+
+    if (dir == DIR_LR) {
+       im = ndata - 1;
+       for (i = 0; i < ndata; i++) {
+           if (ydata[i] <= threshold) {
+               im = i;
+               found = TRUE;
+               break;
+           }
+       }
+    } else {
+       im = 0;
+       for (i = ndata-1; i >= 0; i--) {
+           if (ydata[i] <= threshold) {
+               im = i;
+               found = TRUE;
+               break;
+           }
+       }
+    }
+    //printf("%d %g\n", im, xdata[im]);
+
+    *result = xdata[im];
+    return found;
+}
+
+static gboolean
+locate_above(const gdouble *xdata, const gdouble *ydata, gint ndata,
+             PosSearchDir dir, gdouble threshold, gdouble *result)
+{
+    gint i, im;
+    gboolean found = FALSE;
+
+    if (!ndata) {
+        *result = 0.0;
+        return FALSE;
+    }
+
+    if (dir == DIR_LR) {
+       im = ndata - 1;
+       for (i = 0; i < ndata; i++) {
+           if (ydata[i] >= threshold) {
+               im = i;
+               found = TRUE;
+               break;
+           }
+       }
+    } else {
+       im = 0;
+       for (i = ndata-1; i >= 0; i--) {
+           if (ydata[i] >= threshold) {
+               im = i;
+               found = TRUE;
+               break;
+           }
+       }
+    }
+
+//    printf("%d %g\n", im, xdata[im]);
+    *result = xdata[im];
+    return found;
+}
+
+static gboolean
+locate_in_one_curve(GwyLawn *lawn, gint col, gint row,
+                    gint pos_pick, gint pos_search, gint segment,
+                    PosSearchMethod method, PosSearchDir dir, gdouble threshold,
+                    gdouble *result)
+{
+    const gdouble *ydata, *pdata;
+    gint ndata, from, end;
+    const gint *segments;
+
+    ydata = gwy_lawn_get_curve_data_const(lawn, col, row, pos_search, &ndata);
+    pdata = gwy_lawn_get_curve_data_const(lawn, col, row, pos_pick, &ndata);
+
+    if (segment >= 0) {
+        segments = gwy_lawn_get_segments(lawn, col, row, NULL);
+        from = segments[2*segment];
+        end = segments[2*segment + 1];
+        ydata += from;
+        pdata += from;
+        ndata = end - from;
+    }
+
+    if (method == METHOD_BELOW)
+        return locate_below(pdata, ydata, ndata, dir, threshold, result);
+    if (method == METHOD_ABOVE)
+        return locate_above(pdata, ydata, ndata, dir, threshold, result);
+
+    g_return_val_if_reached(FALSE);
+}
+
+static void
+extract_one_curve(GwyLawn *lawn, GwyGraphCurveModel *gcmodel,
+                  gint col, gint row, gint segment,
+                  GwyParams *params)
+{
+    gint search_curve = gwy_params_get_int(params, PARAM_SEARCH_CURVE);
+    const gdouble *ydata;
+    gdouble *xdata;
+    gint i, ndata, from, end;
+    const gint *segments;
+
+    ydata = gwy_lawn_get_curve_data_const(lawn, col, row, search_curve, &ndata);
+    xdata = g_new(gdouble, ndata);
+    for (i = 0; i < ndata; i++)
+           xdata[i] = i;
+
+    if (segment >= 0) {
+        segments = gwy_lawn_get_segments(lawn, col, row, NULL);
+        from = segments[2*segment];
+        end = segments[2*segment + 1];
+        xdata += from;
+        ydata += from;
+        ndata = end - from;
+    }
+    gwy_graph_curve_model_set_data(gcmodel, xdata, ydata, ndata);
+    g_free(xdata);
+}
+
+static void
+update_graph_model_props(GwyGraphModel *gmodel, ModuleArgs *args)
+{
+    GwyLawn *lawn = args->lawn;
+    GwyParams *params = args->params;
+    gint search_curve = gwy_params_get_int(params, PARAM_SEARCH_CURVE);
+    GwySIUnit *yunit;
+    const gchar *xlabel, *ylabel;
+
+    xlabel = g_strdup("sample");
+    yunit = gwy_lawn_get_si_unit_curve(lawn, search_curve);
+    ylabel = gwy_lawn_get_curve_label(lawn, search_curve);
+
+    g_object_set(gmodel,
+                 "si-unit-y", yunit,
+                 "axis-label-bottom", xlabel ? xlabel : _("Untitled"),
+                 "axis-label-left", ylabel ? ylabel : _("Untitled"),
+                 "label-visible", FALSE,
+                 NULL);
+}
+
+static void
+sanitise_one_param(GwyParams *params, gint id, gint min, gint max, gint defval)
+{
+    gint v;
+
+    v = gwy_params_get_int(params, id);
+    if (v >= min && v <= max) {
+        gwy_debug("param #%d is %d, i.e. within range [%d..%d]", id, v, min, max);
+        return;
+    }
+    gwy_debug("param #%d is %d, setting it to the default %d", id, v, defval);
+    gwy_params_set_int(params, id, defval);
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    GwyLawn *lawn = args->lawn;
+
+    sanitise_one_param(params, PARAM_XPOS, 0, gwy_lawn_get_xres(lawn)-1, gwy_lawn_get_xres(lawn)/2);
+    sanitise_one_param(params, PARAM_YPOS, 0, gwy_lawn_get_yres(lawn)-1, gwy_lawn_get_yres(lawn)/2);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

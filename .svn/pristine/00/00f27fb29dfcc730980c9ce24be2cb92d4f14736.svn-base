@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='text-data-export'>
+  <title>Text Data Export</title>
+  <para>
+    Exporting data to plain text file can be often useful for further
+    processing in other software as text files are highly portable.
+  </para>
+  <variablelist>
+    <varlistentry>
+      <indexterm>
+        <primary>text export</primary>
+        <secondary>images</secondary>
+      </indexterm>
+      <term>Image data</term>
+      <listitem>
+        <para>
+          Image data can be exported simply by invoking
+          <menuchoice>
+            <guimenu>File</guimenu>
+            <guimenuitem>Save as</guimenuitem>
+          </menuchoice>
+          and selecting file name extension <filename>.txt</filename> or
+          choosing <guilabel>ASCII data matrix (.txt)</guilabel> from the
+          <link linkend='file-saving'>file save dialogue</link>.  This writes
+          the current channel as a matrix of values, each line in the file
+          corresponding to one image row.  Optionally, the export of all
+          channels can be concatenated and written to one file (separated
+          by blank lines).
+        </para>
+        <para>
+          Exactly the same method allows also exporting image data to simple
+          three-column text files as XYZ data.  Just select
+          file name extension <filename>.xyz</filename> or
+          choose the <guilabel>XYZ text data (.xyz)</guilabel> format instead.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <indexterm>
+        <primary>text export</primary>
+        <secondary>graphs</secondary>
+      </indexterm>
+      <term>Graph curves</term>
+      <listitem>
+        <para>
+          Graph curves are exported using
+          <link linkend='graph-export'><guimenuitem>Export
+          Text</guimenuitem></link> from either the <guimenu>Graph</guimenu>
+          menu or graph right-click context menu.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <indexterm>
+        <primary>text export</primary>
+        <secondary>volume data</secondary>
+      </indexterm>
+      <term>Volume data</term>
+      <listitem>
+        <para>
+          Similarly, volume data are exported using
+          <link linkend='volume-export-text'><guimenuitem>Export
+          Text</guimenuitem></link> from the <guimenu>Volume Data</guimenu>
+          menu.
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <sect2 id='tabular-data-export'>
+    <title>Tabular Data</title>
+    <indexterm>
+      <primary>text export</primary>
+      <secondary>tabular data</secondary>
+    </indexterm>
+    <para>
+      A number of functions which calculate lists and sets of values offer
+      their export as tabular data.  The following figure shows an example
+      from the <link linkend='stat-quantities'>Statistical quantities
+      tool</link>.
+    </para>
+    <informalfigure id='fig-tabular-data-export'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='tabular-data-export-controls.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Controls for tabular data export, from left to right:
+          scientific number format switch, data format selector,
+          copy to clipboard and save to file buttons.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      The scientific number format switch controls whether numbers are written
+      in the machine-readable scientific format, with decimal dot (regardless
+      of locale settings) and <literal>e</literal> for power of 10.  When it is
+      switched on, the values are also written in base units – metres, as
+      opposed to micrometres or kilometres, for instance.  This means output
+      like
+      <informalexample>
+        <programlisting><![CDATA[
+Minimum: 3.32e-9 m
+Maximum: 1.20e-9 m
+]]></programlisting>
+      </informalexample>
+      With format intended to be human-readable (scientific format switched
+      off) the same values could be formatted
+      <informalexample>
+        <programlisting><![CDATA[
+Minimum: 3,32 nm
+Maximum: 1,20 nm
+]]></programlisting>
+      </informalexample>
+      if Gwyddion runs in an environment where comma is used as the decimal
+      separator.
+    </para>
+    <para>
+      The overall format of tabular data is controlled by the data format
+      selector with the following choices (not all may be present if they do
+      not make sense in particular context):
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term><guilabel>Colon:</guilabel></term>
+        <listitem>
+          <para>
+            Somewhat free format intended mainly to be human-readable.
+            The label is separated by a colon and the value and unit are simply
+            printed together and aligned:
+      <informalexample>
+        <programlisting><![CDATA[
+Maximum peak height (Sp): 6.6754 nm
+Maximum pit depth (Sp):   6.1039 nm
+Maximum height (Sz):      12.7793 nm
+]]></programlisting>
+      </informalexample>
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>TAB</guilabel></term>
+        <listitem>
+          <para>
+            Fixed number of columns – typically name, value, error, unit –
+            separated by the TAB character (ASCII 9).  The previous example
+            could be formatted:
+      <informalexample>
+        <programlisting><![CDATA[
+Maximum peak height (Sp)↦6.6754↦↦nm
+Maximum pit depth (Sp)↦6.1039↦↦nm
+Maximum height (Sz)↦12.7793↦↦nm
+]]></programlisting>
+      </informalexample>
+           where ↦ stands for the TAB character.  Note the empty columns for
+           value errors.  If the table can contain errors under some
+           circumstances, which is for statistical quantities the case when
+           <link linkend='caldata'>measurement uncertainties</link> are
+           present, the corresponding columns appears always, even if they are
+           empty.  This prevents format inconsistency with and without errors.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>CSV</guilabel></term>
+        <listitem>
+          <para>
+            Comma-separated values, a common (although not really standardised)
+            format with a fixed number of columns separated by commas.
+            Sometimes semicolons are also used despite the name, however,
+            Gwyddion writes files with comma as the separator.  The previous
+            example could be formatted:
+      <informalexample>
+        <programlisting><![CDATA[
+"Maximum peak height (Sp)","6.6754","","nm"
+"Maximum pit depth (Sp)","6.1039","","nm"
+"Maximum height (Sz)","12.7793","","nm"
+]]></programlisting>
+      </informalexample>
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

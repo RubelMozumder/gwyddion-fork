@@ -1,0 +1,3550 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Gwyddion\n"
+"POT-Creation-Date: 2022-01-07 21:32+0400\n"
+"PO-Revision-Date: 2022-01-07 21:32+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: russian-doc <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: installation-unix.xml:6(title)
+msgid "Linux/Unix Packages"
+msgstr "Пакеты Linux/Unix"
+
+#: installation-unix.xml:7(para)
+msgid ""
+"Some GNU/Linux and Unix systems provide binary packages of Gwyddion. The "
+"<ulink url=\"http://gwyddion.net/download.php\">download</ulink> page of the "
+"project also tracks known packages and packaging efforts. For instance, "
+"Debian, Ubuntu, Gentoo, openSuSE or FreeBSD offer Gwyddion packages. A "
+"Flatpak app installable in multiple distributions also exists. Gwyddion is "
+"available in several Mac OS X port/package repositories, such as MacPorts, "
+"Homebrew and Fink. If your operating system provides such a package and it "
+"is recent enough, install it using the standard means of the operating "
+"system. Otherwise you may need to proceed with <link linkend=\"installation-"
+"unix-source\">compilation from source code</link>."
+msgstr ""
+"Некоторые из систем GNU/Linux и Unix могут содержать уже собранные пакеты с "
+"Gwyddion. Страница <ulink url=\"http://gwyddion.net/download.php\">загрузки</"
+"ulink> проекта отслеживает известные пакеты и сборки. Например, Debian, "
+"Ubuntu, Gentoo, openSuSE или FreeBSD предлагают пакеты Gwyddion. Также "
+"существует приложение в формате Flatpak, которое можно устанавливать в "
+"различных дистрибутивах. Gwyddion доступен в нескольких репозиториях портов/"
+"пакетов для Mac OS X, таких, как MacPorts, Homebrew и Fink.  Если ваша "
+"операционная система содержит подобные пакеты, и они достаточно свежие, "
+"можно установить их стандартными средствами операционной системы. Если нет, "
+"возможно вам нужно перейти к  <link linkend=\"installation-unix-source"
+"\">разделу о компиляции из исходного кода</link>."
+
+#: installation-unix-source.xml:6(title)
+msgid "Compilation on Linux/Unix"
+msgstr "Сборка в среде Linux/Unix"
+
+#: installation-unix-source.xml:7(para)
+msgid ""
+"<application>Gwyddion</application> Unix build system is based on GNU "
+"autotools (<ulink url=\"http://www.gnu.org/software/autoconf/\">autoconf</"
+"ulink>, <ulink url=\"http://www.gnu.org/software/automake/\">automake</"
+"ulink>, <ulink url=\"http://www.gnu.org/software/libtool/\">libtool</"
+"ulink>), like most of current Unix Free and Open Source Software. If you "
+"have ever compiled software from source code, you very likely met autotools "
+"and already know how to proceed. This section shall describe the compilation "
+"procedure in enough detail even for the uninitiated though. File <ulink url="
+"\"https://sourceforge.net/p/gwyddion/code/HEAD/tree/trunk/gwyddion/INSTALL?"
+"force=True\"><filename>INSTALL</filename></ulink> in the top-level directory "
+"of the source tarball contains generic GNU autotools installation "
+"instructions."
+msgstr ""
+"Система сборки <application>Gwyddion</application> на Unix основана на GNU "
+"autotools (<ulink url=\"http://www.gnu.org/software/autoconf/\">autoconf</"
+"ulink>, <ulink url=\"http://www.gnu.org/software/automake/\">automake</"
+"ulink>, <ulink url=\"http://www.gnu.org/software/libtool/\">libtool</"
+"ulink>), так же, как и большинство современного свободного программного "
+"обеспечения и программ с открытым исходным кодом под Unix. Если вы когда-"
+"либо собирали программы из исходников, вы, вероятно, уже встречались с "
+"autotools и знаете, что делать дальше. Этот раздел, тем не менее, будет "
+"описывать процесс сборки достаточно детально, чтобы быть понятным и тем, кто "
+"ещё этого не делал. Файл<ulink url=\"https://sourceforge.net/p/gwyddion/code/"
+"HEAD/tree/trunk/gwyddion/INSTALL?force=True\"><filename>INSTALL</filename></"
+"ulink> в каталоге верхнего уровня архива с исходным кодом содержит общие "
+"инструкции по установке с помощью GNU autotools."
+
+#: installation-unix-source.xml:22(title)
+msgid "Quick Instructions"
+msgstr "Краткие инструкции"
+
+#: installation-unix-source.xml:23(para)
+msgid "If you know the drill:"
+msgstr "Если вам уже знакома последовательность действий:"
+
+#: installation-unix-source.xml:27(userinput)
+msgid ""
+"tar -jxvf gwyddion-2.49.tar.xz cd gwyddion-2.49 ./configure make make install"
+msgstr ""
+"tar -jxvf gwyddion-2.49.tar.xz cd gwyddion-2.49 ./configure make make install"
+
+#: installation-unix-source.xml:35(title)
+msgid "Source Unpacking"
+msgstr "Распаковка исходного кода"
+
+#: installation-unix-source.xml:36(para)
+msgid ""
+"Unpack the source code tarball with "
+"<informalexample><literallayout><userinput>tar -Jxvf gwyddion-2.49.tar.xz</"
+"userinput></literallayout></informalexample> replacing 2.49 with the actual "
+"version number. It will create directory <filename>gwyddion-2.49</filename> "
+"(again, with the actual version number in place of 2.49), <command>cd</"
+"command> to this directory. All other compilation actions will take place "
+"there."
+msgstr ""
+"Распакуйте архив с исходным кодом командой "
+"<informalexample><literallayout><userinput>tar -Jxvf gwyddion-2.49.tar.xz</"
+"userinput></literallayout></informalexample> заменяя 2.49 текущим номером "
+"версии. При этом будет создан каталог <filename>gwyddion-2.49</filename> "
+"(снова с текущим номером версии вместо 2.49), перейдите с помощью "
+"<command>cd</command> в этот каталог. Все остальные действия по сборке будут "
+"проходить там."
+
+#: installation-unix-source.xml:46(para)
+msgid ""
+"If your operating system does not come with xz you might want to download "
+"<filename>gwyddion-2.49.tar.gz</filename> (compressed with gzip) instead and "
+"unpack it with <informalexample><literallayout><userinput>tar -zxvf "
+"gwyddion-2.49.tar.gz</userinput></literallayout></informalexample> However, "
+"modern Unix and Unix-like systems come with both xz and gzip, so the "
+"considerably smaller <filename>gwyddion-2.49.tar.xz</filename> should be "
+"normally the better choice."
+msgstr ""
+"Если в операционной системе отсутствует xz, можно загрузить "
+"<filename>gwyddion-2.49.tar.gz</filename> (сжатый с помощью gzip) вместо "
+"предыдущего архива и распаковать его с помощью "
+"<informalexample><literallayout><userinput>tar -zxvf gwyddion-2.49.tar.gz</"
+"userinput></literallayout></informalexample> Однако, современные Unix и "
+"подобные им системы поддерживают и gzip, и xz, и заметно меньший "
+"<filename>gwyddion-2.49.tar.xz</filename> обычно будет более удачным "
+"вариантом."
+
+#: installation-unix-source.xml:60(title)
+msgid "Configuration"
+msgstr "Настройка"
+
+#: installation-unix-source.xml:61(para)
+msgid ""
+"Run <informalexample><literallayout><userinput>./configure</userinput></"
+"literallayout></informalexample> to configure <application>Gwyddion</"
+"application>."
+msgstr ""
+"Запустите <informalexample><literallayout><userinput>./configure</"
+"userinput></literallayout></informalexample> чтобы сконфигурировать сборку "
+"<application>Gwyddion</application>."
+
+#: installation-unix-source.xml:68(para)
+msgid ""
+"The <command>configure</command> shell script attempts to guess correct "
+"values for various system-dependent variables used during compilation. It "
+"uses those values to create a <filename>Makefile</filename> in each "
+"directory of the package, a couple of header <filename>.h</filename> files "
+"containing system-dependent definitions and a few other system-dependent "
+"auxiliary files. Finally, it creates a shell script <command>config.status</"
+"command> that you can run in the future to recreate the current "
+"configuration, and a file <filename>config.log</filename>. This file "
+"contains the details of the detection process and it is helpful to include "
+"it in compilation related bug reports. At the end, <command>configure</"
+"command> also prints a summary of enabled/disabled optional features, "
+"including the reasons why features were disabled."
+msgstr ""
+"Скрипт оболочки <command>configure</command> пытается угадать правильные "
+"значения для различных переменных, меняющихся от системы к системе и "
+"используемых в процессе компиляции. Он использует эти переменные чтобы "
+"создать <filename>Makefile</filename> в каждом каталоге пакета, набор "
+"заголовочных файлов с расширением <filename>.h</filename>, которые содержат "
+"зависящие от системы определения и некоторые другие  вспомогательные файлы. "
+"В конце своей работы он создаёт другой скрипт оболочки <command>config."
+"status</command>, который можно затем использовать для повторения текущей "
+"конфигурации, и файл <filename>config.log</filename>, который содержит "
+"подробности процесса детектирования и который полезно включать в сообщения "
+"об ошибках компиляции. В конце команда <command>configure</command> также "
+"выводит суммарную сводку о включенных и выключенных дополнительных опциях, "
+"включая причины почему опция была выключена."
+
+#: installation-unix-source.xml:97(envar)
+msgid "PKG_CONFIG_PATH"
+msgstr "PKG_CONFIG_PATH"
+
+#: installation-unix-source.xml:99(para)
+msgid ""
+"Most packages come with so called <ulink url=\"http://pkgconfig.freedesktop."
+"org/wiki/\">pkg-config</ulink> files (<filename>.pc</filename>) that "
+"describe how programs should compile and link with them. <command>configure</"
+"command> uses information from these files, therefore "
+"<envar>PKG_CONFIG_PATH</envar> must be set to list all non-standard "
+"directories with relevant pkg-config files. To add for instance a GTK+ "
+"installation in <filename>/opt/gnome</filename> and a FFTW3 installation in "
+"<filename>$HOME/opt/fftw3</filename> one can do "
+"<informalexample><literallayout><userinput>PKG_CONFIG_PATH=/opt/gnome/lib/"
+"pkgconfig:$HOME/opt/fftw3/lib/pkgconfig export PKG_CONFIG_PATH</userinput></"
+"literallayout></informalexample>"
+msgstr ""
+"Большинство пакетов идут вместе с так называемыми файлами <ulink url="
+"\"http://pkgconfig.freedesktop.org/wiki/\">pkg-config</ulink> (<filename>."
+"pc</filename>), которые описывают как программы должны собираться и "
+"линковаться с ними. <command>configure</command> использует информацию из "
+"этих файлов, следовательно, <envar>PKG_CONFIG_PATH</envar> должна быть "
+"установлена таким образом, чтобы там были перечислены все нестандартные "
+"какталоги с нужными файлами pkg-config. Чтобы добавить, например, "
+"установленную библиотеку GTK+ в <filename>/opt/gnome</filename> и "
+"установленную библиотеку FFTW3 в <filename>$HOME/opt/fftw3</filename>, нужно "
+"выполнить: <informalexample><literallayout><userinput>PKG_CONFIG_PATH=/opt/"
+"gnome/lib/pkgconfig:$HOME/opt/fftw3/lib/pkgconfig export PKG_CONFIG_PATH</"
+"userinput></literallayout></informalexample>"
+
+#: installation-unix-source.xml:118(term)
+msgid ""
+"<envar>PATH</envar>, <envar>LD_LIBRARY_PATH</envar>, "
+"<envar>DYLD_LIBRARY_PATH</envar>"
+msgstr ""
+"<envar>PATH</envar>, <envar>LD_LIBRARY_PATH</envar>, "
+"<envar>DYLD_LIBRARY_PATH</envar>"
+
+#: installation-unix-source.xml:124(para)
+msgid ""
+"It may be necessary to adjust these variables to include non-standard "
+"directories with executables and libraries of relevant packages, "
+"respectively. Variables <envar>LD_LIBRARY_PATH</envar> and "
+"<envar>DYLD_LIBRARY_PATH</envar> both set the search path for shared "
+"libraries, but the former is used in Linux and BSD systems, while the latter "
+"on OS X."
+msgstr ""
+"Может потребоваться настроить эти переменные чтобы включить нестандартные "
+"каталоги с исполняемыми файлами и библиотеками соответствующих пакетов. "
+"Переменные <envar>LD_LIBRARY_PATH</envar> и <envar>DYLD_LIBRARY_PATH</envar> "
+"обе задают путь поиска для разделяемых библиотек, но первая используется в "
+"системах на основе Linux и BSD, в то время, как вторая на OS X."
+
+#: installation-unix-source.xml:136(term)
+msgid "<envar>CPPFLAGS</envar>, <envar>LDFLAGS</envar>"
+msgstr "<envar>CPPFLAGS</envar>, <envar>LDFLAGS</envar>"
+
+#: installation-unix-source.xml:141(para)
+msgid ""
+"It may be necessary to adjust these variables to include non-standard "
+"directories with header files and libraries of packages that do not come "
+"with pkg-config files, for example for libTIFF in <filename>/usr/local</"
+"filename> one can set: <informalexample><literallayout><userinput>CPPFLAGS=-"
+"I/usr/local/include export CPPFLAGS LDFLAGS=-L/usr/local/lib export LDFLAGS</"
+"userinput></literallayout></informalexample>"
+msgstr ""
+"Может потребоваться настроить эти переменные чтобы включить нестандартные "
+"каталоги с заголовочными файлами и библиотеками пакетов, с которыми не шло "
+"файлов pkg-config, например, для libTIFF в <filename>/usr/local</filename> "
+"можно установить: <informalexample><literallayout><userinput>CPPFLAGS=-I/usr/"
+"local/include export CPPFLAGS LDFLAGS=-L/usr/local/lib export LDFLAGS</"
+"userinput></literallayout></informalexample>"
+
+#: installation-unix-source.xml:84(para)
+msgid ""
+"If <command>configure</command> reports missing <link linkend=\"installation-"
+"dependencies\">required packages</link>, install these packages and re-run "
+"it. The same applies to the case when <command>configure</command> passes "
+"but you find you have not installed an optional package you want to compile "
+"<application>Gwyddion</application> with. It is possible a package is not "
+"found or it is misdetected even if you have installed it, namely when it is "
+"installed into a non-standard directory. In this case it is necessary to "
+"adjust certain environment variables to make <command>configure</command> "
+"able to find the packages: <placeholder-1/>"
+msgstr ""
+"Если <command>configure</command> пишет об отсутствии <link linkend="
+"\"installation-dependencies\">требуемых пакетов</link>, установите эти "
+"пакеты и перезапустите её. То же самое справедливо и для случая, если "
+"<command>configure</command> заканчивается успешно, но вы обнаружили, что "
+"забыли установить опциональный компонент, с которым хотели собрать "
+"<application>Gwyddion</application>. Возможно, что пакет не был найден или "
+"был неправильно определён даже если вы его установили, а именно если он был "
+"установлен в нестандартный каталог. В этом случае необходимо настроить "
+"определённые переменные окружения чтобы дать <command>configure</command> "
+"возможность найти эти пакеты: <placeholder-1/>"
+
+#: installation-unix-source.xml:157(para)
+msgid ""
+"Option <option>--prefix</option> of <command>configure</command> sets the "
+"base installation directory. Program components will be installed into its "
+"<filename>bin</filename>, <filename>lib</filename>, <filename>share</"
+"filename>, etc. subdirectories (that will be created if they do not exist). "
+"More detailed control is possible with options specifying particular "
+"subdirectories as <option>--bindir</option>, <option>--libdir</option>. The "
+"default prefix is <filename>/usr/local/bin</filename>, to install "
+"<application>Gwyddion</application> into your home directory you may want to "
+"use for instance <informalexample><literallayout><userinput>./configure --"
+"prefix=$HOME/opt/gwyddion</userinput></literallayout></informalexample> If "
+"you install Gwyddion for personal use it is recommended to use a similar "
+"installation directory as no steps need to be performed as root in this case."
+msgstr ""
+"Опция <option>--prefix</option> команды <command>configure</command> задаёт "
+"базовый каталог установки. Компоненты программы будут установлены в его "
+"подкаталоги <filename>bin</filename>, <filename>lib</filename>, "
+"<filename>share</filename>, и т.д. (которые будут созданы если они не "
+"существуют). Более детальное управление возможно с помощью опций, задающих "
+"отдельные подкаталоги, таких как <option>--bindir</option>, <option>--"
+"libdir</option>. Префикс по умолчанию – <filename>/usr/local/bin</filename>, "
+"чтобы установить <application>Gwyddion</application> в домашний каталог "
+"пользователя можно использовать, например команду "
+"<informalexample><literallayout><userinput>./configure --prefix=$HOME/opt/"
+"gwyddion</userinput></literallayout></informalexample> Если вы "
+"устанавливаете Gwyddion для личного использования это является "
+"рекомендованным вариантом, поскольку в этом случае не требуется выполнять "
+"действий с правами суперпользователя."
+
+#: installation-unix-source.xml:177(title)
+msgid "Configuration tweaks"
+msgstr "Настройки процесса конфигурирования"
+
+#: installation-unix-source.xml:178(para)
+msgid ""
+"Optional features can be enabled/disabled with options such as <option>--"
+"with-foo</option>/<option>--without-foo</option> or <option>--enable-foo</"
+"option>/<option>--disable-foo</option>. For instance compilation with zlib "
+"can be disabled with: <informalexample><literallayout><userinput>./configure "
+"--without-zlib</userinput></literallayout></informalexample> By default all "
+"optional features are enabled if their prerequisites are found. A brief "
+"summary of enabled and disabled optional features is printed near the end of "
+"<command>configure</command> output."
+msgstr ""
+"Необязательные возможности можно включить/выключить с помощью опций вроде "
+"<option>--with-foo</option>/<option>--without-foo</option> или <option>--"
+"enable-foo</option>/<option>--disable-foo</option>. Например, компиляция с "
+"zlib может быть отключена командой: "
+"<informalexample><literallayout><userinput>./configure --without-zlib</"
+"userinput></literallayout></informalexample> По умолчанию все опциональные "
+"возможности включены, если найдены все требуемые для их реализации "
+"библиотеки. Краткая информация о включенных и отключенных опциональных "
+"возможностях печатается в выводе команды <command>configure</command> "
+"недалеко от его конца."
+
+#: installation-unix-source.xml:191(para)
+msgid ""
+"The complete list of <command>configure</command> options and important "
+"variables can be obtained with: <informalexample><literallayout><userinput>./"
+"configure --help</userinput></literallayout></informalexample>"
+msgstr ""
+"Полный список опций и важных переменных <command>configure</command> можно "
+"получить с помощью команды: <informalexample><literallayout><userinput>./"
+"configure --help</userinput></literallayout></informalexample>"
+
+#: installation-unix-source.xml:198(para)
+msgid ""
+"The list is long and most of the options and variables control inclusion/"
+"exclusion of individual optional features or provide compiler and linker "
+"flags for the various libraries. For instance, by setting "
+"<envar>FFTW3_CFLAGS</envar> and <envar>FFTW3_LIBS</envar> you can specify "
+"(or override) how compilation and linking with FFTW3 should be done. "
+"However, this manual specification is only a fallback if the much more "
+"convenient pkg-config method does not work."
+msgstr ""
+"Список будет длинным и большая часть опций контроллирует включение/"
+"выключение отдельных опциональных возможностей или передачу необходимых "
+"флагов компиляции и связывания для различных библиотек. Например, задавая "
+"<envar>FFTW3_CFLAGS</envar> и <envar>FFTW3_LIBS</envar>можно задать (или "
+"переопределить) как будет осуществляться компиляция и связывание с FFTW3. "
+"Однако, такое ручное задание является резервным вариантом для гораздо более "
+"удобного метода, основанного на использовании pkg-config в том случае если "
+"он почему-то не работает."
+
+#: installation-unix-source.xml:207(para)
+msgid ""
+"Some interesting general options are explained in the following paragraphs."
+msgstr "Некоторые интересные общие опции описаны в следующих параграфах."
+
+#: installation-unix-source.xml:212(title)
+msgid "User's tweaks"
+msgstr "Настройки пользователей"
+
+#: installation-unix-source.xml:213(para)
+msgid ""
+"Gwyddion comes with various desktop integration files defining MIME types, "
+"menu entries, file associations, thumbnailers, etc. If you install Gwyddion "
+"to a system prefix they usually end up in the correct location. However, if "
+"you install it somewhere to your home directory then these files need to be "
+"placed elsewhere, namely into certain dot-directories in your home."
+msgstr ""
+"C Gwyddion поставляются различные файлы взаимодействия со средой рабочего "
+"стола, которые определяют типы MIME, элементы меню, привязки файлов, "
+"генерацию миниатюр и т.п. Если Gwyddion устанавливается в системный каталог, "
+"они обычно находятся в правильных местах файловой системы. Однако, если вы "
+"устанавливаете его куда-то в свой каталог пользователя, то эти файлы нужно "
+"поместить в другое место. а именно в определённые скрытые каталоги, "
+"начинающиеся с точки в вашем домашнем каталоге."
+
+#: installation-unix-source.xml:221(para)
+msgid ""
+"This can be requested using <option>--enable-home-installation</option> "
+"option of <command>configure</command>. Note that using this option causes "
+"installation of files outside the specified prefix."
+msgstr ""
+"Это можно задать с помощью опции <option>--enable-home-installation</option> "
+"команды <command>configure</command>. Следует отметить, что использование "
+"этой опции приводит к установке файлов в каталоги вне заданного префикса."
+
+#: installation-unix-source.xml:229(title)
+msgid "Packager's tweaks"
+msgstr "Настройки создателей пакетов"
+
+#: installation-unix-source.xml:230(para)
+msgid ""
+"If Gwyddion is installed into a staging area for a subsequent packaging it "
+"is necessary to disable certain post-installation actions that need to be "
+"done on the target system, not while packaging."
+msgstr ""
+"Если Gwyddion устанавливается во временный каталог для дальнейшего создания "
+"пакета, необходимо отключить определённые действия после установки, которые "
+"нужно производить с системой, где пакет будет установлен, а не в момент "
+"создания пакета."
+
+#: installation-unix-source.xml:235(para)
+msgid ""
+"Updating of Freedesktop files can be disabled with <option>--disable-desktop-"
+"file-update</option>. Installation of GConf2 schemas can be disabled with "
+"<option>--disable-schemas-install</option>. Usually, this does not have to "
+"be done explicitly as installations into a staging area use non-empty "
+"<varname>DESTDIR</varname> (see <link linkend=\"installation-unix-source-"
+"installation\">installation</link>). If <varname>DESTDIR</varname> is found "
+"to be non-empty the build system skips post-installation actions "
+"automatically."
+msgstr ""
+"Обновление файлов FreeDesktop может быть отключено с помощью <userinput>--"
+"disable-desktop-file-update</userinput>. Установка схем GConf2 может быть "
+"отключена с помощью <userinput>--disable-schemas-install</userinput>. Обычно "
+"это не надо делать в явной форме т.к. установки в временный каталог "
+"используют непустую переменную <varname>DESTDIR</varname> (см. раздел <link "
+"linkend=\"installation-unix-source-installation\">установка</link>). Если "
+"переменная <varname>DESTDIR</varname> не пустая, система сборки пропустит "
+"автоматически действия после установки. Тем не менее, обычной причиной "
+"отключения этих действий является то. что Gwyddion устанавливается на "
+"временное место вместо финального каталога (что обычно происходит при сборке "
+"пакетов в Linux). В этом случае вспомогательные действия отключаются "
+"автоматически при непустой переменной <varname>DESTDIR</varname> (см. раздел "
+"<link linkend=\"installation-unix-source-installation\">установка</link>) и, "
+"следовательно, нет нужды отключать их в <command>configure</command>."
+
+#: installation-unix-source.xml:246(para)
+msgid ""
+"Pasing <option>--enable-library-bloat</option> to <command>configure</"
+"command> enforces linking modules with all libraries. This is automatically "
+"enabled on MS Windows where it is required. On Unix systems, linking modules "
+"with libraries that are loaded into the main program anyway only needlessly "
+"slows things down (both during build and program execution). So modules are "
+"not explicitly linked with base libraries such as GLib. If your environment "
+"or policy demands linking modules with all libraries using this option will "
+"ensure it."
+msgstr ""
+"Передавая параметр <option>--enable-library-bloat</option> скрипту "
+"<command>configure</command> заставляет связываться модулям со всеми "
+"библиотеками. Это автоматически включается на MS Windows, где это является "
+"обязательным требованием. В основанных на Unix системах, связывание модулей "
+"со всеми библиотеками, которые уже загружены основной программой только "
+"напрасно замедляет работу (как во время сборки, так и во время исполнения). "
+"Таким образом, модули не связываются непосредственно с основными "
+"библиотеками вроде GLib. если ваша система или правила сборки требуют "
+"связывания модулей со всеми библиотеками (например, в системах, основанных "
+"на AltLinux), использование этой опции включает данное поведение."
+
+#: installation-unix-source.xml:257(para)
+msgid ""
+"Pasing <option>--disable-module-bundling</option> to <command>configure</"
+"command> prevents the bundling of all modules of the same class (file, "
+"process, …) to a single shared library, which is normally done to save space "
+"and speed up program startup. Although bundling changes nothing "
+"functionally, it changes the set of installed files considerably. If you, "
+"for whatever reason, depend on the file <filename>gwyfile.so</filename> "
+"existing on disk then please stop. But meanwhile you can use this option to "
+"force the traditional installation where each module was in a separate file."
+msgstr ""
+"Передачей опции <option>--disable-module-bundling</option> команде "
+"<command>configure</command> можно запретить объединение всех модулей одного "
+"типа (файловых, обработки данных, ...) в одну разделяемую библиотеку, что "
+"обычно делается для сохранения места на диске и ускорения загрузки. Хотя "
+"подобное объединение не меняет функциональность, оно заметно меняет набор "
+"устанавливаемых файлов. Если вы, по той или иной причине, полагаетесь на "
+"наличие на диске файла <filename>gwyfile.so</filename>, самое время "
+"остановиться и перестать так делать. Тем не менее, можно использовать данную "
+"опцию чтобы принудительно получить традиционный вариант установки, где "
+"каждый модуль находился в отдельном файле."
+
+#: installation-unix-source.xml:270(title)
+msgid "Developer's tweaks"
+msgstr "Настройки для разработчиков"
+
+#: installation-unix-source.xml:271(para)
+msgid ""
+"If you intend to patch or otherwise modify Gwyddion source code pass option "
+"<option>--enable-maintainer-mode</option> to <command>configure</command> to "
+"enable various update and rebuild rules that are not used in plain "
+"compilation. Depending on the nature of the modifications, some of the "
+"additional tools described in section <link linkend=\"installation-devel"
+"\">Subversion Checkout, Development</link> may be necessary."
+msgstr ""
+"Если вы собираетесь накладывать патч или иным образом модифицировать "
+"исходный код Gwyddion запустите <command>configure</command> с опцией "
+"<option>--enable-maintainer-mode</option> чтобы включить различные правила "
+"обновления и пересборки, которые не используются при обычной компиляции. В "
+"зависимости от вида изменений могут понадобиться некоторые дополнительные "
+"инструменты, описанные в разделе <link linkend=\"installation-devel\">Снимок "
+"Subversion, разработка</link>."
+
+#: installation-unix-source.xml:281(para)
+msgid ""
+"By default, the C API reference documentation is not rebuilt. Pre-built HTML "
+"is distributed in the tarball, the documentation seldom changes and "
+"generating it takes a rather long time. To enable the generation of API "
+"documentation pass option <option>--enable-gtk-doc</option> to "
+"<command>configure</command>. Of course, you also need gtk-doc. Note that "
+"<command>configure</command> warns if you enable the maintainer mode but "
+"disable gtk-doc (which can be useful to avoid pointless repeated "
+"documentation rebuilds). Unless you are going to do <userinput>make dist</"
+"userinput>, this is harmless."
+msgstr ""
+"По умолчанию справочное руководство по C API не пересобирается. "
+"Подготовленные файлы HTML распространяются с архивом, документация меняется "
+"редко и её генерация требует достаточно продолжительного времени. Для того, "
+"чтобы включить генерацию документации по API нужно передать опцию <option>--"
+"enable-gtk-doc</option> скрипту <command>configure</command>. Естественно, "
+"вам потребуется gtk-doc. Следует отметить, что <command>configure</command> "
+"предупредит вас, если вы включили режим мантейнера, но выключили gtk-doc "
+"(что может быть полезно для того, чтобы не пересобирать постоянно и "
+"бесцельно документацию). Если вы не собираетесь делать <userinput>make dist</"
+"userinput>, это предупреждение безвредно."
+
+#: installation-unix-source.xml:296(title)
+#: installation-cross-mingw32.xml:189(title)
+msgid "Compilation"
+msgstr "Компиляция"
+
+#: installation-unix-source.xml:297(para)
+msgid ""
+"Run <informalexample><literallayout><userinput>make</userinput></"
+"literallayout></informalexample> and wait until <application>Gwyddion</"
+"application> is compiled. If <command>configure</command> finished without "
+"errors the compilation should pass too. To shorten the wait, enable parallel "
+"compilation by running <command>make</command> as "
+"<informalexample><literallayout><userinput>make -j6</userinput></"
+"literallayout></informalexample> replacing 6 with the number of processor "
+"cores."
+msgstr ""
+"Запустите <informalexample><literallayout><userinput>make</userinput></"
+"literallayout></informalexample> и подождите, пока  <application>Gwyddion</"
+"application> соберётся. Если команда <command>configure</command> "
+"завершилась без ошибок, компиляция тоже должна пройти успешно. Для того, "
+"чтобы уменьшить время ожидания, можно разрешить параллельную компиляцию "
+"запуская <command>make</command> командой "
+"<informalexample><literallayout><userinput>make -j6</userinput></"
+"literallayout></informalexample> где 6 необходимо заменить реальным "
+"количеством доступных процессорных ядер."
+
+#: installation-unix-source.xml:311(para)
+msgid ""
+"If you find you need to do unusual things to compile the package, please try "
+"to figure out how <command>configure</command> could detect whether and what "
+"to do, and e-mail patches or instructions to the bug-report address so they "
+"can be considered for the next release."
+msgstr ""
+"Если вам понадобилось сделать нечто необычное, чтобы собрать пакет, "
+"постарайтесь выяснить, как <command>configure</command> может обнаружить, "
+"когда и что нужно делать, и пришлите патчи или инструкции на адрес "
+"электронной почты для сообщений об ошибках, чтобы можно было включить их в "
+"следующий релиз."
+
+#: installation-unix-source.xml:319(title)
+#: installation-compiling-msvc.xml:156(title) install.xml:6(title)
+msgid "Installation"
+msgstr "Установка"
+
+#: installation-unix-source.xml:320(para)
+msgid ""
+"<application>Gwyddion</application> has to be installed to be run, it is not "
+"possible to run it uninstalled."
+msgstr ""
+"<application>Gwyddion</application> нужно установить перед запуском, его "
+"нельзя запустить неустановленным."
+
+#: installation-unix-source.xml:324(para)
+msgid ""
+"Run <informalexample><literallayout><userinput>make install</userinput></"
+"literallayout></informalexample> to install <application>Gwyddion</"
+"application> to the target directory. If you install <application>Gwyddion</"
+"application> to a system directory you have to become root for running this "
+"command. This is the <emphasis>only</emphasis> command that you might have "
+"to run as root during the installation. For example using <command>sudo</"
+"command>: <informalexample><literallayout><userinput>sudo make install</"
+"userinput></literallayout></informalexample>"
+msgstr ""
+"Выполните <informalexample><literallayout><userinput>make install</"
+"userinput></literallayout></informalexample> для установки "
+"<application>Gwyddion</application> в целевой каталог. Если вы "
+"устанавливаете <application>Gwyddion</application> в системный каталог, вам "
+"необходимо стать суперпользователем чтобы выполнить эту команду. Это "
+"<emphasis>единственная</emphasis> команда. которую обязательно нужно "
+"запускать от суперпользователя при установке. Например, используя sudo "
+"<informalexample><literallayout><userinput>sudo make install</userinput></"
+"literallayout></informalexample> "
+
+#: installation-unix-source.xml:338(para)
+msgid ""
+"To install <application>Gwyddion</application> to a staging area, for "
+"example for packaging, set <command>make</command><varname>DESTDIR</varname> "
+"variable to a prefix that will be prepended to all target directories: "
+"<informalexample><literallayout><userinput>make install DESTDIR=/var/tmp/"
+"gwyddion-buildroot</userinput></literallayout></informalexample> Do "
+"<emphasis>not</emphasis> override individual directory variables as "
+"<varname>bindir</varname>, <varname>libdir</varname>."
+msgstr ""
+"Чтобы установить <application>Gwyddion</application> во временное место, "
+"например, для сборки пакета, установите переменную <command>make</command> "
+"<varname>DESTDIR</varname> на префикс, который будет добавлен ко всем "
+"целевым каталогам: <informalexample><literallayout><userinput>make install "
+"DESTDIR=/var/tmp/gwyddion-buildroot</userinput></literallayout></"
+"informalexample> <emphasis>Не</emphasis> переопределяйте переменные "
+"отдельных каталогов такие, как <varname>bindir</varname>, <varname>libdir</"
+"varname>."
+
+#: installation-unix-source.xml:355(varname)
+msgid "GCONF_SCHEMA_CONFIG_SOURCE"
+msgstr "GCONF_SCHEMA_CONFIG_SOURCE"
+
+#: installation-unix-source.xml:354(listitem)
+msgid "<placeholder-1/> – location of GConf2 schemas"
+msgstr "<placeholder-1/> – местоположение схем GConf2"
+
+#: installation-unix-source.xml:359(varname)
+msgid "KDE4_MODULE_DIR"
+msgstr "KDE4_MODULE_DIR"
+
+#: installation-unix-source.xml:358(listitem)
+msgid "<placeholder-1/> – location of KDE4 modules"
+msgstr "<placeholder-1/> – местоположение модулей KDE4"
+
+#: installation-unix-source.xml:349(para)
+msgid ""
+"If you do not install to a system directory, e.g. to a subdirectory of your "
+"home directory, you may need to adjust the following variables during "
+"installation: <placeholder-1/> Also, variable <varname>XDG_DATA_DIRS</"
+"varname> might need to be adjusted after installation to get full desktop "
+"integration."
+msgstr ""
+"Если вы не устанавливаете в системный каталог, т.е. устанавливаете в "
+"подкаталог домашнего каталога, может потребоваться настройка следующих "
+"переменных окружения в процессе установки: <placeholder-1/> Также может "
+"потребоваться настройка переменной <varname>XDG_DATA_DIRS</varname> для "
+"полной интеграции с окружением рабочего стола."
+
+#: installation-unix-source.xml:365(para)
+msgid ""
+"If you install Gwyddion into <filename>/usr/local</filename> and get error "
+"message that <filename>libgwyapp.so.0</filename> cannot be found your system "
+"probably lacks standard library directories in the dynamic linker "
+"configuration. Notably, this happens on Ubuntu. Edit file <filename>/etc/ld."
+"so.conf</filename> and add the line <informalexample><programlisting>/usr/"
+"local/lib</programlisting></informalexample> there."
+msgstr ""
+"Если вы установили Gwyddion в <filename>/usr/local</filename> и получили "
+"сообщение об ошибке <filename>libgwyapp.so.0</filename> не может быть "
+"найдена, в вашей системе, по видимому, отсутствуют стандартные каталоги для "
+"библиотек в настройках динамического линкера. Такое было замечено на Ubuntu. "
+"Отредактируйте файл <filename>/etc/ld.so.conf</filename> и добавьте туда "
+"строку <informalexample><programlisting>/usr/local/lib</programlisting></"
+"informalexample>"
+
+#: installation-unix-source.xml:378(title) installation-osx.xml:165(title)
+msgid "Running"
+msgstr "Запуск"
+
+#: installation-unix-source.xml:379(para)
+msgid ""
+"Running <application>Gwyddion</application> does not normally require any "
+"additional setup."
+msgstr ""
+"Запуск <application>Gwyddion</application> обычно не требует дополнительных "
+"настроек."
+
+#: installation-unix-source.xml:383(para)
+msgid ""
+"The misfeatures of some desktop environments, however, may render "
+"<application>Gwyddion</application> unusable and need to be disabled. The "
+"hijacking of program main menu in <application>Unity</application> makes "
+"most of <application>Gwyddion</application> menus inaccessible. It can be "
+"disabled by by unsetting <envar>UBUNTU_MENUPROXY</envar> while running "
+"<application>Gwyddion</application>: "
+"<informalexample><literallayout><userinput>UBUNTU_MENUPROXY= gwyddion</"
+"userinput></literallayout></informalexample>"
+msgstr ""
+"Но некорректная реализация особенностей некоторых сред рабочего стола, может "
+"привести <application>Gwyddion</application> в нерабочее состояние и эту "
+"функциональность нужно отключить. Перехват главного меню программы в "
+"<application>Unity</application> делает большую часть меню "
+"<application>Gwyddion</application> недоступными. Это можно отключить "
+"сбросив переменную окружения <envar>UBUNTU_MENUPROXY</envar> при запуске "
+"<application>Gwyddion</application>:"
+"<informalexample><literallayout><userinput>UBUNTU_MENUPROXY= gwyddion</"
+"userinput></literallayout></informalexample>"
+
+#: installation-unix-source.xml:396(title)
+msgid "Deinstallation"
+msgstr "Отмена установки"
+
+#: installation-unix-source.xml:397(para)
+msgid ""
+"Run <informalexample><literallayout><userinput>make uninstall</userinput></"
+"literallayout></informalexample> in the directory you previously compiled "
+"<application>Gwyddion</application> to remove it. If you have lost the "
+"source directory meanwhile you can try to unpack, configure and build it "
+"exactly as before and then issue <userinput>make uninstall</userinput>, "
+"although this relies on your ability to reproduce the build process."
+msgstr ""
+"Запустите <informalexample><literallayout><userinput>make uninstall</"
+"userinput></literallayout></informalexample> в каталоге, где ранее собирался "
+"<application>Gwyddion</application> для его удаления. Если вы уже утратили "
+"содержимое этого каталога, можно попробовать распаковать, настроить и "
+"собрать его точно так же, как ранее и после этого выполнить <userinput>make "
+"uninstall</userinput>, хотя результат зависит от вашей способности точно "
+"повторить процесс сборки."
+
+#: installation-unix-source.xml:411(title)
+msgid "RPM Packages"
+msgstr "Пакеты RPM"
+
+#: installation-unix-source.xml:412(para)
+msgid ""
+"It is possible to build RPM packages on RPM-based GNU/Linux distributions "
+"directly from source code tarballs with "
+"<informalexample><literallayout><userinput>rpmbuild -tb gwyddion-2.49.tar."
+"xz</userinput></literallayout></informalexample> where 2.49 is to be "
+"replaced with the actual version as above. This method was tested mainly on "
+"Fedora, openSuSE and Mandriva and the RPM spec file contains some specific "
+"provisions for these systems. Specific support for other RPM-based systems "
+"can be added on request."
+msgstr ""
+"В основанных на RPM дистрибутивах GNU/Linux можно собрать RPM-пакеты "
+"напрямую из архивов с исходным кодом выполнив команду "
+"<informalexample><literallayout><userinput>rpmbuild -tb gwyddion-2.49.tar."
+"xz</userinput></literallayout></informalexample> где 2.49 – текущая версия, "
+"как упоминалось ранее. Этот метод тестировался в основном на Fedora, "
+"openSuSE и Mandriva и spec-файл RPM содержит некоторые специальные директивы "
+"для этих систем. Особая поддержка других основанных на RPM систем может быть "
+"добавлена по запросу."
+
+#: installation-osx.xml:6(title)
+msgid "Mac OS X"
+msgstr "Mac OS X"
+
+#: installation-osx.xml:7(para)
+msgid ""
+"Much of the previous generic <link linkend=\"installation-unix-source\">Unix/"
+"Linux installation section</link> applies also to OS X. Therefore this "
+"section deals mainly with the specifics of OS X installation, some of the "
+"steps listed here are explained in more detail in the generic Unix section."
+msgstr ""
+"Большая часть вышеупомянутых общих <link linkend=\"installation-unix-source"
+"\">инструкций по установке на  Unix/Linux</link> также применима для OS X. "
+"Следовательно, этот раздел посвящён в основном особенностям установки на OS "
+"X, часть шагов, приведённых здесь подробнее описана в разделе про Unix."
+
+#: installation-osx.xml:19(ulink) installation-osx.xml:69(entry)
+#: installation-osx.xml:99(title)
+msgid "MacPorts"
+msgstr "MacPorts"
+
+#: installation-osx.xml:18(listitem)
+msgid ""
+"using <placeholder-1/> (formerly Darwinports) and building from a Portfile."
+msgstr ""
+"используя <placeholder-1/> (ранее известный, как Darwinports) и собирая из "
+"Portfile."
+
+#: installation-osx.xml:23(ulink) installation-osx.xml:68(entry)
+#: installation-osx.xml:142(title)
+msgid "Fink"
+msgstr "Fink"
+
+#: installation-osx.xml:24(application) installation-osx.xml:28(application)
+#: installation-ms-windows.xml:35(application)
+msgid "Gwyddion"
+msgstr "Gwyddion"
+
+#: installation-osx.xml:22(listitem)
+msgid "using <placeholder-1/> and installing <placeholder-2/> using apt-get."
+msgstr ""
+"используя <placeholder-1/> и устанавливая <placeholder-2/> используя apt-get."
+
+#: installation-osx.xml:27(ulink)
+msgid "Homebrew"
+msgstr "Homebrew"
+
+#: installation-osx.xml:26(listitem)
+msgid ""
+"using <placeholder-1/> and build <placeholder-2/> using the brew formula."
+msgstr ""
+"используя <placeholder-1/> и собирая <placeholder-2/> используя формулу "
+"приготовления (brew formula)."
+
+#: installation-osx.xml:14(para)
+msgid ""
+"Beside building everything on your own (good luck), at this time there are "
+"two ways to install <application>Gwyddion</application>: <placeholder-1/>"
+msgstr ""
+"Помимо сборки всего вручную (удачи), в настоящее время есть два варианта, "
+"как установить <application>Gwyddion</application>: <placeholder-1/>"
+
+#: installation-osx.xml:33(title)
+msgid "Preparation"
+msgstr "Подготовка"
+
+#: installation-osx.xml:34(para)
+msgid ""
+"To install and run <application>Gwyddion</application> you need the Xcode "
+"Tools and X (SDK and App) installed. They where located on your CDs/DVDs. "
+"The Xcode Tools where located on the first DVD as XcodeTools.mpkg below "
+"Xcode Tools, the X11SDK is located as X11SDK.pkg below the Packages Folder "
+"within Xcode Tools. X11 is localed as X11User.pkg below <filename>System/"
+"Installation/Packages</filename> even on the first DVD. If you have an CD "
+"Set the Discs may differ. The people from MacPorts recommending using the "
+"newest version of XCode. For further information look at the <ulink url="
+"\"http://www.macports.org/install.php\">MacPorts Install Page</ulink>. Also "
+"you should have some experience using <application>Terminal.app</"
+"application>. All the commands in the the rest of this section are to be "
+"entered and run in <application>Terminal.app</application>."
+msgstr ""
+"Чтобы установить и запустить <application>Gwyddion</application> вам нужны "
+"установленные Xcode Tools и X (SDK и App). Они находятся на системных CD/DVD-"
+"дисках. Xcode Tools находились на первом DVD как XcodeTools.mpkg в "
+"подкаталоге Xcode Tools, X11SDK находится под именем  X11SDK.pkg в "
+"подкаталоге Packages внутри Xcode Tools. X11 находится под именем X11User."
+"pkg внутри <filename>System/Installation/Packages</filename> также на первом "
+"диске. Если у вас был набор на CD, диски могут различаться. Участники "
+"проекта MacPorts рекомендуют использовать наиболее новую версию XCode. "
+"Дополнительная информация доступна на <ulink url=\"http://www.macports.org/"
+"install.php\">странице установки MacPorts</ulink>. Также у вас должен быть "
+"некоторый опыт работы с <application>Terminal.app</application>. Все команды "
+"в продолжении этого раздела надо вводить и запускать в <application>Terminal."
+"app</application>."
+
+#: installation-osx.xml:54(para)
+msgid ""
+"See <link linkend=\"installation-dependencies\">installation dependencies</"
+"link> section for an overview of required and optional packages to install "
+"prior to <application>Gwyddion</application> installation. The following "
+"table summarises how they are called in the two software collections:"
+msgstr ""
+"Необходимые и опциональные пакеты для установки<application>Gwyddion</"
+"application> описаны в разделе <link linkend=\"installation-dependencies"
+"\">зависимости при установке</link>. Следующая таблица содержит их названия "
+"в двух разных коллекциях программного обеспечения:"
+
+#: installation-osx.xml:67(entry) installation-dependencies.xml:28(entry)
+msgid "Package"
+msgstr "Пакет"
+
+#: installation-osx.xml:74(entry)
+msgid "Gtk+"
+msgstr "Gtk+"
+
+#: installation-osx.xml:75(entry)
+msgid "gtk+2"
+msgstr "gtk+2"
+
+#: installation-osx.xml:76(entry)
+msgid "gtk2"
+msgstr "gtk2"
+
+#: installation-osx.xml:79(entry) installation-dependencies.xml:92(ulink)
+msgid "GtkGLExt"
+msgstr "GtkGLExt"
+
+#: installation-osx.xml:80(entry)
+msgid "gtkglext1"
+msgstr "gtkglext1"
+
+#: installation-osx.xml:81(entry)
+msgid "gtkglext"
+msgstr "gtkglext"
+
+#: installation-osx.xml:84(entry) installation-dependencies.xml:81(ulink)
+msgid "FFTW3"
+msgstr "FFTW3"
+
+#: installation-osx.xml:85(entry)
+msgid "fftw3"
+msgstr "fftw3"
+
+#: installation-osx.xml:86(entry)
+msgid "fftw-3"
+msgstr "fftw-3"
+
+#: installation-osx.xml:89(entry) installation-dependencies.xml:189(ulink)
+msgid "LibXML2"
+msgstr "LibXML2"
+
+#: installation-osx.xml:90(entry) installation-osx.xml:91(entry)
+msgid "libxml2"
+msgstr "libxml2"
+
+#: installation-osx.xml:100(para)
+msgid ""
+"MacPorts is a <application>Port</application> based System for porting and "
+"installing Open Source/GNU software to OS X. It's based on using "
+"installation files called <quote>Portfiles</quote> which are describing the "
+"steps to compile and install an application. So it's far easy to port "
+"software to OS X using MacPorts but every computer has to compile the "
+"application. Get and install <ulink url=\"http://www.macports.org/"
+"\">MacPorts</ulink>. After you installed MacPorts, run "
+"<informalexample><literallayout><userinput>sudo port selfupdate</userinput></"
+"literallayout></informalexample> to update MacPorts to the latest version."
+msgstr ""
+"MacPorts – основанная на <application>ports</application> система переноса и "
+"установки программного обеспечения с открытым исходным кодом/программного "
+"обеспечения проекта GNU на OS X. Она основана на использовании установочных "
+"файлов, т.н. <quote>Portfiles</quote>, в которых описаны необходимые шаги по "
+"сборке и установке приложений. Таким образом, программное обеспечение легко "
+"переносится на OS X с использованием MacPorts, но на каждом компьютере "
+"приложения приходится собирать заново. Необходимо загрузить и установить "
+"<ulink url=\"http://www.macports.org/\">MacPorts</ulink>. После установки "
+"запустите <informalexample><literallayout><userinput>sudo port selfupdate</"
+"userinput></literallayout></informalexample> чтобы обновить MacPorts до "
+"последней версии."
+
+#: installation-osx.xml:116(para)
+msgid ""
+"Usually installing ports with MacPorts is easy. But since X11 is not the "
+"native Desktop for OS X, things went a little worse. So it is recommended to "
+"install an alternative X11 before installing <application>Gwyddion</"
+"application>. The recommended alternatives are <ulink url=\"http://http://"
+"xquartz.macosforge.org/\">XQuartz</ulink> on Leopard and the Port "
+"<application>xorg-server</application> on Tiger. After installing the "
+"suggested X11-System, <application>Gwyddion</application> can be then build "
+"and installed simply by <informalexample><literallayout><userinput>sudo port "
+"install gwyddion</userinput></literallayout></informalexample> To install "
+"<application>xorg-server</application> (Tiger) simply type "
+"<informalexample><literallayout><userinput>sudo port install xorg-server</"
+"userinput></literallayout></informalexample> this is <emphasis>needed</"
+"emphasis> for the 3D view on Tiger. After everything is done, you will find "
+"the StartUp-Icon below <filename>/Applications/MacPorts</filename>."
+msgstr ""
+"Обычно установка  с помощью MacPorts несложна. Но поскольку X11 не является "
+"родным окружением рабочего стола для OS X, дела становятся несколько хуже. "
+"Рекомендуется поставить одну из альтернативных версий X11 перед установкой "
+"<application>Gwyddion</application>. Рекомендуемые альтернативы - <ulink url="
+"\"http://http://xquartz.macosforge.org/\">XQuartz</ulink> на Leopard и "
+"<application>xorg-server</application> из системы портов на Tiger. После "
+"установки рекомендованной системы X11, <application>Gwyddion</application> "
+"может быть собран и установлен просто командой "
+"<informalexample><literallayout><userinput>sudo port install gwyddion</"
+"userinput></literallayout></informalexample> Чтобы установить "
+"<application>xorg-server</application> (на Tiger) просто наберите "
+"<informalexample><literallayout><userinput>sudo port install xorg-server</"
+"userinput></literallayout></informalexample> это <emphasis>необходимо</"
+"emphasis> для работы окон трёхмерного вида на Tiger. После того, как все "
+"операции завершатся, иконку запуска можно найти в подменю <filename>/"
+"Applications/MacPorts</filename>."
+
+#: installation-osx.xml:143(para)
+msgid ""
+"Get and install <ulink url=\"http://fink.sourceforge.net/\">Fink</ulink>. "
+"After you installed Fink run <informalexample><literallayout><userinput>apt-"
+"get update</userinput></literallayout></informalexample> to update the "
+"database of available packages and install Gwyddion with "
+"<informalexample><literallayout><userinput>apt-get install gwyddion</"
+"userinput></literallayout></informalexample> To install Gwyddion from source "
+"code, for instance if you want to install a development version, you need to "
+"install the required packages listed in the <link linkend=\"table-osx-"
+"package-names\">above table</link> and then follow the generic <link linkend="
+"\"installation-unix-source\">Unix installation section</link> instructions."
+msgstr ""
+"Загрузите и установите <ulink url=\"http://fink.sourceforge.net/\">Fink</"
+"ulink>. После установки запустите "
+"<informalexample><literallayout><userinput>apt-get update</userinput></"
+"literallayout></informalexample> чтобы обновить список доступных пакетов и "
+"установите Gwyddion командой <informalexample><literallayout><userinput>apt-"
+"get install gwyddion</userinput></literallayout></informalexample> Чтобы "
+"установить Gwyddion из исходных кодов, например, если вы хотите установить "
+"версию для разработчиков, вам необходимо установить требуемые пакеты, "
+"перечисленные в <link linkend=\"table-osx-package-names\">вышеприведённой "
+"таблице</link> и затем следовать общим инструкциям из раздела об<link "
+"linkend=\"installation-unix-source\">установке под Unix</link>."
+
+#: installation-osx.xml:166(para)
+msgid ""
+"On MacPorts you simply click on the StartUp-Icon and wait until "
+"<application>Gwyddion</application> appears. Using Fink or a self-compiled "
+"version you should follow the steps below: Start <application>X11.app</"
+"application> and type in <application>Terminal.app</"
+"application><informalexample><literallayout><userinput>export DISPLAY="
+"\":0\"</userinput></literallayout></informalexample> Then run "
+"<application>Gwyddion</application> from the folder it was installed to. "
+"This is typically <filename>/usr/local/bin</filename> for Fink. So for "
+"example for Fink run: <informalexample><literallayout><userinput>/usr/local/"
+"bin/gwyddion</userinput></literallayout></informalexample> You can also "
+"configure <application>X11.app</application> to run <application>Gwyddion</"
+"application> via: Locate X11.app in your dock, open the menu, choose "
+"Applications, choose Customize from the next menu. Here you can choose add "
+"and enter the name (Gwyddion for example) as <guilabel>Menu Name</guilabel> "
+"and the complete path to Gwyddion (e.g. /usr/local/bin/gwyddion) as "
+"<guilabel>Command</guilabel>. After this you can choose Gwyddion from the "
+"X11 menu."
+msgstr ""
+"В системе с MacPorts можно просто нажать иконку запуска и подождать, пока "
+"<application>Gwyddion</application> запустится. Используя Fink или "
+"самосборную версию, необходимо следовать нижеприведённым инструкциям: "
+"запустите <application>X11.app</application> и наберите в  "
+"<application>Terminal.app</"
+"application><informalexample><literallayout><userinput>export DISPLAY="
+"\":0\"</userinput></literallayout></informalexample> После этого запустите "
+"<application>Gwyddion</application> из того каталога, куда он был "
+"установлен. Для Fink это обычно <filename>/usr/local/bin</filename>. Для "
+"Fink, например, нужно запускать <informalexample><literallayout><userinput>/"
+"usr/local/bin/gwyddion</userinput></literallayout></informalexample> Также "
+"можно настроить <application>X11.app</application> чтобы запускать "
+"<application>Gwyddion</application>: найдите X11.app в доке, запустите меню, "
+"выберите Приложения, выберите Настроить в следующем меню. Здесь можно "
+"выбрать Добавить и ввести имя (например, Gwyddion) как <guilabel>Имя в меню</"
+"guilabel> и полный путь к Gwyddion (т.е. /usr/local/bin/gwyddion) как "
+"<guilabel>Команду</guilabel>. После этого можно будет выбрать Gwyddion из "
+"меню X11."
+
+#: installation-ms-windows.xml:6(title)
+msgid "MS Windows Packages"
+msgstr "Сборки для MS Windows"
+
+#: installation-ms-windows.xml:7(para)
+msgid ""
+"MS Windows packages built by the developers are available on the project "
+"<ulink url=\"http://gwyddion.net/download.php\">download</ulink> page. At "
+"present both 32bit and 64bit executables are provided. Most new users should "
+"choose the 64bit package package nowadays. The 32bit package still has some "
+"uses though."
+msgstr ""
+"Пакеты для MS Windows, собранные разработчиками, доступны на <ulink url="
+"\"http://gwyddion.net/download.php\">странице загрузки</ulink> проекта. В "
+"настоящее время доступны версии как для 32-битных, так и для 64-битных "
+"систем. Большинству новых пользователей скорее всего нужна 64-битная версия. "
+"Однако, 32-битные версии также могут найти своё применение."
+
+#: installation-ms-windows.xml:18(ulink)
+msgid "description of the changes"
+msgstr "описание изменений"
+
+#: installation-ms-windows.xml:14(note)
+msgid ""
+"The packaging of MS Windows executables has changed substantially in version "
+"2.23. So, if you upgrade from a pre-2.23 version to version 2.23 or newer, "
+"please read the <placeholder-1/>."
+msgstr ""
+"Формат поставки исполняемых файлов MS Windows был сильно изменён в версии "
+"2.23. Если вы обновляетесь с версии до 2.23 на версию 2.23 или более новую, "
+"прочтите <placeholder-1/>."
+
+#: installation-ms-windows.xml:21(para)
+msgid ""
+"If you have already installed <application>Gwyddion</application> the "
+"installer asks if you want to replace the previous version."
+msgstr ""
+"Если <application>Gwyddion</application> уже установлен, программа установки "
+"спросит, хотите ли вы заменить предыдущую версию."
+
+#: installation-ms-windows.xml:31(phrase)
+msgid "MS Windows installer upgrade question screenshot"
+msgstr ""
+"Снимок экрана программы установки для MS Windows с вопросом об обновлении"
+
+#: installation-ms-windows.xml:33(caption)
+msgid "The question what to do with the previous <placeholder-1/> version."
+msgstr "Вопрос о том, что делать с предыдущей версией <placeholder-1/>."
+
+#: installation-ms-windows.xml:39(para)
+msgid "You have three options:"
+msgstr "Есть три возможных варианта:"
+
+#: installation-ms-windows.xml:44(term)
+msgid "Yes (replace)"
+msgstr "Да (заменить)"
+
+#: installation-ms-windows.xml:45(listitem)
+msgid ""
+"The already installed version will be replaced. This is the normal upgrade "
+"method."
+msgstr "Уже установленная версия будет заменена. Это обычный метод обновления."
+
+#: installation-ms-windows.xml:51(term)
+msgid "No (keep)"
+msgstr "Нет (оставить)"
+
+#: installation-ms-windows.xml:52(listitem)
+msgid ""
+"The already installed version will be ignored and the installation will "
+"proceed as a fresh one. Generally, this is a bad idea as both versions will "
+"share settings and registry keys and if you uninstall one the other will be "
+"affected. Furthermore, it does not remove any of the files of the already "
+"present version – and they can get into the way. Sill, you may find this "
+"option useful in some cases."
+msgstr ""
+"Уже установленная версия будет проигнорирована и установка пойдёт как новая. "
+"В общем случае, это плохая идея, т.к. обе версии будут использовать общие "
+"настройки и пути реестра, и если вы удалите одну из них, другая также будет "
+"задета. более того, при этом не удаляются никакие файлы из уже имеющейся "
+"версии - и они могут мешать работать новой. Хотя в некоторых случаях этот "
+"вариант может оказаться полезным."
+
+#: installation-ms-windows.xml:62(term)
+msgid "Cancel"
+msgstr "Отмена"
+
+#: installation-ms-windows.xml:63(listitem)
+msgid ""
+"The installation will be aborted and the old version will be kept untouched."
+msgstr "Установка будет отменена и старая версия останется нетронутой."
+
+#: installation-ms-windows.xml:69(para)
+msgid ""
+"In the following steps the installer reminds you of the software components "
+"included in the package and their licenses (that are all Free Software), "
+"lets you change the installation directory and offers a choice of languages "
+"to use for the user interface."
+msgstr ""
+"На следующих шагах программа установки напоминает о включенных в состав "
+"пакета программных компонентах и их лицензиях (что они все являются "
+"свободным программным обеспечением), дают поменять каталог установки и "
+"предлагают выбрать язык, используемый для отображения интерфейса "
+"пользователя."
+
+#: installation-ms-windows.xml:76(title)
+msgid "Uninstallation"
+msgstr "Отмена установки"
+
+#: installation-ms-windows.xml:77(para)
+msgid ""
+"If you want to uninstall Gwyddion go to <menuchoice><guimenu>Start</"
+"guimenu><guisubmenu>Control Panel</guisubmenu><guimenuitem>Add or Remove "
+"Programs</guimenuitem></menuchoice> and choose <application>Gwyddion</"
+"application>. Note that this is valid for Windows XP. The path to the "
+"<guimenuitem>Add/Remove</guimenuitem> window may be slightly different on "
+"other Windows OS."
+msgstr ""
+"Если вы хотите удалить Gwyddion, перейдите в <menuchoice><guimenu>Пуск</"
+"guimenu><guisubmenu>Панель управления</guisubmenu><guimenuitem>Установка и "
+"удаление программ</guimenuitem></menuchoice> (<menuchoice><guimenu>Пуск</"
+"guimenu><guisubmenu>Панель управления</guisubmenu><guimenuitem>Программы и "
+"компоненты</guimenuitem></menuchoice> в некоторых версиях Windows) и "
+"выберите <application>Gwyddion</application>. Этот путь может отличаться в "
+"других версиях Windows."
+
+#: installation-ms-windows.xml:90(title)
+msgid "Registry keys"
+msgstr "Ключи реестра"
+
+#: installation-ms-windows.xml:91(para)
+msgid ""
+"The installer creates the following useful keys under "
+"<literal>HKEY_LOCAL_MACHINE\\Software\\Gwyddion\\2.0</literal>:"
+msgstr ""
+"Программа установки создаёт следующие нужные ключи в ветке реестра "
+"<literal>HKEY_LOCAL_MACHINE\\Software\\Gwyddion\\2.0</literal>:"
+
+#: installation-ms-windows.xml:97(literal)
+msgid "InstallDir"
+msgstr "InstallDir"
+
+#: installation-ms-windows.xml:100(filename)
+msgid "C:\\Program Files\\Gwyddion"
+msgstr "C:\\Program Files\\Gwyddion"
+
+#: installation-ms-windows.xml:98(listitem)
+msgid ""
+"Installation directory, e.g. <placeholder-1/>. Reading this key can be "
+"useful for determining where to install extensions."
+msgstr ""
+"Каталог установки, т.е. <placeholder-1/>. Чтение этого ключа может быть "
+"полезным чтобы определить, куда ставить дополнения."
+
+#: installation-ms-windows.xml:106(literal)
+#: installation-dependencies.xml:29(entry)
+msgid "Version"
+msgstr "Version"
+
+#: installation-ms-windows.xml:107(listitem)
+msgid "Full Gwyddion version as a string."
+msgstr "Полная версия Gwyddion как строка."
+
+#: installation-ms-windows.xml:112(literal)
+#: installation-ms-windows.xml:132(literal)
+msgid "Locale"
+msgstr "Locale"
+
+#: installation-ms-windows.xml:117(command)
+msgid "regedit"
+msgstr "regedit"
+
+#: installation-ms-windows.xml:113(listitem)
+msgid ""
+"Language of Gwyddion user interface chosen during the installation (more "
+"precisely, a locale specification that, among other things, defines the "
+"language). You can modify it using <placeholder-1/> to choose another "
+"language as described below."
+msgstr ""
+"Язык интерфейса пользователя Gwyddion, выбранный при установке (точнее, "
+"задание локали, которое в том числе определяет и язык). Можно изменить его "
+"используя <placeholder-1/> чтобы выбрать другой язык как описано ниже."
+
+#: installation-ms-windows.xml:122(para)
+msgid ""
+"The list of available languages and corresponding <literal>Locale</literal> "
+"values include:"
+msgstr ""
+"Список доступных языков и соответствующих значений <literal>Locale</literal> "
+"включает в себя:"
+
+#: installation-ms-windows.xml:133(entry)
+msgid "Language"
+msgstr "Язык"
+
+#: installation-ms-windows.xml:138(literal)
+msgid "cs_CZ.UTF-8"
+msgstr "cs_CZ.UTF-8"
+
+#: installation-ms-windows.xml:139(entry)
+msgid "Czech (Czech Republic)"
+msgstr "Чешский (Чехия)"
+
+#: installation-ms-windows.xml:142(literal)
+msgid "en_US.UTF-8"
+msgstr "en_US.UTF-8"
+
+#: installation-ms-windows.xml:143(entry)
+msgid "English (United States)"
+msgstr "Английский (США)"
+
+#: installation-ms-windows.xml:146(literal)
+msgid "en_GB.UTF-8"
+msgstr "en_GB.UTF-8"
+
+#: installation-ms-windows.xml:147(entry)
+msgid "English (United Kingdom)"
+msgstr "Английский (Соединённое королевство)"
+
+#: installation-ms-windows.xml:150(literal)
+msgid "fr_FR.UTF-8"
+msgstr "fr_FR.UTF-8"
+
+#: installation-ms-windows.xml:151(entry)
+msgid "French (France)"
+msgstr "Французский (Франция)"
+
+#: installation-ms-windows.xml:154(literal)
+msgid "de_DE.UTF-8"
+msgstr "de_DE.UTF-8"
+
+#: installation-ms-windows.xml:155(entry)
+msgid "German (Germany)"
+msgstr "Немецкий (Германия)"
+
+#: installation-ms-windows.xml:158(literal)
+msgid "it_IT.UTF-8"
+msgstr "it_IT.UTF-8"
+
+#: installation-ms-windows.xml:159(entry)
+msgid "Italian (Italy)"
+msgstr "Итальянский (Италия)"
+
+#: installation-ms-windows.xml:162(literal)
+msgid "ko_KR.UTF-8"
+msgstr "ko_KR.UTF-8"
+
+#: installation-ms-windows.xml:163(entry)
+msgid "Korean (South Korea)"
+msgstr "Корейский (Южная Корея)"
+
+#: installation-ms-windows.xml:166(literal)
+msgid "ru_RU.UTF-8"
+msgstr "ru_RU.UTF-8"
+
+#: installation-ms-windows.xml:167(entry)
+msgid "Russian (Russia)"
+msgstr "Русский (Россия)"
+
+#: installation-ms-windows.xml:170(literal)
+msgid "pt_BR.UTF-8"
+msgstr "pt_BR.UTF-8"
+
+#: installation-ms-windows.xml:171(entry)
+msgid "Portugese (Brazil)"
+msgstr "Португальский (Бразилия)"
+
+#: installation-ms-windows.xml:174(literal)
+msgid "es_ES.UTF-8"
+msgstr "es_ES.UTF-8"
+
+#: installation-ms-windows.xml:175(entry)
+msgid "Spanish (Spain)"
+msgstr "Испанский (Испания)"
+
+#: installation-ms-windows.xml:183(title)
+msgid "Missing features"
+msgstr "Отсутствующие возможности"
+
+#: installation-ms-windows.xml:184(para)
+msgid ""
+"Gwyddion has a large number of optional features that depend on third party "
+"libraries. The MS Windows packages contain most of them but a few are not "
+"included at present:"
+msgstr ""
+"Gwyddion поддерживает большое число опциональных возможностей, которые "
+"зависят от наличия сторонних библиотек. Бинарные сборки под MS Windows "
+"содержат большую часть из них, но некоторые не включены в настоящее время:"
+
+#: installation-ms-windows.xml:190(listitem)
+msgid "Flexible Image Transport System (FITS) file import."
+msgstr "импорт файлов Flexible Image Transport System (FITS)"
+
+#: installation-ms-windows.xml:193(listitem)
+msgid ""
+"Pygwy support in the 64bit packages (it is supported only in the 32bit "
+"packages)."
+msgstr ""
+"поддержка Pygwy в 64битных сборках (оно поддерживается только в 32битных "
+"сборках)."
+
+#: installation-ms-windows.xml:200(title)
+msgid "Enabling pygwy"
+msgstr "Включение pygwy"
+
+#: installation-ms-windows.xml:201(para)
+msgid ""
+"The Python scripting interface, pygwy, is included in the installer. "
+"However, you need to install Python and PyGTK2 separately to use Python "
+"scripting. This can be done either prior to Gwyddion installation or any "
+"time later. If Python and PyGTK2 is not present pygwy simply does not "
+"register itself upon Gwyddion startup."
+msgstr ""
+"Интерфейс написания скриптов на Python, pygwy, включен в инсталятор. Однако, "
+"необходимо отдельно установить Python и PyGTK2 чтобы заработали скрипты на "
+"Python. Это можно сделать как до установки Gwyddion, так и в любое время "
+"после. Если отсутствуют Python и PyGTK2, pygwy просто не будет "
+"регистрировать себя при запуске Gwyddion."
+
+#: installation-ms-windows.xml:208(para)
+msgid ""
+"MS Windows Python installer could be obtained at <ulink url=\"https://www."
+"python.org/downloads/\">https://www.python.org/downloads/</ulink>. Since "
+"pygwy requires Python 2 you need a Python 2.7 package, which are no longer "
+"officially supported. The latest version <filename>python-2.7.16.msi</"
+"filename> is mirrored at <ulink url=\"https://sourceforge.net/projects/"
+"gwyddion/files/pygtk-win32/\">Gwyddion's SourceForge page</ulink> in case "
+"you have trouble finding or downloading it."
+msgstr ""
+"Пакет установки Python для MS Windows можно загрузить по адресу <ulink url="
+"\"https://www.python.org/downloads/\">https://www.python.org/downloads/</"
+"ulink>. Поскольку pygwy требует Python второй версии, установите пакет "
+"Python 2.7, который более не поддерживается. Последняя версия "
+"<filename>python-2.7.16.msi</filename> зеркалируется на странице <ulink url="
+"\"https://sourceforge.net/projects/gwyddion/files/pygtk-win32/\">Gwyddion "
+"сайта SourceForge</ulink> на случай, если возникают проблемы найти или "
+"скачать её в других местах."
+
+#: installation-ms-windows.xml:218(para)
+msgid ""
+"Three packages are required for PyGTK2: PyGTK, PyCairo and PyGObject. Follow "
+"the corresponding download links for these modules at <ulink url=\"http://"
+"www.pygtk.org/downloads.html\">http://www.pygtk.org/downloads.html</ulink> "
+"to obtain the installers <filename>pygobject-2.28.3.win32-py2.7.msi</"
+"filename>, <filename>pycairo-1.8.10.win32-py2.7.msi</filename>, and "
+"<filename>pygtk-2.24.0.win32-py2.7.msi</filename> or possibly newer versions "
+"(if available). They also mirrored at <ulink url=\"https://sourceforge.net/"
+"projects/gwyddion/files/pygtk-win32/\">Gwyddion's SourceForge page</ulink> "
+"in case you have trouble finding or downloading them."
+msgstr ""
+"Для PyGTK2 нужны три пакета: PyGTK, PyCairo и PyGObject. Для загрузки этих "
+"модулей необходимо перейти по соответствующим ссылкам на странице <ulink url="
+"\"http://www.pygtk.org/downloads.html\">http://www.pygtk.org/downloads.html</"
+"ulink> чтобы получить пакеты установки для <filename>pygobject-2.28.3.win32-"
+"py2.7.msi</filename>, <filename>pycairo-1.8.10.win32-py2.7.msi</filename> и "
+"<filename>pygtk-2.24.0.win32-py2.7.msi</filename> или, возможно, более новых "
+"версий, если они станут доступны. Также их зеркало доступно на <ulink url="
+"\"https://sourceforge.net/projects/gwyddion/files/pygtk-win32/\">странице "
+"Gwyddion на SourceForge</ulink> в том случае, если с их поиском и загрузкой "
+"возникнут проблемы."
+
+#: installation-ms-windows.xml:231(para)
+msgid ""
+"Success has also been reported with the all-in-one installer <filename>pygtk-"
+"all-in-one-2.24.2.win32-py2.7.msi</filename> that contains everything. "
+"However, using the all-in-one installer means entire Gtk+ will be installed "
+"twice (into different locations). Which bits of which installation will be "
+"used in pygwy is difficult to tell. Hence this method is not recommended."
+msgstr ""
+"Также сообщалось, что можно успешно установить пакет \"всё-в-одном\" "
+"<filename>pygtk-all-in-one-2.24.2.win32-py2.7.msi</filename>, который "
+"содержит всё, что нужно. Однако, использование этого пакета установки "
+"означает, что весь Gtk+ будет установлен дважды (в различные места файловой "
+"системы). Который из них будет использоваться pygwy трудно сказать, поэтому "
+"этот метод не рекомендуется использовать."
+
+#: installation-mingw32.xml:6(title)
+msgid "Compiling on MS Windows using MinGW"
+msgstr "Компиляция для MS Windows с использованием MinGW"
+
+#: installation-mingw32.xml:7(para)
+msgid ""
+"Although the standard MS Windows executables are created using <link linkend="
+"\"installation-cross-mingw32\">cross-compilation</link> it is also possible "
+"to build Gwyddion on MS Windows using the <ulink url=\"http://www.mingw.org/"
+"\">MinGW</ulink> port of GNU tools to MS Windows. The standard MS Windows "
+"excutables also come with almost all the optional features packaged – the "
+"notable exception being Python scripting. Getting all these components work "
+"in MS Windows requires additional effort. However, the most likely reason "
+"for compiling on MS Windows is to obtain all the necessary files to develop "
+"and build standalone Gwyddion modules and for this purpose building all the "
+"optional components is not necessary."
+msgstr ""
+"Хотя стандартные исполняемые файлы для MS Windows создаются с помощью <link "
+"linkend=\"installation-cross-mingw32\">кросс-компиляции</link>, также "
+"возможно собрать Gwyddion под MS Windows используя порт утилит GNU <ulink "
+"url=\"http://www.mingw.org/\">MinGW</ulink> на MS Windows. Стандартные "
+"исполняемые файлы MS Windows также идут с включенными практическими всеми "
+"опциональными возможностями – заметным исключением из которых является "
+"поддержка скриптов на Python. Чтобы заставить эти компоненты работать в MS "
+"Windows потребуются дополнительные усилия. Однако, наиболее вероятной "
+"причиной компиляции на MS Windows является получение всех необходимых файлов "
+"для создания отдельных модулей Gwyddion, и для этого применения опциональные "
+"компоненты не являются необходимыми.‭"
+
+#: installation-mingw32.xml:20(para)
+msgid ""
+"The procedure is essentially the same as the normal <link linkend="
+"\"installation-unix-source\">Unix compilation</link>. Some MinGW-specific "
+"remarks follow."
+msgstr ""
+"Процедура в основном такая же, как при нормальной <link linkend="
+"\"installation-unix-source\">компиляции под Unix</link>. Некоторые "
+"специфичные для MinGW замечания ниже."
+
+#: installation-mingw32.xml:25(para)
+msgid ""
+"It has been reported that the <ulink url=\"http://ftp.gnome.org/pub/gnome/"
+"binaries/win32/gtk+/2.24/\">Gtk+ 2.24.10 bundle</ulink> can be successfully "
+"used. After installing it, set in the MSYS shell "
+"<informalexample><literallayout><userinput>PKG_CONFIG=<varname>PATH-TO-GTK+</"
+"varname>/gtk+/bin/pkg-config.exe</userinput></literallayout></"
+"informalexample> where <varname>PATH-TO-GTK+</varname> needs to be replaced "
+"with the actual Gtk+ installation directory."
+msgstr ""
+"Сообщалось, что можно успешно использовать <ulink url=\"http://ftp.gnome.org/"
+"pub/gnome/binaries/win32/gtk+/2.24/\">сборку Gtk+ 2.24.10</ulink>. После "
+"установки, задайте в оболочке MSYS "
+"<informalexample><literallayout><userinput>PKG_CONFIG=<varname>ПУТЬ-К-GTK+</"
+"varname>/gtk+/bin/pkg-config.exe</userinput></literallayout></"
+"informalexample> где <varname>ПУТЬ-К-GTK+</varname> надо заменить на "
+"настоящий каталог установки Gtk+."
+
+#: installation-mingw32.xml:36(para)
+msgid ""
+"To compile only the libraries, it may be useful to use the patch "
+"<filename>gwyddion-2.22-build-only-libs.patch</filename> described in the "
+"<link linkend=\"installation-cross-mingw32-modules\">cross-compilation "
+"section</link>. In addition, it seems that the MinGW libintl redefines "
+"<function>printf()</function> to <function>libintl_printf()</function> which "
+"it, however, does not provide. This leads to link failure of "
+"<filename>gwyddion.exe</filename>. This can be ‘fixed’ by simply removing "
+"<filename>include/libintl.h</filename> in the Gtk+ directory."
+msgstr ""
+"Чтобы собрать только библиотеки может оказаться полезным патч "
+"<filename>gwyddion-2.22-build-only-libs.patch</filename> описанный в <link "
+"linkend=\"installation-cross-mingw32-modules\">разделе о кросс-компиляции</"
+"link>. В дополнение, похоже что MinGW libintl переопределяет "
+"<function>printf()</function> на <function>libintl_printf()</function>, "
+"которую, однако, не содержит. Это приводит к сбою компоновки (link) "
+"<filename>gwyddion.exe</filename>. Можно 'исправить' эту ошибку простым "
+"удалением <filename>include/libintl.h</filename> в каталоге Gtk+."
+
+#: installation-devel.xml:6(title)
+msgid "Subversion Checkout, Development"
+msgstr "Снимок Subversion, Разработка"
+
+#: installation-devel.xml:7(para)
+msgid ""
+"<application>Gwyddion</application> uses <ulink url=\"http://subversion."
+"apache.org/\">Subversion</ulink> version control system for source code "
+"revision management. The organisation of the repository is described <ulink "
+"url=\"http://gwyddion.net/resources.php#subversion\">on project web pages</"
+"ulink>. For example the current head revision of the program itself can be "
+"checked out with <informalexample><literallayout><userinput>svn checkout "
+"http://svn.code.sf.net/p/gwyddion/code/trunk/gwyddion</userinput></"
+"literallayout></informalexample>"
+msgstr ""
+"<application>Gwyddion</application> использует систему контроля версий "
+"<ulink url=\"http://subversion.apache.org/\">Subversion</ulink> для "
+"управления ревизиями исходного кода. Организация репозитория описана на "
+"<ulink url=\"http://gwyddion.net/resources.php#subversion\">страницах "
+"проекта</ulink>.  Например, последнюю ревизию самой программы можно получить "
+"из системы контроля версий командой "
+"<informalexample><literallayout><userinput>svn checkout http://svn.code.sf."
+"net/p/gwyddion/code/trunk/gwyddion</userinput></literallayout></"
+"informalexample>"
+
+#: installation-devel.xml:19(para)
+msgid ""
+"The repository does not contain any generated files, no matter how exotic "
+"tools may be necessary to generate them. Therefore, additional packages are "
+"required for building from a fresh checkout. There are also certain platform "
+"limitations. The additional tools and packages required for development are "
+"essentially the same as for compilation from <application>Subversion</"
+"application> checkout. More precisely, to build from a fresh checkout all "
+"the additional tools are necessary, whereas development may require only a "
+"subset of them or even none, depending on the type and extent of the changes "
+"in the source code."
+msgstr ""
+"Репозиторий не содержит никаких генерируемых файлов, независимо от того, "
+"насколько экзотичные инструменты могут понадобиться для их генерации. "
+"Следовательно, требуется использование дополнительных пакетов, для сборки "
+"свежего снимка. Также существуют определённые ограничения платформы. "
+"Дополнительные инструменты и пакеты которые нужны для разработки те же, что "
+"нужны при сборке из снимка <application>Subversion</application>. Точнее, "
+"все инструменты нужны для сборки из свежего снимка, в то время, как "
+"разработка может требовать только их подмножество или вообще не требовать, в "
+"зависимости от типа и масштаба изменений исходного кода."
+
+#: installation-devel.xml:30(para)
+msgid "Additional development build dependencies:"
+msgstr "Дополнительные зависимости для сборки версии для разработчиков"
+
+#: installation-devel.xml:35(ulink)
+msgid "GNU autoconf"
+msgstr "GNU autoconf"
+
+#: installation-devel.xml:34(listitem)
+msgid "<placeholder-1/> ≥ 2.60"
+msgstr "<placeholder-1/> ≥ 2.60"
+
+#: installation-devel.xml:38(ulink)
+msgid "GNU automake"
+msgstr "GNU automake"
+
+#: installation-devel.xml:37(listitem)
+msgid "<placeholder-1/> ≥ 1.11"
+msgstr "<placeholder-1/> ≥ 1.11"
+
+#: installation-devel.xml:41(ulink)
+msgid "GNU libtool"
+msgstr "GNU libtool"
+
+#: installation-devel.xml:40(listitem)
+msgid "<placeholder-1/> ≥ 1.4"
+msgstr "<placeholder-1/> ≥ 1.4"
+
+#: installation-devel.xml:44(ulink) installation-dependencies.xml:110(ulink)
+#: installation-cross-mingw32.xml:130(title)
+msgid "Python"
+msgstr "Python"
+
+#: installation-devel.xml:43(listitem)
+msgid "<placeholder-1/> ≥ 2.4"
+msgstr "<placeholder-1/> ≥ 2.4"
+
+#: installation-devel.xml:47(ulink)
+msgid "gtk-doc"
+msgstr "gtk-doc"
+
+#: installation-devel.xml:46(listitem)
+msgid "<placeholder-1/> ≥ 1.12"
+msgstr "<placeholder-1/> ≥ 1.12"
+
+#: installation-devel.xml:50(ulink)
+msgid "GNU gettext"
+msgstr "GNU gettext"
+
+#: installation-devel.xml:49(listitem)
+msgid "<placeholder-1/> ≥ 0.12, including development stuff"
+msgstr "<placeholder-1/> ≥ 0.12, включая средства для разработки"
+
+#: installation-devel.xml:53(ulink)
+msgid "Inkscape"
+msgstr "Inkscape"
+
+#: installation-devel.xml:52(listitem)
+msgid "<placeholder-1/> ≥ 0.91"
+msgstr "<placeholder-1/> ≥ 0.91"
+
+#: installation-devel.xml:56(ulink)
+msgid "xsltproc"
+msgstr "xsltproc"
+
+#: installation-devel.xml:59(ulink)
+msgid "Epydoc"
+msgstr "Epydoc"
+
+#: installation-devel.xml:62(ulink)
+msgid "pngcrush"
+msgstr "pngcrush"
+
+#: installation-devel.xml:61(listitem)
+msgid "<placeholder-1/> ≥ 1.8.9"
+msgstr "<placeholder-1/> ≥ 1.8.9"
+
+#: installation-devel.xml:64(listitem)
+msgid "probably GNU versions of most tools: the compiler, binutils, …"
+msgstr ""
+"скорее всего версии GNU для большинства инструментов: компилятор, binutils, …"
+
+#: installation-devel.xml:68(para)
+msgid ""
+"After a fresh checkout, run <userinput>./autogen.sh</userinput> with any "
+"arguments you would give to <command>configure</command>. Note it "
+"automatically adds options <option>--enable-maintainer-mode</option> and "
+"<option>--enable-gtk-doc</option> to ensure the rules for creation and "
+"updates of various files are active. Generally, you should always use "
+"<option>--enable-maintainer-mode</option> if you intend to change the "
+"program source code in a non-trivial way."
+msgstr ""
+"После загрузки свежего снимка, запустите <userinput>./autogen.sh</userinput> "
+"с теми же аргументами, которые вы хотели бы передать <command>configure</"
+"command>. Следует отметить. что автоматически добавляются опции <option>--"
+"enable-maintainer-mode</option> и <option>--enable-gtk-doc</option>, чтобы "
+"убедиться, чт оправила создания и обновления различных файлов будут активны. "
+"В общем случае нужно использовать эту опцию <command>configure</command> "
+"каждый раз, когда вы собираетесь изменить исходный код программы "
+"нетривиальным путём."
+
+#: installation-devel.xml:77(para)
+msgid ""
+"On some systems, <command>autogen.sh</command> can fail even if you have "
+"sufficient versions of autotools installed. These systems do not install "
+"general <command>autoconf</command> or <command>automake</command> commands, "
+"only versioned commands such as <command>autoconf261</command> or "
+"<command>automake19</command>. This makes it particularly difficult to find "
+"for example <quote><command>automake</command> 1.9 or newer</quote> with no "
+"limit on how newer it can be. Therefore, <command>autogen.sh</command> does "
+"not attempt this at all. You can either create unversioned symbolic links to "
+"the versioned commands or run <command>autogen.sh</command> as follows: "
+"<informalexample><userinput> AUTOCONF=autoconf261 AUTOHEADER=autoheader261 ./"
+"autogen.sh </userinput></informalexample> You may need to set the following "
+"variables: <envar>ACLOCAL</envar>, <envar>AUTOCONF</envar>, "
+"<envar>AUTOHEADER</envar>, <envar>AUTOM4TE</envar>, <envar>AUTOMAKE</envar>, "
+"<envar>LIBTOOLIZE</envar>. In addition, some operating systems may install "
+"<command>autoconf</command> macros in a place <command>aclocal</command> "
+"does not find them by default. This can be fixed by setting variable "
+"<envar>ACLOCAL_FLAGS</envar> to give <command>aclocal</command> additional "
+"search paths: <informalexample><userinput> ACLOCAL_FLAGS=\"-I /usr/local/"
+"share/aclocal\" ./autogen.sh </userinput></informalexample>"
+msgstr ""
+"На некоторых системах <command>autogen.sh</command> может закончиться с "
+"ошибкой даже если у вас установлены требуемые версии autotools. Эти системы "
+"не устанавливают общие команды <command>autoconf</command> или "
+"<command>automake</command>, а делят их на версии, вроде "
+"<command>autoconf261</command> или <command>automake19</command>. Найти, "
+"например, <quote><command>automake</command>1.9 или новее</quote> без знания "
+"насколько новым он может быть будет весьма нетривиальной задачей.  "
+"Следовательно, <command>autogen.sh</command> даже не пытается этого сделать. "
+"Можно или создать не содержащие версий символические ссылки на команды с "
+"версиями или запустить <command>autogen.sh</command> следующим образом: "
+"<informalexample><userinput> AUTOCONF=autoconf261 AUTOHEADER=autoheader261 ./"
+"autogen.sh </userinput></informalexample> Может потребоваться установка "
+"следующих переменных: <envar>ACLOCAL</envar>, <envar>AUTOCONF</envar>, "
+"<envar>AUTOHEADER</envar>, <envar>AUTOM4TE</envar>, <envar>AUTOMAKE</envar>, "
+"<envar>LIBTOOLIZE</envar>. Дополнительно, некоторые операционные системы "
+"могут установить макрос <command>autoconf</command> в такое место, где "
+"<command>aclocal</command> по умолчанию их не найдёт. Это может быть "
+"исправлено установкой переменной <envar>ACLOCAL_FLAGS</envar>, где будут "
+"указаны дополнительные пути поиска для <command>aclocal</command>: "
+"<informalexample><userinput> ACLOCAL_FLAGS=\"-I /usr/local/share/aclocal\" ./"
+"autogen.sh </userinput></informalexample>"
+
+#: installation-devel.xml:111(para)
+msgid ""
+"It is often necessary to combine these adjustments. For instance on FreeBSD, "
+"where all tools are versioned, one typically invokes (broken to lines for "
+"easier reading): "
+"<informalexample><literallayout><userinput>AUTOCONF=autoconf261 \\ "
+"AUTOHEADER=autoheader261 \\ AUTOM4TE=autom4te261 \\ AUTOMAKE=automake19 \\ "
+"ACLOCAL=aclocal19 \\ ACLOCAL_FLAGS=\"-I /usr/local/share/aclocal\" \\ "
+"CPPFLAGS=-I/usr/local/include \\ LDFLAGS=-L/usr/local/lib \\ ./autogen.sh --"
+"prefix=<replaceable>...</replaceable></userinput></literallayout></"
+"informalexample>"
+msgstr ""
+"Нередко требуется комбинировать эти настройки. Например, на FreeBSD, где все "
+"инструменты разделены по версиям, обычно требуется выполнить (разбито на "
+"строки для простоты чтения): "
+"<informalexample><literallayout><userinput>AUTOCONF=autoconf261 \\ "
+"AUTOHEADER=autoheader261 \\ AUTOM4TE=autom4te261 \\ AUTOMAKE=automake19 \\ "
+"ACLOCAL=aclocal19 \\ ACLOCAL_FLAGS=\"-I /usr/local/share/aclocal\" \\ "
+"CPPFLAGS=-I/usr/local/include \\ LDFLAGS=-L/usr/local/lib \\ ./autogen.sh --"
+"prefix=<replaceable>...</replaceable></userinput></literallayout></"
+"informalexample>"
+
+#: installation-devel.xml:127(para)
+msgid ""
+"If <command>autogen.sh</command> passes you can compile the program as usual."
+msgstr ""
+"Если <command>autogen.sh</command> заканчивается удачно, далее программу "
+"можно собирать как обычно."
+
+#: installation-devel.xml:132(title)
+msgid "MS Windows"
+msgstr "MS Windows"
+
+#: installation-devel.xml:133(para)
+msgid ""
+"Since the standard method to create MS Windows executables is cross-"
+"compilation in Linux the recommended method to develop for MS Windows is "
+"also to compile in Linux. This can be done either on a different physical "
+"computer using <command>ssh</command> or in a virtual machine running on the "
+"same computer as the host MS Windows system. In both cases the Gwyddion "
+"build directory (and other directories) can be shared between the Linux and "
+"MS Windows systems using either Samba or a shared directory mechanism of the "
+"virtual machine and the compiled executables thus can be directly tested in "
+"MS Windows without having to transfer files back and forth."
+msgstr ""
+"Поскольку стандартный метод создания исполняемых файлов MS Windows состоит в "
+"кросс-компиляции в Linux, рекомендуемый способ разработки для MS Windows "
+"также состоит в сборке под Linux. Это можно делать как на физически другом "
+"компьютере используя <command>ssh</command>, так и на виртуальной машине "
+"запущенной на том же компьютере, что и основная система MS Windows. В обоих "
+"случаях каталоги сборки Gwyddion (и другие каталоги) могут быть общими для "
+"Linux и MS Windows используя либо Samba, либо механизм общих каталогов "
+"виртуальной машины. Собранные таким образом исполняемые файлы можно сразу "
+"тестировать в MS Windows не перенося их туда и обратно."
+
+#: installation-dependencies.xml:6(title)
+msgid "Build Dependencies"
+msgstr "Зависимости при сборке"
+
+#: installation-dependencies.xml:7(para)
+msgid ""
+"The following table lists packages required to build <application>Gwyddion</"
+"application> from source code. If your operating system has separate "
+"development packages for libraries you need them too. The table does not "
+"include common software compilation prerequisites like the C compiler or the "
+"<command>make</command> utility. Operating system specifics are described in "
+"following sections dedicated to building on particular operating systems."
+msgstr ""
+"В следующей таблице перечислены пакеты, которые нужны для сборки "
+"<application>Gwyddion</application> из исходного кода. Если в вашей "
+"операционной системе пакеты разработки для библиотек поставляются отдельно, "
+"их также нужно установить. Таблица не включает в себя обязательные вещи, "
+"необходимые для сборки, такие как компилятор C или программу <command>make</"
+"command>. Зависящие от операционной системы вещи описаны в следующих "
+"разделах, посвящённых сборке в определённых операционных системах."
+
+#: installation-dependencies.xml:16(para)
+msgid ""
+"Minimum required versions are listed for some packages. If no specific "
+"version is listed, the minimum version is so old that it did not seem useful "
+"to determine it exactly. Specific environments may be listed in the "
+"Dependency column, meaning the package is useful only in this environment."
+msgstr ""
+"Минимальные требуемые версии указаны для некоторых пакетов. Если особой "
+"версии не указано, подразумевается, что минимально требуемая версия "
+"настолько стара, что её не нужно точно указывать. Особые версии окружения "
+"могут быть указаны в столбце зависимостей, что означает что этот пакет будет "
+"полезен только в определенном окружении."
+
+#: installation-dependencies.xml:30(entry)
+msgid "Dependency"
+msgstr "Необходимость"
+
+#: installation-dependencies.xml:31(entry)
+msgid "Required for, Notes"
+msgstr "Для чего нужно и замечания"
+
+#: installation-dependencies.xml:36(ulink)
+msgid "pkg-config"
+msgstr "pkg-config"
+
+#: installation-dependencies.xml:37(entry)
+msgid "0.16"
+msgstr "0.16"
+
+#: installation-dependencies.xml:38(emphasis)
+#: installation-dependencies.xml:46(emphasis)
+#: installation-dependencies.xml:55(emphasis)
+#: installation-dependencies.xml:65(emphasis)
+#: installation-dependencies.xml:75(emphasis)
+#: installation-dependencies.xml:83(emphasis)
+msgid "Required"
+msgstr "Требуется"
+
+#: installation-dependencies.xml:39(entry)
+msgid ""
+"Tracking the locations and compiler and linker flags of the various packages."
+msgstr ""
+"Отслеживание местоположений, флагов компилятора и редактора связей для "
+"различных пакетов."
+
+#: installation-dependencies.xml:44(ulink)
+msgid "GTK+ 2"
+msgstr "GTK+ 2"
+
+#: installation-dependencies.xml:45(entry)
+msgid "2.18.0"
+msgstr "2.18.0"
+
+#: installation-dependencies.xml:47(entry)
+msgid ""
+"Gwyddion user interface. This entry implies the dependencies of GTK+ itself, "
+"such as GLib, Gdk-Pixbuf, Pango or Cairo."
+msgstr ""
+"Интерфейс пользователя Gwyddion. Этот элемент также подразумевает все "
+"зависимости самой GTK+, такие как: GLib, Gdk-Pixbuf, Pango и Cairo."
+
+#: installation-dependencies.xml:53(ulink)
+msgid "GLib"
+msgstr "GLib"
+
+#: installation-dependencies.xml:54(entry)
+msgid "2.32.0"
+msgstr "2.32.0"
+
+#: installation-dependencies.xml:56(entry)
+msgid ""
+"Everything. GLib is a base library also required by GTK+, but Gwyddion needs "
+"a slightly newer version than strictly required by GTK+."
+msgstr ""
+"Всё. Glib нужна для работы GTK+, но Gwyddion требует чуть более новую "
+"версию, чем строго требуется для GTK+."
+
+#: installation-dependencies.xml:63(ulink)
+msgid "Pango"
+msgstr "Pango"
+
+#: installation-dependencies.xml:64(entry)
+msgid "1.10"
+msgstr "1.10"
+
+#: installation-dependencies.xml:66(entry)
+msgid ""
+"All text rendering. This entry implies pangocairo, which is an optional "
+"component of Pango and in principle can be disabled. However, it is normally "
+"included in Pango packages."
+msgstr ""
+"Вся отрисовка текста. Этот элемент подразумевает pangocairo, который "
+"является опциональным компонентом Pango и в принципе может быть отключен. "
+"Однако, обычно его включают в пакеты Pango."
+
+#: installation-dependencies.xml:73(ulink)
+msgid "Cairo"
+msgstr "Cairo"
+
+#: installation-dependencies.xml:74(entry)
+msgid "1.2"
+msgstr "1.2"
+
+#: installation-dependencies.xml:76(entry)
+msgid "All drawing within GTK+. Version at least 1.6 is recommended."
+msgstr ""
+"Всё рисование в GTK+. Рекомендуется использовать версию по крайней мере 1.6."
+
+#: installation-dependencies.xml:82(entry)
+#: installation-dependencies.xml:138(entry)
+msgid "3.1"
+msgstr "3.1"
+
+#: installation-dependencies.xml:84(entry)
+msgid ""
+"Integral transforms, power spectrum, convolution, deconvolution and "
+"correlation operations. If OpenMP is enabled and FFTW3 with OpenMP support "
+"is found Gwyddion will be able to utilise multithreaded FFT."
+msgstr ""
+"Интегральные преобразования, спектр мощности, свёртка, деконволюция и "
+"операции корреляции. Если OpenMP включен и FFTW3 с поддержкой OpenMP "
+"обнаружена, Gwyddion может использовать многопоточное быстрое преобразование "
+"Фурье."
+
+#: installation-dependencies.xml:93(entry)
+#: installation-dependencies.xml:102(entry)
+msgid "1.0"
+msgstr "1.0"
+
+#: installation-dependencies.xml:94(entry)
+#: installation-dependencies.xml:103(entry)
+#: installation-dependencies.xml:112(entry)
+#: installation-dependencies.xml:122(entry)
+#: installation-dependencies.xml:131(entry)
+#: installation-dependencies.xml:139(entry)
+#: installation-dependencies.xml:150(entry)
+#: installation-dependencies.xml:159(entry)
+#: installation-dependencies.xml:171(entry)
+#: installation-dependencies.xml:183(entry)
+#: installation-dependencies.xml:191(entry)
+#: installation-dependencies.xml:199(entry)
+#: installation-dependencies.xml:207(entry)
+#: installation-dependencies.xml:215(entry)
+#: installation-dependencies.xml:225(entry)
+#: installation-dependencies.xml:233(entry)
+#: installation-dependencies.xml:243(entry)
+#: installation-dependencies.xml:251(entry)
+#: installation-dependencies.xml:260(entry)
+msgid "Optional"
+msgstr "Опционально"
+
+#: installation-dependencies.xml:95(entry)
+msgid ""
+"OpenGL 3D data views. This entry implies the dependencies of GtkGLExt "
+"itself, such as the platform OpenGL libraries and headers."
+msgstr ""
+"Окна трёхмерного просмотра на основе OpenGL. Также подразумеваются "
+"зависимости самой GtkGLExt, такие как системные библиотеки и заголовочные "
+"файлы OpenGL."
+
+#: installation-dependencies.xml:101(ulink)
+msgid "libunique"
+msgstr "libunique"
+
+#: installation-dependencies.xml:105(link)
+#: installation-dependencies.xml:288(link)
+msgid "Remote control"
+msgstr "Удалённое управление"
+
+#: installation-dependencies.xml:104(entry)
+msgid "<placeholder-1/> based on D-BUS or whatever technology is currently in."
+msgstr ""
+"<placeholder-1/>, основанное на D-BUS или то технологии, которая включена в "
+"настоящее время."
+
+#: installation-dependencies.xml:111(entry)
+msgid "2.4"
+msgstr "2.4"
+
+#: installation-dependencies.xml:113(entry)
+msgid ""
+"Pygwy, the Gwyddion Python scripting interface. Not just the interpreter is "
+"required to build pygwy, but also the Python headers and development "
+"libraries."
+msgstr ""
+"Pygwy, интерфейс написания Python-скриптов в Gwyddion. Для сборки pygwy "
+"нужен не только интерпретатор Python, но также его заголовочные файлы и "
+"библиотеки разработчика."
+
+#: installation-dependencies.xml:120(ulink)
+msgid "PyGTK2"
+msgstr "PyGTK2"
+
+#: installation-dependencies.xml:121(entry)
+msgid "2.10"
+msgstr "2.10"
+
+#: installation-dependencies.xml:123(entry)
+msgid ""
+"Pygwy, the Gwyddion Python scripting interface. You need PyGTK2 including "
+"the compile-time parts, i.e. codegen, to build pygwy."
+msgstr ""
+"Pygwy, скриптовый интерфейс к Gwyddion на основе Python. Чтобы собрать pygwy "
+"потребуются части PyGTK2, участвующие в процессе компиляции, т.е. сodegen."
+
+#: installation-dependencies.xml:129(ulink)
+msgid "GtkSourceView 2"
+msgstr "GtkSourceView 2"
+
+#: installation-dependencies.xml:132(entry)
+msgid "Syntax highlighting in the Python scripting console."
+msgstr "Подсветка синтаксиса в командной строке оболочки Python."
+
+#: installation-dependencies.xml:137(ulink)
+msgid "OpenMP"
+msgstr "OpenMP"
+
+#: installation-dependencies.xml:140(entry)
+msgid ""
+"Speedup of various computation using OpenMP multithread parallelisation. "
+"OpenMP is a standard, not specific software, but an additional package may "
+"be needed to enable it in your C compiler."
+msgstr ""
+"Ускорение различных расчётов с использованием распараллеливания с помощью "
+"OpenMP. OpenMP не является отдельным программным обеспечением, но "
+"дополнительный пакет может понадобиться чтобы включить его поддержку в вашем "
+"компиляторе языка C."
+
+#: installation-dependencies.xml:148(ulink)
+msgid "zlib"
+msgstr "zlib"
+
+#: installation-dependencies.xml:151(entry)
+msgid ""
+"Import of SPML data files and import of gzip-compressed data from other file "
+"formats (Createc, NRRD, RHK SM4 PRM metadata)."
+msgstr ""
+"Импорт файлов данных в формате SPML и импорт данных, сжатых gzip, в "
+"некоторых других форматах (Createc, NRRD, метаданные RHK SM4 PRM)."
+
+#: installation-dependencies.xml:157(ulink)
+#: installation-dependencies.xml:176(link)
+msgid "minizip"
+msgstr "minizip"
+
+#: installation-dependencies.xml:164(link)
+#: installation-dependencies.xml:169(ulink)
+msgid "libzip"
+msgstr "libzip"
+
+#: installation-dependencies.xml:160(entry)
+msgid ""
+"Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC SPMxFormat, "
+"Sensofar PLUX and JPK force data files. Alternatively, <placeholder-1/> can "
+"be used instead. Only one of the two libraries is needed."
+msgstr ""
+"Импорт файлов данных APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC "
+"SPMxFormat, Sensofar PLUX и данных силовых кривых JPK. В качестве "
+"альтернативы можно использовать <placeholder-1/>. Требуется только одна из "
+"двух библиотек."
+
+#: installation-dependencies.xml:170(entry)
+msgid "0.11"
+msgstr "0.11"
+
+#: installation-dependencies.xml:172(entry)
+msgid ""
+"Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC SPMxFormat, "
+"Sensofar PLUX and JPK force data files. This is an alternative to "
+"<placeholder-1/>. Only one of the two libraries is needed."
+msgstr ""
+"Импорт файлов данных APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC "
+"SPMxFormat, Sensofar PLUX и данных силовых кривых JPK. Это альтернативный "
+"вариант вместо <placeholder-1/>. Требуется только одна из двух библиотек."
+
+#: installation-dependencies.xml:181(ulink)
+msgid "bzip2"
+msgstr "bzip2"
+
+#: installation-dependencies.xml:184(entry)
+msgid "Import of bzip2-compressed data from NRRD."
+msgstr "Импорт данных, сжатых bzip2, из NRRD."
+
+#: installation-dependencies.xml:192(entry)
+msgid "Import of SPML, APE DAX and Anasys XML data files."
+msgstr "Импорт файлов данных SPML, APE DAX и Anasys XML."
+
+#: installation-dependencies.xml:197(ulink)
+msgid "HDF5"
+msgstr "HDF5"
+
+#: installation-dependencies.xml:200(entry)
+msgid "Import of Ergo data files."
+msgstr "Импорт файлов данных Ergo."
+
+#: installation-dependencies.xml:205(ulink)
+msgid "JANSSON"
+msgstr "JANSSON"
+
+#: installation-dependencies.xml:208(entry)
+msgid "Import of Park PS-PPT data files."
+msgstr "Импорт файлов данных Park PS-PPT."
+
+#: installation-dependencies.xml:213(ulink)
+msgid "libpng"
+msgstr "libpng"
+
+#: installation-dependencies.xml:216(entry)
+msgid ""
+"Export of height fields to 16bit greyscale PNG images and import from 16bit "
+"PNG images. For common 8bit images, you just need PNG support in Gdk-Pixbuf."
+msgstr ""
+"Эспорт полей высот в 16битные изображения PNG в градациях серого и импорт "
+"16битных изображений PNG. Для обычных 8битных изображений нужна только "
+"поддержка PNG в Gdk-Pixbuf."
+
+#: installation-dependencies.xml:223(ulink)
+msgid "libwebp"
+msgstr "libwebp"
+
+#: installation-dependencies.xml:226(entry)
+msgid "WebP format support for image export."
+msgstr "Поддержка формата WebP при экспорте изображений."
+
+#: installation-dependencies.xml:231(ulink)
+msgid "WebP pixbuf loader"
+msgstr "Загрузчик pixbuf формата WebP"
+
+#: installation-dependencies.xml:234(entry)
+msgid ""
+"WebP format support for image import. This is a run-time dependency. It does "
+"not matter if you have the pixbuf loader during Gwyddion compilation."
+msgstr ""
+"Поддержка формата WebP для импорта изображений. Это зависимость времени "
+"исполнения. Не имеет значения, был ли доступен загрузчик pixbuf во время "
+"компилляции Gwyddion."
+
+#: installation-dependencies.xml:241(ulink)
+msgid "OpenEXR"
+msgstr "OpenEXR"
+
+#: installation-dependencies.xml:244(entry)
+msgid "Import and export of OpenEXR HDR images."
+msgstr "Импорт и экспорт изображений OpenEXR HDR."
+
+#: installation-dependencies.xml:249(entry)
+msgid "C++ compiler"
+msgstr "компилятор C++"
+
+#: installation-dependencies.xml:252(entry)
+msgid ""
+"Import and export of OpenEXR HDR images and import of other high-depth "
+"images."
+msgstr ""
+"Импорт и экспорт изображений OpenEXR HDR и импорт других изображений с "
+"большой глубиной цвета."
+
+#: installation-dependencies.xml:258(ulink)
+msgid "cfitsio"
+msgstr "cfitsio"
+
+#: installation-dependencies.xml:261(entry)
+msgid "Import of Flexible Image Transport System (FITS) files."
+msgstr "Импорт файлов Flexible Image Transport System (FITS)"
+
+#: installation-dependencies.xml:266(ulink)
+msgid "desktop-file-utils"
+msgstr "desktop-file-utils"
+
+#: installation-dependencies.xml:268(entry)
+msgid "Optional, Unix"
+msgstr "Опционально, Unix"
+
+#: installation-dependencies.xml:269(entry)
+msgid ""
+"Basic desktop integration to Freedesktop-conforming environments, such as "
+"file associations and installation of Gwyddion to the desktop environments "
+"menus."
+msgstr ""
+"Основная интеграция в окружение рабочего стола на соответствующих стандартам "
+"Freedesktop окружениях, такая как установка Gwyddion в меню и ассоциации "
+"типов файлов."
+
+#: installation-dependencies.xml:276(ulink)
+msgid "gtk-mac-integration"
+msgstr "gtk-mac-integration"
+
+#: installation-dependencies.xml:278(entry)
+msgid "Optional, OS X"
+msgstr "Опционально, OS X"
+
+#: installation-dependencies.xml:279(entry)
+msgid "OS X platform integration such as the global menu."
+msgstr "Интеграция в среду OS X, такая, как использование глобального меню."
+
+#: installation-dependencies.xml:284(ulink)
+msgid "libXmu"
+msgstr "libXmu"
+
+#: installation-dependencies.xml:286(entry)
+msgid "Obsolete, X11"
+msgstr "Устаревший"
+
+#: installation-dependencies.xml:287(entry)
+msgid ""
+"<placeholder-1/> on X11. This is a standard X Window System library and "
+"everyone having X probably has its runtime files. However, since the "
+"modularisation of X in Xorg 7.0, it is distributed separately and therefore "
+"you might not have its development files installed."
+msgstr ""
+"<placeholder-1/> на системах X11. Это стандартная библиотека X Window System "
+"и при наличии в системе X, эта библиотека скорее всего также имеется. Тем не "
+"менее, после разделения X на модули начиная с Xorg 7.0 она распространяется "
+"отдельно, и файлы для разработки с её помощью могут быть не установлены."
+
+#: installation-cross-mingw32.xml:6(title)
+msgid "Cross-Compiling for MS Windows"
+msgstr "Кросс-компиляция для MS Windows"
+
+#: installation-cross-mingw32.xml:7(para)
+msgid ""
+"Cross-compiling Gwyddion for MS Windows under Linux is quite similar to "
+"normal Unix compilation with certain additional setup and extra steps. "
+"Although the process is quite smooth the initial setup may seem a bit "
+"complicated. If, in addition, you are not familiar with the normal Unix "
+"compilation you might wish to start with that and attempt cross-compilation "
+"once you familiarise yourself with the basic procedure."
+msgstr ""
+"Кросс-компиляция Gwyddion для MS Windows под Linux весьма похожа на обычную "
+"сборку для Unix с некоторыми дополнительными настройками и дополнительными "
+"шагами. Хотя процесс достаточно тривиален, начальные настройки могут "
+"показаться в какой-то степени непростыми. Если вы к тому же не знакомы с "
+"обычной сборкой под Unix, имеет смысл начать с неё и попробовать кросс-"
+"компиляцию после того, как основная процедура станет понятной."
+
+#: installation-cross-mingw32.xml:15(para)
+msgid ""
+"These instructions describe compilation under <ulink url=\"http://"
+"fedoraproject.org/\">Fedora</ulink> using its <ulink url=\"http://"
+"fedoraproject.org/wiki/SIGs/MinGW\">MinGW cross-compilation support</ulink> "
+"as this is what Gwyddion developers use. In general, the instructions work "
+"on the current version of Fedora. Compilation on other versions and other "
+"RedHat-based distributions (<ulink url=\"http://centos.org/\">CentOS</"
+"ulink>, <ulink url=\"https://scientificlinux.org/\">Scientific Linux</"
+"ulink>, …) should be similar and relatively straightforward, possibly with "
+"some tweaks. Building on, for instance, <ulink url=\"http://opensuse.org/"
+"\">openSUSE</ulink> will require modifications. Reports of success (or "
+"failure) of cross-compilation of Gwyddion in other distributions and "
+"environments and namely improvements to these instructions are welcome."
+msgstr ""
+"Эти инструкции описывают компиляцию в дистрибутиве <ulink url=\"http://"
+"fedoraproject.org/\">Fedora</ulink> используя дистрибутивную <ulink url="
+"\"http://fedoraproject.org/wiki/SIGs/MinGW\">поддержку кросс-компиляции "
+"MinGW</ulink>, поскольку разработчики Gwyddion используют именно этот "
+"вариант. В общем, эти инструкции работают в текущей версии Fedora. "
+"Компиляция в других версиях и других основанных на RedHat дистрибутивах "
+"(<ulink url=\"http://centos.org/\">CentOS</ulink>, <ulink url=\"https://"
+"scientificlinux.org/\">Scientific Linux</ulink>, …) будет происходить "
+"подобным образом и достаточно проста, но возможно потребуются некоторые "
+"небольшие изменения. Сборка, например, в <ulink url=\"http://opensuse.org/"
+"\">openSUSE</ulink> потребует модификации. Мы будем рады получить отчёты об "
+"успешной (или неудачной) сборке на других системах и дополнить эти "
+"инструкции."
+
+#: installation-cross-mingw32.xml:31(para)
+msgid "Full cross-compilation has the following steps:"
+msgstr "Полная кросс-компиляция включает в себя следующие шаги:"
+
+#: installation-cross-mingw32.xml:35(listitem)
+msgid "configuration for mingw64/mingw32,"
+msgstr "настройка для mingw64/mingw32,"
+
+#: installation-cross-mingw32.xml:36(listitem)
+msgid "compilation,"
+msgstr "компиляция,"
+
+#: installation-cross-mingw32.xml:37(listitem)
+msgid "installation into a staging area,"
+msgstr "установка во временный каталог"
+
+#: installation-cross-mingw32.xml:38(listitem)
+msgid "creation of an installer using NSIS."
+msgstr "создание программы установки используя NSIS."
+
+#: installation-cross-mingw32.xml:40(para)
+msgid ""
+"A script is available that automatically performs all the steps, as <link "
+"linkend=\"installation-cross-mingw32-scripts\">described below</link>."
+msgstr ""
+"Доступен скрипт, который автоматически проведёт все шаги, как <link linkend="
+"\"installation-cross-mingw32-scripts\">описано ниже</link>."
+
+#: installation-cross-mingw32.xml:45(title)
+msgid "Setup"
+msgstr "Настройка"
+
+#: installation-cross-mingw32.xml:46(para)
+msgid ""
+"Before the first compilation you must set up the cross-compilation "
+"environment. This has to be done only once."
+msgstr ""
+"Перед первой компиляцией может потребоваться настройка среды кросс-"
+"компиляции. Это надо делать только один раз."
+
+#: installation-cross-mingw32.xml:51(title)
+msgid "Base MinGW Packages"
+msgstr "Основные пакеты MinGW"
+
+#: installation-cross-mingw32.xml:52(para)
+msgid ""
+"Run as root: <informalexample><literallayout><userinput>dnf install "
+"mingw{32,64}-{gcc-c++,gtk2,libxml2,minizip,fftw,gtkglext,libwebp,OpenEXR}</"
+"userinput></literallayout></informalexample> to install the necessary "
+"mingw32 and mingw64 packages. Several more packages will be installed as "
+"dependencies of those explicitly given here. Note that, technically, some of "
+"the packages are <link linkend=\"installation-dependencies\">optional "
+"dependencies</link> and you can build a MS Windows installer without them "
+"(after some adjustments). Neverhteless the standard installers include these "
+"packages and the cross-compilation scripts expect them to be present by "
+"default."
+msgstr ""
+"Запустите с правами суперпользователя root: "
+"<informalexample><literallayout><userinput>dnf install mingw{32,64}-{gcc-c++,"
+"gtk2,libxml2,minizip,fftw,gtkglext,libwebp,OpenEXR}</userinput></"
+"literallayout></informalexample> чтобы установить необходимые пакеты mingw32 "
+"и mingw64. Некоторые другие пакеты будут установлены как зависимости "
+"пакетов, указанных здесь явно. Следует отметить, что технически некоторые из "
+"пакетов являются <link linkend=\"installation-dependencies\">опциональными "
+"зависимостями</link> и можно собрать пакет установки для MS Windows без них "
+"(после небольшой настройки). Тем не менее, стандартные пакеты установки "
+"включают эти зависимости, и скрипты кросс-компиляции подразумевают их "
+"наличие по умолчанию."
+
+#: installation-cross-mingw32.xml:68(title)
+msgid "Gwyddion.net repository"
+msgstr "Репозиторий Gwyddion.net"
+
+#: installation-cross-mingw32.xml:69(para)
+msgid ""
+"MinGW versions of a few packages used by Gwyddion are not available in "
+"Fedora yet (or any more), or there may be some patches we would like to "
+"include but they are not in Fedora packages. This includes HDF5 and "
+"gtksourceview2 (only used by pygwy)."
+msgstr ""
+"Версии для MinGW некоторых пакетов, используемых Gwyddion, ещё (или уже) "
+"недоступны в Fedora, либо могут быть некоторые исправления, отсутствующие в "
+"пакетах Fedora, которые мы хотели бы включить. В настоящее время это HDF5 и "
+"gtksourceview2, который используется только в pygwy."
+
+#: installation-cross-mingw32.xml:75(para)
+msgid ""
+"You can build these additional packages using the patches and spec files at "
+"<ulink url=\"http://sourceforge.net/projects/gwyddion/files/mingw32-cross-"
+"compile/\">http://sourceforge.net/projects/gwyddion/files/mingw32-cross-"
+"compile/</ulink>, however, it should be much easier to just install them "
+"using <command>dnf</command>. For this, download and install the gwyddion."
+"net <ulink url=\"http://gwyddion.net/download.php#stable-fedora\">repository "
+"configuration package</ulink>. The installation brings two repository "
+"configurations, for the program and for the extra MinGW packages. By default "
+"only the <filename>gwyddion</filename> repository is enabled. Enable "
+"<filename>gwyddion-manually</filename> by editing <filename>/etc/yum.repos.d/"
+"gwyddion-mingw.repo</filename> for the MinGW packages. Run the following "
+"command to install them: <informalexample><literallayout><userinput>dnf "
+"install mingw32-{hdf5,gtksourceview2}</userinput></literallayout></"
+"informalexample> Be warned the repo overrides a few Fedora MinGW packages to "
+"keep them at specific versions."
+msgstr ""
+"Можно собрать эти опциональные пакеты используя патчи и spec-файлы с <ulink "
+"url=\"http://sourceforge.net/projects/gwyddion/files/mingw32-cross-compile/"
+"\">http://sourceforge.net/projects/gwyddion/files/mingw32-cross-compile/</"
+"ulink>, однако, гораздо проще установить их командой <command>dnf</command>. "
+"Для этого нужно загрузить и установить <ulink url=\"http://gwyddion.net/"
+"download.php#stable-fedora\"> пакет конфигурации репозитория</ulink> "
+"gwyddion.net. Установка этого пакета добавит в систему две конфигурации "
+"репозитория, для программы и для дополнительных пакетов MinGW. По умолчанию "
+"будет включен только репозиторий <filename>gwyddion</filename>. Для "
+"добавления пакетов MinGW нужно включить второй репозиторий вручную "
+"редактированием файла <filename>/etc/yum.repos.d/gwyddion-mingw.repo</"
+"filename>. Чтобы установить их необходимо запустить следующую команду: "
+"<informalexample><literallayout><userinput>dnf install mingw32-{hdf5,"
+"gtksourceview2}</userinput></literallayout></informalexample> Следует "
+"отметить, что данный репозиторий переопределяет ряд пакетов MinGW из Fedora "
+"чтобы они были нужных версий."
+
+#: installation-cross-mingw32.xml:95(title)
+msgid "Wine"
+msgstr "Wine"
+
+#: installation-cross-mingw32.xml:96(para)
+msgid ""
+"Wine is the MS Windows compatibility layer/emulator for Unix. It is used to "
+"run NSIS that creates the executable Gwyddion Windows installer. Wine can "
+"also be used to run and test the cross-compiled Gwyddion, as <link linkend="
+"\"installation-cross-mingw32-running\">described below</link>."
+msgstr ""
+"Wine является слоем совместимости/(не) эмулятором MS Windows для Unix. Он "
+"используется для запуска NSIS который создает программу установки Gwyddion "
+"для Windows. Wine также можно использовать для запуска и тестирования "
+"собранного кросс-компиляцией Gwyddion, как <link linkend=\"installation-"
+"cross-mingw32-running\">описано ниже</link>."
+
+#: installation-cross-mingw32.xml:103(para)
+msgid ""
+"Run <informalexample><literallayout><userinput>dnf install wine</userinput></"
+"literallayout></informalexample> to install Wine."
+msgstr ""
+"Запустите <informalexample><literallayout><userinput>dnf install wine</"
+"userinput></literallayout></informalexample> чтобы установить Wine."
+
+#: installation-cross-mingw32.xml:112(title)
+msgid "NSIS"
+msgstr "NSIS"
+
+#: installation-cross-mingw32.xml:113(para)
+msgid ""
+"<ulink url=\"http://nsis.sourceforge.net/\">Nullsoft scriptable install "
+"system</ulink> (NSIS) is used to create the Gwyddion installer. This is a MS "
+"Windows program, therefore, it is installed <emphasis>under Wine</emphasis>. "
+"A cross-compiled version of NSIS might be available in the distribution but "
+"we have found the original more reliable."
+msgstr ""
+"<ulink url=\"http://nsis.sourceforge.net/\">Nullsoft scriptable install "
+"system</ulink> (NSIS) используется для создания программы установки "
+"Gwyddion. Поскольку это программа для MS Windows, она устанавливается "
+"<emphasis>под Wine</emphasis>. Собранная кросс-компиляцией версия NSIS может "
+"присутствовать в некоторых дистрибутивах, но, как показала практика, "
+"оригинальная версия работает более надёжно."
+
+#: installation-cross-mingw32.xml:120(para)
+msgid ""
+"Download NSIS from its web page and run "
+"<informalexample><literallayout><userinput>wine nsis-3.06-setup.exe</"
+"userinput></literallayout></informalexample> replacing 3.06 with the actual "
+"version. Version 3.06 is the oldest NSIS 3 that has been tested, but any "
+"version probably works."
+msgstr ""
+"Загрузите NSIS с его веб-страницы и запустите "
+"informalexample><literallayout><userinput>wine nsis-3.06-setup.exe</"
+"userinput></literallayout></informalexample> заменяя 3.06 текущей версией. "
+"Версия 3.06 это самая старая из протестированных версий NSIS 3, но скорей "
+"всего любая версия будет работать."
+
+#: installation-cross-mingw32.xml:131(para)
+msgid ""
+"To compile pygwy you need to install Python into Wine. The steps are the "
+"same as if you just want to use pygwy, except that all packages listed in "
+"<link linkend=\"installation-ms-windows-pygwy\">Enabling pygwy</link> need "
+"to be installed using <command>msiexec</command>: "
+"<informalexample><literallayout><userinput>wine msiexec /i python-2.7.16.msi "
+"wine msiexec /i pygobject-2.28.3.win32-py2.7.msi wine msiexec /i "
+"pycairo-1.8.10.win32-py2.7.msi wine msiexec /i pygtk-2.24.0.win32-py2.7.msi</"
+"userinput></literallayout></informalexample> or similarly."
+msgstr ""
+"Чтобы собрать pygwy нужно установить Python в Wine. Это делается так же, как "
+"при обычной установке pygwy, за исключением того, что все пакеты, описанные "
+"в разделе <link linkend=\"installation-ms-windows-pygwy\">включение pygwy</"
+"link> необходимо устанавливать с помощью команды <command>msiexec</"
+"command>: : <informalexample><literallayout><userinput>wine msiexec /i "
+"python-2.7.16.msi wine msiexec /i pygobject-2.28.3.win32-py2.7.msi wine "
+"msiexec /i pycairo-1.8.10.win32-py2.7.msi wine msiexec /i pygtk-2.24.0.win32-"
+"py2.7.msi</userinput></literallayout></informalexample> или подобным образом."
+
+#: installation-cross-mingw32.xml:146(title)
+msgid "Support scripts"
+msgstr "Скрипты поддержки"
+
+#: installation-cross-mingw32.xml:147(para)
+msgid ""
+"Support scripts and data are available in <filename>mingw32-cross-compile</"
+"filename> module in the Gwyddion subversion repository. Run "
+"<informalexample><literallayout><userinput>svn checkout http://svn.code.sf."
+"net/p/gwyddion/code/trunk/mingw32-cross-compile</userinput></literallayout></"
+"informalexample> to check it out from the repository."
+msgstr ""
+"Скрипты поддержки и данные доступны в модуле <filename>mingw32-cross-"
+"compile</filename> репозитория subversion программы Gwyddion. нужно "
+"запустить <informalexample><literallayout><userinput>svn checkout http://svn."
+"code.sf.net/p/gwyddion/code/trunk/mingw32-cross-compile</userinput></"
+"literallayout></informalexample> чтобы получить снимок репозитория."
+
+#: installation-cross-mingw32.xml:156(para)
+msgid ""
+"The most important tool you obtain is the <command>cross-build-32</command> "
+"(or <command>cross-build-64</command>) script that automates all the cross-"
+"compilation steps. Before you use it for the first time, review file "
+"<filename>setup32</filename> that defines where various things are located "
+"(or <filename>setup64</filename> for the 64-bit target). The default "
+"contents looks as follows: <informalexample><programlisting>source_dir=$HOME/"
+"Projects/Gwyddion/gwyddion-mingw mingw_prefix=/usr/i686-pc-mingw32/sys-root/"
+"mingw target_prefix=$HOME/opt/gwyddion-mingw32 python_dir=$HOME/.wine/"
+"drive_c/Python27 nsis_compiler=C:\\\\Program\\ Files\\ \\(x86\\)\\\\NSIS\\"
+"\\makensis.exe</programlisting></informalexample> Variable "
+"<varname>source_dir</varname> specifies the location of the unpacked or "
+"checked-out Gwyddion source code and it will likely need to be adjusted. "
+"Variable <varname>target_prefix</varname> specifies the installation "
+"directory (staging area) for the cross-compiled Gwyddion. The default value "
+"should be reasonable and you do not need to change it unless you want to. "
+"The remaining variables, <varname>mingw32_prefix</varname>, "
+"<varname>nsis_compiler</varname> and <varname>python_dir</varname>, specify "
+"the location of MinGW files, NSIS compiler and Win32 Python, respectively. "
+"They do not need to be changed from the default values under normal "
+"circumstances although NSIS can be installed in either <filename>Program "
+"Files (x86)</filename> or <filename>Program Files</filename> by default "
+"depending on Wine configuration. Note <filename>setup</filename> is read by "
+"shell so there must not be any spaces around <literal>=</literal>."
+msgstr ""
+"Наиболее важным из полученных вами является скрипт <command>cross-build-32</"
+"command> (или <command>cross-build-64</command>), который автоматизирует все "
+"шаги кросс-компиляции. Перед тем, как запускать его в первый раз, "
+"просмотрите файл <filename>setup32</filename> (или <filename>setup64</"
+"filename> для 64-битных сборок), который определяет где находятся различные "
+"нужные вещи. По умолчанию его содержимое выглядит следующим образом: "
+"<informalexample><programlisting>source_dir=$HOME/Projects/Gwyddion/gwyddion-"
+"mingw mingw_prefix=/usr/i686-pc-mingw32/sys-root/mingw target_prefix=$HOME/"
+"opt/gwyddion-mingw32 python_dir=$HOME/.wine/drive_c/Python27 nsis_compiler=C:"
+"\\\\Program\\ Files\\ \\(x86\\)\\\\NSIS\\\\makensis.exe</programlisting></"
+"informalexample> Переменная <varname>source_dir</varname> задаёт место, куда "
+"был распакован архив или сохранён снимок системы контроля версий исходного "
+"кода Gwyddion и эту переменную скорей всего нужно будет изменить. Переменная "
+"<varname>target_prefix</varname> указывает каталог установки (временный "
+"каталог) для собранного кросс-компиляцией Gwyddion. Значение по умолчанию "
+"должно работать, и вам не нужно его менять, если вы этого не хотите. "
+"Оставшиеся переменные, <varname>mingw32_prefix</varname>, "
+"<varname>nsis_compiler</varname> и <varname>python_dir</varname>, задают "
+"местоположение файлов MinGW, компилятора NSIS и Win32 Python, "
+"соответственно, и их обычно не надо менять со значений по умолчанию, хотя "
+"NSIS может быть установлен либо в <filename>Program Files (x86)</filename>, "
+"либо в <filename>Program Files</filename> по умолчанию в зависимости от "
+"настроек Wine. Следует отметить, что <filename>setup</filename> читается "
+"оболочкой, и, следовательно, вокруг знака <literal>=</literal> не должно "
+"быть пробелов."
+
+#: installation-cross-mingw32.xml:190(para)
+msgid ""
+"The setup was tedious but it was worth it because the compilation is then "
+"extremely simple. Run <informalexample><literallayout><userinput>./cross-"
+"build-32</userinput></literallayout></informalexample> in <filename>mingw32-"
+"cross-compile</filename> directory to build Win32 insstaller. That's all. If "
+"it succeeds an executable Gwyddion Windows installer with bundled GTK+ and "
+"everything will be created in <varname>$target_prefix</varname>. Similarly, "
+"the Win64 installer is built just with "
+"<informalexample><literallayout><userinput>./cross-build-64</userinput></"
+"literallayout></informalexample>"
+msgstr ""
+"Настройка была утомительной, но это того стоило, поскольку затем компиляция "
+"станет крайне простой. Нужно запустить "
+"<informalexample><literallayout><userinput>./cross-build-32</userinput></"
+"literallayout></informalexample> в каталоге <filename>mingw32-cross-compile</"
+"filename> чтобы собрать пакет установки под Win32. На этом всё. Если процесс "
+"создания прошел успешно, выполняемый пакет установки Gwyddion под Windows "
+"вместе с предустановленным GTK+ и всем остальным будет создан в каталоге, "
+"заданном <varname>$target_prefix</varname>. Аналогично, пакет установки под "
+"Win64 собирается с помощью <informalexample><literallayout><userinput>./"
+"cross-build-64</userinput></literallayout></informalexample>"
+
+#: installation-cross-mingw32.xml:205(para)
+msgid ""
+"You can make a coffee meanwhile – or study the <filename>cross-build</"
+"filename> script (it is actually quite short and clear)."
+msgstr ""
+"Во время сборки можно сделать кофе, или изучить скрипт <filename>cross-"
+"build</filename> (он в действительности достаточно короткий и понятный)."
+
+#: installation-cross-mingw32.xml:210(para)
+msgid ""
+"Note the cross-build scripts run <filename>autogen.sh</filename> but do not "
+"clean the source code directory. You may wish to do that manually if you "
+"compile Gwyddion repeatedly. Especially if you build for both architectures "
+"in the same directory, make sure to run "
+"<informalexample><literallayout><userinput>make distclean</userinput></"
+"literallayout></informalexample> between the builds to get the source "
+"directory back to a well-defined state."
+msgstr ""
+"Следует отметить, что скрипт кросс-компиляции запускает <filename>autogen."
+"sh</filename>, но не чистит каталог с исходным кодом. Вам может понадобиться "
+"сделать это вручную если вы постоянно собираете Gwyddion. Особенно это "
+"важно, если вы собираете версии под обе архитектуры в одном и том же "
+"каталоге, убедитесь, что <informalexample><literallayout><userinput>make "
+"distclean</userinput></literallayout></informalexample> был запущен между "
+"сборками чтобы привести каталог с исходным кодов в правильное состояние."
+
+#: installation-cross-mingw32.xml:223(title)
+msgid "Running under Wine"
+msgstr "Запуск под Wine"
+
+#: installation-cross-mingw32.xml:224(para)
+msgid ""
+"Compiled Gwyddion can be run under Wine. Assuming the default value of "
+"<varname>target_prefix</varname>: "
+"<informalexample><literallayout><userinput>wine ~/opt/gwyddion-mingw32/bin/"
+"gwyddion.exe</userinput></literallayout></informalexample> To run "
+"<filename>gwyddion.exe</filename> the dynamic linker must be able to find "
+"all the necessary DLLs. This is ensured in a somewhat crude way by script "
+"<command>copysysfiles</command> that copies all necessary MinGW files from "
+"system to <varname>$target_prefix</varname>. Since <command>copysysfiles</"
+"command> is executed by <command>cross-build</command> you normally do not "
+"need to execute it manually."
+msgstr ""
+"Собранный Gwyddion может быть запущен под Wine. Предполагая значение по "
+"умолчанию <varname>target_prefix</varname>: "
+"<informalexample><literallayout><userinput>wine ~/opt/gwyddion-mingw32/bin/"
+"gwyddion.exe</userinput></literallayout></informalexample> Чтобы запустить "
+"<filename>gwyddion.exe</filename> динамический линкер должен иметь "
+"возможность найти все нужные DLL. Это обеспечивается несколько грубым путём "
+"в скрипте <command>copysysfiles</command>, который копирует все необходимые "
+"файлы MinGW из системы в <varname>$target_prefix</varname>.  Поскольку "
+"команда <command>copysysfiles</command> запускается из <command>cross-build</"
+"command> обычно не нужно запускать её вручную."
+
+#: installation-cross-mingw32.xml:237(para)
+msgid ""
+"The second step that might be necessary is setting registry key "
+"<informalexample><literallayout>HKEY_LOCAL_MACHINE\\Software\\Microsoft"
+"\\Windows\\CurrentVersion\\App Paths\\gwyddion.exe</literallayout></"
+"informalexample> to point to <filename>gwyddion.exe</filename> and the value "
+"<literal>Path</literal> to point to the <filename>bin</filename> "
+"subdirectory."
+msgstr ""
+"Второй шаг, который может понадобиться, это установка ключа реестра "
+"<informalexample><literallayout>HKEY_LOCAL_MACHINE\\Software\\Microsoft"
+"\\Windows\\CurrentVersion\\App Paths\\gwyddion.exe</literallayout></"
+"informalexample> таким образом, чтобы он указывал на <filename>gwyddion.exe</"
+"filename> и значения <literal>Path</literal>, чтобы оно указывало на "
+"подкаталог <filename>bin</filename>."
+
+#: installation-cross-mingw32.xml:247(title)
+msgid "Cross-compilation of standalone modules"
+msgstr "Кросс-компиляция отдельных модулей"
+
+#: installation-cross-mingw32.xml:248(para)
+msgid ""
+"Cross-compilation of standalone modules requires only Gwyddion headers and "
+"Win32 development libraries. While they can be surely obtained by cross-"
+"compiling entire Gwyddion is it not necessary to do so. By compiling only "
+"the libraries you can avoid the installation of various rarer Gwyddion "
+"dependencies. This can be achieved using the patch <filename>gwyddion-2.22-"
+"build-only-libs.patch</filename> available among the build scripts."
+msgstr ""
+"Кросс-компиляция отдельных модулей требует только заголовочные файлы "
+"Gwyddion и библиотеки для разработки под Win32. Хотя их гарантированно "
+"получить кросс-компиляцией всей программы, делать это необязательно. "
+"Компилируя только библиотеки можно обойтись без установки разнообразных "
+"редких библиотек, от которых зависит Gwyddion. Это можно сделать используя "
+"патч <filename>gwyddion-2.22-build-only-libs.patch</filename>, который "
+"находится вместе со скриптами сборки."
+
+#: installation-cross-mingw32.xml:257(para)
+msgid ""
+"But it gets even easier, the MinGW Gwyddion libraries are available as a RPM "
+"package <filename>mingw32-gwyddion-libs</filename> in the gwyddion.net "
+"repository."
+msgstr ""
+"Но ещё проще, библиотеки MinGW Gwyddion доступны как RPM-пакет "
+"<filename>mingw32-gwyddion-libs</filename> в репозитории gwyddion.net."
+
+#: installation-cross-mingw32.xml:262(para)
+msgid ""
+"Once you have this package installed you can try cross-compilation of the "
+"sample standalone module <filename>threshold-example</filename> that is "
+"available in the subversion repository (or as a tarball). See "
+"<filename>README</filename> therein for some more details."
+msgstr ""
+"После того, как всё установлено можно попробовать собрать пример отдельного "
+"модуля <filename>threshold-example</filename> который доступен в репозитории "
+"subversion (или в виде пакета исходного кода). См. <filename>README</"
+"filename> там для получения дополнительной информации."
+
+#: installation-compiling-msvc.xml:6(title)
+msgid "Compiling on MS Windows using Microsoft Visual Studio"
+msgstr "Компиляция для MS Windows с использованием Microsoft Visual Studio"
+
+#: installation-compiling-msvc.xml:8(title)
+msgid "Bundle Installation"
+msgstr "Установка всего необходимого"
+
+#: installation-compiling-msvc.xml:9(para)
+msgid ""
+"Bundle for compiling in Visual Studio is available <ulink url=\"http://"
+"sourceforge.net/projects/gwyddion/files/gwyddion/2.43/Gwyddion-2.43-msvc.zip/"
+"download\">here</ulink>."
+msgstr ""
+"Набор всего необходимого для сборки с помощью Visual Studio можно скачать "
+"<ulink url=\"http://sourceforge.net/projects/gwyddion/files/gwyddion/2.43/"
+"Gwyddion-2.43-msvc.zip/download\">отсюда</ulink>."
+
+#: installation-compiling-msvc.xml:14(title)
+msgid "Solution"
+msgstr "Решение"
+
+#: installation-compiling-msvc.xml:15(para)
+msgid ""
+"Copy <literal>msvc2015</literal> folder to <command>gwyddion</command> "
+"source code folder (<literal>/trunk/gwyddion</literal> folder in "
+"<literal>svn</literal>, simply called <literal>gwyddion</literal> in the "
+"following text)."
+msgstr ""
+"Скопируйте каталог <literal>msvc2015</literal> в каталог исходного кода "
+"gwyddion (каталог <literal>/trunk/gwyddion</literal> в <literal>svn</"
+"literal>, в дальнейшем для простоты мы будем называть его просто "
+"<literal>gwyddion</literal>)."
+
+#: installation-compiling-msvc.xml:22(title)
+msgid "Generated files"
+msgstr "Сгенерированные файлы"
+
+#: installation-compiling-msvc.xml:23(para)
+msgid ""
+"Copy contents of <literal>generated-files</literal> folder to "
+"<literal>gwyddion</literal> folder."
+msgstr ""
+"Скопируйте содержимое каталога <literal>generated-files</literal> в каталог "
+"<literal>gwyddion</literal>"
+
+#: installation-compiling-msvc.xml:28(title)
+msgid "Python 2.7"
+msgstr "Python 2.7"
+
+#: installation-compiling-msvc.xml:29(para)
+msgid ""
+"Install Python 2.7. Version 2.7.11 does not work. The latest stable version "
+"is Python 2.7.9. Python installation packs are in <literal>libs-install</"
+"literal> folder. Install them to <literal>C:\\libs\\Python\\Win32</literal> "
+"and <literal>C:\\libs\\Python\\x64</literal> folders. It is unpossible to "
+"link against Python Debug library because <literal>python27_d.lib</literal> "
+"file is missing. It does not help to define <literal>MS_NO_COREDLL</"
+"literal>, <literal>Py_NO_ENABLE_SHARED</literal> and "
+"<literal>SWIG_PYTHON_INTERPRETER_NO_DEBUG</literal>."
+msgstr ""
+"Установите Python 2.7. Версия 2.7.11 не работает. Последняя стабильная "
+"версия Python 2.7.9. пакеты установки python находятся в каталоге "
+"<literal>libs-install</literal>. Установите их в каталоги <literal>C:\\libs"
+"\\Python\\Win32</literal> и <literal>C:\\libs\\Python\\x64</literal>. Из-за "
+"того, что файл <literal>python27_d.lib</literal> отсутствует, не получится "
+"связать проект с библиотекой отладки Python. Задание переменных "
+"<literal>MS_NO_COREDLL</literal>, <literal>Py_NO_ENABLE_SHARED</literal> и "
+"<literal>SWIG_PYTHON_INTERPRETER_NO_DEBUG</literal> в данном случае не "
+"помогает."
+
+#: installation-compiling-msvc.xml:40(title)
+msgid "Resolution:"
+msgstr "Как исправить:"
+
+#: installation-compiling-msvc.xml:42(literal)
+msgid "python27.lib"
+msgstr "python27.lib"
+
+#: installation-compiling-msvc.xml:42(literal)
+msgid "python27_d.lib"
+msgstr "python27_d.lib"
+
+#: installation-compiling-msvc.xml:42(listitem)
+msgid "copy <placeholder-1/> to <placeholder-2/>"
+msgstr "скопируйте <placeholder-1/> в каталог <placeholder-2/>"
+
+#: installation-compiling-msvc.xml:43(literal)
+msgid "pyconfig.h"
+msgstr "pyconfig.h"
+
+#: installation-compiling-msvc.xml:43(literal)
+msgid "define Py_DEBUG"
+msgstr "define Py_DEBUG"
+
+#: installation-compiling-msvc.xml:43(listitem)
+msgid "in <placeholder-1/> comment out <placeholder-2/>"
+msgstr "в <placeholder-1/> закомментируйте <placeholder-2/>"
+
+#: installation-compiling-msvc.xml:45(para)
+msgid ""
+"<literal>python27_d.lib</literal> and <literal>pyconfig.h</literal> are in "
+"<literal>libs\\Python27</literal> folder so you can just copy them to "
+"<literal>C:\\libs\\Python27</literal> folder."
+msgstr ""
+"<literal>python27_d.lib</literal> и <literal>pyconfig.h</literal> находятся "
+"в каталоге <literal>libs\\Python27</literal> поэтому их можно просто "
+"скопировать в каталог <literal>C:\\libs\\Python27</literal>."
+
+#: installation-compiling-msvc.xml:53(title)
+msgid "Libraries"
+msgstr "Библиотеки"
+
+#: installation-compiling-msvc.xml:54(para)
+msgid ""
+"<command>Gwyddion</command> depends on external libraries. Set paths to "
+"libraries as <command>environment variables</command>. Path must be ended by "
+"'\\'. Stable versions of these libraries are in <literal>libs</literal> "
+"folder. Example of environment variables setting follows:"
+msgstr ""
+"<command>Gwyddion</command> зависит от внешних библиотек. Необходимо "
+"установить пути к библиотекам как переменные окружения среды. Пути должны "
+"заканчиваться символом обратной косой черты '\\'. Стабильные версии этих "
+"библиотек находятся в каталоге <literal>libs</literal>. Пример установки "
+"переменных окружения приведён ниже:"
+
+#: installation-compiling-msvc.xml:71(title)
+msgid "'Build Events'"
+msgstr "'События сборки'"
+
+#: installation-compiling-msvc.xml:72(para)
+msgid ""
+"A part of project build is copying all files needed to run Gwyddion. "
+"Specific files are copied from <literal>gwyddion</literal> folder to "
+"<literal>$(OutDir)</literal> folder (or appropriate subfolder). DLL files "
+"are copied from extern library paths defined as environment variables to "
+"<literal>$(OutDir)</literal> folder. Commands are in menu item "
+"<literal>Project/Properties/Build Events/Post-Build Event</literal>."
+msgstr ""
+"Частью сборки проекта будет копирование всех файлов, необходимых для запуска "
+"Gwyddion. Отдельные файлы копируются из каталога <literal>gwyddion</literal> "
+"в каталог <literal>$(OutDir)</literal> (или в соответствующий подкаталог). "
+"Файлы динамически связываемых библиотек (DLL) копируются в каталог <literal>"
+"$(OutDir)</literal> из путей к внешним библиотекам, заданным как переменные "
+"окружения. Команды доступны через пункт меню <literal>Project/Properties/"
+"Build Events/Post-Build Event</literal>."
+
+#: installation-compiling-msvc.xml:83(title)
+msgid "Solution Generating"
+msgstr "Генерация решений"
+
+#: installation-compiling-msvc.xml:84(para)
+msgid ""
+"<command>Gwyddion</command> is natively compiled on Linux using "
+"<command>autotools</command>. Conversion of conditional compilation "
+"prescriptions between different platforms is not trivial (conditions, "
+"dependencies, variable expansion, different configuration files on Linux/"
+"Windows due different library availability). These factors avoid adequate "
+"full automatic conversion."
+msgstr ""
+"<command>Gwyddion</command> собирается под Linux с "
+"использованием<command>autotools</command>. Преобразование процедур условной "
+"компиляции между различными платформами (особенно такой самобытной, как "
+"Windows) являются весьма нетривиальными (условия, зависимости, раскрытие "
+"переменных, различные файлы настроек в Linux/Windows вследствие различий в "
+"наборе доступных библиотек). Все эти особенности практически исключают "
+"возможность автоматического преобразования."
+
+#: installation-compiling-msvc.xml:91(para)
+msgid ""
+"<literal>gen-gwyddion-msvc-sln.py</literal> is script generating Visual "
+"Studio <command>solution</command> and <command>projects</command>. Script "
+"must be run in <literal>gwyddion</literal> folder (see above). "
+"<command>Gwyddion</command> must be compiled on Linux before running the "
+"script. Linux compilation generates specific .c, .h files and allows script "
+"to generate exported function files (.def). All these files are needed for "
+"compilation on Windows. They are all sorted to <literal>generated-files</"
+"literal> folder and must be copied to <literal>gwyddion</literal> folder on "
+"Windows. The script results in Visual Studio <literal>solution</literal> and "
+"<literal>projects</literal> which are generated to <literal>msvc2015</"
+"literal> folder. All folders generated by script are created in "
+"<literal>gwyddion</literal> folder."
+msgstr ""
+"<literal>gen-gwyddion-msvc-sln.py</literal> это скрипт, генерирующий решение "
+"и проекты Visual Studio. Скрипт необходимо поместить в каталог "
+"<literal>gwyddion</literal> (см. выше). Gwyddion нужно сначала "
+"скомпилировать под Linux из этого каталога перед запуском скрипта. "
+"Компиляция под Linux создаёт недостающие необходимые файлы .c и .h и "
+"позволяет генерировать экспортируемые файлы функций (.def). Эти файлы "
+"необходимы для сборки под Windows. Они сортируются в каталог "
+"<literal>generated-files</literal> и должны быть скопированы в каталог "
+"<literal>gwyddion</literal> под Windows. Скрипт создаёт файлы решения Visual "
+"Studio (<literal>solution</literal>) и проекты (<literal>projects</literal>) "
+"которые генерируются в каталоге <literal>msvc2015</literal>. Все "
+"генерируемые скриптом каталоги создаются внутри каталога <literal>gwyddion</"
+"literal>."
+
+#: installation-compiling-msvc.xml:104(para)
+msgid ""
+"<literal>config.h</literal> a <literal>gwyconfig.h</literal> configuration "
+"files are natively generated on Linux by <command>autotools</command>. These "
+"files correspond to Linux configuration and must be modified to be able to "
+"compile in Visual Studio. Prepared Windows friendly configuration files are "
+"part of script. These files are copied to <literal>generated-files</literal> "
+"folder during script generating process."
+msgstr ""
+"Файлы <literal>config.h</literal> и <literal>gwyconfig.h</literal> создаются "
+"при компиляции под Linux с помощью <command>autotools</command>. Они "
+"соответствуют Linux-окружению и должны быть изменены чтобы можно было "
+"собрать проект с помощью Visual Studio. Подготовленные файлы конфигурации, "
+"совместимые с Windows являются частью скрипта. Эти файлы копируются в "
+"каталог <literal>generated-files</literal> в процессе работы генерирующего "
+"скрипта."
+
+#: installation-compiling-msvc.xml:113(title)
+msgid "Procedure:"
+msgstr "Процедура:"
+
+#: installation-compiling-msvc.xml:115(title)
+msgid "Compile on Linux"
+msgstr "Компиляция на машине с Linux"
+
+#: installation-compiling-msvc.xml:116(para)
+msgid ""
+"On Linux. Run <literal>./autogen.sh</literal> and <literal>make</literal> in "
+"source code folder (usually <literal>gwyddion</literal> folder). See <link "
+"linkend=\"installation-unix-source\">compilation on Linux/Unix</link>."
+msgstr ""
+"На машине с Linux. Запустите <literal>./autogen.sh</literal> и "
+"<literal>make</literal> в каталоге с исходным кодом (обычно  "
+"<literal>gwyddion</literal>). См. раздел <ulink url=\"http://gwyddion.net/"
+"documentation/user-guide-en/installation-unix-source.html\">Сборка в среде "
+"Linux/Unix</ulink>."
+
+#: installation-compiling-msvc.xml:123(title)
+msgid ""
+"Run script to generate <literal>solution</literal> and to copy out generated "
+"files"
+msgstr ""
+"Запустите скрипт, чтобы создать файлы решения (<literal>solution</literal>) "
+"и скопируйте сгенерированные файлы."
+
+#: installation-compiling-msvc.xml:125(para)
+msgid ""
+"On Linux. Run <literal>gen-gwyddion-msvc-sln.py</literal> in "
+"<literal>gwyddion</literal> folder."
+msgstr ""
+"На машине с Linux. Запустите <literal>gen-gwyddion-msvc-sln.py gwyddion</"
+"literal> в каталоге <literal>gwyddion</literal>. "
+
+#: installation-compiling-msvc.xml:134(literal)
+msgid "Generated folder"
+msgstr "Генерируемый каталог"
+
+#: installation-compiling-msvc.xml:135(entry)
+msgid "Contents"
+msgstr "Содержание"
+
+#: installation-compiling-msvc.xml:140(literal)
+msgid "msvc2015"
+msgstr "msvc2015"
+
+#: installation-compiling-msvc.xml:141(entry)
+msgid "Gwyddion Solution"
+msgstr "Gwyddion Solution"
+
+#: installation-compiling-msvc.xml:144(literal)
+msgid "msvc2015/generated-files"
+msgstr "msvc2015/generated-files"
+
+#: installation-compiling-msvc.xml:145(entry)
+msgid ".def, .c, .h files"
+msgstr "файлы .def, .c, .h"
+
+#: installation-compiling-msvc.xml:151(para)
+msgid ""
+"Copy all files and folders from <literal>./msvc2015/generated-files</"
+"literal> on Linux machine to <literal>./gwyddion</literal> on Windows "
+"machine."
+msgstr ""
+"Необходимо скопировать все файлы и каталоги из <literal>./msvc2015/generated-"
+"files</literal> на машине с Linux в <literal>./gwyddion</literal> на машине "
+"с Windows."
+
+#: installation-compiling-msvc.xml:157(para)
+msgid ""
+"On Windows. See the <link linkend=\"installation-compiling-msvc-installation"
+"\">bundle installation</link> section."
+msgstr ""
+"Под Windows. См. раздел <link linkend=\"installation-compiling-msvc-"
+"installation\">Установка всего необходимого</link>."
+
+#: install.xml:7(para)
+msgid ""
+"<application>Gwyddion</application> source code and executables can be "
+"downloaded from the <ulink url=\"http://gwyddion.net/download.php\">download "
+"web page</ulink> of the project, or alternatively from raw <ulink url="
+"\"http://sourceforge.net/projects/gwyddion/files/\">SourceForge.net download "
+"page</ulink>. The installation varies depending on the operating system and "
+"the various installation methods will be described in the following sections."
+msgstr ""
+"Исходные коды и двоичные файлы <application>Gwyddion</application> можно "
+"загрузить со страницы <ulink url=\"http://gwyddion.net/download.php"
+"\">download</ulink> сайта проекта или напрямую со <ulink url=\"http://"
+"sourceforge.net/projects/gwyddion/files/\">страницы загрузки SourceForge."
+"net</ulink>. Порядок установки слегка меняется в зависимости от используемой "
+"операционной системы и различных методов установки, которые описаны в "
+"следующих разделах."
+
+#: install.xml:16(para)
+msgid ""
+"To play with Gwyddion you might also want to download the <ulink url="
+"\"http://gwyddion.net/download.php#sample-files\">sample "
+"<application>Gwyddion</application> files</ulink>. They are in native "
+"<application>Gwyddion</application> format and represent typical AFM data."
+msgstr ""
+"Чтобы попробовать Gwyddion в деле вам возможно понадобятся <ulink url="
+"\"http://gwyddion.net/download.php#sample-files\">образцы файлов "
+"<application>Gwyddion</application></ulink>. Они сохранены в родном формате "
+"<application>Gwyddion</application> и представляют собой типичные данные АСМ."
+
+#~ msgid "2.8.0"
+#~ msgstr "2.8.0"
+
+#~ msgid "file open dialog"
+#~ msgstr "диалог открытия файла"
+
+#~ msgid "2.14.0"
+#~ msgstr "2.14.0"
+
+#~ msgid ""
+#~ "On Linux distributions using the <ulink url=\"http://www.rpm.org/\">RPM "
+#~ "Package Manager</ulink>, such as Fedora, openSuSE or Mandriva, you can "
+#~ "also build a package yourself from the source code, as <link linkend="
+#~ "\"installation-unix-source-rpm\">described below</link>."
+#~ msgstr ""
+#~ "В дистрибутивах Linux, использующих <ulink url=\"http://www.rpm.org/"
+#~ "\">систему управления пакетами RPM</ulink>, таких как Fedora, openSuSE "
+#~ "или Mandriva, также можно самостоятельно собрать пакет из исходных кодов, "
+#~ "как <link linkend=\"installation-unix-source-rpm\">описано ниже</link>."
+
+#~ msgid "Integral transforms, power spectrum and correlation operations."
+#~ msgstr ""
+#~ "Интегральные преобразования, операции вычисления спектра мощности и "
+#~ "корреляции."
+
+#~ msgid ""
+#~ "Gwyddion needs or can utilise various software libraries, described in "
+#~ "section <link linkend=\"installation-dependencies\">Build Dependencies</"
+#~ "link>. If you install binary packages you usually do not need to concern "
+#~ "yourself with the required components as the packager has taken care of "
+#~ "it and ensured that all are present. However, it is important if you "
+#~ "compile Gwyddion from source code."
+#~ msgstr ""
+#~ "Gwyddion требует или может использовать различные программные библиотеки, "
+#~ "описанные в разделе <link linkend=\"installation-dependencies"
+#~ "\">Зависимости при сборке</link>. Если вы устанавливаете собранные пакеты "
+#~ "это обычно не должно вас волновать, поскольку это задача сборщика пакета "
+#~ "убедиться, что всё нужное доступно в системе. Однако, это важно, если вы "
+#~ "собираете Gwyddion из исходного кода."
+
+#~ msgid "GConf2"
+#~ msgstr "GConf2"
+
+#~ msgid "Obsolete, Unix"
+#~ msgstr "Устаревшее, Unix"
+
+#~ msgid ""
+#~ "Better GNOME 2 and XFce integration (up to XFce 4.6), in particular "
+#~ "automatic generation of SPM file thumbnails in Nautilus and Thunar. Newer "
+#~ "versions of these desktop environments use different mechanisms."
+#~ msgstr ""
+#~ "Лучшая интеграция с GNOME 2 и XFce (до версии 4.6), например, "
+#~ "автоматическая генерация миниатюр для файлов СЗМ в Nautilus и Thunar. "
+#~ "Более новые версии этих графических оболочек используют другие механизмы."
+
+#~ msgid "3.0 (3.1)"
+#~ msgstr "3.0 (3.1)"
+
+#~ msgid "Perl5"
+#~ msgstr "Perl5"
+
+#~ msgid ""
+#~ "It may be necessary to adjust these variables to include non-standard "
+#~ "directories with executables and libraries of relevant packages, "
+#~ "respectively."
+#~ msgstr ""
+#~ "Может потребоваться настроить эти переменные чтобы включить нестандартные "
+#~ "каталоги с исполняемыми файлами и библиотеками соответствующих пакетов."
+
+#~ msgid ""
+#~ "Most of these options control inclusion/exclusion of optional features. "
+#~ "Some interesting general options are explained below."
+#~ msgstr ""
+#~ "Большинство этих опций управляет включением/отключением дополнительных "
+#~ "опциональных возможностей. Некоторые интересные общие настройки описаны "
+#~ "ниже."
+
+#~ msgid ""
+#~ "CFITSIO_DIR = C:\\libs\\cfitsio\\ GTK_DIR = C:\\libs\\Gtk\\ GTKGLEXT_DIR "
+#~ "= C:\\libs\\GetGLExt\\ LIBICONV_DIR = C:\\libs\\libiconv\\ LIBXML_DIR = C:"
+#~ "\\libs\\libxml\\ PYTHON_DIR = C:\\libs\\Python27\\ ZLIB_DIR = C:\\libs"
+#~ "\\zlib\\"
+#~ msgstr ""
+#~ "CFITSIO_DIR = C:\\libs\\cfitsio\\ GTK_DIR = C:\\libs\\Gtk\\ GTKGLEXT_DIR "
+#~ "= C:\\libs\\GetGLExt\\ LIBICONV_DIR = C:\\libs\\libiconv\\ LIBXML_DIR = C:"
+#~ "\\libs\\libxml\\ PYTHON_DIR = C:\\libs\\Python27\\ ZLIB_DIR = C:\\libs"
+#~ "\\zlib\\"
+
+#~ msgid ""
+#~ "On Linux. Run <literal>gen-gwyddion-msvc-sln.py</literal> in "
+#~ "<literal>gwyddion</literal> folder. <informaltable frame=\"none\" id="
+#~ "\"table-generated_folders\"><tgroup cols=\"2\"><?dblatex ll?"
+#~ "><thead><row><entry><literal>Generated folder</literal></"
+#~ "entry><entry>Contents</entry></row></"
+#~ "thead><tbody><row><entry><literal>msvc2015</literal></"
+#~ "entry><entry>Gwyddion Solution</entry></row><row><entry><literal>msvc2015/"
+#~ "generated-files</literal></entry><entry>.def, .c, .h files</entry></row></"
+#~ "tbody></tgroup></informaltable>"
+#~ msgstr ""
+#~ "Под Linux. Запустите <literal>gen-gwyddion-msvc-sln.py gwyddion</literal> "
+#~ "в каталоге <literal>gwyddion</literal>. <informaltable frame=\"none\" id="
+#~ "\"table-generated_folders\"><tgroup cols=\"2\"><?dblatex ll?"
+#~ "><thead><row><entry><literal>Генерируемый каталог</literal></"
+#~ "entry><entry>Содержимое</entry></row></"
+#~ "thead><tbody><row><entry><literal>msvc2015</literal></"
+#~ "entry><entry>решение для сборки gwyddion</entry></"
+#~ "row><row><entry><literal>msvc2015/generated-files</literal></"
+#~ "entry><entry>файлы .def, .c, .h/entry></row></tbody></tgroup></"
+#~ "informaltable>"
+
+#~ msgid "3. Installation"
+#~ msgstr "3. Установка"
+
+#~ msgid "OpenEXR HDR image import and export."
+#~ msgstr "импорт и экспорт изображений с большой глубиной цвета OpenEXR "
+
+#~ msgid "1.3 Configuration files"
+#~ msgstr "1.3 Конфигурационные файлы"
+
+#~ msgid ""
+#~ "Copy contents of <literal>config-files-msvc</literal> folder to "
+#~ "<literal>gwyddion</literal> folder. <literal>config.h</literal> and "
+#~ "<literal>gwyconfig.h</literal> header files are tuned to Windows. They "
+#~ "must replace configuration header files generated on Linux from "
+#~ "<literal>generated-files-ch</literal> folder."
+#~ msgstr ""
+#~ "Скопируйте содержимое каталога <literal>config-files-msvc</literal> в "
+#~ "каталог <literal>gwyddion</literal>.  Файлы заголовков <literal>config.h</"
+#~ "literal> и <literal>gwyconfig.h</literal> настроены под Windows. Они "
+#~ "должны заменить собой файлы, генерируемые под Linux из каталога "
+#~ "<literal>generated-files-ch</literal>."
+
+#~ msgid "Contents of conversion bundle:"
+#~ msgstr "Содержимое пакета преобразования:"
+
+#~ msgid "1. <literal>gen-gwyddion-msvc-sln.py</literal>"
+#~ msgstr "1. <literal>gen-gwyddion-msvc-sln.py</literal>"
+
+#~ msgid "2. <literal>config-files-msvc</literal>"
+#~ msgstr "2. <literal>config-files-msvc</literal>"
+
+#~ msgid "<ulink url=\"http://www.gtk.org/\">GTK+</ulink> ≥ 2.8.0"
+#~ msgstr "<ulink url=\"http://www.gtk.org/\">GTK+</ulink> ≥ 2.8.0"
+
+#~ msgid "This includes the dependencies of GTK+ such as GLib, Pango or Cairo."
+#~ msgstr "Включает в себя зависимости GTK+, такие как GLib, Pango или Cairo."
+
+#~ msgid "<ulink url=\"http://www.gtk.org/\">GLib</ulink> ≥ 2.14.0"
+#~ msgstr "<ulink url=\"http://www.gtk.org/\">GLib</ulink> ≥ 2.14.0"
+
+#~ msgid ""
+#~ "<ulink url=\"http://pkgconfig.freedesktop.org/\">pkg-config</ulink> ≥ 0.16"
+#~ msgstr ""
+#~ "<ulink url=\"http://pkgconfig.freedesktop.org/\">pkg-config</ulink> ≥ 0.16"
+
+#~ msgid ""
+#~ "<ulink url=\"http://gtkglext.sourceforge.net/\">GtkGLExt</ulink> ≥ 1.0"
+#~ msgstr ""
+#~ "<ulink url=\"http://gtkglext.sourceforge.net/\">GtkGLExt</ulink> ≥ 1.0"
+
+#~ msgid "Enables OpenGL 3D data views."
+#~ msgstr "Разрешает трёхмерные виды данных OpenGL."
+
+#~ msgid ""
+#~ "<ulink url=\"http://www.fftw.org/\">FFTW3</ulink> ≥ 3.0 (32bit), ≥ 3.1 "
+#~ "(64bit), Unix only"
+#~ msgstr ""
+#~ "<ulink url=\"http://www.fftw.org/\">FFTW3</ulink> ≥ 3.0 (32bit), ≥ 3.1 "
+#~ "(64bit), только для Unix"
+
+#~ msgid ""
+#~ "<ulink url=\"http://www.gnome.org/~ebassi/source/\">LibUnique</"
+#~ "ulink> ≥ 1.0"
+#~ msgstr ""
+#~ "<ulink url=\"http://www.gnome.org/~ebassi/source/\">LibUnique</"
+#~ "ulink> ≥ 1.0"
+
+#~ msgid "<ulink url=\"http://www.x.org/\">LibXmu</ulink>, X11 only"
+#~ msgstr "<ulink url=\"http://www.x.org/\">LibXmu</ulink>, только для X11"
+
+#~ msgid "Zlib"
+#~ msgstr "Zlib"
+
+#~ msgid "Enables compression support in some file formats (NRRD)."
+#~ msgstr "Добавляет поддержку сжатия в некоторых форматах файлов (NRRD)."
+
+#~ msgid ""
+#~ "<ulink url=\"http://www.pygtk.org/\">PyGTK2</ulink>, including codegen"
+#~ msgstr ""
+#~ "<ulink url=\"http://www.pygtk.org/\">PyGTK2</ulink>, включая codegen"
+
+#~ msgid "Enables pygwy, the Gwyddion Python scripting interface."
+#~ msgstr "Включает pygwy, скриптовый интерфейс на Python для Gwyddion"
+
+#~ msgid ""
+#~ "<ulink url=\"http://www.freedesktop.org/software/desktop-file-utils"
+#~ "\">desktop-file-utils</ulink>, Unix only"
+#~ msgstr ""
+#~ "<ulink url=\"http://www.freedesktop.org/software/desktop-file-utils"
+#~ "\">desktop-file-utils</ulink>, только для Unix"
+
+#~ msgid ""
+#~ "<ulink url=\"http://projects.gnome.org/gconf/\">GConf2</ulink>, Unix only"
+#~ msgstr ""
+#~ "<ulink url=\"http://projects.gnome.org/gconf/\">GConf2</ulink>, только "
+#~ "для Unix"
+
+#~ msgid ""
+#~ "<ulink url=\"http://xmlsoft.org/\">LibXML2</ulink> ≥ 2.<varname>x</"
+#~ "varname>"
+#~ msgstr ""
+#~ "<ulink url=\"http://xmlsoft.org/\">LibXML2</ulink> ≥ 2.<varname>x</"
+#~ "varname>"
+
+#~ msgid ""
+#~ "On Fedora, everything is in the default <quote>Everything</quote> "
+#~ "repository. On openSUSE, it is necessary to add additional package "
+#~ "repositories <filename>windows:mingw:win32/openSUSE_11.3</filename> and "
+#~ "<filename>devel:tools/openSUSE_11.3</filename>, where 11.3 is of course "
+#~ "to be replaced with the actual openSUSE version. In unsure, you can also "
+#~ "look up the packages in the on-line <ulink url=\"http://software.opensuse."
+#~ "org/\">openSUSE package search</ulink>."
+#~ msgstr ""
+#~ "В Fedora всё находится в основном репозитории <quote>Everything</quote>. "
+#~ "В openSUSE необходимо добавить дополнительные репозитории пакетов "
+#~ "<filename>windows:mingw:win32/openSUSE_11.3</filename> и <filename>devel:"
+#~ "tools/openSUSE_11.3</filename>, где 11.3, естественно, необходимо "
+#~ "заменить действительной версией дистрибутива. если что-то вызывает "
+#~ "сомнения, можно найти пакеты в сетевом <ulink url=\"http://software."
+#~ "opensuse.org/\">поиске пакетов openSUSE</ulink>."
+
+#~ msgid "Extra MinGW32 Packages"
+#~ msgstr "Дополнительные пакеты MinGW32"
+
+#~ msgid ""
+#~ "The official Gwyddion packages utilise additional libraries that are not "
+#~ "available in the Fedora and/or openSUSE MinGW environment, namely "
+#~ "GtkGLExt and FFTW. They can be omitted though you will have to modify "
+#~ "some scripts if you do so. At the time of writing this, Fedora lacks both "
+#~ "packages while openSuSE lacks only GtkGLExt. In addition, the default "
+#~ "Bzip2 package is built to use the stdcall calling convention and is not "
+#~ "found by configure."
+#~ msgstr ""
+#~ "Официальные пакеты Gwyddion используют дополнительные библиотеки, которые "
+#~ "не доступны в среде MinGW в Fedora и/или openSUSE, а именно GtkGLExt и "
+#~ "FFTW. Они могут быть пропущены, хотя может потребоваться изменение "
+#~ "некоторых скриптов если вы так сделаете. на момент описания в Fedora "
+#~ "отсутствовали оба пакета, в openSUSE только GtkGLExt. В дополнение, по "
+#~ "умолчанию пакет Bzip2 собран с использованием формата вызовов stdcall и "
+#~ "не обнаруживается configure."
+
+#~ msgid ""
+#~ "The source packages <filename>mingw32-fftw</filename>, <filename>mingw32-"
+#~ "gtkglext</filename> and <filename>mingw32-bzip2-cdecl</filename> can be "
+#~ "downloaded from <ulink url=\"http://sourceforge.net/projects/gwyddion/"
+#~ "files/mingw32-cross-compile/\">Gwyddion SourceForge pages</ulink>. Build "
+#~ "binary packages using <command>rpmbuild</command>: "
+#~ "<informalexample><literallayout><userinput>rpmbuild --rebuild mingw32-"
+#~ "fftw-3.2.2-1.src.rpm</userinput></literallayout></informalexample> "
+#~ "replacing the file name with the name of the downloaded file. If the "
+#~ "<command>rpmbuild</command> command complains about missing dependencies "
+#~ "install them using <command>yum install</command> as before. The created "
+#~ "package can then be installed as root: "
+#~ "<informalexample><literallayout><userinput>#Fedora yum localinstall --"
+#~ "nogpgcheck ~/rpmbuild/RPM/RPMS/noarch/mingw32-3.2.2-1.noarch.rpm # "
+#~ "openSUSE zypper install ~/rpmbuild/RPM/RPMS/noarch/mingw32-3.2.2-1.noarch."
+#~ "rpm</userinput></literallayout></informalexample> The same applies to the "
+#~ "other source packages (all built RPMs can be installed at once with a "
+#~ "single <command>yum</command> or <command>zypper</command> invocation)."
+#~ msgstr ""
+#~ "Пакеты исходного кода <filename>mingw32-fftw</filename>, "
+#~ "<filename>mingw32-gtkglext</filename> и <filename>mingw32-bzip2-cdecl</"
+#~ "filename> могут быть загружены с <ulink url=\"http://sourceforge.net/"
+#~ "projects/gwyddion/files/mingw32-cross-compile/\">страниц Gwyddion на "
+#~ "SourceForge</ulink>. Необходимо собрать пакеты используя команду "
+#~ "<command>rpmbuild</command>: "
+#~ "<informalexample><literallayout><userinput>rpmbuild -bb mingw32-"
+#~ "fftw-3.2.2-1.src.rpm</userinput></literallayout></informalexample> "
+#~ "заменяя имя файла именем загруженного (оно может отличаться). Если "
+#~ "команда <command>rpmbuild</command> сообщает об отсутствующих "
+#~ "зависимостях, установите их с помощью <command>yum install</command> как "
+#~ "ранее. Собранные пакеты могут быть установлены с правами "
+#~ "суперпользователя:<informalexample><literallayout><userinput>#Fedora yum "
+#~ "localinstall --nogpgcheck ~/rpmbuild/RPM/RPMS/noarch/mingw32-3.2.2-1."
+#~ "noarch.rpm # openSUSE zypper install ~/rpmbuild/RPM/RPMS/noarch/"
+#~ "mingw32-3.2.2-1.noarch.rpm</userinput></literallayout></informalexample> "
+#~ "То же самое относится и к остальным пакетам с исходным кодом (все "
+#~ "собранные RPM-пакеты могут быть установлены сразу одним вызовом "
+#~ "<command>yum</command> или <command>zypper</command>)."
+
+#~ msgid ""
+#~ "If you have never built any RPM the package building support has to be "
+#~ "installed and initialised first. Run as root: "
+#~ "<informalexample><literallayout><userinput># Fedora yum install rpm-build "
+#~ "rpmdevtools # openSUSE zypper install rpmdevtools </userinput></"
+#~ "literallayout></informalexample> and then as a normal user (who is going "
+#~ "to build the RPMs): <informalexample><literallayout><userinput>rpmdev-"
+#~ "setuptree</userinput></literallayout></informalexample> This creates a "
+#~ "directory tree in <filename>~/rpmbuild</filename> where the RPM package "
+#~ "building will take place."
+#~ msgstr ""
+#~ "Если вы ни разу не собирали RPM сначала нужно поставить и "
+#~ "инициализировать поддержку сборки пакетов. Запустите с правами root: "
+#~ "<informalexample><literallayout><userinput># Fedora yum install rpm-build "
+#~ "rpmdevtools # openSUSE zypper install rpmdevtools </userinput></"
+#~ "literallayout></informalexample> и затем от пользователя, который будет "
+#~ "собирать RPM-пакеты: <informalexample><literallayout><userinput>rpmdev-"
+#~ "setuptree</userinput></literallayout></informalexample> При этом будет "
+#~ "создано дерево каталогов в <filename>~/rpmbuild</filename>, где и будет "
+#~ "происходить сборка пакетов."
+
+#~ msgid ""
+#~ "The MinGW Gwyddion libraries can be built as a RPM package, "
+#~ "<filename>mingw32-gwyddion-libs</filename>, and then installed and used "
+#~ "as any other MinGW package. To build it you need (of course, replace 2.28 "
+#~ "with the current version):"
+#~ msgstr ""
+#~ "Библиотеки MinGW Gwyddion можно собрать в RPM-пакет, <filename>mingw32-"
+#~ "gwyddion-libs</filename>, установить и использовать как любой другой "
+#~ "пакет MinGW. Чтобы собрать их нужно (естественно, заменяя 2.28 текущей "
+#~ "версией):"
+
+#~ msgid "gwyddion-2.28.tar.xz"
+#~ msgstr "gwyddion-2.28.tar.xz"
+
+#~ msgid ""
+#~ "Copy (or link) the source code tarball to <filename>~/rpmbuild/RPM/"
+#~ "SOURCES</filename>."
+#~ msgstr ""
+#~ "Скопируйте (или сделайте ссылку) пакет исходного кода в <filename>~/"
+#~ "rpmbuild/RPM/SOURCES</filename>."
+
+#~ msgid "gwyddion-2.22-build-only-libs.patch"
+#~ msgstr "gwyddion-2.22-build-only-libs.patch"
+
+#~ msgid ""
+#~ "This patch can be found in among the other <link linkend=\"installation-"
+#~ "cross-mingw32-scripts\">build scripts</link> in <filename>mingw32-cross-"
+#~ "compile</filename> subversion module. Put it also to <filename>~/rpmbuild/"
+#~ "RPM/SOURCES</filename>."
+#~ msgstr ""
+#~ "Этот патч можно найти вместе с остальными <link linkend=\"installation-"
+#~ "cross-mingw32-scripts\">скриптами сборки</link> в модуле subversion "
+#~ "<filename>mingw32-cross-compile</filename>. Его нужно также поместить в "
+#~ "<filename>~/rpmbuild/RPM/SOURCES</filename>."
+
+#~ msgid "mingw32-gwyddion-libs.spec"
+#~ msgstr "mingw32-gwyddion-libs.spec"
+
+#~ msgid ""
+#~ "The RPM spec file can be found in subdirectory <filename>data</filename> "
+#~ "of has to be placed to <filename>~/rpmbuild/RPM/SPECS</filename>."
+#~ msgstr ""
+#~ "Файл spec RPM можно найти в подкаталоге <filename>data</filename> и "
+#~ "поместить в <filename>~/rpmbuild/RPM/SPECS</filename>."
+
+#~ msgid ""
+#~ "Then run <informalexample><literallayout><userinput>rpmbuild -bb ~/"
+#~ "rpmbuild/RPM/SOURCES/mingw32-gwyddion-libs.spec</userinput></"
+#~ "literallayout></informalexample> and install the created package."
+#~ msgstr ""
+#~ "Затем можно запустить <informalexample><literallayout><userinput>rpmbuild "
+#~ "-bb ~/rpmbuild/RPM/SOURCES/mingw32-gwyddion-libs.spec</userinput></"
+#~ "literallayout></informalexample> и установить созданный пакет."
+
+#~ msgid ""
+#~ "Note that pygwy is not really functional on MS Windows at this moment."
+#~ msgstr ""
+#~ "Следует отметить, что pygwy практически не работает на MS Windows в "
+#~ "настоящий момент."
+
+#~ msgid "MS Windows from Source Code Tarball"
+#~ msgstr "MS Windows из архива с исходным кодом"
+
+#~ msgid "The last version of Gwyddion that can be built with MSVC6 is 2.22."
+#~ msgstr ""
+#~ "Последняя версия Gwyddion, которую можно собрать используя MSVC6 – 2.22."
+
+#~ msgid ""
+#~ "<application>Gwyddion</application> MS Windows build system uses the "
+#~ "<application>Microsoft Visual C++</application> (MSVC) compiler (version "
+#~ "6 is tested and recommended, albeit it is a bit older). It primarily "
+#~ "consists of a set of <command>nmake</command> makefiles, that is the "
+#~ "compilation is done from the command line. This approach has several "
+#~ "advantages with respect to reproducibility and automation of the process. "
+#~ "Furthermore, it enables easy synchronization of Unix and MS Windows build "
+#~ "systems. The necessity to use command line may be considered a "
+#~ "disadvantage though you should find the compilation process quite simple "
+#~ "even you are not used to use the command line much."
+#~ msgstr ""
+#~ "Система сборки <application>Gwyddion</application> под MS Windows "
+#~ "использует компилятор <application>Microsoft Visual C++</application> "
+#~ "(MSVC)  (рекомендованная версия 6, хотя она уже несколько устарела). Она "
+#~ "в основном состоит из набора файлов сборки <command>nmake</command>, "
+#~ "следовательно, компиляция осуществляется из командной строки. Это подход "
+#~ "имеет ряд преимуществ в плане воспроизводимости и автоматизации процесса. "
+#~ "Более того, он позволяет легко синхронизировать сборочные системы под "
+#~ "Unix и MS Windows. Необходимость использования командной строки может "
+#~ "считаться недостатком, хотя вам процесс сборки должен показаться "
+#~ "достаточно простым даже если вы не работали много с командной строкой."
+
+#~ msgid ""
+#~ "In addition to MSVC you need to install Gtk+ development environment. "
+#~ "Again, we recommend to use the <ulink url=\"http://downloads.sourceforge."
+#~ "net/gladewin32/gtk-dev-2.12.9-win32-2.exe\">GladeWin32</ulink> package. "
+#~ "Note it also contains the complete run-time environment, therefore you do "
+#~ "not need to install the run-time package if you install the development "
+#~ "one."
+#~ msgstr ""
+#~ "В дополнение к MSVC вам потребуется установить среду разработки Gtk+. "
+#~ "Снова мы рекомендуем использовать пакет <ulink url=\"http://downloads."
+#~ "sourceforge.net/gladewin32/gtk-dev-2.12.9-win32-2.exe\">GladeWin32</"
+#~ "ulink>. Следует отметить, что он содержит полную среду времени "
+#~ "исполнения, следовательно, вам не нужно устанавливать её, если вы "
+#~ "установили версию для разработчика."
+
+#~ msgid "Unpacking"
+#~ msgstr "Распаковка"
+
+#~ msgid ""
+#~ "Unpack the source code tarball with your favorite (de)compression program "
+#~ "or file manager. Tarballs compressed with <ulink url=\"http://www.bzip."
+#~ "org/\">bzip2</ulink> (<filename>.bz2</filename>) are considerably smaller "
+#~ "than <ulink url=\"http://www.gzip.org/\">gzip</ulink> compressed tarballs "
+#~ "(<filename>.gz</filename>), however support for bzip2 compression used to "
+#~ "be less widespread than gzip compression support in MS Windows programs. "
+#~ "Most recent programs support both, for example <ulink url=\"http://www.7-"
+#~ "zip.org/\"><application>7zip</application></ulink> which is also Free "
+#~ "Software."
+#~ msgstr ""
+#~ "Распакуйте архив с исходным кодом своим любимым (раз)архиватором или "
+#~ "файловым менеджером. Архивы, сжатые <ulink url=\"http://www.bzip.org/"
+#~ "\">bzip2</ulink> (<filename>.bz2</filename>) значительно меньше, чем "
+#~ "архивы <ulink url=\"http://www.gzip.org/\">gzip</ulink> (<filename>.gz</"
+#~ "filename>),</ulink>, хотя поддержка сжатия bzip2 менее распространена по "
+#~ "сравнению с gzip среди программ под MS Windows. Последние версии программ "
+#~ "поддерживают оба варианта, например можно взять <ulink url=\"http://www.7-"
+#~ "zip.org/\"><application>7zip</application></ulink>, который также "
+#~ "является свободным программным обеспечением."
+
+#~ msgid ""
+#~ "The unpacking will create directory <filename>gwyddion-2.19</filename> "
+#~ "(with 2.19 replaced with the actual version number) where all other "
+#~ "compilation actions will take place."
+#~ msgstr ""
+#~ "При распаковке будет создан каталог <filename>gwyddion-2.19</filename> "
+#~ "(2.19 заменяется номером текущей версии), где и будут происходить все "
+#~ "остальные действия по компиляции."
+
+#~ msgid ""
+#~ "Open file <filename>make.msc</filename> in a text editor. It starts "
+#~ "approximately as follows:"
+#~ msgstr ""
+#~ "Откройте файл <filename>make.msc</filename> в текстовом редакторе. Он "
+#~ "начинается примерно так:"
+
+#~ msgid ""
+#~ "Check and correct the paths according to the instructions. Often, no "
+#~ "modifications are necessary as the paths in the file represent the "
+#~ "default installation directories of each program."
+#~ msgstr ""
+#~ "Проверьте и исправьте пути в соответствии с инструкциями. Часто изменения "
+#~ "не требуются, поскольку пути в файле представляют собой пути установки по "
+#~ "умолчанию для каждой из программ."
+
+#~ msgid "GTK_TOP"
+#~ msgstr "GTK_TOP"
+
+#~ msgid "bin"
+#~ msgstr "bin"
+
+#~ msgid "lib"
+#~ msgstr "lib"
+
+#~ msgid "share"
+#~ msgstr "share"
+
+#~ msgid "$(GTK_TOP)"
+#~ msgstr "$(GTK_TOP)"
+
+#~ msgid ""
+#~ "It should point to the top-level directory of Gtk+ installation, that is "
+#~ "the directory containing <placeholder-1/>, <placeholder-2/>, "
+#~ "<placeholder-3/>, etc. subdirectories. We will refer to its value as to "
+#~ "<placeholder-4/> below."
+#~ msgstr ""
+#~ "Должен указывать на каталог верхнего уровня установки Gtk+, т.е. на "
+#~ "каталог, содержащий подкаталоги <placeholder-1/>, <placeholder-2/>, "
+#~ "<placeholder-3/>, и т.п. Ниже мы будем ссылаться на его значение как "
+#~ "<placeholder-4/>."
+
+#~ msgid "GTKGLEXT_TOP"
+#~ msgstr "GTKGLEXT_TOP"
+
+#~ msgid ""
+#~ "It should point to the corresponding top-level directory of GtkGLExt "
+#~ "installation. This differs from <placeholder-1/> only if you do not use "
+#~ "GladeWin32 and have installed GtkGLExt separately."
+#~ msgstr ""
+#~ "Должен указывать на каталог верхнего уровня установки GtkGLExt. Он будет "
+#~ "отличаться от <placeholder-1/> только если вы не используете GladeWin32 и "
+#~ "установили GtkGLExt отдельно."
+
+#~ msgid "LIBXML2_TOP"
+#~ msgstr "LIBXML2_TOP"
+
+#~ msgid ""
+#~ "It should point to the corresponding top-level directory of LibXML2 "
+#~ "installation. This differs from <placeholder-1/> only if you do not use "
+#~ "GladeWin32 and have installed LibXML2 separately."
+#~ msgstr ""
+#~ "Должен указывать на каталог верхнего уровня установки LibXML2. Он будет "
+#~ "отличаться от <placeholder-1/> только если вы не используете GladeWin32 и "
+#~ "установили LibXML2 отдельно."
+
+#~ msgid "MSC_TOP"
+#~ msgstr "MSC_TOP"
+
+#~ msgid "It should point to the top-level directory of MSVC installation."
+#~ msgstr "Должен указывать на каталог верхнего уровня установки MSVC."
+
+#~ msgid ""
+#~ "Run a shell (command line, MS-DOS prompt), switch to the source directory "
+#~ "and run <command>vcvars32.bat</command> there. This batch file is "
+#~ "provided by MSVC and sets certain environment variables the command-line "
+#~ "compiler and linker require, it also makes them directly executable by "
+#~ "setting <envar>PATH</envar>. Note <command>vcvars32.bat</command> may not "
+#~ "be in <envar>PATH</envar> itself but it should be easy to locate."
+#~ msgstr ""
+#~ "Запустите оболочку (коммандную строку, приглашение MS-DOS), перейдите в "
+#~ "каталог с исходным кодом и запустите <command>vcvars32.bat</command> там. "
+#~ "Этот пакетный исполняемый файл предоставлен MSVC и устанавливает "
+#~ "определённые переменные окружения, которые нужны компилятору командной "
+#~ "строки и компоновщику, также делает их исполняемыми напрямую устанавливая "
+#~ "переменную <envar>PATH</envar>. Следует заметить, что <command>vcvars32."
+#~ "bat</command> может сама быть не в каталогах, включенных в <envar>PATH</"
+#~ "envar>, но её должно быть легко найти. "
+
+#~ msgid ""
+#~ "Run <informalexample><literallayout><userinput>nmake -f makefile.msc</"
+#~ "userinput></literallayout></informalexample> to compile Gwyddion and "
+#~ "<informalexample><literallayout><userinput>nmake -f makefile.msc install</"
+#~ "userinput></literallayout></informalexample> to install it into a staging "
+#~ "area, namely subdirectory <filename>inst</filename> (created by this "
+#~ "command). If something goes wrong with the second step and you wish to "
+#~ "start it again, remove directory <filename>inst</filename> and file "
+#~ "<filename>inst.stamp</filename> first for a clean start."
+#~ msgstr ""
+#~ "Запустите <informalexample><literallayout><userinput>nmake -f makefile."
+#~ "msc</userinput></literallayout></informalexample> чтобы собрать Gwyddion "
+#~ "и <informalexample><literallayout><userinput>nmake -f makefile.msc "
+#~ "install</userinput></literallayout></informalexample> чтобы установить "
+#~ "его во временный каталог, а именно подкаталог <filename>inst</filename> "
+#~ "(создаваемый этой командой). Если что-то пошло не так и вы хотите "
+#~ "запустить всё заново, сначала удалите каталог <filename>inst</filename> и "
+#~ "файл <filename>inst.stamp</filename> для старта с нуля."
+
+#~ msgid ""
+#~ "The layout of the staging area in <filename>inst</filename> exactly the "
+#~ "same as of the final installation. Therefore you can also run "
+#~ "<application>Gwyddion</application> directly from it (<filename>gwyddion."
+#~ "exe</filename> is found directly in <filename>inst</filename>). Except if "
+#~ "you have never run <application>Gwyddion</application> before, it will "
+#~ "not find the run-time Gtk+ libraries (DLLs) it needs. Run "
+#~ "<command>regedit</command>, create in "
+#~ "<informalexample><literal>HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows"
+#~ "\\Current Version\\App Paths\\Gwyddion.exe</literal></informalexample> a "
+#~ "string key <literal>Path</literal> and put <literal>$(GTK_TOP)\\lib;"
+#~ "$(GTK_TOP)\\bin</literal> there (here again <envar>$(GTK_TOP)</envar> is "
+#~ "to be replaced with the corresponding directory set in <filename>make."
+#~ "msc</filename>, do not put <quote><literal>$(GTK_TOP)</literal></quote> "
+#~ "there literally). If you have separate GtkGLExt and/or LibXML2, add also "
+#~ "their <filename>lib</filename> and <filename>bin</filename> directories, "
+#~ "separated by semicolons. If you cannot edit global registry under "
+#~ "<literal>HKEY_LOCAL_MACHINE</literal>, set the path under "
+#~ "<literal>HKEY_CURRENT_USER</literal> for the current user only."
+#~ msgstr ""
+#~ "Внутреннее расположение временной области в каталоге <filename>inst</"
+#~ "filename> точно такое же, как в конечной установке. Следовательно, можно "
+#~ "также запустить <application>Gwyddion</application> прямо из неё "
+#~ "(<filename>gwyddion.exe</filename> находится прямо в <filename>inst</"
+#~ "filename>). Исключение составляет случай. если вы никогда не запускали "
+#~ "<application>Gwyddion</application> ранее, при этом он не найдёт "
+#~ "требующиеся библиотеки Gtk+ (DLL). Запустите <command>regedit</command>, "
+#~ "создайте в <informalexample><literal>HKEY_LOCAL_MACHINE\\Software"
+#~ "\\Microsoft\\Windows\\Current Version\\App Paths\\Gwyddion.exe</literal></"
+#~ "informalexample> строковый ключ <literal>Path</literal> и поместите туда "
+#~ "<literal>$(GTK_TOP)\\lib;$(GTK_TOP)\\bin</literal> (здесь снова <envar>"
+#~ "$(GTK_TOP)</envar> необходимо заменить соответствующим каталогом, "
+#~ "установленным в <filename>make.msc</filename>, не надо писать туда "
+#~ "<quote><literal>$(GTK_TOP)</literal></quote> буквально). Если вы отдельно "
+#~ "устанавливали GtkGLExt и/или LibXML2, добавьте также их каталоги "
+#~ "<filename>lib</filename> и <filename>bin</filename>, разделённые точками "
+#~ "с запятой. Если вам нельзя редактировать глобальные ключи реестра в "
+#~ "<literal>HKEY_LOCAL_MACHINE</literal>, установите пути в "
+#~ "<literal>HKEY_CURRENT_USER</literal> только для текущего пользователя."
+
+#~ msgid ""
+#~ "Now you can either run <application>Gwyddion</application> from "
+#~ "<filename>inst</filename> or copy the directory elsewhere, possibly "
+#~ "renaming it."
+#~ msgstr ""
+#~ "После этого можно как  запустить <application>Gwyddion</application> из "
+#~ "<filename>inst</filename>, так и скопировать каталог куда-то ещё, "
+#~ "возможно переименовав его."
+
+#~ msgid "Executable Installers"
+#~ msgstr "Системы установки"
+
+#~ msgid ""
+#~ "To create an executable installer you need <ulink url=\"http://www."
+#~ "jrsoftware.org/isinfo.php\">Inno Setup</ulink>, version 4 or newer. Open "
+#~ "<filename>inst/gwyddion.iss</filename> and build the installer, it will "
+#~ "create <filename>Gwyddion-2.19.exe</filename> (with 2.19 replaced with "
+#~ "the actual version number), again in <filename>inst</filename>. You can "
+#~ "repeat this procedure with <filename>inst/gwyddion-devel.iss</filename> "
+#~ "to obtain <filename>Gwyddion-Development-2.19.exe</filename>, should you "
+#~ "ever need it."
+#~ msgstr ""
+#~ "Чтобы создать программу установки вам нужен <ulink url=\"http://www."
+#~ "jrsoftware.org/isinfo.php\">Inno Setup</ulink>, версии 4 или новее. "
+#~ "Откройте <filename>inst/gwyddion.iss</filename> и соберите установщик, он "
+#~ "создаст <filename>Gwyddion-2.19.exe</filename> (где 2.19 заменится "
+#~ "текущим номером версии) снова в <filename>inst</filename>. Можно "
+#~ "повторить процедуру с <filename>inst/gwyddion-devel.iss</filename> чтобы "
+#~ "получить <filename>Gwyddion-Development-2.19.exe</filename>, если он вам "
+#~ "зачем-то понадобится."

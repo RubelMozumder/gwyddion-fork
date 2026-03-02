@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+setup=setup64
+. ./$setup
+. ./get-build-triple
+rm -rf "$target_prefix"
+pushd "$source_dir"
+export CFLAGs="-O3 -ffast-math -msse3"
+./autogen.sh --host=x86_64-w64-mingw32 --build=$build --prefix="$target_prefix" \
+             --enable-maintainer-mode --disable-gtk-doc --without-x \
+             --disable-dependency-tracking \
+             --without-libiconv-prefix --without-libintl-prefix \
+             --disable-schemas-install --disable-desktop-file-update \
+             --without-perl --without-python --without-ruby \
+             --without-kde4-thumbnailer --disable-pygwy \
+             --with-hdf5 \
+             --enable-module-bundling
+# FIXME: Somehow, we get forward and backward slashes mixed up in one path and
+# it causes trouble.
+find . -name Makefile | xargs sed -i 's%\\Lib\\site-packages%/Lib/site-packages%g'
+make
+make -C po update-gmo
+make install
+popd
+./copysysfiles $setup
+cp -v Licenses/*.txt $target_prefix
+./expandnsi $setup <"$source_dir/data/gwyddion.nsit" >"$target_prefix/gwyddion.nsi"
+pushd "$target_prefix"
+wine "$nsis_compiler" gwyddion.nsi
+popd

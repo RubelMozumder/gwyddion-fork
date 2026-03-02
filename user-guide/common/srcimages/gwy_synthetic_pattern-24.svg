@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:cc="http://creativecommons.org/ns#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     width="24"
+     height="24"
+     viewBox="0 0 24 24"
+     id="svg8440"
+     version="1.1"
+     inkscape:version="0.92.1 r"
+     sodipodi:docname="gwy_synthetic_pattern-24.svg"
+     inkscape:export-filename="gwy_crop-24.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90">
+    <sodipodi:namedview
+         id="base"
+         pagecolor="#ffffff"
+         bordercolor="#666666"
+         borderopacity="1.0"
+         inkscape:pageopacity="0.0"
+         inkscape:pageshadow="2"
+         inkscape:zoom="26.569152"
+         inkscape:cx="8.3921436"
+         inkscape:cy="11.749994"
+         inkscape:document-units="px"
+         inkscape:current-layer="layer1"
+         showgrid="true"
+         inkscape:window-width="1920"
+         inkscape:window-height="1028"
+         inkscape:window-x="0"
+         inkscape:window-y="33"
+         inkscape:window-maximized="1"
+         inkscape:snap-global="true">
+                        <inkscape:grid
+                       type="xygrid"
+                       id="grid1px"
+                       originx="0"
+                       originy="0"
+                       dotted="false"
+                       snapvisiblegridlinesonly="false"
+                       spacingx="1.0"
+                       spacingy="1.0"
+                       enabled="true"
+                       visible="true" />
+                           </sodipodi:namedview>
+    <defs
+         id="defs8442" />
+    <metadata
+         id="metadata8445">
+        <rdf:RDF>
+            <cc:Work
+                 rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type
+                     rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:title></dc:title>
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <g
+         inkscape:label="Layer 1"
+         inkscape:groupmode="layer"
+         id="layer1"
+         transform="translate(-18.260046,-276.07986)">
+        <rect
+             style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;paint-order:fill markers stroke;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+             id="rect4523"
+             width="23"
+             height="23"
+             x="18.760046"
+             y="276.57986" />
+        <image
+             y="277.07986"
+             x="19.260046"
+             id="image6991"
+             xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAIAAABL1vtsAAAB6UlEQVQ4y2NggIFv5+v+w4ApDwsD
+Bvh2rgauwJwXiwKGB7M84Srq5bgxFdyf6QFX0IRNAcP+MDW4iu3ucpgKDsdrwxV83BMFVA+0Feh2
+hIp+JR64ilu9ThBBOXamDAnOtUYi58vMft5b8R8bQBixSlsAWQLo8z+vT/0nAjCcLTZ9tz385+0F
+//98+08WYPhPLrjebg8MdVDc4VH079vzHzemv94QcjLbcJk6X6Mc97czFXDZFAlOaBDAhX6/OPjv
+1wc493KDNWaknCsxhStYocEPFV2pJZAgxiHKyghk7/RUgKsA2oxpxBp9IbiCU7lGWJIGMP7gKoDu
+x1SQhqTgzSYsCkCpAK4CGAqYCqTZkBTcnMmAFcDTAjAssSr4/eoEVMH3l6oczFhUfDtbBbfHgpcV
+TVaKjen71X64gq/Hs4ApECMvTXeHq9jqKCPPzgT0PzAUgXHxfmfEzzuL8CVwIPARYvu0P5rk1Hmm
+0PjdtrAft+f9+/mWTgn876fbcPavpzsLpLgIGAH0PDD+gakImBbjxDhEWBiBQQN37++Xh1ET+MvD
+X0+XPF7o8//vD7hgpiQnZqwBfQ1XIM7KxLBKRzBJnAPEggFg3oerAKZ9TCOAYQdXANSLJWkASxC4
+CmAOwlQAjAG4AqALABGESq8liHXKAAAAAElFTkSuQmCC
+"
+             style="image-rendering:optimizeSpeed"
+             preserveAspectRatio="none"
+             height="22"
+             width="22" />
+    </g>
+</svg>

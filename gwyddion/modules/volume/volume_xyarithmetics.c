@@ -1,0 +1,960 @@
+/*
+ *  $Id: volume_xyarithmetics.c 26354 2024-05-21 08:22:32Z yeti-dn $
+ *  Copyright (C) 2018-2023 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <glib/gstdio.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyexpr.h>
+#include <libprocess/brick.h>
+#include <libprocess/arithmetic.h>
+#include <libprocess/correct.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwyradiobuttons.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+#include <app/gwymoduleutils-file.h>
+#include "../process/preview.h"
+
+#define XYARITH_RUN_MODES GWY_RUN_INTERACTIVE
+
+enum {
+    NARGS = 8,
+    HISTSIZE = 96,
+    USER_UNITS_ID = -1,
+};
+
+enum {
+    SENS_EXPR_OK = 1 << 0,
+    SENS_USERUINTS = 1 << 1
+};
+
+enum {
+    COMMON_COORD_X    = 0,
+    COMMON_COORD_Y    = 1,
+    COMMON_COORD_Z    = 2,
+    COMMON_COORD_ZCAL = 3,
+    COMMON_COORD_NCOORDS
+};
+
+enum {
+    XYARITHMETIC_NARGS = NARGS + COMMON_COORD_NCOORDS
+};
+
+enum {
+    XYARITHMETIC_OK      = 0,
+    XYARITHMETIC_DATA    = 1,
+    XYARITHMETIC_EXPR    = 2,
+    XYARITHMETIC_NUMERIC = 4
+};
+
+enum {
+    PARAM_EXPRESSION,
+    PARAM_DATAUNITS,
+    PARAM_USERUNITS,
+    PARAM_FIXED_FILLER,
+    PARAM_FILLER_VALUE,
+    PARAM_VOLUME,
+    PARAM_IMAGE,
+};
+
+typedef struct {
+    GwyParams *params;
+    GtkListStore *history;
+    GwyBrick *result;
+    GwyDataField *preview;
+} ModuleArgs;
+
+typedef struct {
+    GwyExpr *expr;
+    guint err;
+    gchar *name[XYARITHMETIC_NARGS];
+    guint pos[XYARITHMETIC_NARGS];
+    GwyAppDataId first;
+} EvaluationData;
+
+typedef struct {
+    ModuleArgs *args;
+    EvaluationData *evdata;
+    GtkWidget *dialog;
+    GtkWidget *view;
+    GtkWidget *expression;
+    GtkWidget *userunits;
+    GtkWidget *userunits_label;
+    GwyParamTable *table;
+    GtkWidget *result;
+    GSList *dataunits;
+    GwyContainer *data;
+} ModuleGUI;
+
+static gboolean         module_register   (void);
+static void             arithmetic        (GwyContainer *data,
+                                           GwyRunType run);
+static GwyDialogOutcome run_gui           (GwyContainer *data,
+                                           gint id,
+                                           ModuleArgs *args,
+                                           EvaluationData *evdata);
+static void             param_changed     (ModuleGUI *gui,
+                                           gint id);
+static void             data_chosen       (ModuleGUI *gui,
+                                           GwyDataChooser *chooser);
+static void             expr_changed      (ModuleGUI *gui,
+                                           GtkWidget *entry);
+static void             userunits_changed (ModuleGUI *gui,
+                                           GtkEntry *entry);
+static void             dataunits_selected(ModuleGUI *gui);
+static void             show_state        (ModuleGUI *gui,
+                                           const gchar *message);
+static const gchar*     check_bricks      (ModuleArgs *args,
+                                           EvaluationData *evdata);
+static void             preview           (gpointer user_data);
+static void             execute           (ModuleArgs *args,
+                                           EvaluationData *evdata);
+static void             need_data         (const EvaluationData *evdata,
+                                           gboolean *need_data);
+static void             fix_nans          (ModuleArgs *args);
+static void             update_history    (ModuleArgs *args);
+static GwyBrick*        make_x            (GwyBrick *brick);
+static GwyBrick*        make_y            (GwyBrick *brick);
+static GwyBrick*        make_z            (GwyBrick *brick);
+static GwyBrick*        make_zcal         (GwyBrick *brick,
+                                           GwyDataLine *zcal);
+static void             sanitise_params   (ModuleArgs *args);
+static GtkListStore*    load_history      (void);
+static void             save_history      (GtkListStore *history);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Simple arithmetic operations with volume and plane data."),
+    "Petr Klapetek <klapetek@gwyddion.net>,",
+    "1.2",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_xyarithmetics)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_xyarithmetics",
+                             (GwyVolumeFunc)&arithmetic,
+                             N_("/_Basic Operations/_XY Arithmetic..."),
+                             NULL,
+                             XYARITH_RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("Arithmetic operations on volume and plane data"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+    guint i;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_string(paramdef, PARAM_EXPRESSION, "expression", _("_Expression"),
+                             GWY_PARAM_STRING_NULL_IS_EMPTY, NULL, "d1-d2");
+    gwy_param_def_add_int(paramdef, PARAM_DATAUNITS, "dataunits", NULL, -1, NARGS-1, 0);
+    gwy_param_def_add_unit(paramdef, PARAM_USERUNITS, "userunits", _("Specify un_its"), NULL);
+    gwy_param_def_add_boolean(paramdef, PARAM_FIXED_FILLER, "fixed_filler", _("_Fixed filler value"), FALSE);
+    gwy_param_def_add_double(paramdef, PARAM_FILLER_VALUE, "filler_value", _("_Fixed filler value"),
+                             -G_MAXDOUBLE, G_MAXDOUBLE, 0.0);
+    gwy_param_def_add_volume_id(paramdef, PARAM_VOLUME, "volume", NULL);
+
+    for (i = 0; i < NARGS; i++) {
+        gchar *s = g_strdup_printf("image%u", i);
+        gwy_param_def_add_image_id(paramdef, PARAM_IMAGE + i, s, NULL);
+    }
+
+    return paramdef;
+}
+
+void
+arithmetic(GwyContainer *data, GwyRunType run)
+{
+    ModuleArgs args;
+    EvaluationData evdata;
+    GwyAppDataId dataid;
+    GwyAppDataId imid;
+    GwyDialogOutcome outcome;
+    gint newid;
+    guint i;
+
+    g_return_if_fail(run & XYARITH_RUN_MODES);
+    gwy_clear(&args, 1);
+    gwy_app_data_browser_get_current(GWY_APP_BRICK_ID, &dataid.id,
+                                     GWY_APP_CONTAINER_ID, &dataid.datano,
+                                     GWY_APP_DATA_FIELD_ID, &imid.id,
+                                     GWY_APP_CONTAINER_ID, &imid.datano,
+                     0);
+
+    g_return_if_fail(gwy_app_data_id_verify_volume(&dataid));
+    g_return_if_fail(gwy_app_data_id_verify_channel(&imid));
+
+    args.params = gwy_params_new_from_settings(define_module_params());
+
+    gwy_params_set_volume_id(args.params, PARAM_VOLUME, dataid);
+    gwy_params_set_image_id(args.params, PARAM_IMAGE, imid);
+
+    args.history = load_history();
+    args.result = gwy_brick_new(PREVIEW_SIZE, PREVIEW_SIZE, 1, 1.0, 1.0, 1.0, TRUE);
+    args.preview = gwy_data_field_new(PREVIEW_SIZE, PREVIEW_SIZE, 1.0, 1.0, TRUE);
+    sanitise_params(&args);
+
+    evdata.expr = gwy_expr_new();
+    gwy_expr_define_constant(evdata.expr, "pi", G_PI, NULL);
+    gwy_expr_define_constant(evdata.expr, "π", G_PI, NULL);
+
+    for (i = 0; i < NARGS; i++) {
+        evdata.name[i] = g_strdup_printf("d%d", i+1);
+    }
+    evdata.name[NARGS + 0] = g_strdup("x");
+    evdata.name[NARGS + 1] = g_strdup("y");
+    evdata.name[NARGS + 2] = g_strdup("z");
+    evdata.name[NARGS + 3] = g_strdup("zcal");
+
+    outcome = run_gui(data, dataid.id, &args, &evdata);
+    gwy_params_save_to_settings(args.params);
+    save_history(args.history);
+    if (outcome == GWY_DIALOG_CANCEL)
+        goto end;
+    if (outcome != GWY_DIALOG_HAVE_RESULT)
+        execute(&args, &evdata);
+
+    newid = gwy_app_data_browser_add_brick(args.result, args.preview, data, TRUE);
+    gwy_app_set_data_field_title(data, newid, _("Calculated"));
+    gwy_app_sync_volume_items(gwy_app_data_browser_get(evdata.first.datano), data, evdata.first.id, newid, FALSE,
+                              GWY_DATA_ITEM_GRADIENT,
+                              0);
+    gwy_app_volume_log_add_volume(data, -1, newid);
+
+end:
+    GWY_OBJECT_UNREF(args.result);
+    GWY_OBJECT_UNREF(args.preview);
+    g_object_unref(args.params);
+    g_object_unref(args.history);
+    gwy_expr_free(evdata.expr);
+    for (i = 0; i < XYARITHMETIC_NARGS; i++)
+        g_free(evdata.name[i]);
+}
+
+static GwyDialogOutcome
+run_gui(GwyContainer *data, gint id,
+        ModuleArgs *args, EvaluationData *evdata)
+{
+    gint dataunits = gwy_params_get_int(args->params, PARAM_DATAUNITS);
+    const gchar *userunits = gwy_params_get_string(args->params, PARAM_USERUNITS);
+    GtkWidget *hbox, *hbox2, *table, *chooser, *entry, *label, *button;
+    GwyAppDataId dataid;
+    ModuleGUI gui;
+    GwyDialogOutcome outcome;
+    GwyDialog *dialog;
+    guint i, row;
+    gchar *s;
+
+    gui.args = args;
+    gui.evdata = evdata;
+    gui.data = gwy_container_new();
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), args->preview);
+    gwy_app_sync_volume_items(data, gui.data, id, 0, FALSE,
+                              GWY_DATA_ITEM_GRADIENT,
+                              0);
+
+    gui.dialog = gwy_dialog_new(_("Volume - Plane Arithmetic"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_UPDATE, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    gui.view = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, TRUE);
+    hbox = gwy_create_dialog_preview_hbox(GTK_DIALOG(dialog), GWY_DATA_VIEW(gui.view), FALSE);
+
+    table = gtk_table_new(6 + NARGS, 3, FALSE);
+    gtk_table_set_row_spacings(GTK_TABLE(table), 2);
+    gtk_table_set_col_spacings(GTK_TABLE(table), 6);
+    gtk_container_set_border_width(GTK_CONTAINER(table), 4);
+    gtk_box_pack_start(GTK_BOX(hbox), table, TRUE, TRUE, 4);
+    row = 0;
+
+    label = gtk_label_new_with_mnemonic(_("_Expression:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 2, row, row+1, GTK_FILL, 0, 0, 0);
+    row++;
+
+    entry = gtk_combo_box_entry_new_with_model(GTK_TREE_MODEL(args->history), 0);
+    gui.expression = entry;
+    gtk_combo_box_set_active(GTK_COMBO_BOX(gui.expression), 0);
+    gtk_table_attach(GTK_TABLE(table), entry, 0, 3, row, row+1, GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    g_signal_connect_swapped(entry, "changed", G_CALLBACK(expr_changed), &gui);
+    g_signal_connect_swapped(gtk_bin_get_child(GTK_BIN(entry)), "activate", G_CALLBACK(preview), &gui);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+    row++;
+
+    gui.result = label = gtk_label_new(NULL);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 2, row, row+1, GTK_FILL, 0, 0, 0);
+    row++;
+
+    gtk_table_set_row_spacing(GTK_TABLE(table), row-1, 8);
+    label = gtk_label_new(_("Operands"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 2, row, row+1, GTK_FILL, 0, 0, 0);
+
+    label = gtk_label_new(_("Units"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 2, 3, row, row+1, GTK_FILL, 0, 0, 0);
+    row++;
+
+    label = gtk_label_new_with_mnemonic(_("Volume data:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 2, row, row+1, GTK_FILL, 0, 0, 0);
+    row++;
+
+
+    gui.dataunits = NULL;
+    for (i = 0; i < NARGS; i++) {
+        if (i == 1) {
+           label = gtk_label_new_with_mnemonic(_("Images:"));
+           gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+           gtk_table_attach(GTK_TABLE(table), label, 0, 2, row, row+1, GTK_FILL, 0, 0, 0);
+           row++;
+        }
+
+        s = g_strdup_printf("d_%d", i+1);
+        label = gtk_label_new_with_mnemonic(evdata->name[i]);
+        g_free(s);
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row+1, GTK_FILL, 0, 0, 0);
+
+        if (i==0) {
+            chooser = gwy_data_chooser_new_volumes();
+            dataid = gwy_params_get_data_id(args->params, PARAM_VOLUME);
+        }
+        else {
+            chooser = gwy_data_chooser_new_channels();
+            dataid = gwy_params_get_data_id(args->params, PARAM_IMAGE + i);
+        }
+
+        gwy_data_chooser_set_active_id(GWY_DATA_CHOOSER(chooser), &dataid);
+        g_signal_connect_swapped(chooser, "changed", G_CALLBACK(data_chosen), &gui);
+        g_object_set_data(G_OBJECT(chooser), "index", GUINT_TO_POINTER(i));
+        gtk_table_attach(GTK_TABLE(table), chooser, 1, 2, row, row+1, GTK_EXPAND | GTK_FILL, 0, 0, 0);
+        gtk_label_set_mnemonic_widget(GTK_LABEL(label), chooser);
+
+        button = gtk_radio_button_new(gui.dataunits);
+        gui.dataunits = gtk_radio_button_get_group(GTK_RADIO_BUTTON(button));
+        gwy_radio_button_set_value(button, i);
+        s = g_strdup_printf(_("Take result units from data d%d"), i+1);
+        gtk_widget_set_tooltip_text(button, s);
+        g_free(s);
+        gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1, 0, 0, 0, 0);
+        g_signal_connect_swapped(button, "clicked", G_CALLBACK(dataunits_selected), &gui);
+
+        row++;
+    }
+
+
+    hbox2 = gtk_hbox_new(FALSE, 6);
+    gtk_table_attach(GTK_TABLE(table), hbox2, 0, 2, row, row+1, GTK_FILL, 0, 0, 0);
+
+    label = gtk_label_new_with_mnemonic(_("Specify un_its:"));
+    gtk_box_pack_start(GTK_BOX(hbox2), label, FALSE, FALSE, 0);
+    gui.userunits_label = label;
+    gtk_widget_set_sensitive(gui.userunits_label, dataunits == USER_UNITS_ID);
+
+    gui.userunits = entry = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(entry), userunits ? userunits : "");
+    gtk_box_pack_start(GTK_BOX(hbox2), entry, TRUE, TRUE, 0);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+    gtk_widget_set_sensitive(entry, dataunits == USER_UNITS_ID);
+    g_signal_connect_swapped(entry, "changed", G_CALLBACK(userunits_changed), &gui);
+
+    button = gtk_radio_button_new(gui.dataunits);
+    gui.dataunits = gtk_radio_button_get_group(GTK_RADIO_BUTTON(button));
+    gwy_radio_button_set_value(button, USER_UNITS_ID);
+    gtk_widget_set_tooltip_text(button, _("Specify result units explicitly"));
+    gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1, 0, 0, 0, 0);
+    g_signal_connect_swapped(button, "clicked", G_CALLBACK(dataunits_selected), &gui);
+    row++;
+
+    gui.table = gwy_param_table_new(args->params);
+    gwy_param_table_append_entry(gui.table, PARAM_FILLER_VALUE);
+    gwy_param_table_add_enabler(gui.table, PARAM_FIXED_FILLER, PARAM_FILLER_VALUE);
+    gwy_param_table_entry_set_width(gui.table, PARAM_FILLER_VALUE, 12);
+    gtk_table_attach(GTK_TABLE(table), gwy_param_table_widget(gui.table), 0, 2, row, row+1, GTK_FILL, 0, 0, 0);
+    gwy_dialog_add_param_table(dialog, gui.table);
+    row++;
+
+    g_signal_connect_swapped(gui.table, "param-changed", G_CALLBACK(param_changed), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_UPON_REQUEST, preview, &gui, NULL);
+    gtk_widget_grab_focus(gui.expression);
+    gwy_radio_buttons_set_current(gui.dataunits, dataunits);
+    expr_changed(&gui, gui.expression); /* resolves variables */
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    GwyParams *params = gui->args->params;
+
+    if (id < 0 || id == PARAM_FILLER_VALUE) {
+        gdouble filler_value = gwy_params_get_double(params, PARAM_FILLER_VALUE);
+        if (gwy_isinf(filler_value) || gwy_isnan(filler_value))
+            gwy_param_table_set_double(gui->table, PARAM_FILLER_VALUE, 0.0);
+    }
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+data_chosen(ModuleGUI *gui, GwyDataChooser *chooser)
+{
+    ModuleArgs *args = gui->args;
+    guint i = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(chooser), "index"));
+    GwyAppDataId dataid;
+
+    gwy_data_chooser_get_active_id(chooser, &dataid);
+    if (i == 0)
+        gwy_params_set_volume_id(args->params, PARAM_VOLUME, dataid);
+    else
+        gwy_params_set_image_id(args->params, PARAM_IMAGE + i, dataid);
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+    if (!(gui->evdata->err & XYARITHMETIC_EXPR))
+        show_state(gui, NULL);
+}
+
+static void
+expr_changed(ModuleGUI *gui, GtkWidget *entry)
+{
+    ModuleArgs *args = gui->args;
+    EvaluationData *evdata = gui->evdata;
+    const gchar *expr = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(entry))));
+    GError *error = NULL;
+    const gchar *message = NULL;
+    gchar *s = NULL;
+
+    gwy_params_set_string(args->params, PARAM_EXPRESSION, expr);
+    evdata->err = XYARITHMETIC_OK;
+
+    if (gwy_expr_compile(evdata->expr, expr, &error)) {
+        guint nvars = gwy_expr_get_variables(evdata->expr, NULL);
+        g_return_if_fail(nvars);
+        if (nvars == 1) {
+            gdouble v = gwy_expr_execute(evdata->expr, NULL);
+            message = s = g_strdup_printf("%g", v);
+            evdata->err = XYARITHMETIC_NUMERIC;
+        }
+        else {
+            if (gwy_expr_resolve_variables(evdata->expr,
+                                           XYARITHMETIC_NARGS, (const gchar*const*)evdata->name, evdata->pos)) {
+                evdata->err = XYARITHMETIC_EXPR;
+                message = _("Expression contains unknown identifiers");
+            }
+#ifdef DEBUG
+            {
+                gint i;
+                for (i = 0; i < XYARITHMETIC_NARGS; i++)
+                    gwy_debug("pos[%u] = %d", i, evdata->pos[i]);
+            }
+#endif
+        }
+    }
+    else {
+        evdata->err = XYARITHMETIC_EXPR;
+        message = error->message;
+    }
+
+    show_state(gui, message);
+    g_clear_error(&error);
+    g_free(s);
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+userunits_changed(ModuleGUI *gui, GtkEntry *entry)
+{
+    gwy_params_set_unit(gui->args->params, PARAM_USERUNITS, gtk_entry_get_text(entry));
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+dataunits_selected(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    gint dataunits = gwy_radio_buttons_get_current(gui->dataunits);
+
+    gwy_params_set_int(args->params, PARAM_DATAUNITS, dataunits);
+    gtk_widget_set_sensitive(gui->userunits, dataunits == USER_UNITS_ID);
+    gtk_widget_set_sensitive(gui->userunits_label, dataunits == USER_UNITS_ID);
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+show_state(ModuleGUI *gui, const gchar *message)
+{
+    GtkDialog *dialog = GTK_DIALOG(gui->dialog);
+    ModuleArgs *args = gui->args;
+    EvaluationData *evdata = gui->evdata;
+    gboolean ok;
+
+    if (!message && evdata->err != XYARITHMETIC_NUMERIC) {
+        message = check_bricks(args, evdata);
+        gtk_label_set_text(GTK_LABEL(gui->result), evdata->err ? message : NULL);
+    }
+    else {
+        if (message)
+            gtk_label_set_text(GTK_LABEL(gui->result), message);
+    }
+
+    ok = (evdata->err == XYARITHMETIC_OK);
+    gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_OK, ok);
+    gtk_dialog_set_response_sensitive(dialog, GWY_RESPONSE_UPDATE, ok);
+
+    if (ok)
+        set_widget_as_ok_message(gui->result);
+    else
+        set_widget_as_error_message(gui->result);
+}
+
+static const gchar*
+check_bricks(ModuleArgs *args, EvaluationData *evdata)
+{
+    guint i;
+    GwyBrick *brick;
+    GwyDataField *dfield;
+    GwyDataCompatibilityFlags diff;
+    gboolean nd[NARGS];
+
+    if (evdata->err & (XYARITHMETIC_EXPR | XYARITHMETIC_NUMERIC))
+        return NULL;
+
+    need_data(evdata, nd);
+    if (!nd[0]){ 
+        /*no brick*/
+        evdata->err |= XYARITHMETIC_DATA;
+        return _("No volume data in the expression");
+    }
+
+    for (i = 0; i < NARGS; i++) {
+        if (nd[i]) {
+            //first = i; //should we do and use this?
+            break;
+        }
+    }
+    if (i == NARGS) {
+        /* no variables */
+        evdata->err &= ~XYARITHMETIC_DATA;
+        return NULL;
+    }
+
+    /* each window must match with first, this is transitive */
+    brick = gwy_params_get_volume(args->params, PARAM_VOLUME);
+    for (i = 0; i < NARGS; i++) {
+        if (!nd[i])
+            continue;
+
+        dfield = gwy_params_get_image(args->params, PARAM_IMAGE + i);
+        diff = gwy_data_field_check_compatibility_with_brick_xy(dfield, brick,
+                                                                GWY_DATA_COMPATIBILITY_RES
+                                                                | GWY_DATA_COMPATIBILITY_REAL
+                                                                | GWY_DATA_COMPATIBILITY_LATERAL
+                                                                | GWY_DATA_COMPATIBILITY_VALUE);
+        if (diff) {
+            evdata->err |= XYARITHMETIC_DATA;
+            if (diff & GWY_DATA_COMPATIBILITY_RES)
+                return _("Pixel dimensions differ");
+            if (diff & GWY_DATA_COMPATIBILITY_LATERAL)
+                return _("Lateral dimensions are different physical quantities");
+            if (diff & GWY_DATA_COMPATIBILITY_REAL)
+                return _("Physical dimensions differ");
+            if (diff & GWY_DATA_COMPATIBILITY_AXISCAL)
+                return _("Z-axis calibrations differ");
+        }
+    }
+
+    evdata->err &= ~XYARITHMETIC_DATA;
+    return NULL;
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    ModuleArgs *args = gui->args;
+
+    /* We can also get here by activation of the entry so check again. */
+    if (gui->evdata->err != XYARITHMETIC_OK)
+        return;
+
+    execute(args, gui->evdata);
+    g_return_if_fail(args->preview);
+
+    gwy_data_field_data_changed(args->preview);
+    gwy_set_data_preview_size(GWY_DATA_VIEW(gui->view), PREVIEW_SIZE);
+    gwy_dialog_have_result(GWY_DIALOG(gui->dialog));
+}
+
+static void
+update_brick(GwyBrick *src, GwyBrick *target, gint *n, gdouble **tdata)
+{
+    gint xres = gwy_brick_get_xres(src), yres = gwy_brick_get_yres(src), zres = gwy_brick_get_zres(src);
+
+    gwy_brick_resample(target, xres, yres, zres, GWY_INTERPOLATION_NONE);
+    gwy_brick_copy_units(src, target);
+    gwy_brick_set_xreal(target, gwy_brick_get_xreal(src));
+    gwy_brick_set_yreal(target, gwy_brick_get_yreal(src));
+    gwy_brick_set_zreal(target, gwy_brick_get_zreal(src));
+    gwy_brick_set_xoffset(target, gwy_brick_get_xoffset(src));
+    gwy_brick_set_yoffset(target, gwy_brick_get_yoffset(src));
+    gwy_brick_set_zoffset(target, gwy_brick_get_zoffset(src));
+    *n = xres*yres*zres;
+    *tdata = gwy_brick_get_data(target);
+}
+
+static void
+execute(ModuleArgs *args, EvaluationData *evdata)
+{
+    GwyBrick **data_bricks, *brick, *modelbrick;
+    GwyDataField *dfield;
+    GwyDataLine *zcal = NULL;
+    const gdouble **d;
+    gboolean nd[NARGS];
+    gdouble *r = NULL;
+    gboolean first = TRUE;
+    guint n = 0, i, dataunits;
+
+    g_return_if_fail(evdata->err == XYARITHMETIC_OK);
+
+    need_data(evdata, nd);
+    /* We know the expression can't contain more variables */
+    data_bricks = g_new0(GwyBrick*, XYARITHMETIC_NARGS);
+    d = g_new0(const gdouble*, XYARITHMETIC_NARGS + 1);
+
+    /*check if we have a primary brick and if not, do not evalue anything*/
+    modelbrick = gwy_params_get_volume(args->params, PARAM_VOLUME);
+
+    /* First get all the data bricks we directly have */
+    for (i = 0; i < NARGS; i++) {
+        gwy_debug("brick[%u]: %s", i, nd[i] ? "NEEDED" : "not needed");
+        if (!nd[i])
+            continue;
+
+        if (i==0) 
+            brick = data_bricks[0] = gwy_params_get_volume(args->params, PARAM_VOLUME);
+        else {
+            brick = gwy_brick_new_alike(modelbrick, TRUE);
+            dfield = gwy_params_get_image(args->params, PARAM_IMAGE + i);
+            gwy_brick_add_to_xy_planes(brick, dfield);
+            data_bricks[i] = brick;
+        }
+
+        d[evdata->pos[i]] = gwy_brick_get_data_const(brick);
+        if (!i)
+            zcal = gwy_brick_get_zcalibration(brick);
+        gwy_debug("d[%u] set to PRIMARY %u", evdata->pos[i], i);
+        if (first) {
+            first = FALSE;
+            update_brick(brick, args->result, &n, &r);
+            evdata->first = gwy_params_get_data_id(args->params, PARAM_VOLUME + i);
+        }
+    }
+
+    /* Then create the common coordinate bricks if we have to. */
+    i = NARGS + COMMON_COORD_X;
+    if (evdata->pos[i]) {
+        brick = make_x(data_bricks[0]);
+        data_bricks[i] = brick;
+        d[evdata->pos[i]] = gwy_brick_get_data_const(brick);
+    }
+
+    i = NARGS + COMMON_COORD_Y;
+    if (evdata->pos[i]) {
+        brick = make_y(data_bricks[0]);
+        data_bricks[i] = brick;
+        d[evdata->pos[i]] = gwy_brick_get_data_const(brick);
+    }
+
+    i = NARGS + COMMON_COORD_Z;
+    if (evdata->pos[i]) {
+        brick = make_z(data_bricks[0]);
+        data_bricks[i] = brick;
+        d[evdata->pos[i]] = gwy_brick_get_data_const(brick);
+    }
+
+    i = NARGS + COMMON_COORD_ZCAL;
+    if (evdata->pos[i]) {
+        brick = zcal ? make_zcal(data_bricks[0], zcal) : make_z(data_bricks[0]);
+        d[evdata->pos[i]] = gwy_brick_get_data_const(brick);
+    }
+
+    /* Execute */
+    gwy_expr_vector_execute(evdata->expr, n, d, r);
+    fix_nans(args);
+    gwy_brick_mean_xy_plane(args->result, args->preview);
+
+    /* Set units. */
+    dataunits = gwy_params_get_int(args->params, PARAM_DATAUNITS);
+    if (dataunits == USER_UNITS_ID) {
+        gwy_si_unit_set_from_string(gwy_brick_get_si_unit_w(args->result),
+                                    gwy_params_get_string(args->params, PARAM_USERUNITS));
+    }
+    else
+        gwy_brick_copy_units(gwy_params_get_volume(args->params, PARAM_VOLUME + dataunits), args->result);
+
+    /* Free stuff */
+    for (i = NARGS; i < XYARITHMETIC_NARGS; i++) {
+        if (data_bricks[i])
+            g_object_unref(data_bricks[i]);
+    }
+    g_free(data_bricks);
+    g_free(d);
+}
+
+/* Find which data we need. */
+static void
+need_data(const EvaluationData *evdata, gboolean *nd)
+{
+    guint i;
+
+    gwy_clear(nd, NARGS);
+    for (i = 0; i < NARGS; i++) {
+        if (evdata->pos[i])
+            nd[i] = TRUE;
+    }
+
+    // When x and y are needed, always take them from field 1.  This also ensures the expression is considered to be
+    // a field expression.
+    for (i = 0; i < COMMON_COORD_NCOORDS; i++) {
+        if (evdata->pos[NARGS + i]) {
+            nd[0] = TRUE;
+            break;
+        }
+    }
+}
+
+/* Must be run before creating the preview field, so we can reuse args->preview as a buffer. */
+static void
+fix_nans(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    gboolean fixed_filler = gwy_params_get_boolean(params, PARAM_FIXED_FILLER);
+    gdouble filler_value = gwy_params_get_double(params, PARAM_FILLER_VALUE);
+    GwyBrick *result = args->result;
+    gint xres = gwy_brick_get_xres(result), yres = gwy_brick_get_yres(result), zres = gwy_brick_get_zres(result);
+    GwyDataField *plane = args->preview, *mask;
+    gint i;
+
+    plane = gwy_data_field_new(xres, yres, 1.0, 1.0, FALSE);
+    for (i = 0; i < zres; i++) {
+        gwy_brick_extract_xy_plane(result, plane, i);
+        mask = gwy_app_channel_mask_of_nans(plane, FALSE);
+        if (!mask)
+            continue;
+
+        if (fixed_filler)
+            gwy_data_field_area_fill_mask(plane, mask, GWY_MASK_INCLUDE, 0, 0, xres, yres, filler_value);
+        else
+            gwy_data_field_laplace_solve(plane, mask, -1, 0.25);
+        gwy_brick_set_xy_plane(result, plane, i);
+        g_object_unref(mask);
+    }
+}
+
+static GwyBrick*
+make_x(GwyBrick *brick)
+{
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick), zres = gwy_brick_get_zres(brick);
+    GwyBrick *result = gwy_brick_new_alike(brick, FALSE);
+    gdouble dx = gwy_brick_get_dx(brick);
+    gdouble xoff = gwy_brick_get_xoffset(brick);
+    gdouble *data = gwy_brick_get_data(result);
+    gint i, j;
+
+    for (j = 0; j < xres; j++)
+        data[j] = (j + 0.5)*dx + xoff;
+
+    for (i = 1; i < yres*zres; i++)
+        gwy_assign(data + i*xres, data, xres);
+
+    return result;
+}
+
+static GwyBrick*
+make_y(GwyBrick *brick)
+{
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick), zres = gwy_brick_get_zres(brick);
+    GwyBrick *result = gwy_brick_new_alike(brick, FALSE);
+    gdouble dy = gwy_brick_get_dy(brick);
+    gdouble yoff = gwy_brick_get_yoffset(brick);
+    gdouble *data = gwy_brick_get_data(result);
+    gint i, j, k;
+
+    for (k = 0; k < zres; k++) {
+        for (i = 0; i < yres; i++) {
+            gdouble y = (i + 0.5)*dy + yoff;
+            gdouble *rrow = data + (k*yres + i)*xres;
+            for (j = 0; j < xres; j++, rrow++)
+                *rrow = y;
+        }
+    }
+
+    return result;
+}
+
+static GwyBrick*
+make_z(GwyBrick *brick)
+{
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick), zres = gwy_brick_get_zres(brick);
+    GwyBrick *result = gwy_brick_new_alike(brick, FALSE);
+    gdouble dz = gwy_brick_get_dx(brick);
+    gdouble zoff = gwy_brick_get_xoffset(brick);
+    gdouble *data = gwy_brick_get_data(result);
+    gint i, j;
+
+    for (i = 0; i < zres; i++) {
+        gdouble *rrow = data + i*xres*yres;
+        gdouble z = (i + 0.5)*dz + zoff;
+        for (j = 0; j < xres*yres; j++)
+            *rrow = z;
+    }
+
+    return result;
+}
+
+static GwyBrick*
+make_zcal(GwyBrick *brick, GwyDataLine *zcal)
+{
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick), zres = gwy_brick_get_zres(brick);
+    GwyBrick *result = gwy_brick_new_alike(brick, FALSE);
+    gdouble *data = gwy_brick_get_data(result);
+    const gdouble *zd = gwy_data_line_get_data_const(zcal);
+    gint i, j;
+
+    g_return_val_if_fail(gwy_data_line_get_res(zcal) == xres, brick);
+    for (i = 0; i < zres; i++) {
+        gdouble *rrow = data + i*xres*yres;
+        gdouble z = zd[i];
+        for (j = 0; j < xres*yres; j++)
+            *rrow = z;
+    }
+
+    return result;
+}
+
+static void
+update_history(ModuleArgs *args)
+{
+    const gchar *expr = gwy_params_get_string(args->params, PARAM_EXPRESSION);
+    GtkListStore *store = args->history;
+    GtkTreeModel *model = GTK_TREE_MODEL(store);
+    GtkTreeIter iter;
+    gchar *s;
+
+    if (!expr)
+        return;
+
+    gtk_list_store_prepend(store, &iter);
+    gtk_list_store_set(store, &iter, 0, expr, -1);
+
+    while (gtk_tree_model_iter_next(model, &iter)) {
+        gtk_tree_model_get(model, &iter, 0, &s, -1);
+        if (gwy_strequal(s, expr)) {
+            gtk_list_store_remove(store, &iter);
+            g_free(s);
+            break;
+        }
+        g_free(s);
+    }
+}
+
+static GtkListStore*
+load_history(void)
+{
+    GtkListStore *store;
+    gchar *buffer, *line, *p;
+    gsize size;
+
+    store = gtk_list_store_new(1, G_TYPE_STRING);
+    if (!gwy_module_data_load("volume_arithmetic", "history", &buffer, &size, NULL))
+        return store;
+
+    p = buffer;
+    for (line = gwy_str_next_line(&p); line; line = gwy_str_next_line(&p)) {
+        if (*g_strstrip(line)) {
+            GtkTreeIter iter;
+            gtk_list_store_append(store, &iter);
+            gtk_list_store_set(store, &iter, 0, line, -1);
+        }
+    }
+    g_free(buffer);
+    return store;
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    GwyAppDataId dataid;
+    guint i;
+
+    dataid = gwy_params_get_data_id(params, PARAM_IMAGE);
+    for (i = 0; i < NARGS; i++) {
+        /* Replace lost images with d1, FIXME, if there is any */
+        if (!gwy_params_get_image(params, PARAM_IMAGE + i))
+            gwy_params_set_image_id(params, PARAM_IMAGE + i, dataid);
+    }
+    /* Ensures args->expression comes first */
+    update_history(args);
+}
+
+static void
+save_history(GtkListStore *history)
+{
+    GtkTreeModel *model = GTK_TREE_MODEL(history);
+    GtkTreeIter iter;
+    gchar *s;
+    FILE *fh;
+    gint i = 0;
+
+    if (!(fh = gwy_module_data_fopen("volume_arithmetic", "history", "w", NULL)))
+        return;
+
+    if (gtk_tree_model_get_iter_first(model, &iter)) {
+        do {
+            gtk_tree_model_get(model, &iter, 0, &s, -1);
+            fputs(s, fh);
+            fputc('\n', fh);
+            g_free(s);
+        } while (++i < HISTSIZE && gtk_tree_model_iter_next(model, &iter));
+    }
+    fclose(fh);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

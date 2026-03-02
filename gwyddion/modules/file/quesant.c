@@ -1,0 +1,264 @@
+/*
+ *  $Id: quesant.c 26163 2024-02-06 16:56:55Z yeti-dn $
+ *  Copyright (C) 2008 David Necas (Yeti), Jan Horak.
+ *  E-mail: yeti@gwyddion.net, xhorak@gmail.com.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-quesant-afm">
+ *   <comment>Quesant AFM data</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="\x02\x00\x00\x00\x01\x00\x00\x00"/>
+ *   </magic>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-FILEMAGIC]
+ * # Quesant
+ * 0 string \x02\x00\x00\x00\x01\x00\x00\x00 Quesant AFM data
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Quesant AFM
+ * .afm
+ * Read
+ **/
+
+/* TODO: not sure about picture orientation */
+
+#include "config.h"
+#include <libgwyddion/gwymath.h>
+#include <libprocess/datafield.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils-file.h>
+
+#include "err.h"
+
+#define MAGIC "\x02\x00\x00\x00\x01\x00\x00\x00"
+#define MAGIC_SIZE (sizeof(MAGIC) - 1)
+#define HEADER_SIZE 0x148
+
+#define Micrometre 1e-6
+
+static gboolean      module_register(void);
+static gint          quesant_detect (const GwyFileDetectInfo *fileinfo,
+                                     gboolean only_name);
+static GwyContainer* quesant_load   (const gchar *filename,
+                                     GwyRunType mode,
+                                     GError **error);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports Quesant file format."),
+    "Jan Hořák <xhorak@gmail.com>, Yeti <yeti@gwyddion.net>",
+    "0.6",
+    "David Nečas (Yeti) & Jan Hořák",
+    "2008",
+};
+
+GWY_MODULE_QUERY2(module_info, quesant)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("quesant",
+                           N_("Quesant files (.afm)"),
+                           (GwyFileDetectFunc)&quesant_detect,
+                           (GwyFileLoadFunc)&quesant_load,
+                           NULL,
+                           NULL);
+    return TRUE;
+}
+
+static gint
+quesant_detect(const GwyFileDetectInfo *fileinfo, gboolean only_name)
+{
+    gint score = 0;
+
+    if (only_name)
+        return 0;
+    if (fileinfo->buffer_len > MAGIC_SIZE
+        && !memcmp(fileinfo->head, MAGIC, MAGIC_SIZE))
+        score = 100;
+
+    return score;
+}
+
+typedef struct {
+    guint32 desc_offset;       /* offset of description (unused) */
+    guint32 date_offset;       /* date location (unused) */
+    guint32 palette_offset;    /* unknown  */
+    guint32 keys_offset;       /* some sort of description again */
+    guint32 image_offset;      /* offset of image data (first int16 is number of rows and cols) */
+    guint32 img_p_offset;      /* offset of Z axis multiply, this points to a relatively long block, the Z factor just
+                                * happens to be there */
+    guint32 hard_offset;       /* offset of X/Y axis width/height, this points to a relatively long block, the factors
+                                * just happen to be there */
+    guint32 short_desc_offset; /* offset of short desc (unused) */
+
+    /* Read data */
+    guint32 img_res;           /* size of image */
+    gdouble real_size;         /* physical size */
+    gdouble z_scale;           /* z-scale factor */
+    const guint16 *image_data;
+    gchar *title;
+} FileInfo;
+
+static const guchar*
+get_param_pointer(const guchar *buffer, gsize size,
+                  guint32 pos, guint32 len,
+                  const guchar *name,
+                  GError **error)
+{
+    if (pos < HEADER_SIZE || pos > size - len) {
+        err_INVALID(error, name);
+        return NULL;
+    }
+    return buffer + pos;
+}
+
+static gboolean
+read_file_info(const guchar *buffer, gsize size,
+               FileInfo *info,
+               GError **error)
+{
+    guint expected_size, i;
+    const guchar *p;
+
+    gwy_clear(info, 1);
+    p = buffer + MAGIC_SIZE;
+    /* read structure variables from buffer */
+    for (i = 0; i < (HEADER_SIZE - MAGIC_SIZE)/8; i++) {
+        gchar key[5];
+        guint32 value;
+
+        key[4] = '\0';
+        memcpy(key, p, 4);
+        p += 4;
+        value = gwy_get_guint32_le(&p);
+        if (!key[0])
+            continue;
+
+        gwy_debug("%s: 0x%04x", key, value);
+
+        /* Do not take values past the end of file and zeros into account at all.   The software seems to sometimes
+         * emit silly extra fields. */
+        if (!value || value >= size)
+            continue;
+
+        else if (gwy_strequal(key, "DESC"))
+            info->desc_offset = value;
+        else if (gwy_strequal(key, "DATE"))
+            info->date_offset = value;
+        else if (gwy_strequal(key, "PLET"))
+            info->palette_offset = value;
+        else if (gwy_strequal(key, "IMAG"))
+            info->image_offset = value;
+        else if (gwy_strequal(key, "HARD"))
+            info->hard_offset = value;
+        else if (gwy_strequal(key, "IMGP"))
+            info->img_p_offset = value;
+        else if (gwy_strequal(key, "SDES"))
+            info->short_desc_offset = value;
+        else if (gwy_strequal(key, "KEYS"))
+            info->keys_offset = value;
+        else {
+            gwy_debug("Unknown field %s", key);
+        }
+    }
+
+    /* Pixel image size */
+    if (!(p = get_param_pointer(buffer, size, info->image_offset, sizeof(guint16), "IMAG", error)))
+        return FALSE;
+    info->img_res = gwy_get_guint16_le(&p);
+    if (err_DIMENSION(error, info->img_res))
+        return FALSE;
+
+    /* Image data.  It is the *same* pointer, just after the pixel size.  */
+    info->image_data = (const guint16*)p;
+    expected_size = (p - buffer) + info->img_res*info->img_res*sizeof(guint16);
+    if (err_SIZE_MISMATCH(error, expected_size, size, FALSE))
+        return FALSE;
+
+    /* Real image size */
+    if (!(p = get_param_pointer(buffer, size, info->hard_offset, sizeof(gfloat), "HARD", error)))
+        return FALSE;
+    info->real_size = gwy_get_gfloat_le(&p);
+    sanitise_real_size(&info->real_size, "size");
+
+    /* Value scale factor */
+    if (!(p = get_param_pointer(buffer, size, info->img_p_offset + 8, sizeof(gfloat), "IMGP", error)))
+        return FALSE;
+    info->z_scale = gwy_get_gfloat_le(&p);
+
+    return TRUE;
+}
+
+static GwyContainer*
+quesant_load(const gchar *filename,
+             G_GNUC_UNUSED GwyRunType mode,
+             GError **error)
+{
+    GwyContainer *container = NULL;
+    guchar *buffer = NULL;
+    gsize size = 0;
+    GError *err = NULL;
+    FileInfo info;
+    GwyDataField *dfield;
+    gdouble multiplier;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+
+    if (size <= HEADER_SIZE) {
+        gwy_file_abandon_contents(buffer, size, NULL);
+        err_TOO_SHORT(error);
+        return NULL;
+    }
+
+    if (!read_file_info(buffer, size, &info, error)) {
+        gwy_file_abandon_contents(buffer, size, NULL);
+        return NULL;
+    }
+
+    /* create units and datafield */
+    dfield = gwy_data_field_new(info.img_res, info.img_res,
+                                info.real_size * Micrometre, info.real_size * Micrometre,
+                                FALSE);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(dfield), "m");
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(dfield), "m");
+
+    multiplier = info.z_scale * Micrometre;
+    gwy_convert_raw_data(info.image_data, info.img_res*info.img_res, 1,
+                         GWY_RAW_DATA_UINT16, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                         gwy_data_field_get_data(dfield), multiplier, 0.0);
+
+    /* create container */
+    container = gwy_container_new();
+    /* put datafield into container */
+    gwy_container_pass_object(container, gwy_app_get_data_key_for_id(0), dfield);
+    gwy_app_channel_title_fall_back(container, 0);
+    gwy_file_channel_import_log_add(container, 0, NULL, filename);
+
+    gwy_file_abandon_contents(buffer, size, NULL);
+    return container;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

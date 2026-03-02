@@ -1,0 +1,635 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion\n"
+"POT-Creation-Date: 2021-01-03 11:02+0400\n"
+"PO-Revision-Date: 2021-01-05 17:07+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: presentations.xml:6(title)
+msgid "Presentations"
+msgstr "Презентации"
+
+#: presentations.xml:7(para)
+msgid ""
+"<link linkend=\"presentations-masks\">Presentation</link> modules do not "
+"modify the data, instead, they output their results into a separate layer "
+"displayed on top of the original data. The other data processing modules and "
+"tools will still operate on the underlying data. To remove a presentation, "
+"right-click on the data window, and select <guimenuitem>Remove Presentation</"
+"guimenuitem>."
+msgstr ""
+"Модули <link linkend=\"presentations-masks\">презентаций</link> не изменяют "
+"данные, вместо этого они выводят результат в отдельный слой, отображаемый "
+"поверх оригинальных данных. Прочие модули и инструменты работы с данными по "
+"прежнему будут оперировать с нижележащими данными. Чтобы удалить презентацию "
+"нужно нажать правую кнопку мыши в окне данных и выбрать в появившемся меню "
+"<guimenuitem>Удалить презентацию</guimenuitem>."
+
+#: presentations.xml:16(title)
+msgid "Basic Operations"
+msgstr "Основные операции"
+
+#: presentations.xml:18(primary)
+msgid "presentation"
+msgstr "презентации"
+
+#: presentations.xml:19(primary)
+msgid "basic operations"
+msgstr "основные операции"
+
+#: presentations.xml:21(para)
+msgid ""
+"The <menuchoice><guimenu>Data Process</guimenu><guisubmenu>Presentation</"
+"guisubmenu></menuchoice> menu contains a few basic presentation operations:"
+msgstr ""
+"Меню <menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Презентация</"
+"guisubmenu></menuchoice> содержит несколько основных операций с "
+"презентациями:"
+
+#: presentations.xml:31(guimenuitem)
+msgid "Attach Presentation"
+msgstr "Присоединить презентацию"
+
+#: presentations.xml:33(para)
+msgid ""
+"Attaches another data field as a presentation to the current data. Note that "
+"this useful option can be particularly confusing while evaluating anything "
+"from the data as all the computed values are evaluated from the underlying "
+"data (not from the presentation, even if it looks like the data)."
+msgstr ""
+"Присоединяет другое поле данных как презентацию к текущим данным. Следует "
+"отметить, что эта полезная функция иногда может вводить в заблуждение если "
+"пытаться получить нечто, основанное на данных, поскольку все расчётные "
+"значения получаются из нижележащих данных (а не из презентации, хоть она и "
+"выглядит как данные)."
+
+#: presentations.xml:43(guimenuitem)
+msgid "Remove Presentation"
+msgstr "Удалить презентацию"
+
+#: presentations.xml:45(para)
+msgid ""
+"Removes presentation from the current data window. This is an alternative to "
+"the right-click data window menu."
+msgstr ""
+"Удаляет презентацию из текущего окна данных. Этот вариант является "
+"альтернативой контекстного меню, доступного по щелчку правой кнопкой мыши в "
+"окне данных."
+
+#: presentations.xml:52(guimenuitem)
+msgid "Extract Presentation"
+msgstr "Извлечь презентацию"
+
+#: presentations.xml:54(para)
+msgid ""
+"Extracts presentation from the current data window to a new image in the "
+"same file. In this way one can get presentation data for further processing. "
+"Note, however, the extracted data have no absolute scale information as "
+"presentation often help to visualize certain features, but the produced "
+"values are hard or impossible to assign any physical meaning to. Hence the "
+"value range of the new image is always <include href=\"eqi-interval-0-1.xml"
+"\"/>."
+msgstr ""
+"Извлекает презентацию из текущего окна данных в новое изображение того же "
+"файла. Таким способом можно извлечь данные презентации для дальнейшей "
+"обработки. Следует отметить, однако, что извлекаемые данные не содержат "
+"информации о реальном масштабе, поскольку презентация нужна для визуализации "
+"определённых особенностей, но получаемым данным трудно или невозможно "
+"присвоить физический смысл. Следовательно, диапазоном значений нового канала "
+"всегда будет <include href=\"eqi-interval-0-1.xml\"/>."
+
+#: presentations.xml:73(phrase)
+msgid "Illustration of selected presentation filters"
+msgstr "Иллюстрация отдельных фильтров презентаций"
+
+#: presentations.xml:75(caption)
+msgid ""
+"Presentation examples: (a) original data, (b) shading, (c) vertical Prewitt "
+"gradient, (d) Canny edge detection, (e) local non-linearity edge detection, "
+"(f) local contrast improvement."
+msgstr ""
+"Примеры презентаций: (a) реальные данные, (b) затенение, (c) вертикальный "
+"градиент Превитта, (d) поиск краёв Канни, (e) поиск краёв по локальной "
+"нелинейности, (f) улучшение локального контраста."
+
+#: presentations.xml:88(title)
+msgid "Shading Presentation <gwy:icon name=\"shader\"/>"
+msgstr "Презентация затенения <gwy:icon name=\"shader\"/>"
+
+#: presentations.xml:93(guimenu) presentations.xml:114(guimenu)
+#: presentations.xml:139(guimenu) presentations.xml:377(guimenu)
+#: presentations.xml:396(guimenu) presentations.xml:425(guimenu)
+#: presentations.xml:438(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: presentations.xml:94(guisubmenu) presentations.xml:115(guisubmenu)
+#: presentations.xml:140(guisubmenu) presentations.xml:378(guisubmenu)
+#: presentations.xml:397(guisubmenu) presentations.xml:426(guisubmenu)
+#: presentations.xml:439(guisubmenu)
+msgid "Presentation"
+msgstr "Презентация"
+
+#: presentations.xml:95(guimenuitem)
+msgid "Shading"
+msgstr "Затенение"
+
+#: presentations.xml:98(primary)
+msgid "shading"
+msgstr "затенение"
+
+#: presentations.xml:99(para)
+msgid ""
+"Simple and very useful way of seeing data as illuminated from some "
+"direction. The direction can be set by user. It is also possible to mix the "
+"shaded and original images for presentational purposes. Of course, the "
+"resulting image is meaningless from the physical point of view."
+msgstr ""
+"Простой и удобный способ увидеть данные как будто они освещаются с "
+"определённого направления. Направление может быть задано пользователем. "
+"Также возможно смешивать затенённое и исходное изображения для целей "
+"презентации. Разумеется, получающееся в результате изображение не имеет "
+"смысла с физической точки зрения."
+
+#: presentations.xml:107(title)
+msgid ""
+"Gradient Detection Presentations <gwy:icon name=\"gradient_horizontal\"/"
+"><gwy:icon name=\"gradient_vertical\"/>"
+msgstr ""
+"Презентации выделения градиента <gwy:icon name=\"gradient_horizontal\"/><gwy:"
+"icon name=\"gradient_vertical\"/>"
+
+#: presentations.xml:116(guimenuitem)
+msgid "Gradient"
+msgstr "Градиент"
+
+#: presentations.xml:119(primary)
+msgid "gradient filters"
+msgstr "фильтры градиента"
+
+#: presentations.xml:120(primary)
+msgid "Sobel filter"
+msgstr "фильтр Собела"
+
+#: presentations.xml:121(primary)
+msgid "Prewitt filter"
+msgstr "фильтр Превитта"
+
+#: presentations.xml:122(para)
+msgid ""
+"Sobel horizontal and vertical gradient filter and Prewitt horizontal and "
+"vertical gradient filter create similar images as shading, however, they "
+"output data as a result of convolution of data with relatively standardized "
+"kernel. Thus, they can be used for further presentation processing for "
+"example. The kernels for horizontal filters are listed below, vertical "
+"kernels differ only by reflection about main diagonal. <include href=\"eq-"
+"filters-sobel-prewitt.xml\"/>"
+msgstr ""
+"Фильтры горизонтальных и вертикальных градиентов Собела и Превитта создают "
+"изображения, похожие на затемнение, однако, они выводят данные как результат "
+"свёртки данных с относительно стандартизованным ядром. Следовательно, они, "
+"например, могут использоваться для дальнейшей обработки презентаций. Ядра "
+"для горизонтальных фильтров приведены ниже, вертикальные ядра отличаются "
+"только отражением относительно главной диагонали. <include href=\"eq-filters-"
+"sobel-prewitt.xml\"/>"
+
+#: presentations.xml:134(title)
+msgid "Edge Detection Presentations <gwy:icon name=\"edge\"/>"
+msgstr "Презентации поиска края <gwy:icon name=\"edge\"/>"
+
+#: presentations.xml:141(guisubmenu)
+msgid "Edge Detection"
+msgstr "Выделение края"
+
+#: presentations.xml:144(primary) presentations.xml:196(secondary)
+#: presentations.xml:286(secondary)
+msgid "edge detection"
+msgstr "выделение края"
+
+#: presentations.xml:145(primary) presentations.xml:242(primary)
+msgid "step detection"
+msgstr "поиск края"
+
+#: presentations.xml:146(para)
+msgid ""
+"One is often interested in the visualization of the discontinuities present "
+"in the image, particularly in discontinuities in the value (zeroth order) "
+"and discontinuities in the derivative (first order). Although the methods of "
+"location of both are commonly referred to as <quote>edge detection</quote> "
+"methods, these are actually quite different, therefore we will refer to the "
+"former as to step detection and to the latter as to edge detection. Methods "
+"for the detection of more specific features, e.g. corners, are commonly used "
+"too, these methods usually are of order zero."
+msgstr ""
+"Нередко возникает задача визуализации разрывов непрерывности, присутствующих "
+"на изображении, в частности, разрыв непрерывности значений (нулевого "
+"порядка) и непрерывности производных (первого порядка). Хотя методы "
+"обнаружения обоих называют методами <quote>обнаружения края</quote>, они в "
+"реальности достаточно сильно отличаются, поэтому мы будем называть первые "
+"обнаружением ступеней и вторые как обнаружение края (кромки). Методы "
+"обнаружения более частных особенностей, т.е. углов, также широко "
+"используются, эти методы обычно относятся к нулевому порядку."
+
+#: presentations.xml:157(para)
+msgid ""
+"The order of a discontinuity detection method can be easily seen on its "
+"output as edge detection methods produce typical double edge lines at value "
+"discontinuities as is illustrated in the following figure. While the "
+"positions of the upper and lower edge in an ideal step coincide, real-world "
+"data tend to actually contain two distinct edges as is illustrated in the "
+"picture. In addition, finding two edges on a value step, even an ideally "
+"sharp one, is often an inherent feature of edge detection methods."
+msgstr ""
+"Порядок метода обнаружения разрывов непрерывности легко может быть виден на "
+"выводимом изображении. поскольку методы обнаружения краёв обычно дают "
+"типичные двойные линии на разрывах значений, как показано на следующем "
+"рисунке. В то время, как у идеальной ступеньки положения верхней и нижней "
+"кромки совпадают, данные реального мира имеют тенденцию содержать две "
+"отдельных кромки как показано на рисунке. Кроме того, нахождение двух кромок "
+"на ступеньке данных, даже на идеально острой, нередко является врождённой "
+"чертой методов обнаружения кромок."
+
+#: presentations.xml:176(phrase)
+msgid "One-dimensional step and edge schematic image"
+msgstr "Схематичное изображение одномерной ступеньки и края (кромки)"
+
+#: presentations.xml:178(caption)
+msgid "Step versus edge in one dimension."
+msgstr "Ступенька против кромки в одномерном мире."
+
+#: presentations.xml:183(para)
+msgid ""
+"The following step and edge detection functions are available in Gwyddion "
+"(the later ones are somewhat experimental, on the other hand they usually "
+"give better results than the well-known algorithms):"
+msgstr ""
+"В Gwyddion доступны следующие функции обнаружения ступеньки и кромки "
+"(последние являются в некоторой степени экспериментальными, с другой стороны "
+"обычно они дают лучшие результаты по сравнению с хорошо известными "
+"алгоритмами):"
+
+#: presentations.xml:191(guilabel) presentations.xml:195(primary)
+msgid "Canny"
+msgstr "Канни"
+
+#: presentations.xml:198(para)
+msgid ""
+"Canny edge detector is a well-known step detector that can be used to "
+"extract the image of sharp value discontinuities in the data as thin single-"
+"pixel lines."
+msgstr ""
+"Метод обнаружения края Канни – хорошо известный метод обнаружения ступеней и "
+"может быть использован чтобы извлекать изображения резких разрывов значений "
+"данных в виде тонких однопиксельных линий."
+
+#: presentations.xml:207(guilabel) presentations.xml:211(primary)
+msgid "Laplacian of Gaussians"
+msgstr "Лапласиан гауссианов"
+
+#: presentations.xml:213(para)
+msgid ""
+"Laplacian presents a simple convolution with the following kernel (that is "
+"the limit of discrete Laplacian of Gaussians filter for <include href=\"eqi-"
+"sigma-to-0.xml\"/>): <include href=\"eq-filters-laplacian.xml\"/>"
+msgstr ""
+"Лапласиан представляет собой простую свёртку со следующим ядром (которая "
+"является пределом дискретного фильтра лапласиана гауссианов при <include "
+"href=\"eqi-sigma-to-0.xml\"/>): <include href=\"eq-filters-laplacian.xml\"/>"
+
+#: presentations.xml:223(guilabel)
+msgid "Zero Crossing"
+msgstr "Пересечение нуля"
+
+#: presentations.xml:227(primary)
+msgid "zero crossing edge detection"
+msgstr "обнаружение края пересечением нуля"
+
+#: presentations.xml:229(para)
+msgid ""
+"Zero crossing step detection marks lines where the result of Laplacian of "
+"Gaussians filter changes sign, i.e. crosses zero. The FWHM (full width half "
+"maximum) of the Gaussians determines the level of details covered. Threshold "
+"enables to exclude sign changes with too small absolute value of the "
+"neighbour pixels, filtering out fine noise. Note, however, that for non-zero "
+"threshold the edge lines may become discontinuous."
+msgstr ""
+"Алгоритм обнаружения края пересечением нуля помечает линии там, где "
+"результат фильтра лапласиана гауссианов меняет знак, т.е. пересекает ноль. "
+"Полуширина на половинной высоте гауссианов определяет уровень выделяемых "
+"деталей. Порог позволяет исключить смену знака со слишком малым абсолютным "
+"значением соседних пикселей, убирая мелкий шум. Следует заметить, однако, "
+"что для ненулевого порога линии краёв могут перестать быть непрерывными."
+
+#: presentations.xml:245(guilabel)
+msgid "Step"
+msgstr "Ступень"
+
+#: presentations.xml:248(para)
+msgid ""
+"A step detection algorithm providing a good resolution, i.e. sharp "
+"discontinuity lines, and a good dynamic range while being relatively "
+"insensitive to noise. The principle is quite simple: it visualizes the "
+"square root of the difference between the 2/3 and 1/3 quantiles of the data "
+"values in a circular neighbourhood of radius 2.5 pixels centred around the "
+"sample."
+msgstr ""
+"Алгоритм обнаружения ступеней обеспечивает хорошее разрешение, т.е. острые "
+"линии разрыва, и хороший динамический диапазон при этом будучи относительно "
+"нечувствителен к шуму. Принцип достаточно прост: он показывает квадратный "
+"корень разницы между квантилями 2/3 и 1/3 от значений данных в круговой "
+"окрестности радиусом в 2,5 пикселя с центром в каждом дискретном значении."
+
+#: presentations.xml:260(guilabel)
+msgid "Gaussian Step"
+msgstr "Гауссова ступень"
+
+#: presentations.xml:263(para)
+msgid ""
+"Gaussian step is a tunable filter, with trade-off between fine tracing of "
+"the steps and resistance to noise. It has one parameter, width of the "
+"Gaussian (given as full width at half-maximum). Narrow filters produce fine "
+"lines, but also mark local defects. Wide filters distinguish better steps "
+"from other features, but the result is more blurred."
+msgstr ""
+"Гауссова ступень – настраиваемый фильтр, с балансом между точным "
+"отслеживанием ступеней и устойчивостью к шуму. Он имеет один настраиваемый "
+"параметр – ширину гауссовой функции (задаваемую как полная ширина на "
+"половине высоты). Узкие фильтры дают более тонкие линии, но также выделяют "
+"локальные дефекты. Широкие фильтры лучше отделяют ступени от других "
+"особенностей поверхности, но результат будет более размытым."
+
+#: presentations.xml:271(para)
+msgid ""
+"The filter works by convolving the image with kernels consisting of a "
+"Gaussian multiplied by sign function, rotated to cover different "
+"orientations. The results are then squared and summed together."
+msgstr ""
+"Фильтр работает путём расчёта свёртки изображения с ядрами, состоящими из "
+"гауссовой функции умноженной на функцию знака и повернутой чтобы покрывать "
+"различные направления. Результаты затем возводятся в квадрат и суммируются "
+"вместе."
+
+#: presentations.xml:281(guilabel)
+msgid "RMS"
+msgstr "Ср. квадр."
+
+#: presentations.xml:285(primary)
+msgid "rms"
+msgstr "ср. квадр."
+
+#: presentations.xml:288(para)
+msgid ""
+"This step detector visualizes areas with high local value variation. The "
+"root mean square of deviations from the mean value of a circular "
+"neighbourhood of radius 2.5 pixels centred around each sample is calculated "
+"and displayed."
+msgstr ""
+"Обнаружение ступеней показывает области с высоким локальным изменением "
+"значений. Рассчитывается и показывается среднеквадратичное отклонение от "
+"среднего значения в круговой окрестности радиуса 2,5 пикселя с центром в "
+"каждом дискретном значении."
+
+#: presentations.xml:298(guilabel)
+msgid "RMS Edge"
+msgstr "Кромка среднеквадратичного отклонения"
+
+#: presentations.xml:301(primary)
+msgid "rms edge edge detection"
+msgstr "поиск края по кромке среднеквадратичного отклонения"
+
+#: presentations.xml:302(para)
+msgid ""
+"This function essentially postprocesses RMS output with a filter similar to "
+"Laplacian to emphasize boundaries of areas with high local value variation. "
+"Despite the name it is still a step detector."
+msgstr ""
+"Эта функция просто обрабатывает вывод среднеквадратичного отклонения "
+"фильтром, подобным лапласиану, чтобы усилить границы областей с большим "
+"локальным разбросом значений. Несмотря на имя это по прежнему средство "
+"обнаружения ступеней."
+
+#: presentations.xml:312(guilabel)
+msgid "Local Non-Linearity"
+msgstr "Локальная нелинейность"
+
+#: presentations.xml:315(primary)
+msgid "local nonlinearity edge detection"
+msgstr "поиск края по локальной нелинейности"
+
+#: presentations.xml:316(para)
+msgid ""
+"An edge detector which visualizes areas that are locally very non-planar. It "
+"fits a plane through a circular neighbourhood of radius 2.5 pixels centred "
+"around each sample and then it calculates residual sum of squares of this "
+"fit reduced to plane slope, i.e. divided by <include href=\"eqi-1-plus-b_x-"
+"to-2-plus-b_y-to-2.xml\"/> where <include href=\"eqi-b_x.xml\"/> and "
+"<include href=\"eqi-b_y.xml\"/> are the plane coefficients in <include href="
+"\"eqi-x.xml\"/> and <include href=\"eqi-y.xml\"/> directions, respectively. "
+"The square root is then displayed."
+msgstr ""
+"Метод обнаружения края, который показывает локально сильно неплоские "
+"области. Он аппроксимирует плоскостью круговую окрестность радиусом в 2,5 "
+"пикселя с центром в каждом отсчёте и затем рассчитывает остаточную сумму "
+"квадратов аппроксимации, пересчитанную в наклон плоскости, т.е. делённую на "
+"<include href=\"eqi-1-plus-b_x-to-2-plus-b_y-to-2.xml\"/> где <include href="
+"\"eqi-b_x.xml\"/> и <include href=\"eqi-b_y.xml\"/> – коэффициенты плоскости "
+"в направлениях <include href=\"eqi-x.xml\"/> и <include href=\"eqi-y.xml\"/"
+">, соответственно. Затем отображается квадратный корень величины."
+
+#: presentations.xml:333(primary)
+msgid "inclination"
+msgstr "наклон"
+
+#: presentations.xml:334(secondary)
+msgid "edge detection filter"
+msgstr "фильтр поиска кромки"
+
+#: presentations.xml:337(guilabel)
+msgid "Inclination"
+msgstr "Наклон"
+
+#: presentations.xml:340(para)
+msgid ""
+"Visualizes the angle <include href=\"eqi-theta.xml\"/> of local plane "
+"inclination. Technically this function belongs among step detectors, "
+"however, the accentuation of steps in its output is not very strong and it "
+"is more intended for easy visual comparison of different slopes present in "
+"the image."
+msgstr ""
+"Показывает угол <include href=\"eqi-theta.xml\"/> наклона локальной "
+"плоскости. Технически эта функция относится к детекторам ступени, однако. "
+"выделение ступеней на результате вывода не слишком сильное и она больше "
+"предназначена для легкого визуального сравнения различных наклонов, "
+"представленных на изображении."
+
+#: presentations.xml:356(phrase)
+msgid "Comparison of step and edge detection methods on several images"
+msgstr ""
+"Сравнение методов обнаружения ступеней и кромок на нескольких изображениях"
+
+#: presentations.xml:360(caption)
+msgid ""
+"Comparison of step and edge detection methods on several interesting, or "
+"typical example data. Canny and Zero crossing are step detectors that "
+"produce one pixel wide edge lines, Step and Inclination are step detectors "
+"with continuous output, Local nonlinearity is an edge detector – the edge "
+"detection can be easily observed on the second and third row. Note zero "
+"crossing is tunable, it parameters were chosen to produce reasonable output "
+"in each example."
+msgstr ""
+"Сравнение методов обнаружения ступеней и кромок на нескольких интересных или "
+"типичных примерах данных. Канни и пересечение нуля – детекторы ступеней, "
+"которые выводят линии края шириной в один пиксель, ступень и наклон – "
+"детекторы ступеней с непрерывным выводом, локальная нелинейность – детектор "
+"кромки, детектирование кромки легко можно наблюдать на втором и третьем "
+"ряду. Следует отметить, что пересечение нуля можно настраивать, его "
+"параметры подбирались чтобы получить вменяемый результат для каждого примера."
+
+#: presentations.xml:373(title) presentations.xml:379(guimenuitem)
+msgid "Local Contrast"
+msgstr "Локальный контраст"
+
+#: presentations.xml:374(primary)
+msgid "local contrast improvement"
+msgstr "улучшение локального контраста"
+
+#: presentations.xml:382(para)
+msgid ""
+"A method to visualize features in areas with low and high value variation at "
+"the same time. This is achieved by calculation of local value range, or "
+"variation, around each data sample and stretching it to equalize this "
+"variation over all data."
+msgstr ""
+"Метод для показа деталей в областях, где присутствует большое и малое "
+"изменение значений одновременно. Это достигается расчётом диапазона "
+"локального изменения значений, или разброса, вокруг каждого отсчёта данных и "
+"растягивание его таким образом, чтобы сделать этот разброс одинаковым для "
+"всех данных."
+
+#: presentations.xml:390(title)
+msgid "Rank <gwy:icon name=\"rank_filter\"/>"
+msgstr "Ранг <gwy:icon name=\"rank_filter\"/>"
+
+#: presentations.xml:393(primary)
+msgid "local rank transform"
+msgstr "локальное преобразование ранжирования"
+
+#: presentations.xml:398(guimenuitem)
+msgid "Rank"
+msgstr "Ранг"
+
+#: presentations.xml:401(para)
+msgid ""
+"An alternative local contrast enhancement method. It is an equalising high-"
+"pass filter, somewhat complementary to the median filter. Each pixel value "
+"is transformed to its rank among all values from a certain neighbourhood. "
+"The neighbourhood radius can be specified as <guilabel>Kernel size</"
+"guilabel>."
+msgstr ""
+"Альтернативный метод улучшения локального контраста. Это выравнивающий "
+"фильтр верхних частот, чем-то противоположный медианному фильтру. Каждое "
+"значение пикселя преобразуется в его ранг среди всех значений в определённой "
+"окрестности. Радиус окрестности задаётся параметром <guilabel>размер ядра</"
+"guilabel>."
+
+#: presentations.xml:408(para)
+msgid ""
+"The net effect is that all local maxima are equalised to the same maximum "
+"value, all local minima to the same minimum value, and values that are "
+"neither maxima nor minima are transformed to the range between based on "
+"their rank. Since the output of the filter with radius <include href=\"eqi-r."
+"xml\"/> can contain at most <include href=\"eqi-pi-r-plus-1-over-2-to-2.xml"
+"\"/> different values (approximately), the filter also leads to value "
+"discretisation, especially for small kernel sizes."
+msgstr ""
+"В результате получается что все локальные максимумы приводятся к одному "
+"одинаковому максимальному значению, все локальные минимумы к одинаковому "
+"минимальному и все значения, не являющиеся ни максимумом, ни минимумом "
+"преобразуются к диапазону между ними, основанному на их ранге. Поскольку "
+"результат применения фильтра с радиусом <include href=\"eqi-r.xml\"/> может "
+"содержать максимально <include href=\"eqi-pi-r-plus-1-over-2-to-2.xml\"/> "
+"различных значений (приблизительно), фильтр также приводит к дискретизации "
+"значений, особенно для малых размеров ядра фильтра."
+
+#: presentations.xml:421(title) presentations.xml:427(guimenuitem)
+msgid "Logscale"
+msgstr "Логарифмический масштаб"
+
+#: presentations.xml:422(primary)
+msgid "logarithmic scale"
+msgstr "логарифмический масштаб"
+
+#: presentations.xml:430(para)
+msgid "Logarithmic scale is used for false colours data presentation."
+msgstr ""
+"Логарифмический масштаб используется для презентации данных с помощью шкалы "
+"псевдоцвета."
+
+#: presentations.xml:435(title) presentations.xml:440(guimenuitem)
+msgid "SEM Image"
+msgstr "Изображение РЭМ"
+
+#: presentations.xml:443(para)
+msgid ""
+"The function renders an SEM image-like presentation from a topographical "
+"image using the simplest possible Monte Carlo method. For each surface "
+"pixel, a number of lines originating from this pixel are chosen with random "
+"directions and Gaussian length distribution. The standard deviation of the "
+"Gaussian distribution is controlled with the <guilabel>Integration radius</"
+"guilabel> parameters. If the other end of the line hits free space, the "
+"lightness in the origin pixel is increased. If it hits material, i.e. height "
+"value below the surface at the endpoint, the lightness is decreased. More "
+"precisely, this describes the <guilabel>Monte Carlo</guilabel> method. The "
+"number of lines can be controlled with the <guilabel>Quality</guilabel> "
+"parameter. Equivalently, the same intensity can be calculated by direct "
+"integration over all pixels within a circular neighbourhood. This "
+"corresponds to the <guilabel>Integration</guilabel> method."
+msgstr ""
+"Эта функция рисует на основе изображения топографии поверхности похожую на "
+"изображение РЭМ презентацию используя простейший возможный метод Монте-"
+"Карло. Для каждого пикселя поверхности выбирается некоторое количество "
+"отрезков, исходящих из этого пикселя со случайными направлениями и гауссовым "
+"распределением длин. Стандартное отклонение в распределении Гаусса "
+"управляется параметром <guilabel>радиус интегрирования</guilabel>. Если "
+"другой конец отрезка попадает в пустое пространство, яркость исходного "
+"пикселя увеличивается. Если он попадает внутрь материала, т.е. значение "
+"высоты оказывается ниже поверхности в конце отрезка, яркость уменьшается. "
+"Точнее, это описывает используемый метод <guilabel>Монте-Карло</guilabel>. "
+"Количеством отрезков можно управлять с помощью параметра <guilabel>качество</"
+"guilabel>. Эквивалентно, такое же значение интенсивности может быть "
+"рассчитано с помощью прямого интегрирования по всем пикселям в круговой "
+"окрестности заданной точки. Это соответствует методу "
+"<guilabel>Интегрирование</guilabel>."
+
+#: presentations.xml:459(para)
+msgid ""
+"Since even this simple computation can take a long time, it is useful to "
+"consider how its speed depends on the settings. The computation time for "
+"<guilabel>Integration</guilabel> depends only on the integration radius. The "
+"computation time for <guilabel>Monte Carlo</guilabel>, on the other hand, "
+"depends essentially only on <guilabel>Quality</guilabel> (there is also some "
+"dependence on the local topography)."
+msgstr ""
+"Поскольку даже простой расчёт может требовать значительного времени, может "
+"оказаться полезным знать как его скорость зависит от выставленных "
+"параметров. Время расчёта для метода <guilabel>Интегрирование</guilabel> "
+"зависит только от радиуса интегрирования. Время расчёта для метода "
+"<guilabel>Монте-Карло</guilabel>, зависит в основном только от параметра "
+"<guilabel>Качество</guilabel> (также есть некоторая зависимость от локальной "
+"топографии поверхности)."
+
+#~ msgid "Gradient Detection Presentations"
+#~ msgstr "Презентации обнаружения градиента"
+
+#~ msgid "Local contrast"
+#~ msgstr "Локальный контраст"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

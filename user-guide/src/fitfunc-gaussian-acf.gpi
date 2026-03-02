@@ -1,0 +1,28 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+name = 'fitfunc-gaussian-acf'
+set samples 201
+set lmargin at screen 0.07
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+sigma = 1
+T = 1
+
+f(x) = sigma**2 * exp(-(x/T)**2)
+xm = T/sqrt(2)
+M = f(0)
+
+unset grid
+set key top right Left reverse samplen 1.5
+set xtics out nomirror ('0' 0 0, 'T/√2' xm 0)
+set ytics out nomirror ('0' 0 0, 'σ²' M 0)
+set xrange [0:3]
+set yrange [0:1.1*M]
+set arrow from xm,0 to xm,f(xm) nohead ls 10
+set output name.'.svg'
+
+plot \
+    f(x) with lines title 'Gaussian (ACF)' linestyle 3
+

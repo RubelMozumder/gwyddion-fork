@@ -1,0 +1,301 @@
+/*
+ *  $Id: volume_crop.c 26354 2024-05-21 08:22:32Z yeti-dn $
+ *  Copyright (C) 2015-2021 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwythreads.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwynlfit.h>
+#include <libprocess/brick.h>
+#include <libprocess/stats.h>
+#include <libprocess/linestats.h>
+#include <libprocess/gwyprocess.h>
+#include <libprocess/gwyprocesstypes.h>
+#include <libprocess/correlation.h>
+#include <libgwydgets/gwydataview.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwydgetutils.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+#include "libgwyddion/gwyomp.h"
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+};
+
+enum {
+    PARAM_Z,
+    PARAM_KEEPOFFSETS
+};
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    gint isel[4];
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table;
+    GwyContainer *data;
+    GwySelection *selection;
+    GwyRectSelectionLabels *rlabels;
+    GwyDataField *dfield;
+} ModuleGUI;
+
+static gboolean         module_register          (void);
+static GwyParamDef*     define_module_params     (void);
+static void             crop                     (GwyContainer *data,
+                                                  GwyRunType runtype);
+static GwyBrick*        execute                  (ModuleArgs *args);
+static GwyDialogOutcome run_gui                  (ModuleArgs *args,
+                                                  GwyContainer *data,
+                                                  gint id);
+static void             param_changed            (ModuleGUI *gui,
+                                                  gint id);
+static void             preview                  (gpointer user_data);
+static void             update_image             (ModuleGUI *gui,
+                                                  gint z);
+static void             selection_changed        (ModuleGUI *gui);
+static void             rect_updated             (ModuleGUI *gui);
+static void             update_selected_rectangle(ModuleGUI *gui);
+static void             update_ok_sensitivity    (ModuleGUI *gui);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Performs XY plane cropping of all the levels."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "Petr Klapetek & David Nečas (Yeti)",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_crop)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_crop",
+                             (GwyVolumeFunc)&crop,
+                             N_("/_Basic Operations/_Crop..."),
+                             NULL,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("Crop volume data as stack of images"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_int(paramdef, PARAM_Z, "z", "Preview level", 0, G_MAXINT, 0);
+    gwy_param_def_add_boolean(paramdef, PARAM_KEEPOFFSETS, "keepoffsets", _("_Keep offsets"), FALSE);
+    return paramdef;
+}
+
+static void
+crop(GwyContainer *data, GwyRunType runtype)
+{
+    ModuleArgs args;
+    GwyBrick *brick = NULL;
+    GwyBrick *result = NULL;
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    gint oldid, newid;
+
+    g_return_if_fail(runtype & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &brick,
+                                     GWY_APP_BRICK_ID, &oldid,
+                                     0);
+    g_return_if_fail(GWY_IS_BRICK(brick));
+    args.brick = brick;
+    args.params = gwy_params_new_from_settings(define_module_params());
+
+    /* This is the only supported mode. */
+    if (runtype == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, oldid);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+        result = execute(&args);
+    }
+
+    if (result) {
+        newid = gwy_app_data_browser_add_brick(result, NULL, data, TRUE);
+        g_object_unref(result);
+        gwy_app_set_brick_title(data, newid, _("Cropped"));
+        gwy_app_sync_volume_items(data, data, oldid, newid, FALSE,
+                                  GWY_DATA_ITEM_GRADIENT,
+                                  0);
+
+        gwy_app_volume_log_add_volume(data, -1, newid);
+    }
+
+end:
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GtkWidget *hbox, *vbox, *dataview;
+    GwyParamTable *table;
+    GwyDialog *dialog;
+    ModuleGUI gui;
+    GwyDialogOutcome outcome;
+    GwyBrick *brick = args->brick;
+    gdouble xy[4], xreal = gwy_brick_get_xreal(brick), yreal = gwy_brick_get_yreal(brick);
+    GwyDataField *field;
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.data = gwy_container_new();
+    gui.dfield = field = gwy_data_field_new(gwy_brick_get_xres(brick), gwy_brick_get_yres(brick), xreal, yreal, TRUE);
+
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), field);
+    if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.dialog = gwy_dialog_new(_("Crop"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    gui.selection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(dataview), 0, "Rectangle", 1, TRUE);
+    g_object_ref(gui.selection);
+    g_signal_connect_swapped(gui.selection, "changed", G_CALLBACK(selection_changed), &gui);
+
+    hbox = gwy_create_dialog_preview_hbox(GTK_DIALOG(dialog), GWY_DATA_VIEW(dataview), FALSE);
+
+    vbox = gwy_vbox_new(0);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+
+    gui.rlabels = gwy_rect_selection_labels_new(TRUE, G_CALLBACK(rect_updated), &gui);
+    gtk_box_pack_start(GTK_BOX(vbox), gwy_rect_selection_labels_get_table(gui.rlabels), FALSE, FALSE, 0);
+
+    table = gui.table = gwy_param_table_new(args->params);
+    gwy_param_table_append_slider(table, PARAM_Z);
+    gwy_param_table_slider_restrict_range(table, PARAM_Z, 0, gwy_brick_get_zres(brick)-1);
+    gwy_param_table_append_checkbox(table, PARAM_KEEPOFFSETS);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(vbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
+
+    g_signal_connect_swapped(gui.table, "param-changed", G_CALLBACK(param_changed), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+
+    /* Initialis rlabels to the full rectangle the same ways as clearing the selection does. */
+    xy[0] = xy[1] = 0.0;
+    xy[2] = xreal;
+    xy[3] = yreal;
+    gwy_selection_set_data(gui.selection, 1, xy);
+    gwy_selection_clear(gui.selection);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.selection);
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+selection_changed(ModuleGUI *gui)
+{
+    update_selected_rectangle(gui);
+}
+
+static void
+rect_updated(ModuleGUI *gui)
+{
+    gwy_rect_selection_labels_select(gui->rlabels, gui->selection, gui->dfield);
+    update_selected_rectangle(gui);
+}
+
+static void
+update_selected_rectangle(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+
+    gwy_rect_selection_labels_fill(gui->rlabels, gui->selection, gui->dfield, NULL, args->isel);
+    update_ok_sensitivity(gui);
+}
+
+static void
+update_ok_sensitivity(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK,
+                                      args->isel[2] > args->isel[0] && args->isel[3] > args->isel[1]);
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    if (id != PARAM_KEEPOFFSETS)
+        gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+update_image(ModuleGUI *gui, gint z)
+{
+    gwy_brick_extract_xy_plane(gui->args->brick, gui->dfield, z);
+    gwy_data_field_data_changed(gui->dfield);
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    gint z = gwy_params_get_int(gui->args->params, PARAM_Z);
+
+    update_image(gui, z);
+}
+
+GwyBrick*
+execute(ModuleArgs *args)
+{
+    gboolean keep_offset = gwy_params_get_boolean(args->params, PARAM_KEEPOFFSETS);
+    GwyBrick *brick = args->brick;
+    gint col = args->isel[0], row = args->isel[1], width = args->isel[2]+1 - col, height = args->isel[3]+1 - row;
+
+    if (!width || !height)
+        return NULL;
+
+    return gwy_brick_new_part(brick, col, row, 0, width, height, gwy_brick_get_zres(brick), keep_offset);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: presentations-masks.xml 17728 2015-11-08 18:04:50Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='presentations-masks'>
+  <title>Présentations et masques</title>
+  <para>
+    Les présentations et les masques sont des images secondaires ayant certaines
+    fonctions rattachées aux données. Une présentation est une image différence
+    affichée au-dessus des données. Un masque représente un ensemble disparate
+    de pixels sélectionnés. Leur présence est indiquée par les lettres
+    <guilabel>P</guilabel> (présentation) et <guilabel>M</guilabel> (masque) 
+    dans le <link linkend='data-browser-images'>navigateur de données</link>.
+  </para>
+  <informalfigure id='fig-mask-presentation-scheme'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='data-show-mask.png' format='PNG'/>
+      </imageobject>
+      <textobject>
+        <phrase>
+          Masque (en haut), présentation (au milieu), données originales (en bas)
+        </phrase>
+      </textobject>
+      <caption>
+        Visualisation des masques et des présentations. En regardant du dessus
+        on peut les imaginer comme un empilement tel que montré sur l'image.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <para>
+    Les masques et les présentations peuvent tous deux être supprimés des
+    données par les fonctions obtenues par clic droit dans la
+    <link linkend='data-windows'>fenêtre de données</link>, ou par le biais de
+    <link linkend='keyboard-shortcuts'>raccourcis clavier</link>.
+  </para>
+  <informalfigure id='fig-mask-presentation'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='mask.png' format='PNG'/>
+      </imageobject>
+      <textobject>
+        <phrase>Champ de données montrant un masque et une présentation</phrase>
+      </textobject>
+      <caption>
+        Données représentées en fausses couleurs (à gauche), avec un masque
+        superposé visible en rouge (au centre) et avec une présentation ombrée
+        (à droite).
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <sect2 id='presentations-introduction'>
+    <indexterm><primary>présentation</primary></indexterm>
+    <title>Présentation</title>
+    <para>
+      Les présentations peuvent être utilisées pour afficher les données d'une
+      autre manière qu'une simple échelle de couleurs appliquée sur les
+      hauteurs, par exemple en ajoutant des ombres portées ou en mettant en
+      valeurs les bords des détails. Il est aussi possible de superposer des
+      données arbitraires par dessus d'autres sous forme de présentation.
+    </para>
+    <para>
+      Notez qu'une présentation superposée aux données ne reste qu'une simple
+      présentation, elle n'est utilisée pour aucun calcul. Pour toutes les
+      fonctions de traitement et tous les outils les résultats sont toujours
+      calculés à partir des données originales sous-jacentes. Comme les
+      présentations peuvent être longues à calculer, celles-ci ne sont pas mises
+      à jour lorsque les données de base sont modifiées. Les différentes
+      présentations disponibles sont décrites dans la section
+      <link linkend='presentations'>Présentations</link>.
+    </para>
+    <para>
+      Comme les valeurs de l'image de présentation peuvent avoir une échelle
+      arbritraire, ou bien ne pas représenter une quantité physique, l'échelle
+      de couleur sur le côté droit de la 
+      <link linkend='data-windows'>fenêtre des données</link> aucune graduation
+      ni valeur minimale ou maximale lorsqu'une présentation est affichée.
+    </para>
+  </sect2>
+  <sect2 id='masks-introduction'>
+    <indexterm><primary>masque</primary></indexterm>
+    <title>Masques</title>
+    <para>
+      Les masques sont utilisés pour marquer des zone particulières, par exemple
+      des <link linkend='grain-analysis'>grains</link>,
+      des <link linkend='mask-of-outliers'>défauts</link> ou bien des 
+      <link linkend='facet-analysis'>facettes ayant une certaine orientation</link>.
+      Les masques peuvent avoir n'importe quelle forme, et sont visibles dans la
+      fenêtre des données grâce à une couleur superposée aux données. La couleur
+      et l'opacité du masque peuvent être modifiées à l'aide du menu contextuel
+      dans la fenêtre des données.
+    </para>
+    <para>
+      De nombreuses fonctions, en particulier les statistiques, la mise à 
+      niveau ou les fonctions de correction des lignes, peuvent utiliser les
+      masques pour inclure ou exclure des zones dans le calcul. Ce choix est
+      donné dans la partie <guilabel>utilisation du masque</guilabel> avec les
+      options pour exclure la région masquée, n'inclure que la région masquée ou
+      bien ignorer le masque et utiliser toutes les données.
+      Ce choix n'est proposé qu'en présence d'un masque.
+    </para>
+    <para>
+      Le marquage des grains étant l'application principale des masques, de
+      nombreuses fonctions s'appliquant aux zones masquées sont appelées des
+      fonctions de <quote>grains</quote>, par exemple les statistiques de
+      grains. De la même manière, les parties contiguës d'un masque sont parfois
+      appelées grain dans ce manuel. Toutefois, comme un masque ne contient
+      aucune information sur la manière dont il a été créé, toutes les fonctions
+      relatives aux masques peuvent être utilisées sur toutes sortes de masques.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

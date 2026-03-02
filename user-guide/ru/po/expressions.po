@@ -1,0 +1,673 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2019-01-01 16:05+0400\n"
+"PO-Revision-Date: 2019-01-07 12:32+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@km.ru>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: expressions.xml:6(title)
+msgid "Expressions"
+msgstr "Выражения"
+
+#: expressions.xml:7(para)
+msgid ""
+"Expressions used in Data Arithmetic module, grain quantity formulas and in "
+"graph function fitting have syntax similar to common programming languages."
+msgstr ""
+"Выражения, используемые в модуле <quote>арифметика над данными</quote>, "
+"формулах величин зёрен и в аппроксимирующих функциях графиков, имеют "
+"синтаксис подобный многим языкам программирования."
+
+#: expressions.xml:11(para)
+msgid ""
+"All numbers are real (floating point), number literals use standard "
+"notation. Examples of valid numbers: <literal>1</literal>, <literal>.707</"
+"literal>, <literal>2.661</literal>, <literal>8.2e-34</literal>."
+msgstr ""
+"Все числа являются действительными (с плавающей точкой), числовые константы "
+"используют стандартную нотацию. Примеры правильных чисел:  <literal>1</"
+"literal>, <literal>.707</literal>, <literal>2.661</literal>, "
+"<literal>8.2e-34</literal>."
+
+#: expressions.xml:19(para)
+msgid ""
+"Function, constant, and variable names start with a letter and continue with "
+"zero or more letters, numbers, or underscores. Examples of valid "
+"identifiers: <literal>pow10</literal> (a function), <literal>Pi</literal> (a "
+"constant), <literal>d2_2</literal> (a variable)."
+msgstr ""
+"Имена функций, постоянных и переменных начинаются с буквы и продолжаются "
+"нулём или более букв, цифр и знаков подчёркивания. Примеры правильных "
+"идентификаторов: <literal>pow10</literal> (функция), <literal>Pi</literal> "
+"(постоянная), <literal>d2_2</literal> (переменная)."
+
+#: expressions.xml:27(para)
+msgid "The precedence of operations is summarized in following table."
+msgstr "Приоритет операций сведён в нижеприведённую таблицу."
+
+#: expressions.xml:36(entry)
+msgid "Operation"
+msgstr "Операция"
+
+#: expressions.xml:37(entry)
+msgid "Associativity"
+msgstr "Ассоциативность"
+
+#: expressions.xml:38(entry)
+msgid "Examples"
+msgstr "Примеры"
+
+#: expressions.xml:43(entry)
+msgid "parentheses"
+msgstr "скобки"
+
+#: expressions.xml:44(entry)
+msgid "N.A."
+msgstr "недоступно"
+
+#: expressions.xml:45(literal)
+msgid "(x)"
+msgstr "(x)"
+
+#: expressions.xml:48(entry)
+msgid "function call and unary operators"
+msgstr "вызовы функций и унарные операторы"
+
+#: expressions.xml:49(entry) expressions.xml:54(entry)
+msgid "right to left"
+msgstr "справа налево"
+
+#: expressions.xml:50(literal)
+msgid "-sqrt 3"
+msgstr "-sqrt 3"
+
+#: expressions.xml:53(entry)
+msgid "power operator"
+msgstr "оператор степени"
+
+#: expressions.xml:55(literal)
+msgid "2^16"
+msgstr "2^16"
+
+#: expressions.xml:58(entry)
+msgid "multiplication, division, and modulo operators"
+msgstr "операторы умножения, деления, остатка от деления "
+
+#: expressions.xml:59(entry) expressions.xml:64(entry)
+msgid "left to right"
+msgstr "слева направо"
+
+#: expressions.xml:60(literal)
+msgid "9/2 * 8"
+msgstr "9/2 * 8"
+
+#: expressions.xml:63(entry)
+msgid "addition and subtraction operators"
+msgstr "операторы сложения и вычитания"
+
+#: expressions.xml:65(literal)
+msgid "3 - 4 + 5"
+msgstr "3 - 4 + 5"
+
+#: expressions.xml:71(para)
+msgid ""
+"Note <literal>-3^2</literal> is 9, that is <literal>(-3)^2</literal>, like "
+"in <command>bc</command>, but unlike in Perl or Python."
+msgstr ""
+"Следует заметить, что <literal>-3^2</literal> равно 9, и равносильно "
+"<literal>(-3)^2</literal>, как в <command>bc</command>, но в отличие от Perl "
+"или Python."
+
+#: expressions.xml:75(para)
+msgid "Available operators and functions are listed in following table."
+msgstr "Доступные операторы и функции сведены в нижеследующую таблицу."
+
+#: expressions.xml:84(entry) expressions.xml:271(entry)
+msgid "Operator"
+msgstr "Оператор"
+
+#: expressions.xml:85(entry) expressions.xml:272(entry)
+msgid "Meaning"
+msgstr "Смысл"
+
+#: expressions.xml:90(literal) expressions.xml:102(literal)
+msgid "+"
+msgstr "+"
+
+#: expressions.xml:90(entry) expressions.xml:94(entry)
+msgid "<placeholder-1/> (unary)"
+msgstr "<placeholder-1/> (унарный)"
+
+#: expressions.xml:91(entry)
+msgid "no op"
+msgstr "нет операции"
+
+#: expressions.xml:94(literal) expressions.xml:99(literal)
+#: expressions.xml:106(literal)
+msgid "-"
+msgstr "-"
+
+#: expressions.xml:95(entry)
+msgid "negative value"
+msgstr "отрицательное значение"
+
+#: expressions.xml:98(literal)
+msgid "~"
+msgstr "~"
+
+#: expressions.xml:99(entry)
+msgid "negative value (equivalent to <placeholder-1/>)"
+msgstr "отрицательное значение (эквивалентно <placeholder-1/>)"
+
+#: expressions.xml:102(entry) expressions.xml:106(entry)
+msgid "<placeholder-1/> (binary)"
+msgstr "<placeholder-1/> (бинарный)"
+
+#: expressions.xml:103(entry)
+msgid "addition"
+msgstr "сложение"
+
+#: expressions.xml:107(entry)
+msgid "subtraction"
+msgstr "вычитание"
+
+#: expressions.xml:110(literal)
+msgid "*"
+msgstr "*"
+
+#: expressions.xml:111(entry)
+msgid "multiplication"
+msgstr "умножение"
+
+#: expressions.xml:114(literal)
+msgid "/"
+msgstr "/"
+
+#: expressions.xml:115(entry)
+msgid "division"
+msgstr "деление"
+
+#: expressions.xml:118(literal)
+msgid "%"
+msgstr "%"
+
+#: expressions.xml:119(entry)
+msgid "floating point modulo"
+msgstr "остаток с плавающей точкой"
+
+#: expressions.xml:122(literal)
+msgid "^"
+msgstr "^"
+
+#: expressions.xml:123(entry)
+msgid "power"
+msgstr "степень"
+
+#: expressions.xml:126(literal)
+msgid "abs"
+msgstr "abs"
+
+#: expressions.xml:127(entry)
+msgid "absolute value"
+msgstr "модуль"
+
+#: expressions.xml:130(literal)
+msgid "floor"
+msgstr "floor"
+
+#: expressions.xml:131(entry)
+msgid "rounding down to nearest integer"
+msgstr "округление вниз к ближайшему целому (отбрасывание дробной части)"
+
+#: expressions.xml:134(literal)
+msgid "ceil"
+msgstr "ceil"
+
+#: expressions.xml:135(entry)
+msgid "rounding up to nearest integer"
+msgstr "округление вверх до ближайшего целого (следующего после вещественного)"
+
+#: expressions.xml:138(literal)
+msgid "sqrt"
+msgstr "sqrt"
+
+#: expressions.xml:139(entry)
+msgid "square root"
+msgstr "квадратный корень"
+
+#: expressions.xml:142(literal)
+msgid "cbrt"
+msgstr "cbrt"
+
+#: expressions.xml:143(entry)
+msgid "cubic root"
+msgstr "корень кубический"
+
+#: expressions.xml:146(literal)
+msgid "sin"
+msgstr "sin"
+
+#: expressions.xml:147(entry)
+msgid "sine function"
+msgstr "функция синуса"
+
+#: expressions.xml:150(literal)
+msgid "cos"
+msgstr "cos"
+
+#: expressions.xml:151(entry)
+msgid "cosine function"
+msgstr "функция косинуса"
+
+#: expressions.xml:154(literal)
+msgid "tan"
+msgstr "tan"
+
+#: expressions.xml:155(entry)
+msgid "tangent function"
+msgstr "функция тангенса"
+
+#: expressions.xml:158(literal)
+msgid "asin"
+msgstr "asin"
+
+#: expressions.xml:159(entry)
+msgid "arc sine function"
+msgstr "функция арксинуса"
+
+#: expressions.xml:162(literal)
+msgid "acos"
+msgstr "acos"
+
+#: expressions.xml:163(entry)
+msgid "arc cosine function"
+msgstr "функция арккосинуса"
+
+#: expressions.xml:166(literal)
+msgid "atan"
+msgstr "atan"
+
+#: expressions.xml:167(entry)
+msgid "arc tangent function"
+msgstr "функция арктангенса"
+
+#: expressions.xml:170(literal)
+msgid "sinc"
+msgstr "sinc"
+
+#: expressions.xml:171(entry)
+msgid "cardinal sine function, sine divided by the value"
+msgstr "функция \"кардинальный синус\", синус делённый на значение"
+
+#: expressions.xml:174(literal)
+msgid "exp"
+msgstr "exp"
+
+#: expressions.xml:175(entry)
+msgid "base-e exponential function"
+msgstr "функция экспоненты по основанию e"
+
+#: expressions.xml:178(literal)
+msgid "ln"
+msgstr "ln"
+
+#: expressions.xml:179(entry) expressions.xml:183(entry)
+msgid "base-e logarithm function"
+msgstr "функция логарифма по основанию e"
+
+#: expressions.xml:182(literal)
+msgid "log"
+msgstr "log"
+
+#: expressions.xml:186(literal)
+msgid "pow10"
+msgstr "pow10"
+
+#: expressions.xml:187(entry)
+msgid "base-10 exponential function"
+msgstr "степенная функция по основанию 10"
+
+#: expressions.xml:190(literal)
+msgid "log10"
+msgstr "log10"
+
+#: expressions.xml:191(entry)
+msgid "base-10 logarithm function"
+msgstr "функция логарифма по основанию 10"
+
+#: expressions.xml:194(literal)
+msgid "pow2"
+msgstr "pow2"
+
+#: expressions.xml:195(entry)
+msgid "base-2 exponential function"
+msgstr "функция экспоненты по основанию 2"
+
+#: expressions.xml:198(literal)
+msgid "log2"
+msgstr "log2"
+
+#: expressions.xml:199(entry)
+msgid "base-2 logarithm function"
+msgstr "функция логарифма по основанию 2"
+
+#: expressions.xml:202(literal)
+msgid "spow"
+msgstr "spow"
+
+#: expressions.xml:203(entry)
+msgid "signed power function; the result has the same sign as the argument"
+msgstr ""
+"функция степени со знаком; результат будет иметь тот же знак, что и аргумент"
+
+#: expressions.xml:206(literal)
+msgid "sinh"
+msgstr "sinh"
+
+#: expressions.xml:207(entry)
+msgid "hyperbolic sine function"
+msgstr "функция гиперболического синуса"
+
+#: expressions.xml:210(literal)
+msgid "cosh"
+msgstr "cosh"
+
+#: expressions.xml:211(entry)
+msgid "hyperbolic cosine function"
+msgstr "функция гиперболического косинуса"
+
+#: expressions.xml:214(literal)
+msgid "tanh"
+msgstr "tanh"
+
+#: expressions.xml:215(entry)
+msgid "hyperbolic tangent function"
+msgstr "функция гиперболического тангенса"
+
+#: expressions.xml:218(literal)
+msgid "asinh"
+msgstr "asinh"
+
+#: expressions.xml:219(entry)
+msgid "inverse hyperbolic sine function"
+msgstr "инверсия функции гиперболического синуса"
+
+#: expressions.xml:222(literal)
+msgid "acosh"
+msgstr "acosh"
+
+#: expressions.xml:223(entry)
+msgid "inverse hyperbolic cosine function"
+msgstr "инверсия функции гиперболического косинуса"
+
+#: expressions.xml:226(literal)
+msgid "atanh"
+msgstr "atanh"
+
+#: expressions.xml:227(entry)
+msgid "inverse hyperbolic tangent function"
+msgstr "инверсия функции гиперболического тангенса"
+
+#: expressions.xml:230(literal)
+msgid "pow"
+msgstr "pow"
+
+#: expressions.xml:231(literal)
+msgid "pow(x,y)"
+msgstr "pow(x,y)"
+
+#: expressions.xml:231(literal)
+msgid "x^y"
+msgstr "x^y"
+
+#: expressions.xml:231(entry)
+msgid "power function, <placeholder-1/> equals to <placeholder-2/>"
+msgstr "функция степени, <placeholder-1/> соответствует <placeholder-2/>"
+
+#: expressions.xml:234(literal)
+msgid "min"
+msgstr "min"
+
+#: expressions.xml:235(entry)
+msgid "minimum of two values"
+msgstr "минимум двух значений"
+
+#: expressions.xml:238(literal)
+msgid "max"
+msgstr "max"
+
+#: expressions.xml:239(entry)
+msgid "maximum of two values"
+msgstr "максимум двух значений"
+
+#: expressions.xml:242(literal)
+msgid "step"
+msgstr "step"
+
+#: expressions.xml:243(entry)
+msgid "zero for negative values or zero, one for positive values"
+msgstr "нуль для отрицательных чисел или нуля, один для положительных значений"
+
+#: expressions.xml:246(literal)
+msgid "mod"
+msgstr "mod"
+
+#: expressions.xml:247(literal)
+msgid "mod(x,y)"
+msgstr "mod(x,y)"
+
+#: expressions.xml:247(literal)
+msgid "x % y"
+msgstr "x % y"
+
+#: expressions.xml:247(entry)
+msgid "floating point modulo, <placeholder-1/> equals to <placeholder-2/>"
+msgstr ""
+"остаток от деления с плавающей точкой,  <placeholder-1/> эквивалентен "
+"<placeholder-2/>"
+
+#: expressions.xml:250(literal)
+msgid "hypot"
+msgstr "hypot"
+
+#: expressions.xml:251(literal)
+msgid "hypot(x,y)"
+msgstr "hypot(x,y)"
+
+#: expressions.xml:251(literal)
+msgid "sqrt(x^2+y^2)"
+msgstr "sqrt(x^2+y^2)"
+
+#: expressions.xml:251(entry)
+msgid ""
+"Euclidean distance function, <placeholder-1/> equals to <placeholder-2/>"
+msgstr ""
+"Эвклидова функция расстояния, <placeholder-1/> соответствует <placeholder-2/>"
+
+#: expressions.xml:254(literal)
+msgid "atan2"
+msgstr "atan2"
+
+#: expressions.xml:255(entry)
+msgid "arc tangent function of two variables"
+msgstr "функция арктангенса двух переменных"
+
+#: expressions.xml:261(para)
+msgid ""
+"The following functions are available if the system mathematical library "
+"provides them:"
+msgstr ""
+"Следующие функции будут доступны если системная математическая библиотека их "
+"содержит:"
+
+#: expressions.xml:277(literal)
+msgid "erf"
+msgstr "erf"
+
+#: expressions.xml:278(entry)
+msgid "error function (integral of Gaussian from zero)"
+msgstr "функция ошибки (интеграл гауссовой функции от нуля)"
+
+#: expressions.xml:281(literal)
+msgid "erfc"
+msgstr "erfc"
+
+#: expressions.xml:282(entry)
+msgid "complementary error function (integral of Gaussian to infinity)"
+msgstr ""
+"дополнительная функция ошибки (интеграл гауссовой функции до бесконечности)"
+
+#: expressions.xml:285(literal)
+msgid "lGamma"
+msgstr "lGamma"
+
+#: expressions.xml:286(entry)
+msgid "logarithm of <xi:include href=\"eqi-Gamma.xml\"/> function"
+msgstr "логарифм функции <xi:include href=\"eqi-Gamma.xml\"/>"
+
+#: expressions.xml:289(literal)
+msgid "Gamma"
+msgstr "Gamma"
+
+#: expressions.xml:290(entry)
+msgid "<xi:include href=\"eqi-Gamma.xml\"/> function"
+msgstr "функция <xi:include href=\"eqi-Gamma.xml\"/>"
+
+#: expressions.xml:293(literal)
+msgid "J0"
+msgstr "J0"
+
+#: expressions.xml:294(entry)
+msgid "Bessel function of first kind and order 0"
+msgstr "функция Бесселя первого рода порядка 0"
+
+#: expressions.xml:297(literal)
+msgid "J1"
+msgstr "J1"
+
+#: expressions.xml:298(entry)
+msgid "Bessel function of first kind and order 1"
+msgstr "функция Бесселя первого рода порядка 1"
+
+#: expressions.xml:301(literal)
+msgid "Y0"
+msgstr "Y0"
+
+#: expressions.xml:302(entry)
+msgid "Bessel function of second kind and order 0"
+msgstr "функция Бесселя второго рода порядка 0"
+
+#: expressions.xml:305(literal)
+msgid "Y1"
+msgstr "Y1"
+
+#: expressions.xml:306(entry)
+msgid "Bessel function of second kind and order 1"
+msgstr "функция Бесселя второго рода порядка 1"
+
+#: expressions.xml:316(para)
+msgid ""
+"Multiplication signs are optional, you can use spaces instead (or nothing, "
+"in some cases). E.g., <literal>3/4 Pi</literal> and <literal>5(4+3)(2+1)</"
+"literal> are valid expressions. However, <literal>3a</literal> is not a "
+"valid expression, <literal>3e-4</literal> always means <literal>0.0003</"
+"literal>, not <literal>3*e - 4</literal>."
+msgstr ""
+"Знака умножения являются опциональными, вместо них можно использовать "
+"пробелы (или в некоторых случаях ничего не ставить). Например, <literal>3/4 "
+"Pi</literal> и <literal>5(4+3)(2+1)</literal> будут правильными выражениями. "
+"Однако, <literal>3a</literal> не будет, <literal>3e-4</literal> всегда "
+"обозначает <literal>0.0003</literal>, а не <literal>3*e - 4</literal>."
+
+#: expressions.xml:325(para)
+msgid ""
+"There is no difference between function calls and unary operators, so "
+"parentheses can be often omitted. E.g, <literal>sqrt 5</literal> and "
+"<literal>hypot hypot 3,4,5</literal> are valid expression. The latter can be "
+"parenthesized as follows: <literal>hypot(hypot(3,4),5)</literal>."
+msgstr ""
+"Между вызовом функций и унарными операторами нет отличий, поэтому скобки "
+"нередко могут опускаться. Например, <literal>sqrt 5</literal> и "
+"<literal>hypot hypot 3,4,5</literal> будут правильными выражениями. "
+"Последнее можно расписать со скобками следующим образом:  "
+"<literal>hypot(hypot(3,4),5)</literal>."
+
+#: expressions.xml:331(para)
+msgid ""
+"Note however, function calls have higher priority than any other operator, "
+"thus <literal>sin Pi/2</literal> is the same as <literal>(sin Pi)/2</"
+"literal>, not as <literal>sin(Pi/2)</literal>."
+msgstr ""
+"Следует однако отметить, что вызов функции имеет больший приоритет, чем "
+"любой другой оператор, поэтому <literal>sin Pi/2</literal> будет "
+"эквивалентом <literal>(sin Pi)/2</literal>, а не <literal>sin(Pi/2)</"
+"literal>."
+
+#: expressions.xml:312(para)
+msgid ""
+"Beside that, there are a few peculiarities that may make typing simple "
+"expression easier: <placeholder-1/> If in doubt, write out expressions in "
+"full form."
+msgstr ""
+"Помимо этого, есть несколько особенностей, которые упрощают набор простых "
+"выражений: <placeholder-1/> Если сомневаетесь, то пишите выражения в их "
+"полной форме."
+
+#~ msgid "<literal>+</literal> (unary)"
+#~ msgstr "<literal>+</literal> (унарный)"
+
+#~ msgid "<literal>-</literal> (unary)"
+#~ msgstr "<literal>-</literal> (унарный)"
+
+#~ msgid "<literal>+</literal> (binary)"
+#~ msgstr "<literal>+</literal> (бинарный)"
+
+#~ msgid "<literal>-</literal> (binary)"
+#~ msgstr "<literal>-</literal> (бинарный)"
+
+#~ msgid ""
+#~ "Beside that, there are a few peculiarities that may make typing simple "
+#~ "expression easier: <itemizedlist><listitem><para> Multiplication signs "
+#~ "are optional, you can use spaces instead (or nothing, in some cases). E."
+#~ "g., <literal>3/4 Pi</literal> and <literal>5(4+3)(2+1)</literal> are "
+#~ "valid expressions. However, <literal>3a</literal> is not a valid "
+#~ "expression, <literal>3e-4</literal> always means <literal>0.0003</"
+#~ "literal>, not <literal>3*e - 4</literal>. </para></"
+#~ "listitem><listitem><para> There is no difference between function calls "
+#~ "and unary operators, so parentheses can be often omitted. E.g, "
+#~ "<literal>sqrt 5</literal> and <literal>hypot hypot 3,4,5</literal> are "
+#~ "valid expression. The latter can be parenthesized as follows: "
+#~ "<literal>hypot(hypot(3,4),5)</literal>. </para><para> Note however, "
+#~ "function calls have higher priority than any other operator, thus "
+#~ "<literal>sin Pi/2</literal> is the same as <literal>(sin Pi)/2</literal>, "
+#~ "not as <literal>sin(Pi/2)</literal>. </para></listitem></itemizedlist> If "
+#~ "in doubt, write out expressions in full form."
+#~ msgstr ""
+#~ "Помимо этого, есть несколько особенностей, которые могут упростить набор "
+#~ "простых выражений: <itemizedlist><listitem><para> Знак умножения является "
+#~ "необязательным. вместо него можно использовать пробелы (или, в некоторых "
+#~ "случаях, ничего не писать). Т.е., <literal>3/4 Pi</literal> и  "
+#~ "<literal>5(4+3)(2+1)</literal> являются допустимыми выражениями. Однако, "
+#~ "<literal>3a</literal> таковым не является, <literal>3e-4</literal> всегда "
+#~ "означает <literal>0.0003</literal>, а не <literal>3*e - 4</literal>. </"
+#~ "para></listitem><listitem><para> Нет разницы между вызовом функций и "
+#~ "унарными операциями, поэтому скобки можно во многих случаях опустить. Т."
+#~ "е., <literal>sqrt 5</literal> и <literal>hypot hypot 3,4,5</literal> "
+#~ "являются допустимыми выражениями. Последнее может быть приведено скобками "
+#~ "к следующему: <literal>hypot(hypot(3,4),5)</literal>. </para><para> "
+#~ "Следует отметить, однако, что вызов функции имеет более высокий "
+#~ "приоритет, чем любой другой оператор, что приводит к тому, что "
+#~ "<literal>sin Pi/2</literal> является аналогом <literal>(sin Pi)/2</"
+#~ "literal>, а не <literal>sin(Pi/2)</literal>. </para></listitem></"
+#~ "itemizedlist> Если сомневаетесь. всегда записывайте выражение в полной "
+#~ "форме."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

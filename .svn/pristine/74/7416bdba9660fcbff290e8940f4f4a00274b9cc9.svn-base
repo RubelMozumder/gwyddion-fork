@@ -1,0 +1,48 @@
+diff -rupN --no-dereference gtk+-2.24.32/gdk/gdktypes.h gtk+-2.24.32-new/gdk/gdktypes.h
+--- gtk+-2.24.32/gdk/gdktypes.h	2016-10-22 06:09:25.000000000 +0200
++++ gtk+-2.24.32-new/gdk/gdktypes.h	2020-07-30 22:59:03.369986659 +0200
+@@ -39,7 +39,7 @@
+ 
+ #ifdef G_OS_WIN32
+ #  ifdef GDK_COMPILATION
+-#    define GDKVAR __declspec(dllexport)
++#    define GDKVAR extern __declspec(dllexport)
+ #  else
+ #    define GDKVAR extern __declspec(dllimport)
+ #  endif
+diff -rupN --no-dereference gtk+-2.24.32/gtk/gtkdebug.h gtk+-2.24.32-new/gtk/gtkdebug.h
+--- gtk+-2.24.32/gtk/gtkdebug.h	2016-10-22 06:11:41.000000000 +0200
++++ gtk+-2.24.32-new/gtk/gtkdebug.h	2020-07-30 22:59:03.369986659 +0200
+@@ -64,7 +64,7 @@ typedef enum {
+ 
+ #ifdef G_OS_WIN32
+ #  ifdef GTK_COMPILATION
+-#    define GTKVAR __declspec(dllexport)
++#    define GTKVAR extern __declspec(dllexport)
+ #  else
+ #    define GTKVAR extern __declspec(dllimport)
+ #  endif
+diff -rupN --no-dereference gtk+-2.24.32/gtk/gtkmain.h gtk+-2.24.32-new/gtk/gtkmain.h
+--- gtk+-2.24.32/gtk/gtkmain.h	2016-10-22 06:11:38.000000000 +0200
++++ gtk+-2.24.32-new/gtk/gtkmain.h	2020-07-30 22:59:03.369986659 +0200
+@@ -67,7 +67,7 @@ typedef gint	(*GtkKeySnoopFunc)	    (Gtk
+  */
+ #ifdef G_PLATFORM_WIN32
+ #ifdef GTK_COMPILATION
+-#define GTKMAIN_C_VAR __declspec(dllexport)
++#define GTKMAIN_C_VAR extern __declspec(dllexport)
+ #else
+ #define GTKMAIN_C_VAR extern __declspec(dllimport)
+ #endif
+diff -rupN --no-dereference gtk+-2.24.32/gtk/gtktexttypes.h gtk+-2.24.32-new/gtk/gtktexttypes.h
+--- gtk+-2.24.32/gtk/gtktexttypes.h	2016-10-22 06:10:54.000000000 +0200
++++ gtk+-2.24.32-new/gtk/gtktexttypes.h	2020-07-30 22:59:03.369986659 +0200
+@@ -44,7 +44,7 @@ typedef struct _GtkTextMarkBody GtkTextM
+ 
+ #ifdef G_OS_WIN32
+ #ifdef GTK_COMPILATION
+-#define VARIABLE __declspec(dllexport)
++#define VARIABLE extern __declspec(dllexport)
+ #else
+ #define VARIABLE extern __declspec(dllimport)
+ #endif

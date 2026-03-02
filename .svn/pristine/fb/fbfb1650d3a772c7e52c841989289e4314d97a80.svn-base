@@ -1,0 +1,723 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: masks.xml 17732 2015-11-09 16:30:51Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='masks'>
+  <title>Masques</title>
+  <para>
+    Les fonctions relatives aux masques peuvent être classées en trois groupes :
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        Création
+      </term>
+      <listitem>
+        <para>
+            Les masques peuvent être créés par différentes fonctions de
+            marquage, parmi lesquelles on trouve le marquage de grains
+            (<link linkend='grain-threshold'>Marquer par seuil</link>,
+            <link linkend='grain-watershed'>Marquer par segmentation</link>),
+            les fonctions de marquage de défauts
+            (<link linkend='mask-of-outliers'>Masquer les points aberrants</link>,
+            <link linkend='mark-scars'>Marquer les défauts linéaires</link>)
+            et les fonctions de marquage de motifs
+            (<link linkend='mask-by-correlation'>Masquer par corrélation</link>,
+            <link linkend='facet-analysis'>Analyse des facettes</link>,
+            <link linkend='tip-certainty-map'>Carte d'incertitude</link>).
+            En complément, quelques fonctions d'édition de masque permettent de
+            créer des masques en partant de zéro.
+        </para>
+        <para>
+            Les masques sont aussi utilisés pour marquer les pixels invalides
+            présents dans les fichiers importés depuis les formats permettant
+            de faire la distinction entre les pixels valides ou invalides, car
+            Gwyddion n'utilise pas la notion de pixels invalides.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Application
+      </term>
+      <listitem>
+        <para>
+            De manière générale, la zone masquée est considérée comme celle
+            étant d'intérêt, c'est-à-dire celle sur lesquelles on effectue des
+            opérations. Cela s'applique pour les fonctions statistiques telles
+            que
+            <link linkend='stat-quantities'>l'outil de calcul des statistiques</link>.
+            La function
+            <link linkend='remove-data-under-mask'>supprimer les données sous le masque</link>
+            remplace les données situées sous le masques, tandis que
+            <link linkend='remove-grains'>l'outil de suppression des grains</link>
+            peut effectuer le même type de remplacement sur des grains
+            individuels. Il existe plusieurs fonctions d'analyse des propriétés
+            des grains, voir la section
+            <link linkend='grain-analysis-statistics'>statistiques des grains</link>.
+          </para>
+          <para>
+            Certaines fonctions peuvent proposer d'utiliser ou d'exclure le
+            masque pour le calcul (ou aussi ignorer le masque), par exemple les
+            <link linkend='leveling'>fonctions de mise à niveau</link>. Le
+            choix n'est proposé que lorsqu'un masque est présent sur les données.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Édition
+      </term>
+      <listitem>
+        <para>
+            Quelques fonctions de base sur les masques, par exemple l'inversion
+            ou la suppression complète, sont disponibles dans le menu
+            <menuchoice>
+              <guimenu>Traitement des données</guimenu>
+              <guisubmenu>Masque</guisubmenu>
+            </menuchoice>.
+            On trouve parmi les fonctions plus avancées
+            l'<link linkend='remove-grains'>outil de suppression des grains</link> 
+            et le <link linkend='grain-filter'>filtrage des grains</link>
+            qui donnent différentes manières de supprimer des parties du masque,
+            ainsi que <link linkend='mask-editor'>l'éditeur de masque</link> et
+            <link linkend='mark-with'>marquer avec</link>, orientés vers
+            l'édition de masque.
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    Cette section décrit les opérations générales sur les masques n'ayant pas de
+    lien avec une application spécifique.
+  </para>
+  <sect2 id='maskops'>
+    <title>Opérations basiques</title>
+    <para>
+      On trouve dans le menu
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Masque</guisubmenu>
+      </menuchoice>
+      les fonctions <guimenuitem>inverser le masque</guimenuitem>, qui 
+      désélectionne les pixels marqués et vice versa, et 
+      <guimenuitem>supprimer le masque</guimenuitem>, qui enlève la totalité du
+      masque. Ces fonctions sont aussi disponibles dans
+      l'outil d'<link linkend='mask-editor'>édition du masque</link> décrit plus
+      bas.
+    </para>
+    <para>
+      La fonction <guimenuitem>extraire le masque</guimenuitem> crée une 
+      nouvelle image à partir du masque des données en cours d'utilisation. 
+      L'image aura une valeur de 1 pour les pixels masqués et 0 pour les autres.
+    </para>
+    <para id='mask-distribute'>
+      Il est parfois utile de copier le masque vers de nombreuses images. Cette
+      opération peut être réalisée à l'aide la fonction 
+      <guimenuitem>distribuer...</guimenuitem>. Elle peut soit copier le masque
+      vers tous les canaux d'un fichier ou tous les canaux de tous les fichiers
+      ouverts. La fonction évite de remplacer le masque des images cibles si la 
+      case <guilabel>conserver les masques existants</guilabel> est activée.
+      Notez que le masque ne peut être copié que vers les images ayant les 
+      mêmes dimensions en pixels. Les images ayant des dimensions différentes
+      sont ainsi automatiquement exclues.
+    </para>
+  </sect2>
+  <sect2 id='mask-editor'>
+    <title>
+      Éditeur de masque
+      <guiicon>
+        <inlinemediaobject>
+          <imageobject>
+            <imagedata fileref='gwy_mask_editor-24.png' format='PNG'/>
+          </imageobject>
+        </inlinemediaobject>
+      </guiicon>
+    </title>
+    <para>
+      L'éditeur de masque est l'outil universel de modification du masque. Il
+      propose deux groupes de fonctions : l'édition du masque en dessinant
+      directement dans la fenêtre de données, et les opérations sur le masque
+      telles que l'inversion, la dilatation et l'érosion.
+    </para>
+    <para>
+      La modification directe du masque est contrôlée par les boutons du groupe
+      <guilabel>éditeur</guilabel>. Elle peut être réalisée de deux manières :
+      en sélectionnant les formes qui seront ensuite remplies ou effacées (en
+      utilisant l'option <guilabel>formes</guilabel>), ou en faisant du dessin
+      à la main à l'aide des outils de dessins
+      (option <guilabel>outils de dessin</guilabel>).
+    </para>
+    <para>
+      Les boutons de la ligne <guilabel>mode</guilabel> définissent la manière
+      dont les formes dessinées dans la fenêtre de données modifieront le
+      masque :
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Définir
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Le masque est défini par la forme dessinée, après avoir supprimé le
+            masque précédemment présent.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Ajouter
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_add-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Le masque est étendu par la forme dessinée (si aucun masque n'existe
+            celui-ci est alors créé).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Soustraire
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_subtract-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            La forme dessinée est soustraite au masque présent. Cette fonction
+            n'a aucun effet si aucun masque n'est présent.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Intersection
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_intersect-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Le masque est défini par l'intersection entre la forme dessinée et
+            le masque déjà présent. Cette fonction n'a aucun effet si aucun
+            masque n'est présent.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Les boutons de la ligne <guilabel>forme</guilabel> contrôlent la forme
+      dessinée sur le masque. Les formes disponibles sont le rectangle,
+      l'ellipse et la ligne.
+    </para>
+    <para>
+      Les outils de dessin à la main peuvent être sélectionnés avec les boutons
+      de la ligne <guilabel>outil</guilabel>
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Pinceau
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_paint_draw-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Dessin à la main avec un pinceau de taille définie par le paramètre
+            <guilabel>rayon</guilabel>. Cette fonction peut être lente sur les
+            ordinateurs un peu anciens ou sur les grandes images.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Gomme
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_paint_erase-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Effacement à la main avec une gomme de taille définie par le paramètre
+            <guilabel>rayon</guilabel>. Cette fonction peut être lente sur les
+            ordinateurs un peu anciens ou sur les grandes images.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Remplir
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_fill_draw-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Remplissage des parties non masquées contiguës d'une image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Vider
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_fill_erase-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Vidage des parties masquées contiguës d'une image.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Les opérations globales sur les masques, c'est-à-dire l'inversion, la suppression
+      et le remplissage complet des données par un masque, sont disponibles dans
+      la ligne <guilabel>actions</guilabel>. On trouve parmi les opérations
+      supplémentaires :
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guibutton>Dilater</guibutton>
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_grow-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Etend le masque du nombre de pixels défini par
+            <guilabel>quantité</guilabel> sur chaque côté. Pour être plus
+            précis, le masque est étendu d'un pixel sur chaque côté, et
+            l'opération est répétée le nombre de fois défini par
+            <guilabel>Quantité</guilabel>.
+          </para>
+          <para>
+            Normalement, la dilatation ne distingue pas les parties
+            individuelles du masque. Dans le cas d'une dilatation importante,
+            des parties peuvent se toucher et donc fusionner. Cette conséquence
+            peut être évitée avec le paramètre <guilabel>empêcher la fusion des
+            grains lors d'une dilatation</guilabel>, qui empêche que des parties
+            du masque fusionnent si elles ne sont séparées que d'un pixel.
+          </para>
+          <para>
+            Lorsque le masque est fortement étendu, il devient important de 
+            définir la manière dont on mesure la distance à partir du bord du 
+            masque car cela détermine la forme vers laquelle les petits grains
+            vont converger. Cet aspect est contrôlé par l'option
+            <guilabel>type de distance</guilabel>. Les différents types sont
+            décrits au paragraphe 
+            <link linkend='mask-edt'>transformée de distance</link>. On 
+            utilisera de préférence la distance euclidienne.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guibutton>Éroder</guibutton>
+          <guiicon>
+            <inlinemediaobject>
+              <imageobject>
+                <imagedata fileref='gwy_mask_shrink-24.png' format='PNG'/>
+              </imageobject>
+            </inlinemediaobject>
+          </guiicon>
+        </term>
+        <listitem>
+          <para>
+            Réduit le masque du nombre de pixels défini par
+            <guilabel>quantité</guilabel> sur chaque côté. Pour être plus
+            précis, le masque est réduit d'un pixel sur chaque côté, et
+            l'opération est répétée le nombre de fois défini par
+            <guilabel>Quantité</guilabel>.
+          </para>
+          <para>
+            L'érosion peut avoir lieu à partir des bords de l'image. Cet aspect
+            est contrôlé par le paramètre 
+            <guilabel>éroder à partir du bord</guilabel>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guibutton>Remplir les vides</guibutton>
+        </term>
+        <listitem>
+          <para>
+            Rend les grains connectés, c'est-à-dire sans trou, en remplissant les
+            trous présents dans ceux-ci. La case
+            <guilabel>remplir les vides à connexions multiples</guilabel> 
+            permet de déterminer si uniquement les trous simples seront remplis, 
+            c'est-à-dire les trous étant eux-mêmes simplement connectés, ou tous 
+            les trous, peu importe leur topologie.
+          </para>
+          <informalfigure id='fig-voids-connectivity'>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref='voids-connectivity.pdf' format='PDF'/>
+              </imageobject>
+              <imageobject>
+                <imagedata fileref='voids-connectivity.png' format='PNG'/>
+              </imageobject>
+              <caption>
+                Explication de la connectivité des vides pour 
+                <guibutton>remplir les vides</guibutton>. Sans l'option
+                <guilabel>remplir les vides à connexions multiples</guilabel>
+                seuls les vides dans le masque du milieu seront remplis. En 
+                activant cette option tous les vides seront remplis.
+              </caption>
+            </mediaobject>
+          </informalfigure>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='mark-with'>
+    <title>Marquer avec</title>
+    <para>
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Masque</guisubmenu>
+        <guimenuitem>Marquer avec</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      La fonction marquer avec permet de créer ou modifier un masque à l'aide
+      d'un autre masque ou de données de dimensions identiques. Les opérations
+      disponibles sont les mêmes que celles de
+      l'<link linkend='mask-editor'>éditeur de masque</link> : création,
+      union, soustraction et intersection. La source utilisée pour l'autre 
+      masque peut être l'une des suivantes :
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Masque
+        </term>
+        <listitem>
+          <para>
+            Il s'agit du cas le plus simple, un masque est combiné avec un autre
+            en utilisant les opérations logiques spécifiées.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Données
+        </term>
+        <listitem>
+          <para>
+            Dans le mode données, un autre champ de données est utilisé comme
+            masque source. Le masque est constitué des pixels se situant dans
+            une plage de valeurs définie relativement à la plage totale de
+            valeurs des données. Pour utiliser les pixels situés en dehors d'une
+            certaine plage, il suffit de définir une limite haute inférieure à
+            la limite basse.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Présentation
+        </term>
+        <listitem>
+          <para>
+            Le mode présentation diffère seulement du mode données par le fait
+            qu'une présentation est utilisée en lieu et place de données.
+          </para>
+          <para>
+            Il s'agit d'une exception à la règle qui dit que les présentations
+            ne sont jamais utilisées pour des traitements ultérieurs. il peut
+            être parfois intéressant de marquer, par exemple, les bords
+            détectés sur les données, bien que la présentation correspondante
+            visualise une quantité n'ayant pas de sens physique.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='maskmorph'>
+    <title>Opérations morphologiques</title>
+    <para>
+      Des opérations morphologiques classiques peuvent être appliquées sur les
+      masques en utilisant la fonction
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Masque</guisubmenu>
+        <guimenuitem>Opération morpholgique...</guimenuitem>
+      </menuchoice>.
+      Toutes les opérations prennent le masque en premier opérande ainsi qu'un
+      élément dit structurant en second opérande, celui-ci déterminant l'effet
+      exact. L'élément structurant peut être choisi parmi différentes formes
+      basiques prédéfinies (disque, octogone, carré, losange) ou défini en 
+      utilisant un autre masque.
+    </para>
+    <para>
+      Les formes de base sont toutes symétriques. Lorsqu'un autre masque est 
+      utilisé en tant qu'élément structurant celui-ci peut être asymétrique ou
+      avoir des bords vides. Dans ce cas l'élément structurant aura les 
+      dimensions complètes de l'image du masque sélectionné, en incluant les
+      bords vides. Cette image complète est considérée comme centrée. Si vous
+      souhaitez supprimer les bords vides du masque structurant, il vous suffit
+      d'activer l'option <guilabel>tronquer les bords vides</guilabel>. 
+      L'élément structurant sera alors encore considéré comme centré, mais cette
+      fois après la suppression des bords vides.
+    </para>
+    <para>
+      Les opérations suivantes sont proposées :
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Érosion
+        </term>
+        <listitem id='maskops-erosion'>
+          <indexterm>
+            <primary>érosion</primary>
+            <secondary>masque</secondary>
+          </indexterm>
+          <para>
+            l'Erosion supprime les petits détails et réduits la taille des plus
+            gros éléments – d'une quantité et suivant une forme déterminées par
+            l'élément structurant. Plus précisément, si l'élément structurant
+            est placé sur un pixel du masque et qu'il est entièrement contenu
+            dans le masque, alors le pixel du masque est conservé. Tous les 
+            autres pixels du masque sont supprimés.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Dilatation
+        </term>
+        <listitem id='maskops-dilation'>
+          <indexterm>
+            <primary>dilatation</primary>
+            <secondary>masqye</secondary>
+          </indexterm>
+          <para>
+            La dilatation remplit les petits trous et augmente la taille des
+            éléments – d'une quantité et suivant une forme déterminées par
+            l'élément structurant. Plus précisément, si l'élément structurant 
+            est tourné de 180 degrés et placé sur chaque pixel du masque, le
+            résultat de la dilatation est l'union de tous ces éléments 
+            structurants décalés les uns des autres.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Ouverture
+        </term>
+        <listitem id='maskops-opening'>
+          <indexterm>
+            <primary>ouverture</primary>
+            <secondary>masque</secondary>
+          </indexterm>
+          <para>
+            L'ouverture est une érosion suivie d'une dilatation. La dilatation
+            corrige l'effet de l'érosion qui précède là où le masque 
+            correspond aux éléments structurants. Au final les petites bosses et 
+            les grains qui ne correspondent pas sont supprimés, tandis que les 
+            autres sont gardés intacts. La forme du masque est ainsi nettoyée et 
+            simplifiée.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Fermeture
+        </term>
+        <listitem id='maskops-closing'>
+          <indexterm>
+            <primary>fermeture</primary>
+            <secondary>masque</secondary>
+          </indexterm>
+          <para>
+            La fermeture est une dilatation suivie d'une érosion. L'érosion
+            corrige l'effet de la dilatation qui précède là où le masque 
+            correspond aux éléments structurants. Au final les petits creux et 
+            entailles qui ne correspondent pas sont supprimés, tandis que les 
+            autres sont gardés intacts. La forme du masque est ainsi simplifiée.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Ouverture ASF
+        </term>
+        <listitem id='maskops-asf-opening'>
+          <para>
+            Un simple filtre d'ouverture ou de fermeture peut parfois être trop 
+            brutal pour la correction de défauts de différentes tailles. Le 
+            filtre séquentiel alternant(ASF, alternating sequential filter) 
+            consiste en une séquence de fermetures et d'ouvertures en 
+            augmentant progressivement la taille de l'élément structurant 
+            jusqu'à la valeur spécifiée. Il préserve mieux la forme des détails 
+            ne devant pas être supprimés par l'ouverture. La dernière opération 
+            de ce filtre est une ouverture.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Fermeture ASF
+        </term>
+        <listitem id='maskops-asf-closing'>
+          <para>
+            Un simple filtre d'ouverture ou de fermeture peut parfois être trop 
+            brutal pour la correction de défauts de différentes tailles. Le 
+            filtre séquentiel alternant(ASF, alternating sequential filter) 
+            consiste en une séquence d'ouvertures et de fermetures en 
+            augmentant progressivement la taille de l'élément structurant 
+            jusqu'à la valeur spécifiée. Il préserve mieux la forme des détails 
+            ne devant pas être supprimés par la fermeture. La dernière opération 
+            de ce filtre est une fermeture.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='mask-edt'>
+    <title>Carte de distances</title>
+    <indexterm><primary>carte de distances</primary></indexterm>
+    <para>
+      La carte de distances donne pour chaque pixel sa distance
+      par rapport au bord du grain (masque).  Cette fonction est accessible dans
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Masque</guisubmenu>
+        <guimenuitem>Carte de distances</guimenuitem>
+      </menuchoice>.
+      Cette opération est, d'une certaine manière, complémentaire à la 
+      <link linkend='grain-watershed'>segmentation</link>. La	carte de 
+      distances peut être calculée à l'aide de la véritable distance euclidienne
+      <xi:include href="eq-distance-euclidean.xml"/>
+      ainsi que selon d'autres types classiques tels que la distance de 
+      Manhattan (4 voisins)
+      <xi:include href="eq-distance-cityblock.xml"/>
+      ou celle de Tchebychev (8 voisins)
+      <xi:include href="eq-distance-chessboard.xml"/>,
+      qui peuvent être utiles à des fins ditactiques. Plusieurs distances 
+      octogonales sont aussi disponibles, elles sont calculées en prenant
+      alternativement les distances de Manhattan et de Tchebychev, on obtient
+      alors les variantes 4-8 et 8-4 en fonction de la première étape utilisée.  
+      Pour terminer, la distance octogonale sans variante est aussi disponible, 
+      il s'agit de la moyenne des deux variantes précédentes.
+    </para>
+    <para>
+      Lorsque la carte est appliquée à l'intérieur des grains, la distance vaut zéro
+      en-dehors de ceux-ci, et augmente vers leurs «centres». À l'inverse, elle
+      peut être appliquée à l'extérieur des grains, dans ce cas la valeur est 
+      plus élevée pour les pixels les plus éloignés des grains. Il est aussi
+      possible de calculer une carte signée pour les deux côtés, avec des 
+      valeurs positives à l'intérieur des grains, et négatives à l'extérieur.
+    </para>
+    <para>
+      L'option <guilabel>éroder à partir des bords</guilabel> contrôle le
+      comportement du calcul sur les bords de l'image. Lorsqu'elle est activée,
+      les bords de l'image sont considérés comme étant aussi les bords d'un 
+      grain (si le bord est marqué). De cette manière, les bords de l'image ne 
+      peuvent se voir attribuer une valeur élevée. En étant désactivée, les
+      grains sont considérés comme s'étendant à l'infini en dehors de l'image.
+      Les pixels en bord d'image peuvent dans ce cas avoir des valeurs de
+      distance élevées.
+    </para>
+    <informalfigure id='fig-distance-transform'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='distance-transform.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Exemple de carte de distance euclidienne : masque source affiché en 
+          blanc sur noir, carte de distances intérieures, carte de distance 
+          extérieures (avec une échelle de gris inversée pour la comparaison), 
+          et la carte de distances signées.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='mask-thin'>
+    <title>Affinage</title>
+    <para>
+      L'affinage est une autre opération morphologique classique. Elle est
+      accessible dans
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Masque</guisubmenu>
+        <guimenuitem>Affiner</guimenuitem>
+      </menuchoice>.
+      Cette fonction réduit le masque à un squelette constitué de fines lignes
+      caractéristiques de la forme globale du masque. Si le bord du masque est
+      assez tourmenté l'affinage pourra résulter en une quantité importante
+      de petits brins supplémentaires. Il est ainsi parfois utile d'appliquer
+      une opération de simplification (telle qu'une ouverture ou une fermeture)
+      avant d'appliquer l'affinage.
+    </para>
+    <para>
+      Notez que cette fonction ne s'applique qu'au masque. Elle n'utilise
+      aucune information de la surface sous-jacente. Ainsi, bien que le masque
+      affiné puisse se superposer aux crêtes ou aux vallées de parties
+      marquées de la topographie, il ne s'agit en général que de coïncidences.
+    </para>
+    <informalfigure id='fig-mask-thin'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mask-thin.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Exemple d'affinage de masque : topographie de la flexion d'un film
+          polymère (à gauche) ; la même image avec le masque couvrant les bosses 
+          présentes en surface (au centre) ; le même masque après affinage (à 
+          droite).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

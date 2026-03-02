@@ -1,0 +1,920 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion\n"
+"POT-Creation-Date: 2019-01-05 21:42+0400\n"
+"PO-Revision-Date: 2015-11-12 23:37+0300\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: russian <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.5\n"
+
+#: resources.xml:6(title)
+msgid "Resources"
+msgstr "Ресурсы"
+
+#: resources.xml:7(para)
+msgid ""
+"Various bits of data, e.g. <link linkend=\"color-map\">false color maps</"
+"link> or <link linkend=\"raw-file-import-presets\">raw file import presets</"
+"link>, are stored in standalone files that are collectively called resource "
+"files. Gwyddion looks for resources in two different locations: system and "
+"user-specific."
+msgstr ""
+"Некоторые небольшие блоки данных, например, <link linkend=\"color-map"
+"\">карты псевдоцвета</link> или <link linkend=\"raw-file-import-presets"
+"\">предустановки импорта необработанных данных</link>, сохраняются в "
+"отдельных файлах, которые все вместе называются файлами ресурсов. Gwyddion "
+"ищет ресурсы в двух разных местах: системном и индивидуальном для данного "
+"пользователя."
+
+#: resources.xml:14(para)
+msgid ""
+"System resources are installed along with the program and they are not "
+"modifiable. Typically, they are located under a directory such as <filename>/"
+"usr/share/gwyddion</filename> (Unix), <filename>Program Files\\Gwyddion</"
+"filename> (MS Windows) or other directory determined by <link linkend="
+"\"GWYDDION_DATADIR\"><envar>GWYDDION_DATADIR</envar></link>."
+msgstr ""
+"Системные ресурсы устанавливаются вместе с программой и их нельзя менять. "
+"Обычно они расположены в каталоге вроде <filename>/usr/share/gwyddion</"
+"filename> (Unix), <filename>Program Files\\Gwyddion</filename> (MS Windows) "
+"или другом, который определяется <link linkend=\"GWYDDION_DATADIR"
+"\"><envar>GWYDDION_DATADIR</envar></link>."
+
+#: resources.xml:22(para)
+msgid ""
+"User resources are located in a user's directory, this usually means under "
+"<filename>~/.gwyddion</filename> (Unix) or <filename>Documents and Settings"
+"\\gwyddion</filename> (MS Windows)."
+msgstr ""
+"Ресурсы пользователя расположены в его каталоге. Это обычно <filename>~/."
+"gwyddion</filename> (Unix) или <filename>Documents and Settings\\gwyddion</"
+"filename> (MS Windows)."
+
+#: resources.xml:27(para)
+msgid ""
+"All resource files are simple text files that can be easily examined and "
+"modified by text editors or sent to other users (if they are copied or "
+"created manually Gwyddion needs to be restarted to notice them). In most "
+"cases only characters of the ASCII can appear in the files. If international "
+"text can appear there it must be in the UTF-8 encoding. Numerical values are "
+"represented in the standard POSIX format, i.e. with decimal point, "
+"independently on what decimal separator is usual in the user's language."
+msgstr ""
+"Все файлы ресурсов являются простыми текстовыми файлами которые могут легко "
+"быть прочитаны и изменены текстовым редактором или пересланы другим "
+"пользователям (если они скопированы или отредактированы вручную, необходимо "
+"перезапустить Gwyddion чтобы он их заметил). В большинстве случаев в файлах "
+"могут быть только символы ASCII. Если там допустим международный текст, то "
+"он должен быть в кодировке UTF-8. Численные значения представлены в "
+"стандартном формате POSIX, т.е. с десятичной точкой независимо от того, "
+"какой разделитель обычно используется в языке пользователя."
+
+#: resources.xml:37(para)
+msgid ""
+"Resources are organized in subdirectories according to their kind, e.g. "
+"color gradients reside in the subdirectory <filename>gradients</filename>. "
+"The name of the file determines the resource name – gradient Gray is found "
+"in file <filename>gradients/Gray</filename>. Modules can define their own "
+"resource types; the types described here are the most important types but "
+"the list may not be comprehensive."
+msgstr ""
+"Ресурсы упорядочены в подкаталогах в соответствии с их типом, т.е. градиенты "
+"псевдоцвета находятся в подкаталоге <filename>gradients</filename>. Имя "
+"файла определяет название ресурса – градиент Gray находится в файле "
+"<filename>gradients/Gray</filename>. Модули могут определять свои "
+"собственные имена ресурсов; описанные здесь типы наиболее важны, но их "
+"список может быть неполон."
+
+#: resources.xml:45(para)
+msgid ""
+"Every resource file has the same structure. It starts with a line "
+"identifying the resource type: <informalexample><programlisting>Gwyddion "
+"resource GwyGradient</programlisting></informalexample> where "
+"<type>GwyGradient</type> is the type name in the <ulink url=\"http://library."
+"gnome.org/devel/gobject/stable/\">type system</ulink> (which is quite a low-"
+"level detail but so it is), followed by named parameters in the form "
+"<informalexample><programlisting><replaceable>name</"
+"replaceable><replaceable>value</replaceable></programlisting></"
+"informalexample> and resource data. Some resource types may contain only "
+"named parameters, other may contain only data."
+msgstr ""
+"Каждый файл ресурсов имеет одну и ту же структуру. Он начинается со строки, "
+"определяющей тип ресурса : <informalexample><programlisting>Gwyddion "
+"resource GwyGradient</programlisting></informalexample> где "
+"<type>GwyGradient</type> – имя типа в <ulink url=\"http://library.gnome.org/"
+"devel/gobject/stable/\">системе типов</ulink> (что является достаточно "
+"низкоуровневой подробностью, но так обстоит дело), за которой следуют "
+"именованные параметры в форме "
+"<informalexample><programlisting><replaceable>имя</replaceable> "
+"<replaceable>значение</replaceable></programlisting></informalexample> и "
+"данные ресурса. Некоторые ресурсы могут содержать только именованные "
+"параметры, другие только данные."
+
+#: resources.xml:62(title)
+msgid "Gradients"
+msgstr "Градиенты"
+
+#: resources.xml:63(para)
+msgid ""
+"Gradients, i.e. false color maps, reside in directory <filename>gradients</"
+"filename>, they are identified by <type>GwyGradient</type> and contain only "
+"data. They can be edited in the application using the <link linkend=\"color-"
+"gradient-editor\">gradient editor</link>."
+msgstr ""
+"Градиенты. т.е. карты псевдоцвета, находятся в каталоге <filename>gradients</"
+"filename>, они определяются типом <type>GwyGradient</type> и содержат только "
+"данные. Они могут быть отредактированы в программе с использованием <link "
+"linkend=\"color-gradient-editor\">редактора градиентов</link>."
+
+#: resources.xml:70(para)
+msgid ""
+"The gradient data consists of rows corresponding to individual points in the "
+"gradient: <informalexample><programlisting><replaceable>position</"
+"replaceable><replaceable>red</replaceable><replaceable>green</"
+"replaceable><replaceable>blue</replaceable><replaceable>alpha</replaceable></"
+"programlisting></informalexample> The position determines where the color "
+"defined by <replaceable>red</replaceable>, <replaceable>green</replaceable>, "
+"<replaceable>blue</replaceable> and <replaceable>alpha</replaceable> "
+"components is placed in the interval <include href=\"eqi-interval-0-1.xml\"/"
+"> where 0 corresponds to the gradient start, 1 corresponds to the end. The "
+"color is interpolated linearly between the specified points."
+msgstr ""
+"Данные градиента состоят из строк, соответствующих отдельным точкам "
+"градиента:<informalexample><programlisting><replaceable>положение</"
+"replaceable> <replaceable>красный</replaceable> <replaceable>зелёный</"
+"replaceable> <replaceable>синий</replaceable> <replaceable>альфа</"
+"replaceable></programlisting></informalexample> Положение определяет, где "
+"цвет, заданный с помощью четырёх составляющих <replaceable>красный</"
+"replaceable>, <replaceable>зелёный</replaceable>, <replaceable>синий</"
+"replaceable> и <replaceable>альфа</replaceable> будет находиться на отрезке "
+"<include href=\"eqi-interval-0-1.xml\"/>, где 0 соответствует началу отрезка "
+"(и градиента), а 1 его концу. Цвет интерполируется линейно между заданными "
+"точками."
+
+#: resources.xml:84(para)
+msgid ""
+"The positions must form an increasing sequence from 0 to 1 (i.e. the minimum "
+"number of color points is two). The range of the color components is also "
+"<include href=\"eqi-interval-0-1.xml\"/>. Note the alpha value, "
+"corresponding to opacity, is unused and must be given as 1 (fully opaque)."
+msgstr ""
+"Положения должны образовывать растущую последовательность от 0 до 1 (т.е. "
+"минимальное число точек цвета – 2). Диапазон компонентов цвета также "
+"<include href=\"eqi-interval-0-1.xml\"/>. Следует отметить, что значение "
+"альфа, соответствующее непрозрачности не используется и должно быть задано "
+"как 1 (полностью непрозрачному)."
+
+#: resources.xml:91(para)
+msgid ""
+"For instance, the standard gradient Red going from black (0 0 0) to red "
+"(1 0 0) to white (1 1 1) is defined as follows: "
+"<informalexample><programlisting><![CDATA[\n"
+"Gwyddion resource GwyGradient\n"
+"0.0 0 0 0 1\n"
+"0.5 1 0 0 1\n"
+"1.0 1 1 1 1\n"
+"]]></programlisting></informalexample>"
+msgstr ""
+"Например, стандартный градиент Red переходящий от чёрного (0 0 0) к красному "
+"(1 0 0) и затем к белому (1 1 1) определяется следующим образом:"
+"<informalexample><programlisting><![CDATA[\n"
+"Gwyddion resource GwyGradient\n"
+"0.0 0 0 0 1\n"
+"0.5 1 0 0 1\n"
+"1.0 1 1 1 1\n"
+"]]></programlisting></informalexample>"
+
+#: resources.xml:105(title)
+msgid "OpenGL Materials"
+msgstr "Материалы OpenGL "
+
+#: resources.xml:106(para)
+msgid ""
+"OpenGL materials reside in directory <filename>glmaterials</filename>, they "
+"are identified by <type>GwyGLMaterial</type> and contain only data. They can "
+"be edited in the application using the <link linkend=\"opengl-material-editor"
+"\">OpenGL material editor</link>."
+msgstr ""
+"Материалы OpenGL находятся в каталоге <filename>glmaterials</filename>, "
+"определяются по типу <type>GwyGLMaterial</type> и содержат только данные. "
+"Они могут редактироваться в программе с использованием <link linkend="
+"\"opengl-material-editor\">редактора материалов OpenGL</link>."
+
+#: resources.xml:117(listitem)
+msgid "ambient,"
+msgstr "окружающий,"
+
+#: resources.xml:118(listitem)
+msgid "diffuse,"
+msgstr "рассеянный,"
+
+#: resources.xml:119(listitem)
+msgid "specular,"
+msgstr "отраженный,"
+
+#: resources.xml:120(listitem)
+msgid "emission."
+msgstr "излучаемый."
+
+#: resources.xml:112(para)
+msgid ""
+"The material data consists of four RGBA lines, similar to <link linkend="
+"\"resource-gradients\">gradients</link> that correspond in to the four "
+"OpenGL material components in the following order: <placeholder-1/> See "
+"section <link linkend=\"opengl-material-editor\">OpenGL Material Editor</"
+"link> for explanation of the components. They are followed by a line "
+"containing the shininess, again as a number from the interval <include href="
+"\"eqi-interval-0-1.xml\"/>."
+msgstr ""
+"Данные материала состоят из четырёх строк RGBA, подобно <link linkend="
+"\"resource-gradients\">градиентам</link>, которые соответствуют четырём "
+"компонентам материала OpenGL в следующем порядке: <placeholder-1/> См. "
+"раздел <link linkend=\"opengl-material-editor\">Редактор материалов OpenGL</"
+"link>, где описаны отдельные компоненты. За ними следует строка, содержащая "
+"значение блеска как число из интервала <include href=\"eqi-interval-0-1.xml"
+"\"/>."
+
+#: resources.xml:127(para)
+msgid ""
+"Note the emission component, while read and written by Gwyddion, is "
+"presently unused by the 3D view. It is recommended to set it to 0 0 0 1, i."
+"e. black."
+msgstr ""
+"Следует отметить, что компонент, отвечающий за излучение, хоть он и пишется "
+"и читается в Gwyddion, но на текущий момент не используется для трёхмерного "
+"просмотра. Рекомендуется установить его в 0 0 0 1, т.е. чёрный."
+
+#: resources.xml:132(para)
+msgid ""
+"For instance, the standard material Red-Rubber with very dark red ambient "
+"color, grayish diffuse reflection, red specular reflection and low shininess "
+"is defined as follows: <informalexample><programlisting><![CDATA[\n"
+"Gwyddion resource GwyGLMaterial\n"
+"0.05 0.0  0.0  1.0\n"
+"0.5  0.4  0.4  1.0\n"
+"0.7  0.04 0.04 1.0\n"
+"0.0  0.0  0.0  1.0\n"
+".078125\n"
+"]]></programlisting></informalexample>"
+msgstr ""
+"Например, стандартный материал Red-Rubber с очень тёмным красным цветом "
+"окружающего света, серым диффузным рассеянием, красным зеркальным отражением "
+"и низким значением блеска определяется следующим образом: "
+"<informalexample><programlisting><![CDATA[\n"
+"Gwyddion resource GwyGLMaterial\n"
+"0.05 0.0  0.0  1.0\n"
+"0.5  0.4  0.4  1.0\n"
+"0.7  0.04 0.04 1.0\n"
+"0.0  0.0  0.0  1.0\n"
+".078125\n"
+"]]></programlisting></informalexample>"
+
+#: resources.xml:149(title)
+msgid "Grain Values"
+msgstr "Значения зёрен"
+
+#: resources.xml:150(para)
+msgid ""
+"Grain values reside in directory <filename>grainvalues</filename>, they are "
+"identified by <type>GwyGrainValue</type> and contain only named parameters. "
+"They can be used to define additional grain quantities, derived from the "
+"built-in quantities, that appear under <guilabel>User</guilabel> group in "
+"<link linkend=\"grain-analysis-statistics\">grain analysis functions</link>. "
+"At the time of writing this, there is no editor in the application, new "
+"quantities must be created manually."
+msgstr ""
+"Значения зёрен находятся в каталоге <filename>grainvalues</filename>, "
+"определяются типом <type>GwyGrainValue</type> и содержат только именованные "
+"параметры. Они могут использоваться для определения дополнительных величин "
+"зёрен, которые появляются в группе <guilabel>Пользовательские</guilabel> в "
+"<link linkend=\"grain-analysis-statistics\">функциях анализа зёрен</link>. В "
+"то время, когда этот текст пишется, в программе нет редактора для этих "
+"величин и их нужно создавать вручную."
+
+#: resources.xml:160(para)
+msgid "The named parameters are summarized in the following table:"
+msgstr "Именованные параметры сведены в следующую таблицу:"
+
+#: resources.xml:169(entry) resources.xml:301(entry)
+msgid "Parameter"
+msgstr "Параметр"
+
+#: resources.xml:170(entry)
+msgid "Required"
+msgstr "Необходимо"
+
+#: resources.xml:171(entry) resources.xml:302(entry) resources.xml:489(entry)
+msgid "Type"
+msgstr "Тип"
+
+#: resources.xml:172(entry) resources.xml:303(entry) resources.xml:490(entry)
+msgid "Description"
+msgstr "Описание"
+
+#: resources.xml:177(varname) resources.xml:206(varname)
+msgid "symbol"
+msgstr "symbol"
+
+#: resources.xml:178(entry) resources.xml:188(entry)
+msgid "required"
+msgstr "необходимо"
+
+#: resources.xml:179(entry)
+msgid "identifier"
+msgstr "идентификатор"
+
+#: resources.xml:180(entry)
+msgid ""
+"Identifier to use in other expressions (but see below). It must be a valid "
+"identifier of ASCII letters, numbers and underscores, starting with a letter."
+msgstr ""
+"Идентификатор, чтобы использовать в других выражениях (но см. ниже). Он "
+"должен быть правильным идентификатором, состоящим из букв латинского "
+"алфавита ASCII, чисел и знаков подчёркивания, начинающихся с буквы."
+
+#: resources.xml:187(varname)
+msgid "expression"
+msgstr "expression"
+
+#: resources.xml:189(entry) resources.xml:199(entry)
+msgid "free-form"
+msgstr "свободная форма"
+
+#: resources.xml:193(link)
+msgid "Expressions"
+msgstr "Выражения"
+
+#: resources.xml:190(entry)
+msgid ""
+"Formula for calculation of this quantity from other grain quantities. The "
+"general expression syntax is described in section <placeholder-1/>."
+msgstr ""
+"Формула для расчёта этой величины из других величин зёрен. Общий синтаксис "
+"выражений описан в разделе <placeholder-1/>."
+
+#: resources.xml:197(varname)
+msgid "symbol_markup"
+msgstr "symbol_markup"
+
+#: resources.xml:198(entry) resources.xml:211(entry) resources.xml:221(entry)
+#: resources.xml:231(entry) resources.xml:242(entry)
+msgid "optional"
+msgstr "опционально"
+
+#: resources.xml:203(ulink)
+msgid "Pango markup language"
+msgstr "языком разметки Pango"
+
+#: resources.xml:200(entry)
+msgid ""
+"Fancy symbol that can include Greek letters or subscripts and superscripts "
+"expressed with the <placeholder-1/>. It is used for presentation in the "
+"application so, while it is optional, it is recommended to at least define "
+"it identically to <placeholder-2/>."
+msgstr ""
+"Специальные строки, которые могут включать в себя греческие буквы, "
+"надстрочные и подстрочные символы могут быть описаны <placeholder-1/>. Это "
+"используется для представления в программе и, хотя это является "
+"опциональным, рекомендуется хотя бы объявлять его так же, как и "
+"<placeholder-2/>."
+
+#: resources.xml:210(varname)
+msgid "power_xy"
+msgstr "power_xy"
+
+#: resources.xml:212(entry) resources.xml:222(entry) resources.xml:309(entry)
+#: resources.xml:382(entry) resources.xml:389(entry) resources.xml:396(entry)
+#: resources.xml:403(entry) resources.xml:410(entry) resources.xml:438(entry)
+#: resources.xml:445(entry) resources.xml:452(entry)
+msgid "integer"
+msgstr "целое"
+
+#: resources.xml:213(entry)
+msgid ""
+"The power in which the lateral dimensions appear in the quantity. For "
+"instance, this is 1 for grain dimensions, 2 for areas and volumes. The "
+"default value is 0."
+msgstr ""
+"Степень, в которой латеральный размер входит в величину. Например, эта "
+"величина равна 1 для размеров зёрен, 2 для площадей и объёмов. Значение по "
+"умолчанию 0."
+
+#: resources.xml:220(varname)
+msgid "power_z"
+msgstr "power_z"
+
+#: resources.xml:224(quote) resources.xml:235(quote)
+msgid "height"
+msgstr "высоты"
+
+#: resources.xml:223(entry)
+msgid ""
+"The power in which the <placeholder-1/> dimension appears in the quantity. "
+"For instance, this is 1 for values and volumes, 0 for dimensions and areas. "
+"The default value is 0."
+msgstr ""
+"Степень, в которой размерность <placeholder-1/> входит в величину. Например, "
+"равно 1 для значений и объёмов, 0 для размеров в плоскости и площадей. "
+"Значение по умолчанию 0."
+
+#: resources.xml:230(varname)
+msgid "same_units"
+msgstr "same_units"
+
+#: resources.xml:232(entry) resources.xml:243(entry) resources.xml:361(entry)
+#: resources.xml:375(entry) resources.xml:417(entry) resources.xml:424(entry)
+#: resources.xml:431(entry) resources.xml:466(entry)
+msgid "0 or 1"
+msgstr "0 или 1"
+
+#: resources.xml:233(entry)
+msgid ""
+"Given as 1 if the quantity makes sense only for lateral and <placeholder-1/> "
+"dimensions being the same physical quantities. For instance, this is "
+"required for the surface area. The default is 0."
+msgstr ""
+"Устанавливается в 1, если величина имеет смысл только если пространственные "
+"размеры и <placeholder-1/> являются одинаковыми физическими величинами. "
+"Например, это требуется для площади поверхности. Значение по умолчанию 0."
+
+#: resources.xml:241(varname) resources.xml:247(varname)
+msgid "is_angle"
+msgstr "is_angle"
+
+#: resources.xml:244(entry)
+msgid ""
+"Given as 1 if the quantity is an angle. The expression should calculate "
+"angles in radians. However, if <placeholder-1/> is set Gwyddion knowns the "
+"value can be converted to degrees for presentation. The default is 0."
+msgstr ""
+"Устанавливается в 1, если величина является углом. Выражение должно "
+"рассчитывать углы в радианах. Однако, если задана переменная <placeholder-1/"
+">, Gwyddion будет знать что значение можно перевести в градусы для "
+"представления его пользователю. Значение по умолчанию 0."
+
+#: resources.xml:256(para)
+msgid ""
+"At present, user-defined grain quantities cannot depend on other user-"
+"defined grain quantities to avoid circular dependencies. The built-in grain "
+"quantities are listed below:"
+msgstr ""
+"В настоящее время заданные пользователем величины зёрен не могут "
+"использовать другие заданные пользователем величины зёрен чтобы избежать "
+"круговых зависимостей. Встроенные величины зёрен перечислены ниже:"
+
+#: resources.xml:264(para)
+msgid ""
+"For instance, a new grain value Height, measuring the grain height as the "
+"difference between the maximum and minimum value, can be defined as follows: "
+"<informalexample><programlisting><![CDATA[\n"
+"Gwyddion resource GwyGrainValue\n"
+"symbol dz\n"
+"symbol_markup Δz\n"
+"power_xy 0\n"
+"power_z 1\n"
+"expression z_max - z_min\n"
+"]]></programlisting></informalexample>"
+msgstr ""
+"Например, новая величина зёрен Height, измеряющая высоту зерна как разность "
+"между его максимальным и минимальным значением, может быть задана следующим "
+"образом: <informalexample><programlisting><![CDATA[\n"
+"Gwyddion resource GwyGrainValue\n"
+"symbol dz\n"
+"symbol_markup Δz\n"
+"power_xy 0\n"
+"power_z 1\n"
+"expression z_max - z_min\n"
+"]]></programlisting></informalexample>"
+
+#: resources.xml:281(title)
+msgid "Raw File Presets"
+msgstr "Предустановки импорта необработанных файлов"
+
+#: resources.xml:282(para)
+msgid ""
+"Raw file presents reside in directory <filename>rawfile</filename>, they are "
+"identified by <type>GwyRawFilePreset</type> and contain only named "
+"parameters. They are normally created and edited by the preset editor in the "
+"<link linkend=\"raw-file-import\">raw file import module</link>."
+msgstr ""
+"Предустановки импорта необработанных файлов хранятся в каталоге "
+"<filename>rawfile</filename>, они определяются типом <type>GwyRawFilePreset</"
+"type> и содержат только именованные параметры. Они обычно создаются и "
+"изменяются в редакторе предустановок в <link linkend=\"raw-file-import"
+"\">модуле импорта необработанных файлов</link>."
+
+#: resources.xml:289(para)
+msgid ""
+"The named parameters in the resource files correspond closely to the "
+"parameters in the user interface explained in detail in section <link "
+"linkend=\"raw-file-import\">Raw Data File Import</link>. Hence, they will be "
+"described only briefly here."
+msgstr ""
+"Именованные параметры в файлах ресурсов близко соответствуют параметрам "
+"интерфейса пользователя, описанным в деталях в разделе <link linkend=\"raw-"
+"file-import\">Импорт необработанных файлов данных</link>. Следовательно, "
+"здесь они будут описаны только кратко."
+
+#: resources.xml:308(varname)
+msgid "xres"
+msgstr "xres"
+
+#: resources.xml:308(varname)
+msgid "yres"
+msgstr "yres"
+
+#: resources.xml:308(entry) resources.xml:315(entry)
+msgid "<placeholder-1/>, <placeholder-2/>"
+msgstr "<placeholder-1/>, <placeholder-2/>"
+
+#: resources.xml:310(entry)
+msgid "horizontal and vertical size"
+msgstr "горизонтальный и вертикальный размер"
+
+#: resources.xml:315(varname) resources.xml:326(varname)
+#: resources.xml:334(varname)
+msgid "xreal"
+msgstr "xreal"
+
+#: resources.xml:315(varname) resources.xml:327(varname)
+#: resources.xml:335(varname)
+msgid "yreal"
+msgstr "yreal"
+
+#: resources.xml:316(entry) resources.xml:340(entry) resources.xml:368(entry)
+msgid "number"
+msgstr "число"
+
+#: resources.xml:319(varname) resources.xml:323(varname)
+msgid "xyexponent"
+msgstr "xyexponent"
+
+#: resources.xml:319(varname) resources.xml:331(varname)
+msgid "xyunit"
+msgstr "xyunit"
+
+#: resources.xml:317(entry)
+msgid ""
+"physical dimensions, in units given by <placeholder-1/> and <placeholder-2/>"
+msgstr ""
+"физические размеры в единицах, заданных <placeholder-1/> и <placeholder-2/>"
+
+#: resources.xml:324(entry) resources.xml:347(entry)
+msgid "multiple of 3"
+msgstr "кратное трём"
+
+#: resources.xml:325(entry)
+msgid "power of 10 to multiply <placeholder-1/> and <placeholder-2/> with"
+msgstr ""
+"степень 10, на которую нужно умножить <placeholder-1/> и <placeholder-2/>"
+
+#: resources.xml:332(entry) resources.xml:354(entry) resources.xml:459(entry)
+msgid "string"
+msgstr "строка"
+
+#: resources.xml:335(literal)
+msgid "\"m\""
+msgstr "\"m\""
+
+#: resources.xml:333(entry)
+msgid ""
+"base units of <placeholder-1/> and <placeholder-2/>, e.g. <placeholder-3/>"
+msgstr ""
+"основные единицы измерения <placeholder-1/> и <placeholder-2/>, т.е. "
+"<placeholder-3/>"
+
+#: resources.xml:339(varname) resources.xml:349(varname)
+#: resources.xml:356(varname)
+msgid "zscale"
+msgstr "zscale"
+
+#: resources.xml:341(entry)
+msgid "unit step in values"
+msgstr "шаг единиц в значениях"
+
+#: resources.xml:346(varname)
+msgid "zexponent"
+msgstr "zexponent"
+
+#: resources.xml:348(entry)
+msgid "power of 10 to multiply <placeholder-1/> with"
+msgstr "степень 10, на которую нужно умножить <placeholder-1/>"
+
+#: resources.xml:353(varname)
+msgid "zunit"
+msgstr "zunit"
+
+#: resources.xml:355(entry)
+msgid "base units of <placeholder-1/>"
+msgstr "основные единицы <placeholder-1/>"
+
+#: resources.xml:360(varname)
+msgid "havemissing"
+msgstr "havemissing"
+
+#: resources.xml:362(entry)
+msgid "0 means missing value handling is disabled, 1 means it is enabled"
+msgstr ""
+"0 означает что обработка отсутствующих значений отключена, 1 что включена"
+
+#: resources.xml:367(varname)
+msgid "missingvalue"
+msgstr "missingvalue"
+
+#: resources.xml:369(entry)
+msgid "the special subsitute value that denotes missing data"
+msgstr "специальное замещающее значение, которое обозначает отсутствие данных"
+
+#: resources.xml:374(varname)
+msgid "format"
+msgstr "формат"
+
+#: resources.xml:376(entry)
+msgid "0 means binary, 1 means text"
+msgstr "0 означает двоичный, 1 - текстовый"
+
+#: resources.xml:381(varname)
+msgid "builtin"
+msgstr "builtin"
+
+#: resources.xml:381(entry) resources.xml:388(entry) resources.xml:395(entry)
+#: resources.xml:402(entry) resources.xml:409(entry) resources.xml:416(entry)
+#: resources.xml:423(entry) resources.xml:430(entry) resources.xml:437(entry)
+msgid "<placeholder-1/> (binary)"
+msgstr "<placeholder-1/> (двоичный)"
+
+#: resources.xml:383(entry)
+msgid "built-in data format id, see below"
+msgstr "встроенный идентификатор формата данных, см. ниже"
+
+#: resources.xml:388(varname)
+msgid "offset"
+msgstr "offset"
+
+#: resources.xml:390(entry)
+msgid "data offset in file, in bytes"
+msgstr "смещение данных в файле, в байтах"
+
+#: resources.xml:395(varname)
+msgid "size"
+msgstr "size"
+
+#: resources.xml:397(entry)
+msgid "data value size, in bits"
+msgstr "размер значения данных, в байтах"
+
+#: resources.xml:402(varname)
+msgid "skip"
+msgstr "skip"
+
+#: resources.xml:404(entry)
+msgid "number of bits to skip after each value"
+msgstr "число бит, которое нужно пропустить после каждого значения"
+
+#: resources.xml:409(varname)
+msgid "rowskip"
+msgstr "rowskip"
+
+#: resources.xml:411(entry)
+msgid "number of additional bits to skip after each row"
+msgstr "число дополнительных бит, которое нужно пропустить после каждой строки"
+
+#: resources.xml:416(varname)
+msgid "sign"
+msgstr "sign"
+
+#: resources.xml:418(entry)
+msgid "0 means unsigned, 1 means signed"
+msgstr "0 означает без знака, 1 - со знаком"
+
+#: resources.xml:423(varname)
+msgid "revsample"
+msgstr "revsample"
+
+#: resources.xml:425(entry)
+msgid "1 means reverse bits in values"
+msgstr "1 означает инверсию битов в значениях"
+
+#: resources.xml:430(varname)
+msgid "revbyte"
+msgstr "revbyte"
+
+#: resources.xml:432(entry)
+msgid "1 means reverse bits in bytes"
+msgstr "1 означает обратный порядок бит в байтах"
+
+#: resources.xml:437(varname)
+msgid "byteswap"
+msgstr "byteswap"
+
+#: resources.xml:439(entry)
+msgid "byte swap pattern"
+msgstr "шаблон замены байтов"
+
+#: resources.xml:444(varname)
+msgid "lineoffset"
+msgstr "lineoffset"
+
+#: resources.xml:444(entry) resources.xml:451(entry) resources.xml:458(entry)
+#: resources.xml:465(entry)
+msgid "<placeholder-1/> (text)"
+msgstr "<placeholder-1/> (текстовый)"
+
+#: resources.xml:446(entry)
+msgid "lines to skip before starting to read the data"
+msgstr "число строк, которые нужно пропустить перед чтением данных"
+
+#: resources.xml:451(varname)
+msgid "skipfields"
+msgstr "skipfields"
+
+#: resources.xml:453(entry)
+msgid "fields to skip at the start of each line"
+msgstr "число полей, которое нужно пропустить вначале каждой строки"
+
+#: resources.xml:458(varname)
+msgid "delimiter"
+msgstr "delimiter"
+
+#: resources.xml:460(entry)
+msgid "field delimiter, empty string means arbitrary whitespace"
+msgstr ""
+"разделитель полей, пустая строка означает произвольный пробельный символ"
+
+#: resources.xml:465(varname)
+msgid "decomma"
+msgstr "decomma"
+
+#: resources.xml:467(entry)
+msgid "1 if decimal separator is comma, 0 for dot"
+msgstr "1 если десятичный разделитель запятая, 0 для точки"
+
+#: resources.xml:475(para)
+msgid ""
+"Note the choice of a built-in binary format, i.e. nonzero <varname>builtin</"
+"varname>, implies the binary format to some extent. This means the options "
+"<varname>size</varname>, <varname>revbyte</varname> and <varname>sign</"
+"varname> are ignored as they are used only for detailed specification of "
+"user formats. The available formats are listed in the following table:"
+msgstr ""
+"Следует отметить. что при выборе встроенного двоичного формата, т.е. "
+"ненулевой переменной <varname>builtin</varname>, означает двоичный формат до "
+"некоторой степени. Это означает. что опции <varname>size</varname>, "
+"<varname>revbyte</varname> и <varname>sign</varname> игнорируются, поскольку "
+"они используются только для подробного задания пользовательских форматов. "
+"Доступные форматы перечислены в нижеприведённой таблице:"
+
+#: resources.xml:495(entry)
+msgid "0"
+msgstr "0"
+
+#: resources.xml:496(entry)
+msgid "user-specified"
+msgstr "Определённый пользователем"
+
+#: resources.xml:499(entry)
+msgid "1"
+msgstr "1"
+
+#: resources.xml:500(entry)
+msgid "signed 8bit integer"
+msgstr "8-битное целое со знаком"
+
+#: resources.xml:503(entry)
+msgid "2"
+msgstr "2"
+
+#: resources.xml:504(entry)
+msgid "unsigned 8bit integer"
+msgstr "8-битное целое без знака"
+
+#: resources.xml:507(entry)
+msgid "3"
+msgstr "3"
+
+#: resources.xml:508(entry)
+msgid "signed 16bit integer"
+msgstr "16-битное целое со знаком"
+
+#: resources.xml:511(entry)
+msgid "4"
+msgstr "4"
+
+#: resources.xml:512(entry)
+msgid "unsigned 16bit integer"
+msgstr "16-битное целое без знака"
+
+#: resources.xml:515(entry)
+msgid "5"
+msgstr "5"
+
+#: resources.xml:516(entry)
+msgid "signed 32bit integer"
+msgstr "32-битное целое со знаком"
+
+#: resources.xml:519(entry)
+msgid "6"
+msgstr "6"
+
+#: resources.xml:520(entry)
+msgid "unsigned 32bit integer"
+msgstr "32-битное целое без знака"
+
+#: resources.xml:523(entry)
+msgid "7"
+msgstr "7"
+
+#: resources.xml:524(entry)
+msgid "IEEE float"
+msgstr "IEEE float (число с плавающей точкой, одинарной точности)"
+
+#: resources.xml:527(entry)
+msgid "8"
+msgstr "8"
+
+#: resources.xml:528(entry)
+msgid "IEEE double"
+msgstr "IEEE double (число с плавающей точкой с двойной точностью)"
+
+#: resources.xml:531(entry)
+msgid "9"
+msgstr "9"
+
+#: resources.xml:532(entry)
+msgid "signed 64bit integer"
+msgstr "64-битное целое со знаком"
+
+#: resources.xml:535(entry)
+msgid "10"
+msgstr "10"
+
+#: resources.xml:536(entry)
+msgid "unsigned 64bit integer"
+msgstr "64-битное целое без знака"
+
+#~ msgid "<varname>xres</varname>, <varname>yres</varname>"
+#~ msgstr "<varname>xres</varname>, <varname>yres</varname>"
+
+#~ msgid "<varname>xreal</varname>, <varname>yreal</varname>"
+#~ msgstr "<varname>xreal</varname>, <varname>yreal</varname>"
+
+#~ msgid ""
+#~ "power of 10 to multiply <varname>xreal</varname> and <varname>yreal</"
+#~ "varname> with"
+#~ msgstr ""
+#~ "степень 10, на которую нужно умножить <varname>xreal</varname> и "
+#~ "<varname>yreal</varname>"
+
+#~ msgid ""
+#~ "base units of <varname>xreal</varname> and <varname>yreal</varname>, e.g. "
+#~ "<literal>\"m\"</literal>"
+#~ msgstr ""
+#~ "основные единицы <varname>xreal</varname> и <varname>yreal</varname>, т."
+#~ "е. <literal>\"m\"</literal>"
+
+#~ msgid "<varname>builtin</varname> (binary)"
+#~ msgstr "<varname>builtin</varname> (двоичный)"
+
+#~ msgid "<varname>offset</varname> (binary)"
+#~ msgstr "<varname>offset</varname> (двоичный)"
+
+#~ msgid "<varname>size</varname> (binary)"
+#~ msgstr "<varname>size</varname> (двоичный)"
+
+#~ msgid "<varname>skip</varname> (binary)"
+#~ msgstr "<varname>skip</varname> (двоичный)"
+
+#~ msgid "<varname>rowskip</varname> (binary)"
+#~ msgstr "<varname>rowskip</varname> (двоичный)"
+
+#~ msgid "<varname>sign</varname> (binary)"
+#~ msgstr "<varname>sign</varname> (двоичный)"
+
+#~ msgid "<varname>revsample</varname> (binary)"
+#~ msgstr "<varname>revsample</varname> (двоичный)"
+
+#~ msgid "<varname>revbyte</varname> (binary)"
+#~ msgstr "<varname>revbyte</varname> (двоичный)"
+
+#~ msgid "<varname>byteswap</varname> (binary)"
+#~ msgstr "<varname>byteswap</varname> (двоичный)"
+
+#~ msgid "<varname>lineoffset</varname> (text)"
+#~ msgstr "<varname>lineoffset</varname> (текстовый)"
+
+#~ msgid "<varname>skipfields</varname> (text)"
+#~ msgstr "<varname>skipfields</varname> (текстовый)"
+
+#~ msgid "<varname>delimiter</varname> (text)"
+#~ msgstr "<varname>delimiter</varname> (текстовый)"
+
+#~ msgid "<varname>decomma</varname> (text)"
+#~ msgstr "<varname>decomma</varname> (текстовый)"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

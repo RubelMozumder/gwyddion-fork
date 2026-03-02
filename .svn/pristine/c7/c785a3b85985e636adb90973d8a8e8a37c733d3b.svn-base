@@ -1,0 +1,222 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2017-09-04 20:56+0400\n"
+"PO-Revision-Date: 2017-09-04 21:08+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@km.ru>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: unrotate.xml:6(title)
+msgid "Unrotate <gwy:icon name=\"unrotate\"/>"
+msgstr "Исправить разворот <gwy:icon name=\"unrotate\"/>"
+
+#: unrotate.xml:9(primary)
+msgid "rotation correction"
+msgstr "коррекция разворота"
+
+#: unrotate.xml:10(primary)
+msgid "unrotate"
+msgstr "исправить разворот"
+
+#: unrotate.xml:13(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: unrotate.xml:14(guisubmenu)
+msgid "Correct Data"
+msgstr "Исправить данные"
+
+#: unrotate.xml:15(guimenuitem)
+msgid "Unrotate"
+msgstr "Исправить разворот"
+
+#: unrotate.xml:18(para)
+msgid ""
+"Unrotate can automatically make principal directions in an image parallel "
+"with horizontal and/or vertical image edges. For that to work, the data need "
+"to have some principal directions, therefore it is most useful for scans of "
+"artifical and possibly crystalline structures."
+msgstr ""
+"Инструмент исправить разворот может автоматически сделать главные оси "
+"изображения параллельными горизонтальным или вертикальным сторонам "
+"изображения. Чтобы это работало, у данных должны быть эти главные оси, "
+"следовательно, этот метод наиболее полезен при сканировании искусственных и, "
+"возможно, кристаллических структур."
+
+#: unrotate.xml:24(para)
+msgid ""
+"The rotation necessary to straighten the image – displayed as "
+"<guilabel>Correction</guilabel> – is calculated from peaks in angular <link "
+"linkend=\"slope-distribution\">slope distribution</link> assuming a "
+"prevalent type of structure, or symmetry. The symmetry can be estimated "
+"automatically too, but it is possible to select a particular symmetry type "
+"manually and let the module calculate only corresponding rotation "
+"correction. Note if you assume a structure type that does not match the "
+"actual structure, the calculated rotation is rarely meaningful."
+msgstr ""
+"Поворот, необходимый для выравнивания изображения – показанный как "
+"<guilabel>Поправка</guilabel> – рассчитывается из пиков на угловом <link "
+"linkend=\"slope-distribution\">распределении наклонов</link> предполагая "
+"преобладающий тип структуры или симметрию. Симметрия также может быть "
+"оценена автоматически, но можно выбрать какой-то тип симметрии вручную и "
+"оставить модулю расчёт только соответствующего корректирующего поворота. "
+"Следует заметить, что если вы выбрали тип структуры, не соответствующий "
+"реальности, то рассчитанный поворот редко когда будет иметь смысл."
+
+#: unrotate.xml:35(para)
+msgid ""
+"It is recommended to level (or <link linkend=\"facet-level\">facet-level</"
+"link>) the data first as overall slope can skew the calculated rotations."
+msgstr ""
+"Рекомендуется перед расчётом выровнять данные (или <link linkend=\"facet-"
+"level\">выровнять грани</link>) поскольку общий наклон может исказить "
+"рассчитанный поворот."
+
+#: unrotate.xml:49(phrase)
+msgid "Unrotate symmetries scheme"
+msgstr "Схема симметрий коррекции поворота"
+
+#: unrotate.xml:51(caption)
+msgid ""
+"Orientations of prevalent directions corresponding to Unrotate symmetry "
+"types."
+msgstr ""
+"Ориентация главных осей в соответствии с типами симметрии, доступных при "
+"коррекции поворота."
+
+#: unrotate.xml:62(term)
+msgid "Detected"
+msgstr "Найденная"
+
+#: unrotate.xml:66(para)
+msgid ""
+"Automatically detected symmetry type, displayed above as <guilabel>Detected</"
+"guilabel>."
+msgstr ""
+"Автоматически определённый тип симметрии, показанный выше как "
+"<guilabel>обнаруженный</guilabel>."
+
+#: unrotate.xml:73(term)
+msgid "Parallel"
+msgstr "Параллельная"
+
+#: unrotate.xml:77(para)
+msgid "Parallel lines, one prevalent direction."
+msgstr "Параллельные линии, одно преимущественное направление."
+
+#: unrotate.xml:83(term)
+msgid "Triangular"
+msgstr "Треугольная"
+
+#: unrotate.xml:87(para)
+msgid ""
+"Triangular symmetry, three prevalent directions (unilateral) by 120 degrees."
+msgstr ""
+"Треугольная симметрия, три преимущественных направления (однонаправленных) "
+"под углами 120 градусов."
+
+#: unrotate.xml:94(term)
+msgid "Square"
+msgstr "Прямоугольная"
+
+#: unrotate.xml:98(para)
+msgid ""
+"Square symmetry, two prevalent directions oriented approximately along image "
+"sides."
+msgstr ""
+"Прямоугольная симметрия, два преимущественных направления приблизительно "
+"вдоль сторон изображения."
+
+#: unrotate.xml:105(term)
+msgid "Rhombic"
+msgstr "Ромбическая"
+
+#: unrotate.xml:109(para)
+msgid ""
+"Rhombic symmetry, two prevalent directions oriented approximately along "
+"diagonals. The only difference from Square is the preferred diagonal "
+"orientation (as opposed to parallel with sides)."
+msgstr ""
+"Ромбическая симметрия, два преимущественных направления приблизительно вдоль "
+"диагоналей. Единственным отличием от прямоугольной симметрии является "
+"предпочтение диагональной ориентации (в противоположность параллельной "
+"сторонам изображения)."
+
+#: unrotate.xml:118(term)
+msgid "Hexagonal"
+msgstr "Гексагональная"
+
+#: unrotate.xml:122(para)
+msgid ""
+"Hexagonal symmetry, three prevalent directions (bilateral) by 120 degrees."
+msgstr ""
+"Гексагональная симметрия, три преимущественных направления (двунаправленных) "
+"под углами 120 градусов."
+
+#: unrotate.xml:57(para)
+msgid ""
+"The assumed structure type can be set with <guilabel>Assume</guilabel> "
+"selector. Following choices are possible: <placeholder-1/>"
+msgstr ""
+"Предполагаемый тип структуры может быть задан с помощью меню выбора "
+"<guilabel>Предполагаемая</guilabel>. Доступен выбор из следующих вариантов: "
+"<placeholder-1/>"
+
+#~ msgid ""
+#~ "Unrotate <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_unrotate-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Исправить разворот <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_unrotate-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "The assumed structure type can be set with <guilabel>Assume</guilabel> "
+#~ "selector. Following choices are possible: "
+#~ "<variablelist><varlistentry><term> Detected </term><listitem><para> "
+#~ "Automatically detected symmetry type, displayed above as "
+#~ "<guilabel>Detected</guilabel>. </para></listitem></"
+#~ "varlistentry><varlistentry><term> Parallel </term><listitem><para> "
+#~ "Parallel lines, one prevalent direction. </para></listitem></"
+#~ "varlistentry><varlistentry><term> Triangular </term><listitem><para> "
+#~ "Triangular symmetry, three prevalent directions (unilateral) by 120 "
+#~ "degrees. </para></listitem></varlistentry><varlistentry><term> Square </"
+#~ "term><listitem><para> Square symmetry, two prevalent directions oriented "
+#~ "approximately along image sides. </para></listitem></"
+#~ "varlistentry><varlistentry><term> Rhombic </term><listitem><para> Rhombic "
+#~ "symmetry, two prevalent directions oriented approximately along "
+#~ "diagonals. The only difference from Square is the preferred diagonal "
+#~ "orientation (as opposed to parallel with sides). </para></listitem></"
+#~ "varlistentry><varlistentry><term> Hexagonal </term><listitem><para> "
+#~ "Hexagonal symmetry, three prevalent directions (bilateral) by 120 "
+#~ "degrees. </para></listitem></varlistentry></variablelist>"
+#~ msgstr ""
+#~ "Тип предполагаемой структуры может быть задан с помощью меню выбора "
+#~ "<guilabel>Предполагаемая</guilabel>. Доступны следующие варианты: "
+#~ "<variablelist><varlistentry><term> Найденная </term><listitem><para> "
+#~ "Автоматически найденная симметрия, показанная выше как <guilabel>Найдена</"
+#~ "guilabel>. </para></listitem></varlistentry><varlistentry><term> "
+#~ "Параллельная </term><listitem><para> Параллельные линии, одна главная "
+#~ "ось. </para></listitem></varlistentry><varlistentry><term> Треугольная </"
+#~ "term><listitem><para> Треугольная симметрия, три главных оси "
+#~ "(односторонних) под углом в 120 градусов. </para></listitem></"
+#~ "varlistentry><varlistentry><term> Квадратная </term><listitem><para> "
+#~ "Квадратная симметрия, две главных оси ориентированных примерно вдоль "
+#~ "сторон изображения. </para></listitem></varlistentry><varlistentry><term> "
+#~ "Ромбическая </term><listitem><para> Ромбическая симметрия, две главных "
+#~ "оси ориентированных примерно вдоль диагоналей. Отличием от квадратной "
+#~ "является предпочтительная ориентация вдоль диагоналей (а не параллельно "
+#~ "краям изображения). </para></listitem></varlistentry><varlistentry><term> "
+#~ "Гексагональная </term><listitem><para> Гексагональная симметрия, три "
+#~ "главных оси (двунаправленных) под углом 120 градусов. </para></listitem></"
+#~ "varlistentry></variablelist>"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

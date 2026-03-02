@@ -1,0 +1,239 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: installation-ms-windows.xml 11696 2010-12-20 10:55:40Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-ms-windows'>
+  <title>Paquets MS Windows</title>
+  <para>
+    Les paquets MS Windows compilés par les développeurs sont disponibles sur la
+    la page de
+    <ulink url='http://gwyddion.net/download.php'>téléchargement</ulink>. Les
+    paquets 32 et 64 bits sont proposés. La plupart des nouveaux utilisateurs 
+    choisiront le paquet 64 bits. Le paquet 32 bits peut toutefois avoir une 
+    certaine utilité.
+  </para>
+  <note>
+    La compilation des paquets exécutables sous MS Windows a changé de manière
+    significative depuis la 2.23. Si vous faites une mise à jour d'une version
+    antérieure à la 2.23 vers la version 2.23, nous vous invitons à lire la
+    <ulink url='http://gwyddion.net/switch-to-mingw32.php'>description des
+      changements</ulink>.
+  </note>
+  <para>
+    Si vous avez déjà installé <application>Gwyddion</application> l'installeur
+    vous demandera si vous souhaitez remplacer la version prédédente.
+  </para>
+  <informalfigure id='fig-win32-installer-upgrade-screenshot'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='win32-installer-upgrade.png' format='PNG'/>
+      </imageobject>
+      <textobject>
+        <phrase>Capture d'écran de mise à jour d'installation sous MS Windows</phrase>
+      </textobject>
+      <caption>
+        La question concerne ce que vous souhaitez faire de la version
+        précédente de <application>Gwyddion</application>.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <para>
+    Vous avez trois options :
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>Oui (remplacer)</term>
+      <listitem>
+        La version déjà installée sera remplacée. Il s'agit de la méthode
+        normale de mise à jour.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Non (conserver)</term>
+      <listitem>
+        La version déjà installée sera ignorée et l'installation continuera
+        comme s'il s'agissait d'une première installation. Il s'agit en
+        général d'une mauvaise idée car les deux versions partageront les mêmes
+        réglages et clés de registre, et si vous en désinstallez une l'autre en
+        sera affectée. De plus, il ne supprime aucun des fichiers de la version
+        déjà présente – et il peuvent rester. Dans certains cas vous pourrez 
+        trouver cette option utile.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Annuler</term>
+      <listitem>
+        L'installation sera annulée et l'ancienne version ne sera pas modifiée.
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    Dans les étapes suivantes l'installeur vous rappelle les composants du
+    logiciel inclus dans le paquet ainsi que leurs licences (qui sont tous des
+    logiciels libres), puis vous propose un répertoire d'installation, et enfin
+    vous propose la langue de l'interface utilisateur.
+  </para>
+  <sect2 id='installation-ms-windows-uninstall'>
+    <title>Désinstallation</title>
+    <para>
+      Si vous souhaitez désinstaller Gwyddion, allez dans le menu
+      <menuchoice>
+        <guimenu>Démarrer</guimenu>
+        <guisubmenu>Panneau de configuration</guisubmenu>
+        <guimenuitem>Ajout/Suppression de programmes</guimenuitem>
+      </menuchoice>
+      et choisissez <application>Gwyddion</application>. Notez que cette
+      procédure est valable sous Windows XP. Le chemin vers la fenêtre
+      <guimenuitem>Ajout/Suprression</guimenuitem> peut être légèrement
+      différent sur d'autres versions de Windows.
+    </para>
+  </sect2>
+  <sect2 id='installation-ms-windows-registry'>
+    <title>Clés de registre</title>
+    <para>
+      L'installeur crée les clés suivantes dans
+      <literal>HKEY_LOCAL_MACHINE\Software\Gwyddion\2.0</literal> :
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term><literal>InstallDir</literal></term>
+        <listitem>
+          Répertoire d'installation, par exemple
+          <filename>C:\Program Files\Gwyddion</filename>. La lecture de cette clé
+          peut être utile pour déterminer où installer des extensions.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><literal>Version</literal></term>
+        <listitem>
+          Version complète de Gwyddion sous forme de chaîne de caractères.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><literal>Locale</literal></term>
+        <listitem>
+          La langue de l'interface utilisateur de Gwyddion est choisie durant
+          l'installation (plus précisément, une localisation qui, entre autre,
+          définit la langue). Vous pouvez la modifier en utilisant
+          <command>regedit</command> pour choisir une autre langue.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Voici la liste des langues disponibles et les valeurs des
+      <literal>localisations</literal> correspondantes :
+    </para>
+    <para>
+      <informaltable id='table-locales'>
+        <tgroup cols='2'>
+          <?dblatex ll?>
+          <thead>
+            <row>
+              <entry><literal>gwy_locale</literal></entry>
+              <entry>Langue</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><literal>cs_CZ.UTF-8</literal></entry>
+              <entry>Tchèque (République Tchèque)</entry>
+            </row>
+            <row>
+              <entry><literal>de_DE.UTF-8</literal></entry>
+              <entry>Allemand (Allemagne)</entry>
+            </row>
+            <row>
+              <entry><literal>en_GB.UTF-8</literal></entry>
+              <entry>Anglais (Royaume Uni)</entry>
+            </row>
+            <row>
+              <entry><literal>en_US.UTF-8</literal></entry>
+              <entry>Anglais (Etats-Unis)</entry>
+            </row>
+            <row>
+              <entry><literal>es_ES.UTF-8</literal></entry>
+              <entry>Espagnol (Espagne)</entry>
+            </row>
+            <row>
+              <entry><literal>fr_FR.UTF-8</literal></entry>
+              <entry>Français (France)</entry>
+            </row>
+            <row>
+              <entry><literal>it_IT.UTF-8</literal></entry>
+              <entry>Italien (Italie)</entry>
+            </row>
+            <row>
+              <entry><literal>ko_KR.UTF-8</literal></entry>
+              <entry>Coréen (Corée du Sud)</entry>
+            </row>
+            <row>
+              <entry><literal>pt_BR.UTF-8</literal></entry>
+              <entry>Portugais (Brésil)</entry>
+            </row>
+            <row>
+              <entry><literal>ru_RU.UTF-8</literal></entry>
+              <entry>Russe (Russie)</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </sect2>
+  <sect2 id='installation-ms-windows-missing'>
+    <title>Fonctionnalités manquantes</title>
+    <para>
+      Gwyddion possède plusieurs fonctionnalités dépendant de librairies 
+      tierces. Le paquet MS Windows en contient la plupart mais certaines 
+      d'entre elles ne sont incluses pour l'instant :
+    </para>
+    <itemizedlist>
+      <listitem>
+        Import d'images FITS (Flexible Image Transport System).
+      </listitem>
+      <listitem>
+        Support de Pygwy pour la version 64bit (il n'est supporté que dans la
+        version 32bit).
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2 id='installation-ms-windows-pygwy'>
+    <title>Activation de pygwy</title>
+    <para>
+      L'interface de script Python, pygwy, est inclue dans l'installeur.
+      Il vous faudra toutefois installer Python et PyGTK2 afin d'activer les
+      possibilités de script Python. Ceci peut être réalisé avant l'installation
+      de Gwyddion, ou bien ultérieurement. Si Python ou PyGTK2 ne sont pas
+      présents, pygwy ne pourra pas s'enregistrer lors du démarrage de Gwyddion.
+    </para>
+    <para>
+      L'installeur de Python pour MS Windows peut être téléchargé sur
+      <ulink url="http://python.org/download/releases/">http://python.org/download/releases/</ulink>.
+      Pygwy nécessite Python 2, il vous faudra donc installer une version de
+      Python 2.7, en général la dernière. Toutefois, certaines versions s'avèrent
+      problématiques. Actuellement, la dernière version connue ne posant pas
+      de problème est <filename>python-2.7.13.msi</filename>.
+    </para>
+    <para>
+      Trois paquets sont nécessaires pour faire fonctionner PyGTK2 : PyGTK,
+      PyCairo et PyGObject. Utilisez les liens de téléchargement sur
+      <ulink url="http://www.pygtk.org/downloads.html">http://www.pygtk.org/downloads.html</ulink>
+      et téléchargez les installeurs
+      <filename>pygobject-2.28.3.win32-py2.7.msi</filename>,
+      <filename>pycairo-1.8.10.win32-py2.7.msi</filename>, et
+      <filename>pygtk-2.24.0.win32-py2.7.msi</filename> ou plus récents (si
+      disponibles).
+      Ils sont aussi disponibles sur la 
+      <ulink url='https://sourceforge.net/projects/gwyddion/files/pygtk-win32/'>page SourceForge de Gwyddion</ulink>
+      au cas où vous auriez du mal à les trouver ou les télécharger.
+
+    </para>
+    <para>
+      L'utilisation de l'installeur tout-en-un
+      <filename>pygtk-all-in-one-2.24.2.win32-py2.7.msi</filename> a été testée
+      avec succès. Toutefois, cette méthode implique que Gtk+ sera installé
+      deux fois (à deux endroits différents). Il est difficile d'affirmer quelle
+      installation sera utilisée par pygwy, cette méthode est donc déconseillée.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

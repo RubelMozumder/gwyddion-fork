@@ -1,0 +1,430 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2017-2022 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyrandgenset.h>
+#include <libprocess/stats.h>
+#include <libprocess/arithmetic.h>
+#include <libprocess/mfm.h>
+#include <libgwydgets/gwyradiobuttons.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-process.h>
+#include <app/gwymoduleutils-synth.h>
+#include <app/gwyapp.h>
+#include "preview.h"
+#include "mfmops.h"
+
+#define RUN_MODES (GWY_RUN_IMMEDIATE | GWY_RUN_INTERACTIVE)
+
+enum {
+    PARAM_ACTIVE_PAGE,
+    PARAM_UPDATE,
+    PARAM_OUT,
+    PARAM_PROBE,
+    PARAM_HEIGHT,
+    PARAM_THICKNESS,
+    PARAM_MAGNETISATION,
+    PARAM_SIZE_A,
+    PARAM_SIZE_B,
+    PARAM_SIZE_C,
+    PARAM_MTIP,
+    PARAM_BX,
+    PARAM_BY,
+    PARAM_LENGTH,
+
+    PARAM_DIMS0  //?
+};
+
+typedef enum {
+    GWY_MFM_PARALLEL_OUTPUT_HX   = 0,
+    GWY_MFM_PARALLEL_OUTPUT_HZ   = 1,
+    GWY_MFM_PARALLEL_OUTPUT_FORCE   = 2,
+    GWY_MFM_PARALLEL_OUTPUT_FORCE_DX = 3,
+    GWY_MFM_PARALLEL_OUTPUT_FORCE_DDX  = 4
+} GwyMfmParallelOutputType;
+
+typedef struct {
+    GwyParams *params;
+    GwyDataField *field;
+    GwyDataField *result;
+    /* Cached input image parameters. */
+    gdouble zscale;  /* Negative value means there is no input image. */
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GtkWidget *dataview;
+    GwyParamTable *table_dimensions;
+    GwyParamTable *table_generator;
+    GwyContainer *data;
+    GwyDataField *template_;
+} ModuleGUI;
+
+static gboolean      module_register           (void);
+static GwyParamDef*  define_module_params      (void);
+static void          mfm_parallel               (GwyContainer *data,
+                                                GwyRunType runtype);
+static GwyDialogOutcome run_gui                (ModuleArgs *args,
+                                                GwyContainer *data,
+                                                gint id);
+static GtkWidget*    dimensions_tab_new        (ModuleGUI *gui);
+static GtkWidget*    generator_tab_new         (ModuleGUI *gui);
+static void          param_changed             (ModuleGUI *gui,
+                                                gint id);
+static void          dialog_response           (ModuleGUI *gui,
+                                                gint response);
+static void          preview                   (gpointer user_data);
+static void          execute                   (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Simulation of parallel magnetic media"),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "2.0",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2017",
+};
+
+GWY_MODULE_QUERY2(module_info, mfm_parallel)
+
+static gboolean
+module_register(void)
+{
+    gwy_process_func_register("mfm_parallel",
+                              (GwyProcessFunc)&mfm_parallel,
+                              N_("/SPM M_odes/_Magnetic/Para_llel Media Field..."),
+                              GWY_STOCK_MFM_PARALLEL,
+                              RUN_MODES,
+                              0,
+                              N_("Simulate stray field above parallel magnetic medium"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+    static const GwyEnum mfm_parallel_outputs[] = {
+        {
+            "H<sub>x</sub>",
+            GWY_MFM_PARALLEL_OUTPUT_HX,
+        },
+        {
+            "H<sub>z</sub>",
+            GWY_MFM_PARALLEL_OUTPUT_HZ,
+        },
+        {
+            "F<sub>z</sub>",
+            GWY_MFM_PARALLEL_OUTPUT_FORCE,
+        },
+        {
+            "dF<sub>z</sub>/dz",
+            GWY_MFM_PARALLEL_OUTPUT_FORCE_DX,
+        },
+        {
+            "d<sup>2</sup>F<sub>z</sub>/dz<sup>2</sup>",
+            GWY_MFM_PARALLEL_OUTPUT_FORCE_DDX,
+        },
+    };
+
+    static const GwyEnum mfm_parallel_probes[] = {
+        { N_("Point charge"), GWY_MFM_PROBE_CHARGE, },
+        { N_("Bar"),          GWY_MFM_PROBE_BAR,    },
+    };
+
+
+
+    if (paramdef)
+        return paramdef;
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_process_func_current());
+    gwy_param_def_add_active_page(paramdef, PARAM_ACTIVE_PAGE, "active_page", NULL);
+    gwy_param_def_add_instant_updates(paramdef, PARAM_UPDATE, "update", NULL, TRUE);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_OUT, "out", _("Output _type"), mfm_parallel_outputs,
+                              G_N_ELEMENTS(mfm_parallel_outputs), GWY_MFM_PARALLEL_OUTPUT_HZ);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_PROBE, "probe", _("_Probe type"), mfm_parallel_probes,
+                              G_N_ELEMENTS(mfm_parallel_probes), GWY_MFM_PROBE_CHARGE);
+    gwy_param_def_add_double(paramdef, PARAM_HEIGHT, "height", _("_Output plane height"), 1, 1000, 100);
+    gwy_param_def_add_double(paramdef, PARAM_THICKNESS, "thickness", _("_Film thickness"), 0, 1000, 100);
+    gwy_param_def_add_double(paramdef, PARAM_MAGNETISATION, "magnetisation", _("_Remanent magnetization"),
+                             1, 1000, 1);
+    gwy_param_def_add_double(paramdef, PARAM_SIZE_A, "size_a", _("Size _A (dir. left)"), 1, 1000, 200);
+    gwy_param_def_add_double(paramdef, PARAM_SIZE_B, "size_b", _("Size _B (dir. right)"), 1, 1000, 200);
+    gwy_param_def_add_double(paramdef, PARAM_SIZE_C, "size_c", _("_Gap size"), 1, 1000, 10);
+    gwy_param_def_add_double(paramdef, PARAM_MTIP, "mtip", _("Tip _magnetization"), 1, 10000, 1);
+    gwy_param_def_add_double(paramdef, PARAM_BX, "bx", _("Bar width _x"), 1, 1000, 10);
+    gwy_param_def_add_double(paramdef, PARAM_BY, "by", _("Bar width _y"), 1, 1000, 10);
+    gwy_param_def_add_double(paramdef, PARAM_LENGTH, "length", _("Bar length (_z)"), 1, 10000, 500);
+    gwy_synth_define_dimensions_params(paramdef, PARAM_DIMS0);
+    return paramdef;
+}
+
+static void
+mfm_parallel(GwyContainer *data, GwyRunType runtype)
+{
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    ModuleArgs args;
+    GwyDataField *field;
+    gint id;
+
+    g_return_if_fail(runtype & RUN_MODES);
+    gwy_clear(&args, 1);
+
+    gwy_app_data_browser_get_current(GWY_APP_DATA_FIELD, &field,
+                                     GWY_APP_DATA_FIELD_ID, &id,
+                                     0);
+    if (field && gwy_si_unit_equal_string(gwy_data_field_get_si_unit_xy(field), "m"))
+       args.field = field;
+    else
+       args.field = field = NULL;
+
+    args.zscale = field ? gwy_data_field_get_rms(field) : -1.0; //is in synth.c, not sure if to add
+
+    args.params = gwy_params_new_from_settings(define_module_params());
+    gwy_synth_sanitise_params(args.params, PARAM_DIMS0, field);
+
+    if (runtype == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, id);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+    }
+    args.result = gwy_synth_make_result_data_field((args.field = field), args.params, FALSE); 
+    execute(&args);
+
+    gwy_synth_add_result_to_file(args.result, data, id, args.params);
+
+end:
+    GWY_OBJECT_UNREF(args.result);
+    g_object_unref(args.params);
+
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GwyDialogOutcome outcome;
+    GwyDialog *dialog;
+    GtkWidget *hbox;
+    GtkNotebook *notebook;
+    ModuleGUI gui;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.template_ = args->field;
+
+    args->result = gwy_synth_make_result_data_field(args->field, args->params, TRUE);
+
+    gui.data = gwy_container_new();
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), args->result);
+    if (gui.template_)
+        gwy_app_sync_data_items(data, gui.data, id, 0, FALSE, GWY_DATA_ITEM_GRADIENT, 0);
+
+    gui.dialog = gwy_dialog_new(_("Parallel Media Stray Field"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_UPDATE, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    gui.dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    hbox = gwy_create_dialog_preview_hbox(GTK_DIALOG(dialog), GWY_DATA_VIEW(gui.dataview), FALSE);
+
+    notebook = GTK_NOTEBOOK(gtk_notebook_new());
+    gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(notebook), TRUE, TRUE, 0);
+
+    gtk_notebook_append_page(notebook, dimensions_tab_new(&gui), gtk_label_new(_("Dimensions")));
+    gtk_notebook_append_page(notebook, generator_tab_new(&gui), gtk_label_new(_("Generator")));
+    gwy_param_active_page_link_to_notebook(args->params, PARAM_ACTIVE_PAGE, notebook);
+
+    g_signal_connect_swapped(gui.table_dimensions, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_generator, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(dialog, "response", G_CALLBACK(dialog_response), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.data);
+    GWY_OBJECT_UNREF(args->field);
+    GWY_OBJECT_UNREF(args->result);
+
+    return outcome;
+}
+
+static GtkWidget*
+dimensions_tab_new(ModuleGUI *gui)
+{
+    gui->table_dimensions = gwy_param_table_new(gui->args->params);
+    gwy_synth_append_dimensions_to_param_table(gui->table_dimensions, GWY_SYNTH_FIXED_ZUNIT | GWY_SYNTH_NO_INITIALIZE);
+    gwy_dialog_add_param_table(GWY_DIALOG(gui->dialog), gui->table_dimensions);
+
+    return gwy_param_table_widget(gui->table_dimensions);
+}
+
+static GtkWidget*
+generator_tab_new(ModuleGUI *gui)
+{
+    GwyParamTable *table;
+
+    table = gui->table_generator = gwy_param_table_new(gui->args->params);
+
+    gwy_param_table_append_slider(table, PARAM_HEIGHT);
+    gwy_param_table_set_unitstr(table, PARAM_HEIGHT, "nm");
+    gwy_param_table_append_slider(table, PARAM_THICKNESS);
+    gwy_param_table_set_unitstr(table, PARAM_THICKNESS, "nm");
+    gwy_param_table_append_slider(table, PARAM_MAGNETISATION);
+    gwy_param_table_set_unitstr(table, PARAM_MAGNETISATION, "kA/m");
+    gwy_param_table_append_slider(table, PARAM_SIZE_A);
+    gwy_param_table_set_unitstr(table, PARAM_SIZE_A, "nm");
+    gwy_param_table_append_slider(table, PARAM_SIZE_B);
+    gwy_param_table_set_unitstr(table, PARAM_SIZE_B, "nm");
+    gwy_param_table_append_slider(table, PARAM_SIZE_C);
+    gwy_param_table_set_unitstr(table, PARAM_SIZE_C, "nm");
+    gwy_param_table_append_combo(table, PARAM_OUT);
+    gwy_param_table_append_combo(table, PARAM_PROBE);
+    gwy_param_table_append_slider(table, PARAM_MTIP);
+    gwy_param_table_set_unitstr(table, PARAM_MTIP, "kA/m");
+    gwy_param_table_append_slider(table, PARAM_BX);
+    gwy_param_table_set_unitstr(table, PARAM_BX, "nm");
+    gwy_param_table_append_slider(table, PARAM_BY);
+    gwy_param_table_set_unitstr(table, PARAM_BY, "nm");
+    gwy_param_table_append_slider(table, PARAM_LENGTH);
+    gwy_param_table_set_unitstr(table, PARAM_LENGTH, "nm");
+
+    gwy_param_table_append_header(table, -1, _("Options"));
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_checkbox(table, PARAM_UPDATE);
+
+    gwy_dialog_add_param_table(GWY_DIALOG(gui->dialog), table);
+
+    return gwy_param_table_widget(table);
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    GwyParams *params = gui->args->params;
+    gint power10, xyid = PARAM_DIMS0 + GWY_DIMS_PARAM_XYUNIT;
+
+    if (gwy_synth_handle_param_changed(gui->table_dimensions, id))
+        id = -1;
+
+    if ((id < 0 || id == xyid) && !gwy_si_unit_equal_string(gwy_params_get_unit(params, xyid, &power10), "m")) {
+        gwy_param_table_set_string(gui->table_dimensions, xyid, "µm");
+        gwy_synth_handle_param_changed(gui->table_dimensions, xyid);
+    }
+
+    if (id != PARAM_ACTIVE_PAGE && id != PARAM_UPDATE)
+        gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+dialog_response(ModuleGUI *gui, gint response)
+{
+    ModuleArgs *args = gui->args;
+
+    if (response == GWY_RESPONSE_SYNTH_INIT_Z) {
+        gdouble zscale = args->zscale;
+        gint power10z;
+
+        if (zscale > 0.0) {
+            gwy_params_get_unit(args->params, PARAM_DIMS0 + GWY_DIMS_PARAM_ZUNIT, &power10z);
+            //gwy_param_table_set_double(gui->table_generator, PARAM_SIGMA, zscale/pow10(power10z));
+            //same case as param_changed, presumably should do something but I don't know what
+        }
+    }
+    else if (response == GWY_RESPONSE_SYNTH_TAKE_DIMS) {
+        gwy_synth_use_dimensions_template(gui->table_dimensions);
+    }
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    
+    gui->args->result = gwy_synth_make_result_data_field(gui->args->field, gui->args->params, FALSE);
+    gwy_container_set_object(gui->data, gwy_app_get_data_key_for_id(0), gui->args->result);
+    gwy_set_data_preview_size(GWY_DATA_VIEW(gui->dataview), PREVIEW_SIZE);
+    
+    execute(gui->args);
+    gwy_data_field_data_changed(gui->args->result);
+}
+
+static void
+execute(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    //gboolean do_initialise = gwy_params_get_boolean(params, PARAM_DIMS0 + GWY_DIMS_PARAM_INITIALIZE);
+    GwyDataField /**field = args->field,*/ *result = args->result;
+
+    GwyMFMComponentType component;
+    GwyDataField *tmp;
+    gdouble a = gwy_params_get_double(params, PARAM_SIZE_A)*1e-9,
+            b = gwy_params_get_double(params, PARAM_SIZE_B)*1e-9,
+            c = gwy_params_get_double(params, PARAM_SIZE_C)*1e-9,
+            height = gwy_params_get_double(params, PARAM_HEIGHT)*1e-9,
+            thickness = gwy_params_get_double(params, PARAM_THICKNESS)*1e-9,
+            length = gwy_params_get_double(params, PARAM_LENGTH)*1e-9,
+            bx = gwy_params_get_double(params, PARAM_BX)*1e-9,
+            by = gwy_params_get_double(params, PARAM_BY)*1e-9,
+            mtip = gwy_params_get_double(params, PARAM_MTIP)*1e3,
+            magnetisation = gwy_params_get_double(params, PARAM_MAGNETISATION);
+    gint out = gwy_params_get_enum(params, PARAM_OUT);
+    gint probe = gwy_params_get_enum(params, PARAM_PROBE);
+
+    /*
+    if (field && do_initialise)   //is in noise_synth.c, should be here?
+        gwy_data_field_copy(field, result, FALSE);
+    else
+        gwy_data_field_clear(result);
+    */
+
+    if (out == GWY_MFM_PARALLEL_OUTPUT_HX)
+        component = GWY_MFM_COMPONENT_HX;
+    else if (out == GWY_MFM_PARALLEL_OUTPUT_HZ
+             || out == GWY_MFM_PARALLEL_OUTPUT_FORCE)
+        component = GWY_MFM_COMPONENT_HZ;
+    else if (out == GWY_MFM_PARALLEL_OUTPUT_FORCE_DX)
+        component = GWY_MFM_COMPONENT_DHZ_DZ;
+    else if (out == GWY_MFM_PARALLEL_OUTPUT_FORCE_DDX)
+        component = GWY_MFM_COMPONENT_D2HZ_DZ2;
+    else {
+        g_return_if_reached();
+    }
+
+    gwy_data_field_mfm_parallel_medium(result, height, a, b, c,
+                                       magnetisation, thickness,
+                                       component);
+
+    if (out == GWY_MFM_PARALLEL_OUTPUT_FORCE
+        || out == GWY_MFM_PARALLEL_OUTPUT_FORCE_DX
+        || out == GWY_MFM_PARALLEL_OUTPUT_FORCE_DDX) {
+        tmp = gwy_data_field_duplicate(result);
+        gwy_data_field_mfm_perpendicular_medium_force(tmp, result,
+                                                      probe, mtip,
+                                                      bx, by, length);
+        g_object_unref(tmp);
+    }
+
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: fitting-3d-shapes.xml 23036 2021-01-03 17:12:56Z dn2010 $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="fitting-3d-shapes">
+  <title>Аппроксимация 3D форм</title>
+  <para>Многие трёхмерные геометрические формы могут быть аппроксимированы функциями <guilabel>Аппроксимация формы</guilabel> для <link linkend="fit-shape-image">изображений</link> и <link linkend="fit-shape">данных XYZ</link>, которые имеют общие параметры. Следовательно, мы сначала опишем общие для них параметры и отдельно затем перечислим особые параметры в описаниях отдельных аппроксимирующих геометрических форм.</para>
+  <sect2 id="fitting-3d-shapes-general">
+    <title>Основные общие параметры</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href="eqi-x_0.xml"/></term>
+        <listitem>
+          <para>Горизонтальное положение центра фигуры, обычно совпадает с вершиной (или самой нижней точкой для фигур с отрицательной высотой). Для периодических форм это смещение относительно начала координат одной из бесконечного множества фигур.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-y_0.xml"/></term>
+        <listitem>
+          <para>Вертикальное положение центра фигуры, обычно совпадает с вершиной (или самой нижней точкой для фигур с отрицательной высотой). Для периодических форм это смещение относительно начала координат одной из бесконечного множества фигур.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-z_0.xml"/></term>
+        <listitem>
+          <para>Высота базовой плоскости (в центре фигуры, если базовая плоскость наклонена). Следует заметить, что этот параметр может показывать 100% корреляцию с другими параметрами, относящимися к высоте, если фигура занимает всё изображение и базовая плоскость не видна.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-h.xml"/></term>
+        <listitem>
+          <para>Высота фигуры по отношению к горизонтальной базовой плоскости.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-phi.xml"/></term>
+        <listitem>
+          <para>Вращение в положительном направлении по отношению к основной системе координат, в которой обычно главные оси фигуры выровнены горизонтально и вертикально.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id="fitting-3d-shapes-bumps">
+    <title>Общие параметры для выступов</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href="eqi-b_x.xml"/></term>
+        <listitem>
+          <para>Наклон базовой плоскости в горизонтальном направлении.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-b_y.xml"/></term>
+        <listitem>
+          <para>Наклон базовой плоскости в вертикальном направлении.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-a.xml"/></term>
+        <listitem>
+          <para>Параметр анизотропии. Он равен отношению более длинной и более короткой сторон (или полуосей или других размерностей ширины) фигуры. Следовательно, одна из сторон будет равна средней ширине, умноженной на <xi:include href="eqi-sqrt-a.xml"/>, а другая средней ширине, делённой на <xi:include href="eqi-sqrt-a.xml"/>. Зафиксируйте его равным единице если фигура не должна растягиваться в одном направлении и сжиматься в другом.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Выступающие фигуры имеют параметры базовой плоскости <xi:include href="eqi-b_x.xml"/> и <xi:include href="eqi-b_y.xml"/>, а также обычно какой-то параметр, описывающий размер фигуры в основании. Если на изображении представлена только вершина, их значения будут неопределёнными или они перестают быть независимыми. Это может приводить к тому, что аппроксимация начнёт плохо сходиться или закончится ошибкой. Значения параметров надо в этом случае исправить.</para>
+  </sect2>
+  <sect2 id="fitting-3d-shapes-smooth-bumps">
+    <title>Общие параметры для сглаженных выступов</title>
+    <para>Сглаженные гауссовой функцией выступы – конусы и пирамиды – имеют следующие два общих параметра:</para>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href="eqi-R.xml"/></term>
+        <listitem>
+          <para>радиус кривизны на острие.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-alpha.xml"/></term>
+        <listitem>
+          <para>Тангенс наклона боковой стороны.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id="fitting-3d-shapes-steps">
+    <title>Общие параметры для выступов</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href="eqi-h.xml"/></term>
+        <listitem>
+          <para>Высота выступа по отношению к горизонтальной базовой плоскости.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-delta.xml"/></term>
+        <listitem>
+          <para>Гладкость, которая определяет ширину грани в форме функции ошибки между нижней и верхней плоскостями.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id="fitting-3d-shapes-periodic">
+    <title>Общие параметры для периодических форм</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href="eqi-L.xml"/></term>
+        <listitem>
+          <para>Период, т.е. то расстояние, после которого форма начинает повторяться.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href="eqi-p.xml"/></term>
+        <listitem>
+          <para>Покрытие, т.е. часть плоскости, на которой присутствует какая-либо фигура, а не базовая плоскость.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id="fitting-3d-shapes-specific">
+    <title>Особые параметры</title>
+    <para><guilabel>Решетка (простая)</guilabel> содержит только один дополнительный параметр, который задаёт её форму, <xi:include href="eqi-c.xml"/>. Гребень имеет форму срезанного гиперболического косинуса, где малое значение <xi:include href="eqi-c.xml"/> соответствует параболическому сечению, в то время, как большое значение <xi:include href="eqi-c.xml"/> соответствует острому, почти прямоугольному сечению.</para>
+    <para><guilabel>Решетка (трёхуровневая)</guilabel> имеет сечение в форме трёх трапециоидов поставленных друг на друга. Соответствующие три параметра высоты <xi:include href="eqi-h_1.xml"/>, <xi:include href="eqi-h_2.xml"/> и <xi:include href="eqi-h_3.xml"/> определяют высоту каждого из них. Соответствующие параметры уменьшения толщины <xi:include href="eqi-q_1.xml"/>, <xi:include href="eqi-q_2.xml"/> и <xi:include href="eqi-q_3.xml"/> задают насколько толщина верхнего основания соответствующего трапециоида уменьшается по отношению к нижнему (на множитель <xi:include href="eqi-1-over-1-plus-q_i.xml"/>). Также нередко полезно взглянуть на производные величины <xi:include href="eqi-L_0.xml"/>, <xi:include href="eqi-L_1.xml"/>, <xi:include href="eqi-L_2.xml"/> и <xi:include href="eqi-L_3.xml"/>, которые напрямую равны ширинам и производную величину <xi:include href="eqi-h.xml"/> равную общей высоте.</para>
+    <informalfigure id="fig-grating-3-level">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="grating-3-level.pdf" format="PDF"/>
+        </imageobject>
+        <imageobject>
+          <imagedata fileref="grating-3-level.png" format="PNG"/>
+        </imageobject>
+        <caption>Ширины и высоты трапециоидов, формирующих профиль трёхуровневой решетки. Следует отметить, что ширины это производные параметры, напрямую не аппроксимирующие.</caption>
+      </mediaobject>
+    </informalfigure>
+    <para><guilabel>Отверстия</guilabel> имеют параметры <xi:include href="eqi-s.xml"/>, который задаёт конусность отверстия вследствие наклонных боковых граней, и <xi:include href="eqi-r.xml"/>, который задаёт кривизну скривления углов. Для обоих параметров нули соответствуют идеальной прямоугольной форме.</para>
+    <para><guilabel>Параболическое кольцо</guilabel> является трёхмерной симметричной относительно вращения версией функции аппроксимации <guilabel>Параболическая ступень</guilabel> и управляется в точности теми же самыми параметрами формы.</para>
+    <para><guilabel>Сфера</guilabel> имеет только один параметр формы <xi:include href="eqi-C.xml"/>, задающий кривизну. Радиус доступен в качестве производной величины.</para>
+    <para><guilabel>Цилиндр (лежащий)</guilabel> также имеет параметр кривизны <xi:include href="eqi-C.xml"/>. В дополнение он имеет параметр наклона <xi:include href="eqi-b_parallel.xml"/>, задающий наклон базовой плоскости вдоль оси цилиндра.</para>
+    <para><guilabel>Гауссиана</guilabel> имеет параметр среднего среднеквадратичного отклонения <xi:include href="eqi-sigma_mean.xml"/>. Для анизотропных гауссиан он равен геометрическому среднему двух ширин в ортогональных направлениях, доступных в качестве производных величин.</para>
+    <para><guilabel>Лоренцева</guilabel> форма имеет параметр полуширины на половине высоты <xi:include href="eqi-beta_mean.xml"/>. Для анизотропных лоренцевых функций он равен геометрическому среднему двух ширин в ортогональных направлениях, доступных в качестве производных величин.</para>
+    <para><guilabel>Конус</guilabel> имеет параметр <xi:include href="eqi-R.xml"/>, который определяет радиус конуса у основания.</para>
+    <para><guilabel>Пирамида (алмазоподобная)</guilabel> и <guilabel>Пирамида (трёхгранная)</guilabel> имеют параметр <xi:include href="eqi-L.xml"/>, который определяет длину её стороны (вдоль основания). Поскольку основной ориентацией пирамиды является диагональная, все четыре стороны всё равно будут иметь одинаковую длину даже если параметр анизотропии <xi:include href="eqi-a.xml"/> не равен единице.</para>
+    <para><guilabel>Ступень (двусторонняя)</guilabel> имеет параметр <xi:include href="eqi-w.xml"/>, который задаёт ширину ступени.</para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

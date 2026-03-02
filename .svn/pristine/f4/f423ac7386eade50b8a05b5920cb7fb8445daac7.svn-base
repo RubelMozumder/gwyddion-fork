@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informalequation id='eq-mfm-parallel-stripes'>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref='eq-mfm-parallel-stripes.svg' format='SVG'/>
+    </imageobject>
+    <textobject role='tex'>
+      <phrase>
+<![CDATA[
+\begin{array}{r@{{}={}}l}
+\displaystyle
+B_x(x,z)
+  & \displaystyle
+    \frac{\mu_0 M_r}\pi \left(\atan \frac{x(d+z)}{x^2+a^2+a(d+z)} - \atan\frac{xz}{x^2 + a^2 + az}\right)\\
+\noalign{\smallskip}
+\displaystyle
+B_z(x,z)
+  & \displaystyle
+    \frac{\mu_0 M_r}{2\pi} \ln\frac{x^2 + (d + z + a)^2}{x^2 + (z + a)^2}\\
+\end{array}
+]]>
+      </phrase>
+    </textobject>
+  </mediaobject>
+</informalequation>
+<!-- vim: set ts=2 sw=2 et : -->

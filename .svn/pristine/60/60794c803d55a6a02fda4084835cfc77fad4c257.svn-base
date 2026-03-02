@@ -1,0 +1,44 @@
+--- glib-2.54.3.orig/gobject/gparamspecs.h	2017-07-14 01:03:39.000000000 +0200
++++ glib-2.54.3/gobject/gparamspecs.h	2021-02-23 16:19:53.372432377 +0100
+@@ -1144,7 +1144,7 @@ GParamSpec*	g_param_spec_variant	 (const
+ #    else /* !GOBJECT_STATIC_COMPILATION */
+ #      ifdef GOBJECT_COMPILATION
+ #        ifdef DLL_EXPORT
+-#          define GOBJECT_VAR __declspec(dllexport)
++#          define GOBJECT_VAR extern __declspec(dllexport)
+ #        else /* !DLL_EXPORT */
+ #          define GOBJECT_VAR extern
+ #        endif /* !DLL_EXPORT */
+--- glib-2.54.3.orig/glib/pcre/pcre_internal.h	2016-10-22 07:21:51.000000000 +0200
++++ glib-2.54.3/glib/pcre/pcre_internal.h	2021-02-23 16:20:32.519881081 +0100
+@@ -143,7 +143,7 @@ PCRE_EXP_DATA_DEFN only if they are not
+ #    ifndef PCRE_STATIC
+ #      define PCRE_EXP_DECL       extern __declspec(dllexport)
+ #      define PCRE_EXP_DEFN       __declspec(dllexport)
+-#      define PCRE_EXP_DATA_DEFN  __declspec(dllexport)
++#      define PCRE_EXP_DATA_DEFN  extern __declspec(dllexport)
+ #    else
+ #      define PCRE_EXP_DECL       extern
+ #      define PCRE_EXP_DEFN
+--- glib-2.54.3.orig/glib/gtypes.h	2018-01-08 21:00:42.000000000 +0100
++++ glib-2.54.3/glib/gtypes.h	2021-02-23 16:20:48.646653978 +0100
+@@ -522,7 +522,7 @@ G_END_DECLS
+ #    else /* !GLIB_STATIC_COMPILATION */
+ #      ifdef GLIB_COMPILATION
+ #        ifdef DLL_EXPORT
+-#          define GLIB_VAR __declspec(dllexport)
++#          define GLIB_VAR extern __declspec(dllexport)
+ #        else /* !DLL_EXPORT */
+ #          define GLIB_VAR extern
+ #        endif /* !DLL_EXPORT */
+--- glib-2.54.3.orig/gmodule/gmodule.h	2017-07-14 01:03:39.000000000 +0200
++++ glib-2.54.3/gmodule/gmodule.h	2021-02-23 16:20:59.223505028 +0100
+@@ -34,7 +34,7 @@ G_BEGIN_DECLS
+  */
+ #define	G_MODULE_IMPORT		extern
+ #ifdef G_PLATFORM_WIN32
+-#  define	G_MODULE_EXPORT		__declspec(dllexport)
++#  define	G_MODULE_EXPORT		extern __declspec(dllexport)
+ #elif __GNUC__ >= 4
+ #  define	G_MODULE_EXPORT		__attribute__((visibility("default")))
+ #else /* !G_PLATFORM_WIN32 && __GNUC__ < 4 */

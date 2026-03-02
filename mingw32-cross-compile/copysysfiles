@@ -1,0 +1,76 @@
+#!/usr/bin/python2
+import sys, os, re, subprocess, shutil
+
+# Fedora 36 has separate imath, but nothing cross-compiled there works.  Keep the Fedora 34 version around.
+packages_redhat_36 = 'atk libaec bzip2 cairo dlfcn expat libffi fftw fontconfig freetype gcc gcc-c++ gettext gdk-pixbuf glib2 libgomp gtk2 gtkglext gtksourceview2 harfbuzz hdf5 imath jansson jasper libjpeg-turbo libpng libtiff libwebp libxml2 libzip openexr pango pcre pixman win-iconv winpthreads zlib'
+packages_redhat_34 = 'atk libaec bzip2 cairo dlfcn expat libffi fftw fontconfig freetype gcc gcc-c++ gettext gdk-pixbuf glib2 libgomp gtk2 gtkglext gtksourceview2 harfbuzz hdf5 jansson jasper libjpeg-turbo libpng libtiff libwebp libxml2 libzip openexr pango pcre pixman win-iconv winpthreads zlib'
+# FIXME: No mingw gomp package on SuSE? And do we have hdf5?
+packages_suse = 'atk bzip2 libcairo2 libexpat libffi fftw3 fontconfig freetype gcc gdk-pixbuf gettext-runtime glib2 gtk2 gtkglext gtksourceview2 jansson libjasper libjpeg libpng libtiff libwebp libxml2 pango pcre pixman winpthreads zlib'
+
+if os.access('/etc/redhat-release', os.R_OK):
+    packages = packages_redhat_34
+elif os.access('/etc/SuSE-release', os.R_OK):
+    packages = packages_suse
+else:
+    sys.stderr.write('Unsupported build system.  Improve me!\n')
+    sys.exit(1)
+
+nargs = len(sys.argv)
+if nargs > 2 or nargs == 2 and sys.argv[1] in ('-h', '--help'):
+    print 'copysysfiles [setup]'
+    sys.exit(0)
+
+if nargs == 2:
+    setupfile = sys.argv[1]
+else:
+    setupfile = 'setup'
+
+if not os.access(setupfile, os.R_OK):
+    sys.stderr.write('Cannot find setup file %s.\n' % setupfile)
+    sys.exit(1)
+
+for line in file(setupfile):
+    m = re.match(r'^(?P<name>\w+)=(?P<value>.*?)\s*$', line)
+    if m:
+        locals()[m.group('name')] = os.path.expandvars(m.group('value'))
+
+for name in ('target_prefix', 'mingw_prefix'):
+    if name not in locals():
+        sys.stderr.write('Cannot find %s in %s.\n' % (name, setupfile))
+        sys.exit(1)
+
+if target_prefix.find('mingw32') >= 0:
+    mingw='32'
+elif target_prefix.find('mingw64') >= 0:
+    mingw='64'
+else:
+    sys.stderr.write('Cannot guess 32/64bit from %s.\n' % target_prefix)
+    sys.exit(1)
+
+pkglist = ['mingw%s-%s' % (mingw, x) for x in packages.split()]
+p = subprocess.Popen(['rpm', '-q', '--qf='] + pkglist,
+                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p.wait()
+if p.returncode:
+    sys.stderr.write(p.stdout.read())
+    sys.exit(1)
+del p
+
+filelist = subprocess.Popen(['rpm', '-ql'] + pkglist,
+                            stdout=subprocess.PIPE).communicate()[0]
+
+for filename in sorted(set(filelist.split())):
+    if not filename.startswith(mingw_prefix):
+        continue
+    if not os.path.isfile(filename):
+        continue
+    if filename.endswith('.a') or filename.endswith('.la'):
+        continue
+    basefile = filename[len(mingw_prefix)+1:]
+    dirname = os.path.join(target_prefix, os.path.dirname(basefile))
+    if not os.path.isdir(dirname):
+        os.makedirs(dirname)
+    targetfile = os.path.join(target_prefix, basefile)
+    if os.path.isfile(targetfile):
+        os.unlink(targetfile)
+    shutil.copy(filename, targetfile)

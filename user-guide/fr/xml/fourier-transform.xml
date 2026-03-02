@@ -1,0 +1,308 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: fourier-transform.xml 10447 2009-11-15 12:41:03Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='fourier-transform' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>
+    Transformée de Fourier <gwy:icon name='fft'/>
+  </title>
+  <indexterm><primary>Transformée de Fourier</primary></indexterm>
+  <para>
+    La transformée de Fourier bi-dimensionnelle peut être utilisée à partir de
+    <menuchoice>
+      <guimenu>Traitement des Données</guimenu>
+      <guisubmenu>Transformées</guisubmenu>
+      <guimenuitem>FFT 2D</guimenuitem>
+    </menuchoice>
+    dans lequel est implémentée une transformée de Fourier rapide (FFT, Fast
+    Fourier Transform). La transformée de Fourier décompose un signal selon
+    ses composantes harmoniques, elle est ainsi très utile pour l'analyse
+    des fréquences spatiales présentes dans les données SPM.
+  </para>
+  <para>
+    Le module <guilabel>FFT 2D</guilabel> propose plusieurs types de sortie :
+    <itemizedlist>
+      <listitem>
+        Module – valeur absolue des coefficients de Fourier complexes,
+        propoportionnelle à la racine carrée de la densité spectrale de
+        puissance (PSD, Power Spectral Density).
+      </listitem>
+      <listitem>
+        Phase – phase des coefficients complexes (rarement utilisé).
+      </listitem>
+      <listitem>
+        Partie réelle – partie réelle des coefficients complexes.
+      </listitem>
+      <listitem>
+        Partie imaginaire – partie imaginaire des coefficients complexes.
+      </listitem>
+    </itemizedlist>
+    ainsi que certaines combinaisons pour des raisons pratiques.
+  </para>
+  <para id='psdf-section'>
+    <indexterm>
+      <primary>densité spectrale de puissance</primary>
+      <secondary>section</secondary>
+    </indexterm>
+    Des sections radiales de la PSD bi-dimensionnelle peuvent être aisément
+    obtenus avec
+    <menuchoice>
+      <guimenu>Traitement des Données</guimenu>
+      <guisubmenu>Statistiques</guisubmenu>
+      <guimenuitem>Section de PSD</guimenuitem>
+    </menuchoice>.
+    Plusieurs autres fonctions générant des densités spectrales sont décrites
+    dans la section
+    <link linkend='power-spectral-density-1d'>Analyse Statistique</link>.
+    Il est aussi possible de filtrer des images dans le domaine fréquentiel en
+    utilisant les filtres de FFT
+    <link linkend='fft-filter-1d'>uni-dimensionnels</link> et
+    <link linkend='fft-filter-2d'>bi-dimensionnels</link>, ou simplement
+    la <link linkend='frequency-split'>séparation fréquentielle</link>.
+  </para>
+  <para id='psdf-log-phi'>
+    <indexterm>
+      <primary>densité spectrale de puissance</primary>
+      <secondary>log-phi</secondary>
+    </indexterm>
+    Pour comparer des textures indépendemment de l'échelle et de la rotation, 
+    il est utile de transformer les coordonnées fréquentielles cartésiennes de
+    la PSDF en coordonnées définies par le logarithme de la fréquence spatiale
+    et de sa direction. L'échelle et la rotation deviennent alors de simples
+    translations selon les nouvelles coordonnées.
+    La fonction
+    <menuchoice>
+      <guimenu>Traitement des données</guimenu>
+      <guisubmenu>Statistiques</guisubmenu>
+      <guimenuitem>PSDF Log-Phi</guimenuitem>
+    </menuchoice>
+    calcule directement la PSDF transformée. La coordonnée horizontale sans
+    dimension est l'angle (de 0 à <xi:include href="eqi-2-pi.xml"/>), et la
+    coordonnée verticale est le logarithme de la fréquence spatiale. iL est
+    possible d'adoucir la PSDF à l'aide d'un filtre gaussien de largeur donnée
+    avant de faire la tranformation.
+  </para>
+  <para>
+    Notez que la transformée de Fourier traite les données comme si elles
+    s'étendaient à l'infini, ce qui implique des conditions aux limites
+    périodiques. Comme les données réelles ne possèdent pas ces propriétés, il
+    est nécessaire d'utiliser des fonctions de fenêtrage pour supprimer les
+    données sur les bords de l'image. Si vous n'en choisissez aucune, la FFT
+    traitera les données avec une fonction de fenêtrage rectangulaire qui
+    donne une mauvaise image de la transformée, donnant ainsi un spectre de
+    Fourier erroné.
+  </para>
+  <para id='windowing'>
+    Gwyddion propose plusieurs fonctions de fenêtrage. La plupart d'entre elles
+    sont basées sur des fonctions sinus ou cosinus qui atténuent correctement
+    les données sur les bords de l'image. Dans la table des formules de
+    fenêtrage qui suit, la variable indépendante <xi:include href="eqi-x.xml"/>
+    appartient à l'intervalle <xi:include href="eqi-interval-0-1.xml"/>
+    qui correspond à l'abscisse normalisée ; pour simplifier la notation
+    la variable <xi:include href="eqi-xi-is-2pi-x.xml"/> est utilisée dans
+    certaines formules. Les types de fenêtrage disponibles sont données dans la
+    table qui suit :
+  </para>
+  <informaltable id='table-windowing-types'>
+    <tgroup cols='2' align='left'>
+      <?dblatex lX?>
+      <thead>
+        <row>
+          <entry>Nom</entry>
+          <entry>Formule</entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>Aucun</entry>
+          <entry>1</entry>
+        </row>
+        <row>
+          <entry>Rectangle</entry>
+          <entry>0.5 aux bords, 1 partout ailleurs</entry>
+        </row>
+        <row>
+          <entry>Hann</entry>
+          <entry><xi:include href="eq-windowing-hann.xml"/></entry>
+        </row>
+        <row>
+          <entry>Hamming</entry>
+          <entry><xi:include href="eq-windowing-hamming.xml"/></entry>
+        </row>
+        <row>
+          <entry>Blackmann</entry>
+          <entry><xi:include href="eq-windowing-blackmann.xml"/></entry>
+        </row>
+        <row>
+          <entry>Lanczos</entry>
+          <entry><xi:include href="eq-windowing-lanczos.xml"/></entry>
+        </row>
+        <row>
+          <entry>Welch</entry>
+          <entry><xi:include href="eq-windowing-welch.xml"/></entry>
+        </row>
+        <row>
+          <entry>Nutall</entry>
+          <entry><xi:include href="eq-windowing-nutall.xml"/></entry>
+        </row>
+        <row>
+          <entry>Plateau</entry>
+          <entry><xi:include href="eq-windowing-flat-top.xml"/></entry>
+        </row>
+        <row>
+          <entry>Kaiser<xi:include href="eqi-alpha.xml"/></entry>
+          <entry>
+            <xi:include href="eq-windowing-kaiser.xml"/>,
+            où <xi:include href="eqi-BesselI0.xml"/>
+            est la fonction de Bessel modifiée d'orde zéro et
+            <xi:include href="eqi-alpha.xml"/> est un paramètre
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+  <informalfigure id='fig-windowing-win'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='windowing-win.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='windowing-win.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Fonctions de fenêtrage : Hann, Hamming, Blackmann, Lanczos, Welch,
+        Nutall, plateau, Kaiser 2,5.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <informalfigure id='fig-windowing-fft'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='windowing-fft.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='windowing-fft.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Enveloppes des réponses fréquentielles de fonctions de fenêtrage : Hann,
+        Hamming, Blackmann, Lanczos, Welch, Nutall, plateau, Kaiser 2,5.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <sect2 id='fft-filter-1d'>
+    <title>
+      Filtre FFT 1D <gwy:icon name='fft_filter_1d'/>
+    </title>
+    <indexterm>
+      <primary>transformée de Fourier</primary>
+      <secondary>filtrage 1D</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Correction des données</guisubmenu>
+        <guimenuitem>Filtrage FFT 1D</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Le filtrage de Fourier est un excellent moyen de supprimer le 
+      bruit d'une image en se basant sur l'analyse fréquentielle. La 
+      transformée de Fourier de l'image est d'abord calculée, puis un filtre
+      est appliquée à cette transformée. La transformée inverse est finalement
+      appliquée pour obtenir l'image filtrée.  Gwyddion utilise la 
+      transformée de Fourier rapide (FFT) pour rendre ce calcul beaucoup
+      plus rapide.
+    </para>
+    <para>
+      Pour le filtre FFD 1D, les fréquences à supprimer du spectre (type
+      de suppression : annuler) ou réduites aux valeurs des fréquences
+      avoisinantes (type de suppression : supprimer) peuvent être
+      sélectionnées en marquant les zone souhaitées dans le graphe du
+      spectre. La sélection peut être facilement inversée en utilisant 
+      le type de filtre (marqué ou non marqué). Le filtrage FFT 1D peut
+      être utilisé pour la direction verticale ou horizontale.
+    </para>
+  </sect2>
+  <sect2 id='fft-filter-2d'>
+    <title>
+      Filtrage FFT 2D <gwy:icon name='fft_filter_2d'/>
+    </title>
+    <indexterm>
+      <primary>transformée de Fourier</primary>
+      <secondary>filtrage 2D</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Correction des données</guisubmenu>
+        <guimenuitem>Filtrage FFT 2D</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+     Le filtrage FFT 2D agit de manière similaire à la version 1D (voir
+     plus haut), mais en utilisant une transformée de Fourier 2D. Les 
+     fréquences à filtrer doivent donc être sélectionnées à l'aide d'un
+     éditeur de masque en 2D. Comme les fréquences sont liées au centre
+     de l'éditeur (qui correspond à la fréquence nulle), le masque peut
+     être automatiquement lié au centre (origine des coordonnées 
+     spectrales) lors de son édition. Plusieurs types d'affichage et de
+     sortie sont disponibles, dont la description est explicite – l'image 
+     ou les coefficients de la FFT (ou bien les deux) peuvent être 
+     extraits par le module.
+    </para>
+  </sect2>
+  <sect2 id='frequency-split'>
+    <title>
+      Séparation fréquentielle <gwy:icon name='frequency_split'/>
+    </title>
+    <indexterm>
+      <primary>transformée de Fourier</primary>
+      <secondary>filtre passe-haut</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>transformée de Fourier</primary>
+      <secondary>filtre passe-bas</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Niveau</guisubmenu>
+        <guimenuitem>Séparation fréquentielle</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Une alternative simple au
+      <link linkend='fft-filter-2d'>filtrage FFT 2D</link> consiste à 
+      séparer les fréquences spatiales hautes et basses en utilisant un 
+      filtre passe-haut ou passe-bas. Le module de séparation 
+      fréquentielle peut générer l'image basse ou haute fréquence, ou 
+      bien les deux à la fois, en fonction du 
+      <guilabel>Type de sortie</guilabel> sélectionné.
+    </para>
+    <para>
+      La <guilabel>Coupure</guilabel> permet de définir la fréquence de
+      coupure, affichée en fraction de la fréquence de Nyquist, ainsi 
+      que la période spatiale correspondante. Si 
+      <guilabel>Largeur des bords</guilabel> (elle aussi donnée en 
+      fraction de la fréquence de Nyquist) est nulle, le filtre aura des
+      bords droits. Pour une valeur non-nulle, la transition aura la 
+      forme de la fonction d'erreur (erf), avec la largeur spécifiée.
+    </para>
+    <para>
+      Le filtrage fréquentiel peut générer des artefatcts sur les bords 
+      des l'image. Plusieurs manières de gérer les bords sont donc
+      proposées, en complément de <guilabel>Aucun</guilabel> qui n'est 
+      réellement utile que pour les données périodiques (ou bien si la 
+      continuité est assurée entre les bords). Les options
+      <guilabel>Laplace</guilabel> et <guilabel>Miroir</guilabel> 
+      étendent respectivement l'image à l'aide de l'équation de Laplace 
+      ou par mise en miroir de l'image, exactement de la même manière 
+      que la fonction <link linkend='extend'>Étendre</link>.
+      L'option <guilabel>Connexion douce</guilabel> applique aux lignes
+      et aux colonnes la méthode d'extension uni-dimensionnelle utilisée
+      dans l'outil <link linkend='roughness-iso'>Rugosité</link> pour
+      supprimer les artefacts aux bords.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

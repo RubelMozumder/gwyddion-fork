@@ -1,0 +1,2341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: synthetic.xml 26085 2024-01-02 16:20:48Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 xmlns:xi="http://www.w3.org/2001/XInclude" id="synthetic">
+  <title>Синтетические поверхности</title>
+  <para>Помимо функций для анализа измеренных данных Gwyddion предлагает несколько генераторов искусственных поверхностей которые можно также использовать для тестирования или моделирования вне Gwyddion [<link linkend="synthetic-ref-1">1</link>].</para>
+  <para>Все генераторы поверхностей имеют некоторый общий набор параметров, определяющих размеры и масштабы созданной поверхности и элементов управления генератором случайных чисел. Эти параметры описаны ниже, параметры, специфичные для каждого генератора описаны в соответствующих подразделах.</para>
+  <para>Параметры изображения:</para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <guilabel>Горизонтальный, вертикальный размер</guilabel>
+      </term>
+      <listitem>
+        <para>Горизонтальное и вертикальное разрешение создаваемой поверхности в пикселях.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Квадратное изображение</guilabel>
+      </term>
+      <listitem>
+        <para>Включение этой опции делает горизонтальное и вертикальное разрешения одинаковыми.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Ширина, высота</guilabel>
+      </term>
+      <listitem>
+        <para>Горизонтальные и вертикальные физические размеры создаваемой поверхности в выбранных единицах. Следует отметить, что квадратные пиксели считаются таковыми, изменение одного параметра ведёт к изменению другого.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Единицы измерения пространства и значений</guilabel>
+      </term>
+      <listitem>
+        <para>Единицы измерения пространственных размеров (<guilabel>Ширина</guilabel>, <guilabel>Высота</guilabel>) и значений (высот). Выбранные здесь единицы измерения также определяют единицы измерения не безразмерных параметров отдельных генераторов.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guibutton><guilabel>Взять размеры текущего изображения</guilabel></guibutton>
+      </term>
+      <listitem>
+        <para>Нажатие этой кнопки приводит к заполнению всех вышеперечисленных параметров в соответствии с текущим изображением.</para>
+        <para>Следует отметить, что хотя единицы измерения значений обновляются, масштаб значений определяется зависящими от генератора параметрами, которые могут не выводиться напрямую из статистических свойств текущего изображения. Следовательно, эти параметры не пересчитываются.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Заменить текущее изображение</guilabel>
+      </term>
+      <listitem>
+        <para>Эта опция имеет двойной эффект. Во первых, она заставляет размеры и масштабы автоматически устанавливаться равными текущему изображению. Во вторых, при этом генерируемая поверхность заменяет текущее изображение вместо создания нового.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Начать с текущего изображения</guilabel>
+      </term>
+      <listitem>
+        <para>Эта опция имеет двойной эффект. Во первых, она заставляет размеры и масштабы автоматически устанавливаться равными текущему активному изображению. Во вторых, она заставляет генератор начать с поверхности, содержащейся в текущем изображении и модифицировать её вместо плоской поверхности. Следует отметить, что это не влияет на то, будет ли результат записан в текущее изображение или будет создано новое.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>Элементы управления генератором случайных чисел:</para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <guilabel>Случайное зерно</guilabel>
+      </term>
+      <listitem>
+        <para>Начальное число генератора случайных чисел. При выборе тех же параметров и разрешений и того же начального числа генерируется та же самая поверхность, даже на разных компьютерах. Различные начальные числа приводят к генерации разных поверхностей с теми же общими характеристиками, заданными параметрами генератора.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guibutton><guilabel>Новый</guilabel></guibutton>
+      </term>
+      <listitem>
+        <para>Заменяет начальное число случайным.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Сделать случайным</guilabel>
+      </term>
+      <listitem>
+        <para>Включение этой опции приводит к тому, что начальное число выбирается случайно при каждом запуске генератора. Это позволяет удобно перезапускать генератор просто нажимая <keycap>Ctrl-F</keycap> (см. раздел <link linkend="keyboard-shortcuts">клавиатурные сокращения</link>).</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>Обновить/просмотреть элементы управления:</para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <guilabel>Обновлять сразу</guilabel>
+      </term>
+      <listitem>
+        <para>Если этот флаг включен, поверхность рассчитывается заново после каждого изменения входных параметров. Эта опция доступна для генераторов которые работают относительно быстро.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Прогрессивное обновление</guilabel>
+      </term>
+      <listitem>
+        <para>Если этот флаг включен, изображение предпросмотра показывает развитие морфологии поверхности в процессе симуляции. Эта опция доступна для медленных генераторов, которые задействуют итерационные физические модели. Включение прогрессивного обновления в общем случае слегка замедляет симуляцию, поскольку снимки требуют некоторого времени для своего получения и отображения.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <sect2 id="spectral-synthesis">
+    <title>Спектральный <gwy:icon name="synthetic_spectral"/></title>
+    <para>Модуль спектрального синтеза создаёт случайно шероховатые поверхности путём синтеза преобразования Фурье поверхности в соответствии с заданными параметрами и затем применением обратного преобразования Фурье для получения реальной поверхности. Генерируемые поверхности являются периодическими (т.е. идеально гладко сшиваются на границах).</para>
+    <para>Параметры Фурье-образа определяют форму функции спектральной плотности мощности, т.е. модулей коэффициентов Фурье, фазы задаются случайно. В настоящий момент все создаваемые поверхности изотропны, т.е. функция спектральной плотности мощности радиально симметрична.</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Ср. квадр.</guilabel>
+        </term>
+        <listitem>
+          <para>Среднеквадратичное значение высот (или отличий от средней плоскости, которая, однако, всегда является плоскостью <xi:include href="eqi-z-is-0.xml"/>). Кнопка <guilabel>как у текущего изображения</guilabel> устанавливает значение среднеквадратичного отклонения равным таковому для текущего изображения.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Минимальная, максимальная частота</guilabel>
+        </term>
+        <listitem>
+          <para>Минимальная и максимальная пространственные частоты. Увеличение минимальной частоты ведёт к <quote>уплощению</quote> изображения, т.е. удалению крупных выделяющихся частей. Уменьшение максимальной частоты ограничивает остроту выступающих частей.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Разрешить гауссов множитель</guilabel>
+        </term>
+        <listitem>
+          <para>Включает умножение коэффициентов Фурье на гауссову функцию, что в реальном пространстве соответствует свёртке с гауссианой.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Разрешить лоренцев множитель</guilabel>
+        </term>
+        <listitem>
+          <para>Включает умножение коэффициентов в разложении Фурье на функцию, пропорциональную <xi:include href="eqi-1-over-1-plus-K2T2-to-3t4.xml"/>, где <xi:include href="eqi-T.xml"/> — длина автокорреляции. Таким образом, сам множитель фактически не является лоренцевым, но он соответствует лоренцевой одномерной плотности спектра мощности, которая в свою очередь соответствует экспоненциальной функции автокорреляции (подробное обсуждение функций автокорреляции приведено в разделе <link linkend="autocorrelation-1d">Статистический анализ</link>). Этот множитель убывает сравнительно медленно, таким образом, ограниченное разрешение играет обычно большую роль, чем в случае с гауссовым.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Длина автокорреляции</guilabel>
+        </term>
+        <listitem>
+          <para>Длина автокорреляции гауссова или лоренцева множителя (подробное обсуждение функций автокорреляции приведено в разделе <link linkend="autocorrelation-1d">Статистический анализ</link>).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Разрешить степенной множитель</guilabel>
+        </term>
+        <listitem>
+          <para>Включает умножение коэффициентов в разложении Фурье на множитель, пропорциональный <xi:include href="eqi-1-over-k-to-p.xml"/>, где <xi:include href="eqi-k.xml"/> - пространственная частота и <xi:include href="eqi-p.xml"/> - степень. Это позволяет создавать различные фрактальные поверхности.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Степень</guilabel>
+        </term>
+        <listitem>
+          <para>Степень <xi:include href="eqi-p.xml"/>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-spectral">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-spectral.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные поверхности созданные спектральным синтезом: узкий диапазон пространственных частот (слева), гауссова случайная поверхность (по центру) и фрактальная поверхность, созданная со степенным множителем и <xi:include href="eqi-p.xml"/> равными 1,5 (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="object-synthesis">
+    <title>Объекты <gwy:icon name="synthetic_objects"/></title>
+    <para>Метод размещения объектов позволяет создавать случайные поверхности, состоящие из выступающих частей определённой формы. Алгоритм прост: заданное число объектов помещается в случайные места поверхности. Для каждого из размещаемых объектов, новые высоты меняются на <xi:include href="eqi-max-z-z_0-plus-h.xml"/>, где <xi:include href="eqi-z.xml"/> – текущая высота отдельной точки, <xi:include href="eqi-h.xml"/> – высота объекта в этой точке (подразумевая нулевой базис) и <xi:include href="eqi-z_0.xml"/> – текущая минимальная высота над базисом помещаемого объекта. Алгоритм рассматривает горизонтальную плоскость как заполненную идентичными копиями поверхности, следовательно, и сама поверхность будет периодически повторяющейся (т.е. будет идеально совмещаться сама с собой на границах при использовании в качестве текстуры).</para>
+    <informaltable role="image-grid" align="center" id="table-synthetic-objects">
+      <tgroup frame="none" cols="4">
+        <?dblatex cccc?>
+        <tbody>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-pyramid.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-diamond.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-tetrahedron.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-hexpyramid.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Пирамида</entry>
+            <entry>Бриллиант</entry>
+            <entry>Тетраэдр</entry>
+            <entry>Гексагональная пирамида</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-cone.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-sphere.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-nugget.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-parbump.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Конус</entry>
+            <entry>Полусфера</entry>
+            <entry>Половина сварной точки</entry>
+            <entry>Параболический выступ</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-gaussian.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-expspike.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-fullsphere.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-fullnugget.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Гауссиана</entry>
+            <entry>Экспоненциальный выброс</entry>
+            <entry>Полная сфера</entry>
+            <entry>Сварная точка</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-box.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-thatch.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-semipyramid.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-tent.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Параллелепипед</entry>
+            <entry>Камыш</entry>
+            <entry>Полупирамида</entry>
+            <entry>Палатка</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="synthetic-object-doughnut.png" format="PNG"/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry/>
+            <entry/>
+            <entry/>
+          </row>
+          <row>
+            <entry>Бублик</entry>
+            <entry/>
+            <entry/>
+            <entry/>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+    <para>Параметры и настройки на вкладке <guilabel>Форма</guilabel> управляют формой отдельных особенностей:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Форма</guilabel>
+        </term>
+        <listitem>
+          <para>Форма (тип) размещаемых объектов. В настоящее время возможные варианты включают: полусферы, прямоугольные параллелепипеды, различные пирамиды, бугры, иглы и некоторое количество более странных форм. Разница между полусферой и полной сферой состоит в высоте. Полная сфера включает также высоту нижней половины. То же самое относится и к сварным точкам.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Размер</guilabel>
+        </term>
+        <listitem>
+          <para>Пространственный размер объекта, обычно сторона описанного квадрата.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Пропорции</guilabel>
+        </term>
+        <listitem>
+          <para>Соотношение между размерами по <xi:include href="eqi-x.xml"/> и <xi:include href="eqi-y.xml"/> объекта по отношению к некоторым пропорциям по умолчанию.</para>
+          <para>Изменение соотношения сторон не всегда подразумевает простое геометрическое масштабирование, например, объекты, называемые частицами меняют форму от полусфер до стержней при изменении соотношения сторон.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Величина, пропорциональная высоте объекта, обычно высота самой высокой точки.</para>
+          <para>Включение опции <guilabel>Масштабируется с размером</guilabel> заставляет невозмущенные высоты масштабироваться пропорционально размерам отдельных объектов. В противном случае высота не зависит от размера. Пропорциональное масштабирование полезно при использовании ненулевого разброса размеров чтобы сохранить форму всех объектов одинаковой (в противоположность их вертикальному удлинению и уплощению). Если все объекты имеют одинаковый размер, опция никак не влияет на результат.</para>
+          <para>Кнопка <guilabel>как у текущего изображения</guilabel> устанавливает значение высоты равным значению, основанном на среднеквадратичном отклонении текущего изображения.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Усечение</guilabel>
+        </term>
+        <listitem>
+          <para>Фигуры могут быть усечены на определённой высоте для создания усечённых конусов, пирамид, и т.п. Высота усечения задаётся в долях от общей высоты объекта. Единица означает неусечённую фигуру, ноль – полное удаление объекта.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Каждый параметр может быть задан случайно для отдельных объектов, это задаётся опцией <guilabel>Разброс</guilabel>. Для мультипликативных величин (все, кроме ориентации и усечения), распределение логарифмически нормальное со значением среднеквадратичного отклонения логарифма величины заданным параметром <guilabel>Разброс</guilabel>.</para>
+    <para>Параметры и настройки на вкладке <guilabel>Размещение</guilabel> управляют где и как поверхность будет меняться с помощью сгенерированных фигур:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее количество раз, которое объект перекрывает пиксель изображения. Значение покрытия 1 означает что поверхность будет ровно один раз покрыта объектами, при этом они будут покрывать её равномерно. Большие значения означают больше слоёв объектов и более медленную генерацию изображения.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Направление особенности</guilabel>
+        </term>
+        <listitem>
+          <para>Направление изменения поверхности при добавлении объектов. Положительные и отрицательные изменения соответствуют образованию высот и впадин при добавлении объектов соответственно. Нулевое значение параметра означает что выступы и впадины выбираются случайно. Положительное значение делает выступы более вероятными, максимальное значение, равное 1 соответствует формированию только выступов. То же самое справедливо для отрицательных значений и впадин.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Рост плёнки колоннами</guilabel>
+        </term>
+        <listitem>
+          <para>Для столбчатости равной нулю локальная модификация поверхности работает как описано во введении. Для столбчатости равной одному (максимальной) объекты считаются имеющими также нижнюю часть, которая является идеальным зеркальным отражением (видимой) верхней части. Как только нижняя часть касается любой точки поверхности, она прилипает к ней. Это задаёт итоговую высоту. Диапазон высот растёт быстро в данном случае и объём будет достаточно пористым (что не представлено полем высот, разумеется). Значения между 0 и 1 означают что высота объекта интерполируется между двумя экстремумами.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Избегать наложения</guilabel>
+        </term>
+        <listitem>
+          <para>Если эта опция включена, на любой пиксель поверхности может быть помещено не более одного объекта. Следовательно, они никогда не будут пересекаться. Опция <guilabel>Покрытие</guilabel> в данном случае не задаёт сколько объектов будет реально помещено на поверхность, а только количество попыток генератора разместить объект. Как только не остаётся свободного места, куда можно поместить объект заданного размера, увеличение покрытия не будет влиять на результат (только замедлять генерацию).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ориентация</guilabel>
+        </term>
+        <listitem>
+          <para>Поворот решетки по отношению к определённому исходному направлению, измеренный против часовой стрелки. Ориентация также может быть сделана случайной используя соответствующую настройку <guilabel>Разброса</guilabel>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-objects">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-objects.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные поверхности, созданные размещением объектов: сфер различного размера (слева), узких камышовых листьев различного направления (по центру), отрицательных непересекающихся гексагональных пирамид разного размера (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="particle-synthesis">
+    <title>Чвстицы <gwy:icon name="synthetic_particles"/></title>
+    <para>Осаждение частиц проводит динамическое моделирование падения взаимодействующих сферических частиц на твёрдую поверхность. Частицы не падают все одновременно. Вместо этого, они падают последовательно между частицами уже лежащими на поверхности и им даётся время для релаксации.</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Радиус частицы</guilabel>
+        </term>
+        <listitem>
+          <para>Радиус сферических частиц в физических единицах. Высота и пространственные размеры должны быть одной и той же физической величиной, следовательно, тут будет только один параметр размерности.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ширина распределения</guilabel>
+        </term>
+        <listitem>
+          <para>Стандартное отклонение распределения радиуса (гауссова).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Какая часть поверхности должна быть покрыта, если она равномерно покрывается осаждаемыми частицами. если модель не может разместить требуемого числа частиц, обычно вследствие слишком малого времени симуляции, выводится сообщение об ошибке.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Шагов релаксации</guilabel>
+        </term>
+        <listitem>
+          <para>Длина моделирования, измеренная в количестве шагов.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para id="rod-synthesis">Метод осаждения стержней основан на том же динамическом моделировании, но для продолговатых частиц. Частицы в действительности формируются триплетами сфер, тем не менее, это позволяет получить достаточно вменяемый диапазон соотношений размеров частиц. Модель также имеет несколько дополнительных параметров взаимодействия.</para>
+  </sect2>
+  <sect2 id="pileup-synthesis">
+    <title>Нагромождение <gwy:icon name="synthetic_noise"/></title>
+    <para>Генератор искусственных поверхностей <link linkend="object-synthesis">Объекты</link> достаточно быстр, но это достигается избеганием любых видов трёхмерной геометрии и только тем, что поверхность изменяется по простым правилам. Модули <link linkend="particle-synthesis">осаждения частиц и стержней</link> лежат около другого конца спектра скорость-реализм и действительно выполняют динамическое моделирование падения на поверхность взаимодействующих частиц. Этот модуль лежит посередине, поскольку он формирует поверхность из реальных трёхмерных твёрдых объектов, но по прежнему использует только простые правила для того, что происходит с ними когда они касаются поверхности, сохраняя хорошую скорость генерации поверхности.</para>
+    <para>Объекты начинают падать из горизонтального положения. Когда они касаются поверхности, находится положение локальной средней плоскости вокруг области контакта. Фигура после этого поворачивается так, чтобы лежать прямо на этой локальной плоскости, её финальная высота определяется как подробнее описано в описании <guilabel>Столбчатости</guilabel> ниже, и затем она просто прилипает в этом положении. Дальнейшее соскальзывание, кувыркание, обрушение и прочие динамические усадочные процессы не моделируются.</para>
+    <para>Некоторые параметры генератора имеют точно такое же значение, что и для синтеза <link linkend="object-synthesis">Объектов</link>. Это включает в себя <guilabel>Покрытие</guilabel>, <guilabel>Избегать наложения</guilabel> и <guilabel>Ориентация</guilabel>. Остальные описаны ниже:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Форма</guilabel>
+        </term>
+        <listitem>
+          <para>Форма (вид) помещаемых объектов. В настоящее время возможные варианты включают в себя различные удлинённые формы.</para>
+          <informaltable role="image-grid" align="center" id="table-synthetic-pileup">
+            <tgroup frame="none" cols="3">
+              <?dblatex ccc?>
+              <tbody>
+                <row>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref="synthetic-pileup-ellipsoid.png" format="PNG"/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref="synthetic-pileup-bar.png" format="PNG"/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref="synthetic-pileup-cylinder.png" format="PNG"/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                </row>
+                <row>
+                  <entry>Эллипсоид</entry>
+                  <entry>Брус</entry>
+                  <entry>Цилиндр</entry>
+                </row>
+                <row>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref="synthetic-pileup-nugget.png" format="PNG"/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref="synthetic-pileup-hexbar.png" format="PNG"/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                  </entry>
+                </row>
+                <row>
+                  <entry>Частица</entry>
+                  <entry>Гексагональный стержень</entry>
+                  <entry/>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ширина</guilabel>
+        </term>
+        <listitem>
+          <para>Формы могут быть вытянуты вдоль оси <xi:include href="eqi-x.xml"/> (что контролируется опцией <guilabel>Соотношение сторон</guilabel>). Их размер в перпендикулярном направлении задаётся шириной. Поперечное сечение будет симметричным. Следовательно, ширина задаёт сразу и горизонтальную ширину, и высоту.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Соотношение сторон</guilabel>
+        </term>
+        <listitem>
+          <para>Отношение между размерами вдоль направлений <xi:include href="eqi-x.xml"/> и <xi:include href="eqi-y.xml"/>. Другими словами, вытянутость. Оно всегда не меньше единицы, формы никогда не сжимаются вдоль оси <xi:include href="eqi-x.xml"/>. Следовательно, распределение соотношения размеров может быть сильно асимметричным, если номинальное значение близко к единице и разброс велик.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Рост плёнки колоннами</guilabel>
+        </term>
+        <listitem>
+          <para>В общем случае, этот параметр влияет на то, насколько фигуры склонны образовывать колоннообразные структуры (пористые, если топографические данные могут это представить). Значение по умолчанию, равное нулю, можно представить как если бы нижняя часть фигуры плавилась при взаимодействии и заполняла впадину, куда она упала. Следует отметить, что объёмное равновесие является в какой-то мере приблизительным и высота, на которой застревает объект может быть такой, что острые выступы на поверхности пробивают его насквозь.</para>
+          <para>Максимальная столбчатость (1) означает, что как только любая часть формы касается поверхности, она прилипает к ней. Для меньших положительных значений финальная высота интерполируется парой высот, заданной двумя подходами.</para>
+          <para>Если столбчатость отрицательна, форма вбита в поверхность. Для минимального значения (-1) оно опускается на наименьшую высоту, для которой по крайней мере одна точка всей её нижней границы не будет ниже оригинальной поверхности. Снова, для других отрицательных значений финальная высота будет интерполирована.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-pileup">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-pileup.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные поверхности, создаваемые нагромождением геометрических форм: направленных гексагональных брусьев на центральном гребне (слева), беспорядочная куча элипсоидальных игл (по центру), куча кубов наваленных на центральную колонну (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="noise-synthesis">
+    <title>Шум <gwy:icon name="synthetic_noise"/></title>
+    <para>Случайный некоррелированный точечный шум генерируется независимо в каждой точке. Доступно несколько распределений.</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Распределение</guilabel>
+        </term>
+        <listitem>
+          <para>Распределение значения шума. Варианты включают в себя гауссово, экспоненциальное, равномерное и треугольное распределения, распределение вида соль и перец.</para>
+          <para>Распределение вида соль и перец работает несколько отлично от того, которое является привычным для работающих с компьютерной графикой, поскольку диапазон значений неограничен. Это бимодальное распределение состоящее из двух <xi:include href="eqi-delta.xml"/>-функций. Другими словами, константа (задаваемая с помощью RMS) добавляется и/или вычитается из каждого значения пикселя.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Направление</guilabel>
+        </term>
+        <listitem>
+          <para>Шум можно генерировать как симметричный, так и односторонний. Среднее значение распределения симметричного шума равно нулю, т.е. среднее значение данных не меняется при добавлении симметричного шума. Односторонний шум только увеличивает (положительный) или уменьшает (отрицательный) значения данных.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ср. квадр.</guilabel>
+        </term>
+        <listitem>
+          <para>Среднеквадратичное значение распределения шума. Точнее, среднеквадратичное соответствующего симметричного распределения в случае одностороннего шума.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Плотность</guilabel>
+        </term>
+        <listitem>
+          <para>Плотность показывает долю значений, которые будут изменяться. Если она равна 1, то изменятся все пиксели изображения. Если она меньше, некоторые останутся неизменными.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-noise">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-noise.png" format="PNG"/>
+        </imageobject>
+        <caption>Различные виды искусственного шума, добавленные к одной и той же поверхности: симметричный гауссов шум (слева), положительный экспоненциальный шум (по центру), отрицательный экспоненциальный шум (справа). Все изображения показаны с одинаковой шкалой псевдоцвета и все виды шума имеют одинаковое среднеквадратичное отклонение.</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="line-noise-synthesis">
+    <title>Линейный шум <gwy:icon name="synthetic_line_noise"/></title>
+    <para>Линейный шум представляет собой шум с длительностью больше пренебрежимо малой, который приводит к типичным ступеням или царапинам (они же называются штрихами) в направлении быстрой оси сканирования или смещенным линиям сканирования. Параметры <guilabel>Распределение</guilabel>, <guilabel>Направление</guilabel> и <guilabel>Среднеквадратичное отклонение</guilabel> имеют те же значения, что и для <link linkend="noise-synthesis">точечного шума</link>. Другие параметры управляют пространственными характеристиками шума.</para>
+    <para>Доступны следующие основные типы линейных дефектов: <itemizedlist>
+        <listitem><guilabel>Ступеньки</guilabel> представляет собой резкое изменение значений которое продолжается до конца скана (или до возникновения следующей ступени).</listitem>
+        <listitem><guilabel>Царапины</guilabel> это локальные изменения значения с конечной длиной, т.е. значения возвращаются к оригинальному уровню в пределах той же линии скана.</listitem>
+        <listitem><guilabel>Борозды</guilabel> подобны царапинам, но на большем масштабе: они могут продолжаться на несколько линий сканирования.</listitem>
+        <listitem><guilabel>Наклон</guilabel> создает разброс наклонов отдельных линий сканирования, в противоположность тому, чтобы напрямую сдвигать их высоту.</listitem>
+        <listitem><guilabel>Автогенерация (жужжание)</guilabel> добавляет квазипериодическое возмущение, моделирующее тип шума возникающий из электронных помех.</listitem>
+      </itemizedlist></para>
+    <para>Ступеньки имеют следующие параметры:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Плотность</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее число дефектов на линию скана, включая любое время простоя (которое определяется параметром <guilabel>Рабочий ход</guilabel>).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>В пределах линии</guilabel>
+        </term>
+        <listitem>
+          <para>Доля времени сканирования линии, которая тратится непосредственно на снятие данных. Остальное время относится к холостому ходу. Значение 1 соответствует случаю нулевого времени холостого хода, т.е. все ступени появляются в пределах изображения. Значение 0 означает, что время снятия данных пренебрежимо мало к общему времени сканирования линии, следовательно, ступени могут встречаться только между линиями.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Направление сканирования</guilabel>
+        </term>
+        <listitem>
+          <para>Если ступени могут возникать внутри линии сканирования это задаёт горизонтальное направление сканирования (предполагается что медленная ось сканирования направлена сверху вниз). Для сканирования слева направо левая часть линии сканирования будет непрерывна с данными выше и нижняя с данными ниже. Для сканирования справа налево наоборот. Два направления проиллюстрированы в описании <link linkend="fig-scan-step-artefacts">Блочной коррекции ступеней</link>, которая исправляет подобные артефакты.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Кумулятивные</guilabel>
+        </term>
+        <listitem>
+          <para>Для кумулятивных ступеней случайное значение всегда добавляется к текущему значению данных; для одиночных ступеней новое смещение данных напрямую равно случайному значению смещения.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Для царапин доступны следующие параметры:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Доля изображения покрытая дефектами, если они не пересекаются. Поскольку дефекты могут пересекаться, значение покрытия 1.0 не означает, что изображение полностью закрыто объектами.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Длина</guilabel>
+        </term>
+        <listitem>
+          <para>Длина царапины в пикселях.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Разброс</guilabel>
+        </term>
+        <listitem>
+          <para>Разброс длины царапины, описание в разделе <link linkend="object-synthesis">объекты</link>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Гребни имеют следующие параметры:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Плотность</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее число дефектов на линию скана, включая любое время простоя (которое определяется параметром <guilabel>Рабочий ход</guilabel>).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>В пределах линии</guilabel>
+        </term>
+        <listitem>
+          <para>Доля времени сканирования линии, которая тратится непосредственно на снятие данных. Остальное время относится к холостому ходу. Значение 1 соответствует случаю нулевого времени холостого хода, т.е. все ступени появляются в пределах изображения. Значение 0 означает, что время снятия данных пренебрежимо мало к общему времени сканирования линии, следовательно, ступени могут встречаться только между линиями.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Направление сканирования</guilabel>
+        </term>
+        <listitem>
+          <para>Если ступени могут возникать внутри линии сканирования это задаёт горизонтальное направление сканирования (предполагается что медленная ось сканирования направлена сверху вниз). Для сканирования слева направо левая часть линии сканирования будет непрерывна с данными выше и нижняя с данными ниже. Для сканирования справа налево наоборот. Два направления проиллюстрированы в описании <link linkend="fig-scan-step-artefacts">Блочной коррекции ступеней</link>, которая исправляет подобные артефакты.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ширина</guilabel>
+        </term>
+        <listitem>
+          <para>Средняя длина дефекта, измеренная в единицах размера изображения. Значение 1 означает что средней длиной будет всё время сканирования изображения. Малые значения означают что дефекты в основном будут занимать только одну линию сканирования.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Наклон имеет следующие параметры:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Разброс смещений</guilabel>
+        </term>
+        <listitem>
+          <para>С нулевым смещением все линии сканирования наклонены относительно середины. Другими словами, центральный столбец изображения не искажается. Увеличение разброса смещений случайно сдвигает точки поворота больше и больше влево и вправо от центра.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Гудение имеет следующие параметры:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Длина волны</guilabel>
+        </term>
+        <listitem>
+          <para>Характеристическая частота жужжания, измеренная в размерах изображения.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Разброс</guilabel>
+        </term>
+        <listitem>
+          <para>Малый разброс означает что шум будет очень узкополосным и будет выглядеть более-менее похоже на чистую синусоидальную волну. Большие значения порождают более широкий спектр с биениями и более искаженным профилем.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Компоненты</guilabel>
+        </term>
+        <listitem>
+          <para>Число случайных синусоидальных компонент, которые будут использованы чтобы сконструировать шум в каждой линии сканирования.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-line-noise">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-line-noise.png" format="PNG"/>
+        </imageobject>
+        <caption>Различные виды линейного шума добавленные к искусственной пирамидальной поверхности: Верхний ряд: исходная поверхность (слева); относительно редкие кумулятивные ступени (по центру); относительно редкие борозды (справа). Нижний ряд: царапины со средней длиной 16 пикселей и высокой степенью покрытия (слева); наклон с малым разбросом смещений (по центру); автогенерация с настройками по умолчанию (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="pattern-synthesis">
+    <title>Структура <gwy:icon name="synthetic_pattern"/></title>
+    <para>Правильные геометрические текстуры, представляют поверхности, часто встречающиеся в микроскопии в качестве стандартов или тестовых образцов. В настоящее время может генерировать следующие типы текстур:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Лестница</guilabel>
+        </term>
+        <listitem>
+          <para>Одномерную лестничную текстуру, сформированную ступенями постоянной ширины и высоты.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Решетка</guilabel>
+        </term>
+        <listitem>
+          <para>Одномерная текстура, сформированная двусторонними ступенями (гребнями) постоянной ширины и высоты.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Амфитеатр</guilabel>
+        </term>
+        <listitem>
+          <para>Текстура в виде суперэллипса, сформированная ступенями постоянной ширины и высоты.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Концентрические круги</guilabel>
+        </term>
+        <listitem>
+          <para>Текстура в виде суперэллипса, сформированная двусторонними ступенями (гребнями) постоянной ширины и высоты.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Звезда Сименса</guilabel>
+        </term>
+        <listitem>
+          <para>Круговая текстура, сформированная сменяющими друг друга высокой и низкой кромками.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Отверстия (прямоугольные)</guilabel>
+        </term>
+        <listitem>
+          <para>Двумерная регулярная структура из прямоугольных отверстий, возможно квадратных.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Колонны</guilabel>
+        </term>
+        <listitem>
+          <para>Двумерная правильная упорядоченная структура симметричных колонн нескольких возможных видов (круглых, квадратных или шестигранных).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Двойная лестница</guilabel>
+        </term>
+        <listitem>
+          <para>Двумерная регулярная структура из ступеней фиксированной ширины и высоты.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Каждый тип текстуры имеет свой набор геометрических параметров, задающих форму и размер различных частей текстуры. Они описаны в следующих разделах. Большая часть геометрических параметров имеет также связанное с ними управление разбросом, подобное используемому в <link linkend="object-synthesis">синтезе объектов</link>, что позволяет сделать некоторые аспекты текстуры менее упорядоченными.</para>
+    <para>Расположение структуры на горизонтальной поверхности управляется параметрами на вкладке <guilabel>Положение</guilabel>, общей для всех видов шаблонов:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Ориентация</guilabel>
+        </term>
+        <listitem>
+          <para>Поворот текстуры по отношению к определённому исходному направлению, измеренный против часовой стрелки.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Эта вкладка также содержит параметры деформации. Включение разброса параметров делает поверхность в какой-то степени неправильной, однако, форма характерных особенностей поддерживается неизменной. Это дополняется другим методом изменения, называемым <guilabel>Деформация</guilabel> который разрешает искажение шаблона в плоскости <xi:include href="eqi-xy.xml"/>. У деформации есть два параметра:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Амплитуда</guilabel>
+        </term>
+        <listitem>
+          <para>Величина пространственной деформации. Относительная численная величина в основном определяющая как далеко может зайти деформация.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Пространственный масштаб</guilabel>
+        </term>
+        <listitem>
+          <para>Характерный размер деформаций. Он описывает не как далеко смещаются характерные части изображения, а как резко или медленно сама деформация меняется вдоль горизонтальной плоскости.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Деформация работает аналогично двумерной гауссовой деформации, применяемой с помощью <link linkend="displacement-field">поля смещения</link>. Однако, в данном случае она применяется к координатной системе перед тем, как отрисовывать текстуру, в то время, как <link linkend="displacement-field">поле смещения</link> искажает уже дискретизированные изображения.</para>
+    <para>Все текстуры также имеют параметр <guilabel>Высота</guilabel>, задающий высоту элементов текстуры в физических единицах измерения. Для текстур по типу лестницы, которые растут непрерывно этот параметр задаёт высоту одной ступени. Для текстур, состоящих из выступов или впадин относительно ровной базовой плоскости этот параметр задаёт высоту одного отдельного элемента (если она не модифицирована Разбросом).</para>
+    <informalfigure id="fig-synthetic-pattern">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-pattern.png" format="PNG"/>
+        </imageobject>
+        <caption>Поверхности на основе искусственных текстур. Верхний ряд: острые ступени, деформированные с большой длиной волны, масштабированная решетка с большим разбросом ширины и широкими асимметричными уклонами, слегка деформированный амфитеатр с отрицательной параболичностью, и концентрические круги с положительной параболичностью и меняющейся высотой. Нижний ряд: звезда Сименса с увеличенной верхней гранью, длинные прямоугольные отверстия с меняющимся вертикальным размером и положением, ряды слегка деформированных круглых колонн и двойная лестница с меняющейся шириной ступени.</caption>
+      </mediaobject>
+    </informalfigure>
+    <sect3 id="pattern-synthesis-staircase">
+      <title>Лестница</title>
+      <para>Лестница имеет следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина террасы</guilabel>
+          </term>
+          <listitem>
+            <para>Ширина одной ступени, заданная в пикселях, но также отображаемая в физических единицах. Все остальные размеры в горизонтальной плоскости задаются как доля этой базовой ширины.</para>
+            <para>Ширина включает в себя ширину наклонной части и может рассматриваться как <quote>период</quote> текстуры.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Разброс положения</guilabel>
+          </term>
+          <listitem>
+            <para>Случайное положение кромки ступени. Кромки никогда не пересекаются. Даже для максимального уровня случайности, они могут максимум коснуться края следующей ступени.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина уклона</guilabel>
+          </term>
+          <listitem>
+            <para>Доля ширины, занятая наклонной кромкой. нуль означает острые ступени, единица означает, что текстура будет ровным уклоном (без рандомизации или влияния других модифицирующих параметров).</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Масштабируется с длиной</guilabel>
+          </term>
+          <listitem>
+            <para>Если включено для высоты ступени, высота будет настраиваться чтобы быть пропорциональной ширине окружающих террас, при этом сохраняя среднюю высоту ступеней заданной. Этот подход наиболее близко сохраняет среднюю плоскость поверхности даже для случайной ширины ступеней.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id="pattern-synthesis-grating">
+      <title>Решетка</title>
+      <para>Решетка имеет следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Период</guilabel>
+          </term>
+          <listitem>
+            <para>Период текстуры, заданный в пикселях, но также отображаемый в физических единицах. Все остальные размеры в горизонтальной плоскости задаются как доля этой базовой ширины.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Разброс положения</guilabel>
+          </term>
+          <listitem>
+            <para>Рандомизация ширины отдельных пар гребень-желоб.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Масштабировать особенности с шириной</guilabel>
+          </term>
+          <listitem>
+            <para>Если включено, то все горизонтальные размеры масштабируются пропорционально ширине каждой отдельной пары гребень-впадина для рандомизированных текстур. В противном случае <guilabel>Верхняя доля</guilabel> или <guilabel>Ibhbyf yfrkjyf</guilabel> относятся к невозмущенному базовому периоду текстуры.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Верхняя фракция</guilabel>
+          </term>
+          <listitem>
+            <para>Доля ширины, приходящаяся на верхнюю поверхность.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина уклона</guilabel>
+          </term>
+          <listitem>
+            <para>Доля ширины, приходящаяся на наклонные грани. Грани добавляются к верхней поверхности, но не заменяют её. Следовательно нулевая <guilabel>Доля верхней фракции</guilabel> и ненулевой наклон будет приводить к треугольным профилям.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Асимметрия</guilabel>
+          </term>
+          <listitem>
+            <para>Распределение ширины уклона для левых и правых кромок. Минус один означает что левые кромки будут наклонными и правые острыми. Плюс один означает что левые будут острыми и правые наклонными. Ноль обозначает симметричные уклоны.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id="pattern-synthesis-amphitheatre">
+      <title>Амфитеатр</title>
+      <para>Амфитеатр имеет следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Параметр суперэллипса</guilabel>
+          </term>
+          <listitem>
+            <para>Контуры ступени это суперэллипсы, описываемые уравнением <xi:include href="eq-superellipse-pattern-amphitheatre.xml"/> где <xi:include href="eqi-p.xml"/>. Нулевое значение соответствует квадратам, максимальное значение, равное двум, соответствует ромбам, значение по умолчанию, равное единице, соответствует кругам.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина террасы</guilabel>
+          </term>
+          <listitem>
+            <para>Ширина одной ступени, заданная в пикселях, но также отображаемая в физических единицах. Все остальные размеры в горизонтальной плоскости задаются как доля этой базовой ширины.</para>
+            <para>Ширина включает в себя ширину наклонной части и может рассматриваться как <quote>период</quote> текстуры.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Разброс положения</guilabel>
+          </term>
+          <listitem>
+            <para>Случайное положение кромки ступени. Кромки никогда не пересекаются. Даже для максимального уровня случайности, они могут максимум коснуться края следующей ступени.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Параболичность</guilabel>
+          </term>
+          <listitem>
+            <para>Положительные значения означают, что терраса становится уже с увеличением расстояния от центра и весь профиль становится ближе к параболическому. Отрицательные значения приводят к обратному эффекту, общая форма становится параболой, лежащей на боку.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина уклона</guilabel>
+          </term>
+          <listitem>
+            <para>Доля ширины, занятая наклонной кромкой. нуль означает острые ступени, единица означает, что текстура будет конусом (без рандомизации или влияния других модифицирующих параметров).</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id="pattern-synthesis-rings">
+      <title>Концентрические круги</title>
+      <para>Концентрические окружности имеют следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Параметр суперэллипса</guilabel>
+          </term>
+          <listitem>
+            <para>Контуры колец это суперэллипсы, описываемые уравнением <xi:include href="eq-superellipse-pattern-rings.xml"/> где <xi:include href="eqi-p.xml"/>. Нулевое значение соответствует квадратам, максимальное значение, равное двум, соответствует ромбам, значение по умолчанию, равное единице, соответствует кругам.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Период</guilabel>
+          </term>
+          <listitem>
+            <para>Период текстуры, заданный в пикселях, но также отображаемый в физических единицах. Все остальные размеры в горизонтальной плоскости задаются как доля этой базовой ширины.</para>
+            <para>Поскольку эта текстура является радиальной, период надо рассматривать как отсчитываемый при движении по радиусу от центра наружу.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Разброс положения</guilabel>
+          </term>
+          <listitem>
+            <para>Рандомизация ширины отдельных пар гребень-желоб.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Параболичность</guilabel>
+          </term>
+          <listitem>
+            <para>Положительные значения означают, что терраса становится уже с увеличением расстояния от центра и весь профиль становится ближе к параболическому. Отрицательные значения приводят к обратному эффекту, общая форма становится параболой, лежащей на боку.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Масштабировать особенности с шириной</guilabel>
+          </term>
+          <listitem>
+            <para>Если включено, то все горизонтальные размеры масштабируются пропорционально ширине каждой отдельной пары гребень-впадина для рандомизированных текстур. В противном случае <guilabel>Верхняя доля</guilabel> или <guilabel>Ibhbyf yfrkjyf</guilabel> относятся к невозмущенному базовому периоду текстуры.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Верхняя фракция</guilabel>
+          </term>
+          <listitem>
+            <para>Доля ширины, приходящаяся на верхнюю поверхность.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина уклона</guilabel>
+          </term>
+          <listitem>
+            <para>Доля ширины, приходящаяся на наклонные грани. Грани добавляются к верхней поверхности, но не заменяют её. Следовательно нулевая <guilabel>Доля верхней фракции</guilabel> и ненулевой наклон будет приводить к треугольным профилям.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Асимметрия</guilabel>
+          </term>
+          <listitem>
+            <para>Распределение ширины наклонов между левой и правой кромкой. Минус один означает, что внутренние кромки будут наклонными и внешние острыми. Плюс один делает внутренние острыми и внешние наклонными. Нулевое значение задаёт одинаковые наклоны в обе стороны.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id="pattern-synthesis-siemens-star">
+      <title>Звезда Сименса</title>
+      <para>Звезда Сименса имеет следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Количество секторов</guilabel>
+          </term>
+          <listitem>
+            <para>Число круговых секторов, на которые делится плоскость. Каждый сектор содержит верхнюю и нижнюю поверхность, так что количество кромок будет удвоенным числом секторов.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Верхняя фракция</guilabel>
+          </term>
+          <listitem>
+            <para>Доля углов, приходящаяся на верхнюю поверхность.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Сдвиг края</guilabel>
+          </term>
+          <listitem>
+            <para>Сдвиг кромки по отношению к радиальным ступицам, собирающимся вместе в центре. Положительные значения означают что верхняя поверхность увеличивается при сдвиге, отрицательные увеличивают нижнюю поверхность. Сдвиг не меняет асимптотическую долю верхней поверхности (для радиуса, стремящегося к бесконечности), но он меняет центр текстуры.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id="pattern-synthesis-rectangular-holes">
+      <title>Отверстия (прямоугольные)</title>
+      <para>Прямоугольные отверстия имеют следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term><guilabel>Период по X</guilabel> и <guilabel>период по Y</guilabel></term>
+          <listitem>
+            <para>Горизонтальный и вертикальный периоды текстуры, задаваемые в пикселях, но также отображаемые в физических единицах измерения. Все остальные пространственные размеры задаются как доля от меньшего из этих двух размеров.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Разброс положения</guilabel>
+          </term>
+          <listitem>
+            <para>Случайный выбор положения отверстий по отношению к центру прямоугольника.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Верхняя фракция по X</guilabel> и <guilabel>Верхняя фракция по Y</guilabel></term>
+          <listitem>
+            <para>Доля ширины занятой верхней поверхностью на горизонтальных и вертикальных профилях, проходящих через центр отверстия. Поскольку размеры задаются как две доли, соотношение сторон отверстия масштабируется пропорционально двум соответствующим периодам.</para>
+            <para>Верхняя грань обычно имеет большую площадь поскольку некоторые профили не пересекают отверстий – и может ещё больше увеличиваться за счёт скругления углов.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина уклона</guilabel>
+          </term>
+          <listitem>
+            <para>Доля размера (меньшей стороны базового прямоугольника) занимаемая наклонными гранями. Наклон будет одинаковым в обоих направлениях.</para>
+            <para>Наклоны добавлены к верхней поверхности, они её не заменяют. Следовательно, нулевая верхняя поверхность и ненулевой наклон приводят к треугольным профилям.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Округлость</guilabel>
+          </term>
+          <listitem>
+            <para>Радиус закругления углов, задаваемый как доля размера (меньшей стороны базового прямоугольника).</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id="pattern-synthesis-pillars">
+      <title>Колонны</title>
+      <para>Колонны имеют следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Форма</guilabel>
+          </term>
+          <listitem>
+            <para>Форма основания колонны, которая может быть круглой, квадратной или гексагональной.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Период по X</guilabel> и <guilabel>период по Y</guilabel></term>
+          <listitem>
+            <para>Горизонтальный и вертикальный периоды текстуры, задаваемые в пикселях, но также отображаемые в физических единицах измерения. Все остальные пространственные размеры задаются как доля от меньшего из этих двух размеров.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Разброс положения</guilabel>
+          </term>
+          <listitem>
+            <para>Случайный выбор положения колонн по отношению к центру прямоугольника.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Размер</guilabel>
+          </term>
+          <listitem>
+            <para>Ширина колонны, заданная как доля размера (меньшей стороны базового прямоугольника). Колонны симметричны и их соотношение сторон не масштабируется вместе с прямоугольником.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ширина уклона</guilabel>
+          </term>
+          <listitem>
+            <para>Доля размера (меньшей стороны базового прямоугольника) занимаемая наклонными гранями. Наклон будет одинаковым в обоих направлениях.</para>
+            <para>Наклоны добавлены к верхней поверхности, они её не заменяют. Следовательно, нулевая верхняя поверхность и ненулевой наклон приводят к треугольным профилям.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Ориентация</guilabel>
+          </term>
+          <listitem>
+            <para>Поворот отдельных колонн по отношению к прямоугольной базовой решетке. Например, квадратные колонны в базовой ориентации будут выглядеть похоже на текстуру отверстий (только инвертированную), в то время как они же, но повернутые на 45 градусов образуют шахматную текстуру.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id="pattern-synthesis-double-staircase">
+      <title>Двойная лестница</title>
+      <para>Двойная лестница имеет следующие особые параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term><guilabel>Ширина террасы по X width</guilabel> и <guilabel>Ширина террасы по Y</guilabel></term>
+          <listitem>
+            <para>Ширина и высота одной ступени в горизонтальном и вертикальном направлениях, задаваемая в пикселях, но также отображаемая в физических единицах длины. Может рассматриваться как <quote>периоды</quote> текстуры.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+  </sect2>
+  <sect2 id="columnar-synthesis">
+    <title>Столбчатые плёнки <gwy:icon name="synthetic_columnar"/></title>
+    <para>Модель вертикального роста плёнок (колоннами) использует простой механизм осаждения на основе алгоритма Монте-Карло, в котором малые частицы падают на поверхность с направлений, заданных нижеуказанными параметрами, прилипают к поверхности вблизи точки падения и увеличивают там локальную высоту. Эффект затенения при этом заставляет больше частиц прилипать к более высоким точкам поверхности, и меньше к более низким. Положительная обратная связь по высоте приводит к образованию колонн. Алгоритм рассматривает горизонтальную плоскость, заполненную идентичными копиями текущей поверхности, следовательно, генерируемые поверхности также будут периодическими (т.е. идеально сшиваться на границах). У генератора поверхности есть следующие параметры:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее число частиц, генерируемых над каждым пикселем поверхности.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Увеличение локальной высоты при прилипании частицы к поверхности. Поскольку горизонтальный размер частицы всегда один пиксель, высота измеряется в пикселях. Высота в один пиксель подразумевает кубические частицы, пока рассмотрение касается процесса роста. С точки зрения детекции столкновений частицы считаются бесконечно малыми.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Наклон</guilabel>
+        </term>
+        <listitem>
+          <para>Центральный угол наклона, с которым генерируются частицы (угол падения). Нулевое значение обозначает, что малые углы падения имеют наивысшую вероятность. Большие значения означают, что частицы более вероятно упадут с большего угла, чем с меньшего. Но для большого разброса направлений, распределение остаётся изотропным в горизонтальной плоскости.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Направление</guilabel>
+        </term>
+        <listitem>
+          <para>Центральное направление в горизонтальной плоскости, с которым генерируются частицы. Большой разброс означает изотропное распределение в горизонтальной плоскости; для малых дисперсий рост анизотропен.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Релаксация</guilabel>
+        </term>
+        <listitem>
+          <para>Метод определения пикселя, к которому в конечном итоге прилипнет частица. На данный момент доступны два варианта. При слабой релаксации рассматриваются только два пикселя: непосредственно перед столкновением и после него, частица прилипает к более низкому из них. В случае сильной релаксации дополнительно рассматривается локальная область 3×3 пикселя. Частица может переместиться к более низкому соседнему пикселю с определённой вероятностью перед тем, как прилипнет насовсем к поверхности.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-columnar">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-columnar.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные колоннообразные поверхности: свободная упаковка колонн (слева), плотная упаковка колонн (по центру), направленный рост при сильной релаксации (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="ballistic-synthesis">
+    <title>Баллистическое осаждение <gwy:icon name="synthetic_ballistic_deposition"/></title>
+    <para>Вертикальное баллистическое осаждение это одна из простейших фундаментальных моделей роста плёнок. Частицы падают вертикально в произвольно выбранное место (пиксель). Высота этого места увеличивается на высоту частицы. Однако, если новая высота окажется меньше высоты любого из четырёх соседних мест, частица считается прилипшей к соседней колонне. Таким образом, высота точки падения становится равной максимальной из окружающих высот. Это является единственным механизмом, вводящим корреляции в горизонтальной плоскости в результирующую шероховатость.</para>
+    <para>Расчёт имеет всего несколько параметров:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее число частиц, генерируемых над каждым пикселем поверхности.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Увеличение локальной высоты, которое происходит при падении частицы на пиксель.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-ballistic">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-ballistic.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные поверхности, созданные баллистическим осаждением: начальная фаза с достаточно малой длиной корреляции (слева); после того, как корреляции достигли размера изображения (по центру); осаждение, начатое с высоты поверхности микросхемы (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="wave-synthesis">
+    <title>Волны <gwy:icon name="synthetic_waves"/></title>
+    <para>Метод волнового синтеза генерирует изображение на основе интерференции волн от набора точечных источников. Помимо обычной косинусоидальной волны, доступны несколько других форм волны, каждая из которых имеет чётный и нечётный вариант, различающиеся на сдвиг фазы <xi:include href="eqi-pi-over-2.xml"/> во всех частотных компонентах. Когда волна рассматривается как комплексная, чётная часть (косинусоида) образует действительную часть, а нечётная (синусоида) образует мнимую.</para>
+    <informalfigure id="fig-synthetic-wave-waveform">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="waveform.pdf" format="PDF"/>
+        </imageobject>
+        <imageobject>
+          <imagedata fileref="waveform.png" format="PNG"/>
+        </imageobject>
+        <caption>Чётные и нечётные формы волны для различных доступных видов волн. Для изображений смещения используются только косинусоидальные формы; полная комплексная волна используется для генерации изображений интенсивности и фазы.</caption>
+      </mediaobject>
+    </informalfigure>
+    <para>Для генератора доступны нижеследующие опции:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Величина</guilabel>
+        </term>
+        <listitem>
+          <para>Величина для показа на изображении. Смещение это сумма действительных частей. Амплитуда это модуль комплексной волны. Фаза это фазовый угол комплексной волны.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Число волн</guilabel>
+        </term>
+        <listitem>
+          <para>Число точечных источников, от которых распространяются волны.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Форма волны</guilabel>
+        </term>
+        <listitem>
+          <para>Одна из описанных выше форм волны.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Амплитуда</guilabel>
+        </term>
+        <listitem>
+          <para>Приблизительная амплитуда высот (среднеквадратичное отклонение) генерируемого изображения. Следует отметить, что она отличается от от амплитуды отдельных волн: амплитуда высот в сгенерированном изображении должна расти пропорционально квадратному корню из числа волн в этом случае, в то время как она фактически остаётся почти постоянной пока не меняется амплитуда.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Частота</guilabel>
+        </term>
+        <listitem>
+          <para>Пространственная частота волн. Измеряется относительно размера изображение, т.е. значение 1.0 означает длину волны, равную размеру стороны изображения.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>X центра</guilabel>, <guilabel>Y центра</guilabel></term>
+        <listitem>
+          <para>Координаты точечных источников. Нуль соответствует центру изображения. Координаты измеряются в размерах изображения. В общем случае, хотя бы один из соответствующих разбросов должен быть ненулевым, иначе все точечные источники будут совпадать (хотя можно сгенерировать некоторые интересные текстуры варьируя частоты).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Затухание</guilabel>
+        </term>
+        <listitem>
+          <para>Затухание определяет как быстро волны ослабляются. Значение измеряется в обратных длинах волн и задаётся как десятичный логарифм, что показывается единицами измерения <guilabel>log₁₀</guilabel>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-waves">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-waves.png" format="PNG"/>
+        </imageobject>
+        <caption>Искуственные волнистые поверхности: карта смещений сгенерированная с достаточно большим разбросом частот (слева); изображение амплитуды для волны в форме обратного cosh (по центру); изображение фазы для малого кластера далёких источников (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="domain-synthesis">
+    <title>Домены <gwy:icon name="synthetic_domains"/></title>
+    <para>Расчёт реализует гибридную неравновесную модель Изинга [<link linkend="synthetic-ref-2">2</link>], совмещающую дискретную модель Изинга для малых расстояний с непрерывным медленным ингибитором.</para>
+    <para>Дискретная переменная <xi:include href="eqi-u.xml"/> имеет два возможных значения, которые она меняет с вероятностью <xi:include href="eq-ising-flipping.xml"/> где <xi:include href="eqi-Delta-E.xml"/> – изменение энергии в результате смены состояния и <xi:include href="eqi-T.xml"/> – температура. Энергия задаётся числом соседей в противоположном состоянии в направлениях вдоль координатных осей <xi:include href="eqi-n_o.xml"/>, числом соседей в противоположном состоянии в направлении по диагоналям <xi:include href="eqi-n_d.xml"/> и также смещением, вызванным полем ингибитора  <xi:include href="eqi-v.xml"/>: <xi:include href="eq-ising-energy.xml"/></para>
+    <para>Непрерывное поле ингибитора <xi:include href="eqi-v.xml"/> задано локальным дифференциальным уравнением, связанным с переменной  <xi:include href="eqi-u.xml"/>: <xi:include href="eq-ising-diffeq.xml"/> где <xi:include href="eqi-mu.xml"/> – связь ингибитора и <xi:include href="eqi-nu.xml"/> – параметр смещения. Граничные условия для расчёта периодические, следовательно, генерируемые изображения также будут периодическими (т.е. идеально совмещаться друг с другом на границе).</para>
+    <para>Расчёт управляется следующими параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Число шагов</guilabel>
+        </term>
+        <listitem>
+          <para>Одна итерация расчёта состоит из четырёх шагов: обновление <xi:include href="eqi-u.xml"/> методом Монте-Карло, шаг по времени в решении дифференциального уравнения для <xi:include href="eqi-v.xml"/>, другой шаг Монте-Карло и ещё один шаг по времени в дифференциальном уравнении. Показываемые значения <xi:include href="eqi-v.xml"/> соответствуют второму обновлению. Значение, показываемое как <xi:include href="eqi-u.xml"/> это среднее из двух значений, наиболее близких по времени к соответствующему значению <xi:include href="eqi-v.xml"/>. Таким образом, изображения <xi:include href="eqi-u.xml"/> трёхзначные, а не двузначные.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Температура</guilabel>
+          <xi:include href="eqi-T.xml"/>
+        </term>
+        <listitem>
+          <para>Температура определяет вероятность, с которой переменная с двумя состояниями <xi:include href="eqi-u.xml"/> может переходить из одного в другое с энергией большей или равной (смена состояния, которая сильно понижает энергию, происходит сама по себе). Большая температура означает меньшее разделение между двумя доменами <xi:include href="eqi-u.xml"/>.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Сила ингибитора</guilabel>
+          <xi:include href="eqi-B.xml"/>
+        </term>
+        <listitem>
+          <para>Сила, с которой непрерывная переменная смещает энергию в каждом пикселе. Для больших значений ингибитор играет большую роль по сравнению с поверхностным натяжением.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Связь ингибитора</guilabel>
+          <xi:include href="eqi-mu.xml"/>
+        </term>
+        <listitem>
+          <para>Фактор связи между <xi:include href="eqi-u.xml"/> и <xi:include href="eqi-v.xml"/> в дифференциальном уравнении для <xi:include href="eqi-v.xml"/>.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Смещение</guilabel>
+          <xi:include href="eqi-nu.xml"/>
+        </term>
+        <listitem>
+          <para>Смещение в дифференциальном уравнении для <xi:include href="eqi-v.xml"/> в сторону больших или меньших значений.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Временной шаг метода Монте-Карло</guilabel>
+        </term>
+        <listitem>
+          <para>Временной шаг в дифференциальном уравнении, соответствующий одному шагу в методе Монте-Карло. Таким образом, этот параметр определяет относительную скорость двух этих процессов.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Диапазон значений создаваемых изображений.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Вкладка <guilabel>Предустановки</guilabel> содержит несколько загружаемых наборов параметров, которые генерируют интересные структуры. Можно выбрать набор предустановок и нажать <guibutton>Загрузить выбранные предустановки</guibutton> чтобы загрузить набор параметров для данного генератора. Начальное число для генератора случайных чисел не является частью предустановок. Следовательно, для каждого начального числа получаемые изображения будут всё ещё варьироваться, но будут сохранять одинаковый общий облик (несколько зависит от удачи экспериментатора, некоторые случайные значения генерируют менее интересные изображения по сравнению с другими).</para>
+    <informalfigure id="fig-synthetic-domains">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-domains.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные доменные поверхности: спиральные волны с дальним порядком (слева); упорядоченные спиральные волны с близким порядком при большей температуре (по центру); непрерывное изменение при ситуации низкой температуры с малой силой и связью (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="annealing-synthesis">
+    <title>Отжиг <gwy:icon name="synthetic_anneal"/></title>
+    <para>Модуль реализует простую модель клеточного автомата описывающего разделение фаз с помощью отжига не смешивающегося решеточного газа, состоящего из двух компонент A и C. Рассматривается только взаимодействие между ближайшими соседями. Различие в энергиях образования <xi:include href="eq-anneal-formation-energy-difference.xml"/> определяет предпочтение в разделении фаз. Отжиг происходит путём обмена местами двух соседних ячеек (пикселей). релаксация всегда происходит в сторону более энергетически выгодного расположения, однако они также могут переключаться в сторону менее выгодного с вероятностью, задаваемой температурой <xi:include href="eqi-T.xml"/><xi:include href="eq-anneal-swapping-probability.xml"/> Поскольку вероятность зависит только от соотношения компонент, можно задать постоянную Больцмана равной единице и тогда модель зависит только от безразмерной температуры и относительного соотношения двух компонент.</para>
+    <para>Расчёт управляется следующими параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Число шагов</guilabel>
+        </term>
+        <listitem>
+          <para>Одна итерация соответствует тому, что каждая пара расположений в соседних ячейках однократно проверяется на возможность замены. Однако, это сохраняется только в вероятностном смысле. Некоторые расположения могут быть проверены несколько раз в течение одной итерации, другие ни разу.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Начальная температура</guilabel>
+        </term>
+        <listitem>
+          <para>Безразмерная температура определяет вероятность с которой ячейки могут меняться в сторону менее энергетически выгодной конфигурации, как описано выше. Начальная температура это температура при которой начинается отжиг.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Конечная температура</guilabel>
+        </term>
+        <listitem>
+          <para>Безразмерная температура при которой моделирование завершается.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Доля компонента</guilabel>
+        </term>
+        <listitem>
+          <para>Доля компонента C в смеси A-C.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Диапазон значений создаваемых изображений.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Число шагов усреднения</guilabel>
+        </term>
+        <listitem>
+          <para>Выводимое изображение может захватывать только финальное состояние или оно может быть расчитано усреднением определенного числа состояний до конечного, задаваемого этим параметром.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Опционально может быть задействована трёхкомпонентная модель. Третий компонент B ведёт себя подобно A и С. Однако, модель в этом случае будет содержать больше параметров:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Доля компонента B</guilabel>
+        </term>
+        <listitem>
+          <para>Доля компонента B в смеси. Остаток будет поделен между A и С в соответствии с <guilabel>Долей компонента</guilabel>.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Энергия смешивания AB</guilabel>
+        </term>
+        <listitem>
+          <para>Разница в энергиях формирования для компонент A и B по отношению к максимальному значению.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Энергия смешивания AC</guilabel>
+        </term>
+        <listitem>
+          <para>Разница в энергиях формирования для компонент A и C по отношению к максимальному значению.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Энергия смешивания BC</guilabel>
+        </term>
+        <listitem>
+          <para>Разница в энергиях формирования для компонент B и C по отношению к максимальному значению.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Для того, чтобы безразмерная температура масштабировалась одинаково с двухкомпонентной моделью, наибольшая энергия смешивания всегда нормируется к 1. Если вы пытаетесь её уменьшить, две другие энергии смешивания увеличиваются вместо неё, сохраняя соотношение, до тех пор, пока одна из них не достигнет значения 1. Тогда эта разница энергий станет наибольшей и наибольшая до этого может уменьшаться дальше.</para>
+    <informalfigure id="fig-synthetic-annealing">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-annealing.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные изображения отжига созданные для двухкомпонентной модели и двух различных вариантов настроек трёхкомпонентной модели.</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="cpde-synthesis">
+    <title>Связанные уравнения в частных производных <gwy:icon name="synthetic_turing_pattern"/></title>
+    <para>Большое число интересных текстур может создаваться с помощью численного решения связанных нелинейных дифференциальных уравнений в частных производных в плоскости изображения. В настоящее время модуль реализует два генератора с общими основными параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Число шагов</guilabel>
+        </term>
+        <listitem>
+          <para>Число шагов по времени для решения связанных дифференциальных уравнений в частных производных. Решение практически перестаёт меняться после определенного числа итераций, которое, однако, очень сильно варьируется в зависимости от типа текстуры и её параметров.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <sect3 id="cpde-synthesis-turing">
+      <title>Шаблон Тьюринга</title>
+      <para>Генератор текстуры Тьюринга может генерировать одиночную классическую текстуру в относительно управляемом режиме. Он имеет следующие параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Размер</guilabel>
+          </term>
+          <listitem>
+            <para>Характеристические ширины полос в текстуре.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Степень хаоса</guilabel>
+          </term>
+          <listitem>
+            <para>Специальный параметр, управляющий сходимостью решения. Малые значения приводят к более упорядоченным текстурам. Однако, решение может сходиться очень долго для больших раземеров изображения. Большие значения приводят к более возмущенным текстурам, однако, гораздо быстрее.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      <para>Текстура генерируется двухкомпонентной моделью диффузия-реакция, с уравнениями для обоих компонентов в форме <xi:include href="eq-turing-diffeq.xml"/> В уравнении для второго компонента роли просто меняются (и отличаются константы). Функция <xi:include href="eqi-f.xml"/> определяется как <xi:include href="eq-turing-function-f.xml"/> Константы <xi:include href="eqi-p.xml"/>, <xi:include href="eqi-q.xml"/> и <xi:include href="eqi-r.xml"/> не управляются напрямую. Они (и шаг по времени) рассчитываются из размера и степени хаотичности в соответствии с калибровочной формулой.</para>
+      <informalfigure id="fig-synthetic-turing">
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="synthetic-turing.png" format="PNG"/>
+          </imageobject>
+          <caption>Три текстуры Тьюринга с одной и той же характеристической шириной полосы и степенью хаоса увеличивающейся слева направо.</caption>
+        </mediaobject>
+      </informalfigure>
+    </sect3>
+    <sect3 id="cpde-synthesis-diffreact">
+      <title>Диффузия-реакция</title>
+      <para>Модель диффузии-реакции может генерировать большое разнообразие текстур. Однако, прямая настройка скоростей реакции и параметров, таких как размер особенностей, невозможна. Модуль содержит следующие параметры:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Тип вывода</guilabel>
+          </term>
+          <listitem>
+            <para>Какой из двух компонент будет отрисовываться на изображении.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Скорость удаления</guilabel>
+          </term>
+          <listitem>
+            <para>Константа скорости реакции, относящаяся к удалению материала.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Скорость питания</guilabel>
+          </term>
+          <listitem>
+            <para>Константа скорости притока (питания) материала в реакции.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Плотность источника</guilabel>
+          </term>
+          <listitem>
+            <para>Плотность на пиксель фиксированных источников с высоким/низким значениями. Плотность рассчитывается на пиксель, множитель 10<superscript>-3</superscript> не используется.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Количество итераций без источника</guilabel>
+          </term>
+          <listitem>
+            <para>Как много итераций в конце будет проводиться после того, как источники будут убраны. Можно задать значение больше, чем общее количество итераций, но это не очень полезно (при таком задании источники будут убраны с самого начала).</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      <para>В большей части диапазонов параметров реакции требуется источник реагентов чтобы получались интересные текстуры. Без такого источника состояние системы развивается в постоянное плоское изображение или нестабильность в формате шахматной доски. Одной из возможностей стимулирования генерации интересных текстур (часто используемой в демонстрациях) является большая пространственная неоднородность констант реакции в области протекания. Однако, это не позволяет рассчитывать заданные специфичные текстуры для определенных наборов параметров.</para>
+      <para>Тогда, вместо этого, модуль добавляет явно заданные источники. Они реализованы в грубой форме как случайные пиксели, которые сохраняют свои низкие/высокие значения (и иногда их можно наблюдать в анимации эволюции). На них не действует реакция, но они влияют на своих ближайших соседей.</para>
+      <para>Некоторые текстуры будут стабильны после того, как они сформировались, и при удалении источников ничего не происходит. Некоторые нет и вырождаются в одно из неинтересных состояний. Немного разные наборы текстур могут быть получены при удалении источников на длительное время и при удалении источников ненадолго в конце. Кроме того, есть несколько интересных переходных текстур.</para>
+      <informalfigure id="fig-synthetic-diffreact">
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="synthetic-diffreact.png" format="PNG"/>
+          </imageobject>
+          <caption>Примеры текстур, которые могут быть получены с помощью модели диффузии-реакции.</caption>
+        </mediaobject>
+      </informalfigure>
+    </sect3>
+  </sect2>
+  <sect2 id="diffusion-synthesis">
+    <title>Диффузия <gwy:icon name="synthetic_diffusion"/></title>
+    <para>Модуль моделирования реализует дискретную модель диффузии с ограниченной агрегацией на основе метода Монте-Карло. Частицы в форме пикселей падают на поверхность и движутся вдоль неё пока не прилипают к кластеру, постепенно образуя монослой. Поток падающих частиц невелик, поэтому в каждый момент времени свободно двигается малое число частиц и частица может пройти заметное расстояние по поверхности до момента прилипания. Для типичных значений параметров это приводит к образованию кластеров в форме <quote>фрактальной снежинки</quote>.</para>
+    <para>Расчёт управляется следующими параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее количество раз, когда частица попадает на заданный пиксель изображения. Значение покрытия 1 означает что поверхность будет покрыта монослоем, предполагая, что частицы покрывают её равномерно.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Поток</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее число частиц, падающих на каждый заданный пиксель за один шаг моделирования. Меньшие значения потока приводят к более крупным структурам, поскольку частицы участвуют в диффузии более продолжительное время до встречи с другой частицей. Значение задано как десятичный логарифм, что показывается единицами измерения <guilabel>log₁₀</guilabel>.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Высота отдельной частицы которая задаёт высоту ступеней в получаемом изображении.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Вероятность прилипания</guilabel>
+        </term>
+        <listitem>
+          <para>Вероятность того, что свободная частица окончательно прилипнет и перестанет двигаться, когда она касается другой отдельной частицы. Вероятности что частица прилипнет, если она коснётся двух или трёх частиц возрастает пропорционально в зависимости от этого значения. Вероятность прилипания всегда нулевая для частицы без соседей и всегда единица для частицы, окруженной четырьмя соседними.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Вероятность активации</guilabel>
+        </term>
+        <listitem>
+          <para>Вероятность для частицы, которая не прилипла что она сдвинется если она касается другой частицы. Вероятность для большего числа касающихся частиц уменьшается как степень вероятности для отдельной частицы. Частицы без соседей могут двигаться свободно всегда.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Вероятность прохождения Швёбеля</guilabel>
+        </term>
+        <listitem>
+          <para>Частица, которая упала на верхушку уже сформированного кластера может иметь сниженную вероятность спуститься на более низкий уровень из-за так называемого барьера Швёбеля. Если этот параметр равен 1, барьера нет, т.е. частицы могут свободно спускаться. Наоборот, вероятность, равная 0, означает что частицы никогда не спустятся на более низкие уровни. Значение задано как десятичный логарифм, что показывается единицами измерения <guilabel>log₁₀</guilabel>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Следует отметить, что некоторые комбинации параметров, а именно очень маленький поток и очень низкая вероятность преодолеть барьер Швёбеля, могут привести к очень долгим временам моделирования.</para>
+    <informalfigure id="fig-synthetic-diffusion">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-diffusion.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные дифузионные поверхности: редкие кластеры с высокой вероятностью прилипания (слева); частые кластеры с низкой вероятностью прилипания (по центру); многослойные фрактальные структуры с высоким барьером Швёбеля (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="fibre-synthesis">
+    <title>Волокна <gwy:icon name="synthetic_fibres"/></title>
+    <para>Метод синтеза поверхности, основанный на случайном размещении волокон сильно похож на метод синтеза <link linkend="object-synthesis">Объекты</link>, за исключением того, что вместо объектов ограниченного размера он добавляет бесконечно длинные (в принципе) волокна на поверхность.</para>
+    <para>Генератор имеет небольшой набор параметров, поделенных между вкладками <guilabel>Генератор</guilabel> и <guilabel>Размещение</guilabel>. Первая группа содержит основные настройки и параметры, определяющие профили отдельных волокон:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Форма</guilabel>
+        </term>
+        <listitem>
+          <para>Форма профиля поперёк волокна. Опции <guilabel>Полукруг</guilabel>, <guilabel>Треугольник</guilabel>, <guilabel>Прямоугольник</guilabel> и <guilabel>Парабола</guilabel> не требуют пояснений. Форма <guilabel>Квадратичный сплайн</guilabel> соответствует кусочной квадратичной функции, состоящей из трёх частей, которая является базисной функцией квадратичного B-сплайна.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее количество волокон перекрывающих один пиксель изображения. Значение покрытия 1 означает что поверхность будет ровно один раз покрыта волокнами, при этом они будут покрывать её равномерно и не будут пересекаться. Большие значения означают больше слоёв объектов и более медленную генерацию изображения. Значение является приблизительным и действительное покрытие немного зависит от других параметров.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ширина</guilabel>
+        </term>
+        <listitem>
+          <para>Ширина волокна в пикселях. Также имеет обычную связанную опцию <guilabel>Разброс</guilabel>, которая определяет различия между отдельными волокнами. Однако, для волокон ширина также может меняться вдоль каждого отдельного волокна. Это настраивается опцией <guilabel>Вдоль волокна</guilabel>. Высокие значения разброса вдоль волокна могут в сочетаниях с некоторыми другими опциями (в частности, высокими значениями деформации по длине и высокими значениями разброса толщины) приводить к странно выглядящим изображениям и возможным артефактам.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Величина, пропорциональная высоте волокна, обычно высота наивысшей точки. Также как и <guilabel>Ширина</guilabel>, она имеет два разброса, между отдельными волокнами и вдоль каждого индивидуального волокна.</para>
+          <para>Выбор опции <guilabel>Масштабируется с шириной</guilabel> заставляет невозмущённые высоты масштабироваться пропорционально ширине волокна. В противном случае высота не зависит от размера.</para>
+          <para>Кнопка <guilabel>как у текущего изображения</guilabel> устанавливает значение высоты равным значению, основанном на среднеквадратичном отклонении текущего изображения.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Усечение</guilabel>
+        </term>
+        <listitem>
+          <para>Волокна могут быть усечены на определённой высоте для создания профилей в форме усечённых полукругов, парабол, и т.п. Высота усечения задаётся в долях от общей высоты объекта. Единица означает неусечённую фигуру, ноль – полное удаление волокна.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Вторая группа содержит опции, управляющие тем, как волокна деформируются и добавляются к изображению:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Ориентация</guilabel>
+        </term>
+        <listitem>
+          <para>Поворот волокон, измеренный против часовой стрелки. Ноль соответствует ориентации слева направо.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Плотность</guilabel>
+        </term>
+        <listitem>
+          <para>Плотность управляет тем, как часто волокно деформируется по его длине. Низкая плотность соответствует постепенной деформации на больших масштабах, в то время, как высокая плотность означает что волокно деформируется часто, что приводит к волнистым и извилистым формам.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Горизонтальный масштаб</guilabel>
+        </term>
+        <listitem>
+          <para>Как сильно волокно деформировано в направлении, перпендикулярном его основному направлению. Увеличение этого значения делает волокно извилистым, правда в относительно правильной форме.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>По длине</guilabel>
+        </term>
+        <listitem>
+          <para>Как сильно точки волокна смещаются вдоль его длины. Увеличение этого параметра вызывает появление неправильных перекручиваний и петель (или даже узлов).</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-fibres">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-fibres.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные волокнистые поверхности: умеренно искривленные волокна, все ориентированные в более или менее одном направлении (слева); много слоёв тонких прямых случайно ориентированных волокон (по центру); параллельные волокна с высокой плотностью горизонтальных деформаций (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="lattice-synthesis">
+    <title>Решетка <gwy:icon name="synthetic_lattice"/></title>
+    <para>Модуль синтеза решеток создаёт поверхности основанные на случайных двумерных решетках. Он содержит две основные части. В первой, управляемой параметрами во вкладке <guilabel>Решетка</guilabel>, создаётся набор точек в плоскости, которые организованы в более или менее случайную решетку. Вторая часть, управляемая параметрами во вкладке <guilabel>Поверхность</guilabel>, создаёт реальную поверхность, основанную на величинах, рассчитанных в ходе тесселяции Вороного и /или триангуляции Делоне для заданного набора точек.</para>
+    <para>Создание решетки управляется следующими параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Решетка</guilabel>
+        </term>
+        <listitem>
+          <para>Основной тип решетки. Случайная решетка соответствует полностью случайно расположенным точкам. Другие типы соответствуют правильному расположению точек  (квадратному, гексагональному, треугольному), хорошо известным мозаичным заполнениям (каирской, плосконосой квадратной, Пенроуза) или восстановлениям поверхности (кремний 7×7).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Размер</guilabel>
+        </term>
+        <listitem>
+          <para>Средний размер ячейки. Точнее, этот параметр описывает среднюю плотность точек. Он равен стороне квадрата, если такое же число точек организовано в квадратную решетку.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Релаксация решетки</guilabel>
+        </term>
+        <listitem>
+          <para>Величина, на которую решетке можно релаксировать. Процесс релаксации отталкивает точки от очень близких соседей в сторону большой пустой области. В целом это приводит к тому, что размеры ячеек становятся более равномерными. Естественно, процесс релаксации не влияет на правильные решетки. Следует отметить, что релаксация требует прогрессивной ретесселяции и большой параметр релаксации может существенно замедлить генерацию поверхности.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Релаксация высоты</guilabel>
+        </term>
+        <listitem>
+          <para>Величина, на которую могут релаксировать случайные значения, присвоенные каждой точке (см. ниже). Процесс релаксации похож на диффузию и приводит к общему сглаживанию случайных значений.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ориентация</guilabel>
+        </term>
+        <listitem>
+          <para>Поворот решетки по отношению к определённому исходному направлению, измеренный против часовой стрелки. Доступно только для правильных сеток, поскольку случайная сетка является изотропной.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>Амплитуда</guilabel>, <guilabel>Горизонтальный масштаб</guilabel></term>
+        <listitem>
+          <para>Параметры, управляющие деформацией решетки. Имеют то же значение, что и в <link linkend="pattern-synthesis">синтезе структур</link>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Финальная поверхность строится как взвешенная сумма набора основных величин, полученных в результате тесселяции Вороного или триангуляции Делоне. Каждая величина может быть включена или выключена. Если она выбрана в списке, её вес добавляется к сумме и её пороговые параметры можно модифицировать двигая ползунки. Нижний и верхний порог ограничивают диапазон значений (который всегда нормализован до <xi:include href="eqi-interval-0-1.xml"/>) меняя все величины выше верхнего порога на величину порога и аналогично для нижнего.</para>
+    <para>Некоторые из основных величин рассчитываются только из горизонтальных координат. Некоторые, однако, рассчитываются из случайных значений (<quote>высот</quote>), присвоенных каждой точке множества. Доступные величины включают в себя:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Случайная постоянная</guilabel>
+        </term>
+        <listitem>
+          <para>Округляющая интерполяция между случайными величинами, присвоенными каждой точке множества. Это означает, что каждая ячейка Вороного заполнена постоянной случайной величиной.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Случаная линейная</guilabel>
+        </term>
+        <listitem>
+          <para>Линейная интерполяция между случайными величинами, присвоенными каждой точке множества. Следовательно, поверхность является непрерывной и каждому треугольнику Делоне соответствует грань поверхности.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Случайная выпуклая</guilabel>
+        </term>
+        <listitem>
+          <para>Интерполяция похожа на предыдущую, но является нелинейной, создавая относительно ровные области вокруг каждой точки множества.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Радиальное расстояние</guilabel>
+        </term>
+        <listitem>
+          <para>Расстояние до ближайшей точки множества.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Сегментированное расстояние</guilabel>
+        </term>
+        <listitem>
+          <para>Расстояние до ближайшей границы ячейки Вороного, масштабированное в каждом сегменте ячейки таким образом, чтобы точка множества была равноудалена от всех границ.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Сегментированное случайное</guilabel>
+        </term>
+        <listitem>
+          <para>Та же величина, что и сегментированное расстояние, но умноженная на случайное значение, присвоенное точке множества.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Расстояние до границы</guilabel>
+        </term>
+        <listitem>
+          <para>Расстояние до ближайшей границы ячейки Вороного.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Случайное до границы</guilabel>
+        </term>
+        <listitem>
+          <para>Та же величина, что и расстояние до границы, но умноженная на случайную величину, присвоенную точке множества.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Расстояние до второго ближайшего</guilabel>
+        </term>
+        <listitem>
+          <para>Расстояние до второй ближайшей точки множества.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-lattice">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-lattice.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные решетчатые поверхности: граненная поверхность, создаваемая случайной линейной интерполяцией (слева); бугры на искаженной треугольной текстуре (по центру); искаженная прямоугольная текстура с сегментами, разделёнными бороздами (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="brownian-synthesis">
+    <title>Броуновский <gwy:icon name="synthetic_brownian_motion"/></title>
+    <para>Этот модуль генерирует, помимо других вещей, поверхности с профилями, подобными дробному броуновскому движению. Метод создания, однако, не очень сложен. Начиная от углов изображения, внутренние точки рекурсивно линейно интерполируются вдоль горизонтальной и вертикальной осей, добавляя шум, который масштабируется с расстоянием согласно заданной экспоненте Хёрста. Некоторые из поверхностей окажутся такими же, как генерирует <link linkend="spectral-synthesis">спектральный синтез</link>, однако, создание их в линейном пространстве, а не в пространстве частот, позволяет менять их различные свойства.</para>
+    <para>Генератор настраивается нижеследующими параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Экспонента Хёрста</guilabel>
+        </term>
+        <listitem>
+          <para>Экспонента Хёрста <xi:include href="eqi-H.xml"/>. Для нормальных значений между 0 и 1, квадратный корень из <link linkend="height-height-correlation-1d">функции корреляции высота-высота</link> растёт как <xi:include href="eqi-H.xml"/>-тая степень расстояния. Алгоритм создания позволяет использовать даже отрицательные значения, поскольку он останавливается при конечном разрешении в один пиксель.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Масштаб стационарности</guilabel>
+        </term>
+        <listitem>
+          <para>Масштаб, на котором принудительно реализуется стационарность (следует заметить, что дробное броуновское движение не является стационарным). Когда этот масштаб сравним с размером изображения или больше, он оказывает немного влияния. Однако, когда он мал, изображение становится <quote>усреднённым</quote> вместо самоподобия выше этого масштаба.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Распределение</guilabel>
+        </term>
+        <listitem>
+          <para>Распределение шума, добавленного при генерации. Равномерный и гауссов приводят в общем случае к одинаковым поверхностям (статистически); первый, однако, является более быстрым. Более тяжелые в хвосте распределения, т.е. экспоненциальное и особенно степенное, приводят к ярко выраженным пикам и впадинам.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Степень</guilabel>
+        </term>
+        <listitem>
+          <para>Степень <xi:include href="eqi-alpha.xml"/> степенного распределения. Функция плотности вероятности пропорциональна <xi:include href="eq-fBm-power-pdf.xml"/></para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Ср. квадр.</guilabel>
+        </term>
+        <listitem>
+          <para>Среднеквадратичное значение высот (или отличий от средней плоскости, которая, однако, всегда является плоскостью <xi:include href="eqi-z-is-0.xml"/>). Следует отметить, что это значение применяется к данному генерируемому изображению, не процессу как таковому, который не имеет конечного среднеквадратичного отклонения. Кнопка <guilabel>Как у текущего изображения</guilabel> устанавливает значение среднеквадратичного отклонения равным ему же для текущего изображения.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-brownian">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-brownian.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные броуновские  поверхности: классическая поверхность, созданная с H порядка 0,7 (слева); похожее на туманность изображение, сгенерированное с помощью степенного распределения с большой интенсивностью в хвосте (по центру); влияние малого масштаба стационарности (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="phases-synthesis">
+    <title>Фазы <gwy:icon name="synthetic_phases"/></title>
+    <para>Модуль создаёт данные несколько напоминающие структуру магнитных доменов, изучаемых магнитно-силовой микроскопией (МСМ) или структуру полимеров в органических солнечных батареях, изучаемую каким-либо видом контрастирования состава (ИК, КР, силовые кривые). В отличие от более физически правильных, но требующих больших вычислительных ресурсов подходов, данный работает на основе спектрального синтеза поверхности с ограниченным набором пространственных частот и последующем применении морфологических операций для получения изображений двух фаз. Выходное изображение в данном методе в основном состоит из двух значений, соответствующих двум фазам, хотя иногда может появляться промежуточное <quote>переходное</quote> значение.</para>
+    <para>Генератор настраивается нижеследующими параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Размер</guilabel>
+        </term>
+        <listitem>
+          <para>Типичная ширина полосы.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Разброс размеров</guilabel>
+        </term>
+        <listitem>
+          <para>Разброс размеров (или. точнее, пространственных частот). Малый разброс означает гладкие правильные элементы структуры. Однако, для очень малых значений разброса на изображении могут появиться предпочтительные направления (и оно станет анизотропным) вследствие исчерпания набора допустимых пространственных частот. Большой разброс означает менее правильные границы раздела фаз и большее количество переходных областей.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Различие в значениях соответствующих двум различным фазам, определяет общий масштаб изображения по <xi:include href="eqi-z.xml"/>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-phases">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-phases.png" format="PNG"/>
+        </imageobject>
+        <caption>Искусственные изображения двух фаз: малый разброс размеров (слева); больший разброс размеров (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="discs-synthesis">
+    <title>Диски <gwy:icon name="synthetic_discs"/></title>
+    <para>Модуль создаёт данные, состоящие из непересекающихся дисков, возможно постобработанных таким образом, чтобы образовать поверхность, покрытую черепицей (мозаичной текстурой). Подобного результата можно также достичь используя синтез <link linkend="object-synthesis">Объектов</link> если включена опция <guilabel>Избегать наложения</guilabel>. Однако, в данном случае, только несколько затравочных дисков расположены случайным образом, остальные всегда помещаются в центр самого большого оставшегося пустого пространства. Это приводит к более равномерному распределению размеров. Более того, преобразование в черепицу создаёт структуру, где обычно три объекта встречаются под углами близкими к 120 градусам, подобно пенистым структурам.</para>
+    <para>Генератор настраивается нижеследующими параметрами:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Начальный радиус</guilabel>
+        </term>
+        <listitem>
+          <para>Радиус диска-затравки, случайно размещаемого в начале.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Минимальный радиус</guilabel>
+        </term>
+        <listitem>
+          <para>Минимально допустимый радиус всех остальных дисков. Когда не остаётся места для диска хотя бы такого размера, генерация останавливается.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Зазор</guilabel>
+        </term>
+        <listitem>
+          <para>Дополнительный отступ от соседних дисков. В то время, как <guilabel>Минимальный радиус</guilabel> задаёт минимальный размер действительно размещаемых дисков, этот параметр увеличивает минимальный размер свободного пространства, куда можно поместить диск.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Преобразовать в мозаику</guilabel>
+        </term>
+        <listitem>
+          <para>Если включено, все диски расширяются до того момента, как они начнут касаться своих соседей. Поверхность становится мозаичной, с тонкими зазорами между отдельными фрагментами.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Толщина зазора</guilabel>
+        </term>
+        <listitem>
+          <para>Ширина зазора между элементами мозаики после преобразования.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Применить фильтр размыкания</guilabel>
+        </term>
+        <listitem>
+          <para>Если включено, мозаичное покрытие затем подвергается обработке <link linkend="maskops-opening">фильтра размыкания</link> заданного размера. Этот процесс убирает слишком маленькие детали и делает оставшиеся более округлыми.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Размер</guilabel>
+        </term>
+        <listitem>
+          <para>Размер фильтра размыкания.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Высота</guilabel>
+        </term>
+        <listitem>
+          <para>Высота дисков или мозаики по отношению к базовому уровню, определяет общий масштаб оси <xi:include href="eqi-z.xml"/> изображения. Высоты отдельных особенностей будут распределены вокруг этого значения когда параметр <guilabel>Разброс</guilabel> ненулевой.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-discs">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-discs.png" format="PNG"/>
+        </imageobject>
+        <caption>Изображения искусственных дисков: круглые диски с некоторым распределением высоты (слева); преобразование в мозаику (по центру); эрозия фильтром размыкания (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="dunes-synthesis">
+    <title>Дюны <gwy:icon name="synthetic_dunes"/></title>
+    <para>Модуль основан на простом моделировании формирования ветровых дюн [<link linkend="synthetic-ref-3">3</link>]. Частицы могут быть подхвачены ветром с определенной вероятностью, перенесены вдоль направления ветра и осесть в новом месте. Функция имеет следующие параметры:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее число частиц на единичный пиксель.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Число шагов</guilabel>
+        </term>
+        <listitem>
+          <para>Одна итерация соответствует тому, что ветер подхватывает одну случайную частицу в каждом пикселе и она осаждается где-то ещё. Однако, пиксели при этом выбираются случайно. Некоторые места могут быть выбраны несколько раз в ходе одной итерации, другие ни разу. Некоторые из выбранных мест могут быть голой скалой-основанием на которой нет песчаных частиц чтобы их подхватить.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>Направление</guilabel> и <guilabel>Разброс</guilabel></term>
+        <listitem>
+          <para>Среднее направление ветра и разброс этого направления. Малый разброс соответствует случаю, когда направление ветра постоянно. Большие значения соответствуют более случайному направлению ветра.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>Минимальный шаг</guilabel> и <guilabel>Диапазон шагов</guilabel></term>
+        <listitem>
+          <para>Песчаная частица может считаться касающейся поверхности временами и переносимой ветром высоко над поверхностью между касаниями. Она может осесть на поверхность когда она касается её. Минимальный шаг это минимальное расстояние (в пикселях) одного такого скачка; диапазон задаёт интервал (снова в пикселях) между минимальной и максимальной длиной прыжка.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Вероятность прилипания на скалах</guilabel>
+        </term>
+        <listitem>
+          <para>Вероятность частицы осесть на поверхность когда она касается голой скалы.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Вероятность прилипания на песке</guilabel>
+        </term>
+        <listitem>
+          <para>Вероятность частицы осесть на поверхность когда она касается поверхности и там уже есть некоторое количество песка. Эта вероятность в общем случае должна быть выше, чем для голой скалы.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Максимальный уклон</guilabel>
+        </term>
+        <listitem>
+          <para>Когда осаждение частицы (или подхватывание её ветром) создаёт слишком большую разницу высоты между соседними пикселями песок становится нестабильным. Он после этого сползает вниз чтобы либо уменьшить высоту холма, либо заполнить впадины пока максимальный уклон нигде не будет превышен.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-dunes">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-dunes.png" format="PNG"/>
+        </imageobject>
+        <caption>Изображения дюн: с настройками по умолчанию (слева); длинные плоские дюны с небольшим максимальным уклоном (по центру); более изотропные дюны для направления ветра с высокой случайностью (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="plateaus-synthesis">
+    <title>Плато <gwy:icon name="synthetic_plateaus"/></title>
+    <para>Поверхность создается наложением хлопьев или плато поверх друг друга, начиная с наибольшего и двигаясь к меньшему в соответствии с законом масштабирования. По умолчанию они не пересекаются, но можно включить режим наложения хлопьев (немного похоже на то, как происходит с одномерными материалами по типу графена). Генератор использует следующий набор параметров:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Максимальный размер</guilabel>
+        </term>
+        <listitem>
+          <para>Приблизительный максимальный радиус плато.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Минимальный размер</guilabel>
+        </term>
+        <listitem>
+          <para>Приблизительный минимальный радиус плато.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Степенной закон размера</guilabel>
+        </term>
+        <listitem>
+          <para>Насколько быстро радиус плато уменьшается с увеличением количества уже помещенных плато. Большие значения означают то, что размер быстро убывает и плато имеют тенденцию быть редкими и изолированными. Малые значения означают что размер убывает медленно и плато имеют тенденцию быть плотными и складываться в высокие структуры.</para>
+          <warning>Может быть сложно, или даже невозможно, найти положения всех плато с заданным максимальным и минимальным размером и степенью масштабирования. Низкие степени полезны только с узкими диапазонами размеров. В противном случае генератор поверхности будет очень медленным или вообще никогда не закончит работать.</warning>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Неправильность формы</guilabel>
+        </term>
+        <listitem>
+          <para>Насколько сильно формы могут отклоняться от симметричных дисков.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Степень пересечения</guilabel>
+        </term>
+        <listitem>
+          <para>Приблизительная доля плато, которые будут пересекаться с другими плато.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Масштабируется со степенью размера</guilabel>
+        </term>
+        <listitem>
+          <para>Степень, с которой высота плато масштабируется с его размером. Для заданной по умолчанию степени 0 все плато будут иметь одинаковую высоту (за исключением возможного случайного разброса). Положительные степени означают, что высота уменьшается с уменьшением размера. Отрицательные степени означают, что более маленькие плато будут выше, создавая поверхность с пиками.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-plateaus">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-plateaus.png" format="PNG"/>
+        </imageobject>
+        <caption>Изображения плато: с настройками по умолчанию (слева); приблизительно самоаффинная поверхность с небольшой степенью масштабирования и минимальным размером (по центру); несколько пересекающиеся хлопья неправильной формы (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="wetting-synthesis">
+    <title>Смачивание</title>
+    <para>Смачивание это простое моделирование движения границы смачивания через случайную среду. Среда представлена сеткой вокселей, где каждый воксель имеет разное сопротивление. Жидкость всегда распространяется через воксель с минимальным сопротивлением. Генератор создает изотропные текстуры с дискретной высотой, соответствующей уровням, до которых дошел фронт смачивания. Генератор имеет следующий набор параметров:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Покрытие</guilabel>
+        </term>
+        <listitem>
+          <para>Среднее количество раз, которое жидкость проходит через пиксель. Результирующее изображение показывает только наиболее дальние точки, таким образом его среднее значение не связано напрямую с покрытием.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Диффузия</guilabel>
+        </term>
+        <listitem>
+          <para>Вероятность случайного распространения с соседних вокселей, не связанное с приоритетом основанным на сопротивлении. Следует отметить, что значение является логарифмическим.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id="fig-synthetic-wetting">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="synthetic-wetting.png" format="PNG"/>
+        </imageobject>
+        <caption>Изображения фронта смачивания: типичный результат с умеренным покрытием (слева); начальная стадия распространения (справа).</caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id="synthetic-ref">
+    <title>Ссылки</title>
+    <para id="synthetic-ref-1">[1] D. Nečas, P. Klapetek: Synthetic Data in Quantitative Scanning Probe Microscopy. Nanomaterials 11 (2021) 1746 <ulink url="http://dx.doi.org/10.3390/nano11071746">10.3390/nano11071746</ulink></para>
+    <para id="synthetic-ref-2">[2] L. M. Pismen, M. I. Monine, G. V. Tchernikov: Patterns and localized structures in a hybrid non-equilibrium Ising model. Physica D 199 (2004) 82, <ulink url="http://dx.doi.org/10.1016/j.physd.2004.08.006">doi:10.1016/j.physd.2004.08.006</ulink></para>
+    <para id="synthetic-ref-3">[3] B. T. Werner: Eolian dunes: Computer simulations and attractor interpretation. Geology 23 (1995) 1107, <ulink url="http://dx.doi.org/10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3.CO;2">doi:10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3.CO;2</ulink></para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

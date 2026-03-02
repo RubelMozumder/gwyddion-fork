@@ -1,0 +1,264 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-01-01 13:32+0400\n"
+"PO-Revision-Date: 2021-01-01 13:36+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: interpolation.xml:6(title)
+msgid "Interpolation"
+msgstr "Интерполяция"
+
+#: interpolation.xml:7(primary)
+msgid "interpolation"
+msgstr "интерполяция"
+
+#: interpolation.xml:8(para)
+msgid ""
+"Most geometrical transformations, such as rotation, scaling or <link linkend="
+"\"drift-compensation\">drift compensation</link> utilize or depend on data "
+"interpolation. Also some other operations, e.g. <link linkend=\"profile"
+"\">profile extraction</link>, can work with values between individual pixels "
+"and hence involve interpolation. Since SPM data are relatively coarsely "
+"sampled compared to measured details (full images are typically only a few "
+"hundred pixels in width and height), the interpolation method used can "
+"become critical for proper quantitative analysis of data properties. "
+"Gwyddion implements several interpolation methods [<link linkend="
+"\"interpolation-ref-1\">1</link>] and the user can choose which method to "
+"use for most of the modules using interpolation."
+msgstr ""
+"Большинство геометрических преобразований, таких, как поворот, "
+"масштабирование или <link linkend=\"drift-compensation\">компенсация дрейфа</"
+"link> используют интерполяцию или или их результат зависит от выбора типа "
+"интерполяции данных. Также некоторые другие операции, например, <link "
+"linkend=\"profile\">извлечение профилей</link>, могут работать со значениями "
+"между отдельными пикселями и, следовательно, использовать интерполяцию. "
+"Поскольку данные СЗМ снимаются в относительно редко расположенных точках по "
+"сравнению с измеряемыми особенностями изображения (полные изображения обычно "
+"содержат всего лишь сотни пикселей в высоту и ширину), используемые методы "
+"интерполяции могут стать критичными для правильного количественного анализа "
+"свойств данных. В Gwyddion реализовано несколько методов интерполяции [<link "
+"linkend=\"interpolation-ref-1\">1</link>] и в большинстве модулей, где "
+"интерполяция требуется, можно выбрать используемый метод."
+
+#: interpolation.xml:22(para)
+msgid ""
+"Here, we describe the principles and properties of one-dimensional "
+"interpolation methods. All implemented two-dimensional interpolation methods "
+"are separable and thus simply composed of the corresponding one-dimensional "
+"methods. The following interpolation methods are currently available:"
+msgstr ""
+"Здесь мы описываем принципы и свойства методов одномерной интерполяции. Все "
+"реализованные методы двумерной интерполяции поддерживают разделение "
+"переменных и, следовательно, сводятся к соответствующим методам одномерной "
+"интерполяции. В настоящий момент доступны следующие методы интерполяции:"
+
+#: interpolation.xml:31(primary)
+msgid "round interpolation"
+msgstr "интерполяция округлением"
+
+#: interpolation.xml:32(primary)
+msgid "nearest neighbourhood interpolation"
+msgstr "интерполяция до ближайшего соседнего"
+
+#: interpolation.xml:33(term)
+msgid "Round"
+msgstr "Округление"
+
+#: interpolation.xml:35(para)
+msgid ""
+"Round interpolation (also called nearest neighbourhood interpolation) is the "
+"simplest method – it just takes rounded value of the expected position and "
+"finds therefore the closest data value at integer position. Its polynomial "
+"degree is 0, regularity <include href=\"eqi-C-to-minus-1.xml\"/> and order 1."
+msgstr ""
+"Интерполяция округлением (также называемая интерполяцией до ближайшего "
+"соседнего) – простейший метод, значения текущего местоположения округляются "
+"до целых и, таким образом, определяется ближайшее значение в точке с целыми "
+"координатами. Её степень многочлена = 0, регулярность <include href=\"eqi-C-"
+"to-minus-1.xml\"/> и порядок 1."
+
+#: interpolation.xml:47(primary)
+msgid "linear interpolation"
+msgstr "линейная интерполяция"
+
+#: interpolation.xml:48(term)
+msgid "Linear"
+msgstr "Линейная"
+
+#: interpolation.xml:50(para)
+msgid ""
+"Linear interpolation is a linear interpolation between the two closest data "
+"values. The value <include href=\"eqi-z.xml\"/> at point of relative "
+"position <include href=\"eqi-x.xml\"/> is obtained as <include href=\"eq-"
+"interpolation-linear.xml\"/> where <include href=\"eqi-z_0.xml\"/> and "
+"<include href=\"eqi-z_1.xml\"/> are values at the preceding and following "
+"points, respectively. Its polynomial degree is 1, regularity <include href="
+"\"eqi-C-to-0.xml\"/> and order 2. It is identical to the second-order B-"
+"spline."
+msgstr ""
+"Линейная интерполяция между двумя ближайшими значениями. Значение <include "
+"href=\"eqi-z.xml\"/> в точке с относительными координатами <include href="
+"\"eqi-x.xml\"/> получается с помощью уравнения <include href=\"eq-"
+"interpolation-linear.xml\"/> где <include href=\"eqi-z_0.xml\"/> и <include "
+"href=\"eqi-z_1.xml\"/> - значения в предыдущей и следующей точке, "
+"соответственно. Степень многочлена 1, регулярность <include href=\"eqi-C-"
+"to-0.xml\"/>, порядок 2. Она идентична B-сплайну второго порядка."
+
+#: interpolation.xml:66(primary)
+msgid "Key interpolation"
+msgstr "Кубическая интерполяция"
+
+#: interpolation.xml:67(term)
+msgid "Key"
+msgstr "Кубическая"
+
+#: interpolation.xml:69(para)
+msgid ""
+"Key interpolation (more precisely Key's interpolation with <include href="
+"\"eqi-a-is-minus-1-over-2.xml\"/> which has the highest interpolation order) "
+"makes use also of values in the before-preceding and after-following points "
+"<include href=\"eqi-z_minus-1.xml\"/> and <include href=\"eqi-z_2.xml\"/>, "
+"respectively. In other words it has support of length 4. The value is then "
+"obtained as <include href=\"eq-interpolation-w1234.xml\"/> where <include "
+"href=\"eq-interpolation-key.xml\"/> are the interpolation weights. Key's "
+"interpolation degree is 3, regularity <include href=\"eqi-C-to-1.xml\"/> and "
+"order 3."
+msgstr ""
+"Кубическая интерполяция (точнее интерполяция Кея (Key) с <include href=\"eqi-"
+"a-is-minus-1-over-2.xml\"/> который имеет наиболее высокий порядок "
+"интерполяции) также использует значения в точках перед предыдущей и после "
+"следующей <include href=\"eqi-z_minus-1.xml\"/> и <include href=\"eqi-z_2.xml"
+"\"/>, соответственно. Другими словами оно имеет носитель длины 4. Значение "
+"затем получается по формуле <include href=\"eq-interpolation-w1234.xml\"/> "
+"где <include href=\"eq-interpolation-key.xml\"/> - веса интерполяции. "
+"Степень интерполяции Кея равна 3, регулярность <include href=\"eqi-C-to-1.xml"
+"\"/> и порядок 3."
+
+#: interpolation.xml:87(primary)
+msgid "Schaum interpolation"
+msgstr "Интерполяция по Шауму"
+
+#: interpolation.xml:88(term)
+msgid "Schaum"
+msgstr "по Шауму"
+
+#: interpolation.xml:90(para)
+msgid ""
+"Schaum interpolation (more precisely fourth-order Schaum) has also support "
+"of length 4. The interpolation weights are <include href=\"eq-interpolation-"
+"schaum.xml\"/> Its polynomial degree is 3, regularity <include href=\"eqi-C-"
+"to-0.xml\"/> and order 4."
+msgstr ""
+"Интерполяция по Шауму (точнее, интерполяция Шаума четвёртого порядка) также "
+"имеет носитель длины 4. Веса интерполяции - <include href=\"eq-interpolation-"
+"schaum.xml\"/> Степень полинома 3, регулярность <include href=\"eqi-C-to-0."
+"xml\"/> и порядок 4."
+
+#: interpolation.xml:100(primary)
+msgid "NNA interpolation"
+msgstr "Интерполяция аппроксимацией ближайшим соседом"
+
+#: interpolation.xml:101(term)
+msgid "NNA"
+msgstr "АБС"
+
+#: interpolation.xml:103(para)
+msgid ""
+"Nearest neighbour approximation is again calculated from the closest four "
+"data values but unlike all others it is not piecewise-polynomial. The "
+"interpolation weights are <include href=\"eq-interpolation-nna.xml\"/> for "
+"<include href=\"eqi-k-is-minus-1-to-2.xml\"/>, where <include href=\"eqi-"
+"r_minus-1-is-1-plus-x.xml\"/>, <include href=\"eqi-r_0-is-x.xml\"/>, "
+"<include href=\"eqi-r_1-is-1-minus-x.xml\"/>, <include href=\"eqi-r_2-is-2-"
+"minus-x.xml\"/>. Its order is 1."
+msgstr ""
+"Аппроксимация ближайшим соседом снова рассчитывается из ближайших четырёх "
+"значений данных, но, в отличие от остальных, не является кусочно "
+"полиномиальной. Веса интерполяции: <include href=\"eq-interpolation-nna.xml"
+"\"/> для <include href=\"eqi-k-is-minus-1-to-2.xml\"/>, где  <include href="
+"\"eqi-r_minus-1-is-1-plus-x.xml\"/>, <include href=\"eqi-r_0-is-x.xml\"/>, "
+"<include href=\"eqi-r_1-is-1-minus-x.xml\"/>, <include href=\"eqi-r_2-is-2-"
+"minus-x.xml\"/>. Её порядок = 1."
+
+#: interpolation.xml:118(primary)
+msgid "B-spline interpolation"
+msgstr "Интерполяция B-сплайном"
+
+#: interpolation.xml:119(term)
+msgid "B-spline"
+msgstr "B-сплайн"
+
+#: interpolation.xml:121(para)
+msgid ""
+"The weights are <include href=\"eq-interpolation-bspline.xml\"/> However, "
+"they are not used with directly function values as above, but with "
+"interpolation coefficients calculated from function values [<link linkend="
+"\"interpolation-ref-1\">1</link>]. Its polynomial degree is 3, regularity "
+"<include href=\"eqi-C-to-2.xml\"/> and order 4."
+msgstr ""
+"Веса - <include href=\"eq-interpolation-bspline.xml\"/> Однако, они "
+"применяются не напрямую к значениям функции, как выше, а к коэффициентам "
+"интерполяции, рассчитанным из значений функции [<link linkend="
+"\"interpolation-ref-1\">1</link>]. Степень полинома 3, регулярность <include "
+"href=\"eqi-C-to-2.xml\"/> и порядок 4."
+
+#: interpolation.xml:133(primary)
+msgid "O-MOMS interpolation"
+msgstr "интерполяция O-MOMS"
+
+#: interpolation.xml:134(term)
+msgid "O-MOMS"
+msgstr "O-MOMS"
+
+#: interpolation.xml:136(para)
+msgid ""
+"The weights are <include href=\"eq-interpolation-omoms.xml\"/> However, they "
+"are not used directly with function values as above, but with interpolation "
+"coefficients calculated from function values [<link linkend=\"interpolation-"
+"ref-1\">1</link>]. Its polynomial degree is 3, regularity <include href="
+"\"eqi-C-to-0.xml\"/> and order 4."
+msgstr ""
+"Веса интерполяции: <include href=\"eq-interpolation-omoms.xml\"/> Однако, "
+"они применяются не напрямую к значениям функции, как выше, а к коэффициентам "
+"интерполяции, рассчитанным из значений функции [<link linkend="
+"\"interpolation-ref-1\">1</link>]. Степень полинома 3, регулярность  "
+"<include href=\"eqi-C-to-0.xml\"/> и порядок 4."
+
+#: interpolation.xml:154(phrase)
+msgid "2D interpolation examples"
+msgstr "Примеры двумерной интерполяции"
+
+#: interpolation.xml:156(caption)
+msgid ""
+"Illustration of the available interpolation types (the original pixels are "
+"obvious on the result of Round interpolation). All images have identical "
+"false colour map ranges."
+msgstr ""
+"Иллюстрация доступных видов интерполяции (исходные пиксели очевидны на "
+"изображении результата интерполяции округлением). Все изображения имеют "
+"идентичные диапазоны псевдоцвета."
+
+#: interpolation.xml:164(title)
+msgid "References"
+msgstr "Источники"
+
+#: interpolation.xml:165(para)
+msgid ""
+"[1] P. Thévenaz, T. Blu, M. Unser: Interpolation revisited. IEEE "
+"Transactions on medical imaging 10 (2000) 739–758, <ulink url=\"http://dx."
+"doi.org/10.1109/42.875199\">doi:10.1109/42.875199</ulink>"
+msgstr ""
+"[1] P. Thévenaz, T. Blu, M. Unser: Interpolation revisited. IEEE "
+"Transactions on medical imaging 10 (2000) 739–758, <ulink url=\"http://dx."
+"doi.org/10.1109/42.875199\">doi:10.1109/42.875199</ulink>"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

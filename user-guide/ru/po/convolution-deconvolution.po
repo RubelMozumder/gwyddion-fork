@@ -1,0 +1,543 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2019-09-22 23:59+0400\n"
+"PO-Revision-Date: 2019-09-23 00:17+0400\n"
+"Last-Translator: \n"
+"Language-Team: ru <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: convolution-deconvolution.xml:6(title)
+msgid "Convolution and deconvolution"
+msgstr "Свёртка и деконволюция"
+
+#: convolution-deconvolution.xml:7(para)
+msgid ""
+"Several Gwyddion functions do convolutions and deconvolutions of some sort. "
+"A subtle point which is occasionaly a source of confusion is the difference "
+"between continuous and discrete operations. When images <xi:include href="
+"\"eqi-f.xml\"/> and <xi:include href=\"eqi-g.xml\"/> are physical "
+"quantities, i.e. fields sampled in space, their convolution <xi:include href="
+"\"eqi-h.xml\"/><xi:include href=\"eq-convolution-continuous.xml\"/> is again "
+"a physical field. Its physical dimension (units) is <xi:include href=\"eq-"
+"convolution-units.xml\"/> For images <xi:include href=\"eqi-dim-A.xml\"/> "
+"has the dimension of image area, i.e. usually square metres."
+msgstr ""
+"Несколько функций Gwyddion делают некоторые разновидности операций свёртки и "
+"деконволюции. Тонкий вопрос, который приводит к непониманию, это разница "
+"между непрерывными и дискретными операциями. Когда изображения <xi:include "
+"href=\"eqi-f.xml\"/> и <xi:include href=\"eqi-g.xml\"/> являются "
+"распределениями физических величин, т.е. дискретными замерами некоторого "
+"поля в пространстве, их свёртка <xi:include href=\"eqi-h.xml\"/><xi:include "
+"href=\"eq-convolution-continuous.xml\"/> также будет физической величной. Её "
+"физическая размерность (единицы измерения) будет <xi:include href=\"eq-"
+"convolution-units.xml\"/>. Для изображений <xi:include href=\"eqi-dim-A.xml"
+"\"/> имеет размерность площади изображения, т.е. обычно квадратных метров."
+
+#: convolution-deconvolution.xml:20(para)
+msgid ""
+"When the integral is realized using a discrete Riemann sum <xi:include href="
+"\"eq-convolution-Riemann-sum.xml\"/> the area appears as the area of one "
+"pixel <xi:include href=\"eqi-Delta-A.xml\"/>. This is how all Gwyddion "
+"convolution, deconvolution and transfer function operations work by default, "
+"i.e. with the <guilabel>Normalize as integral</guilabel> option enabled."
+msgstr ""
+"Когда интеграл реализован с помощью дискретной суммы Римана <xi:include href="
+"\"eq-convolution-Riemann-sum.xml\"/> площадь представляет собой площадь "
+"одного пикселя <xi:include href=\"eqi-Delta-A.xml\"/>. Это то, как все "
+"операции свёртки. деконволюции и передаточной функции работают в Gwyddion по "
+"умолчанию, т.е. когда опция <guilabel>Нормализовать как интеграл</guilabel> "
+"включена."
+
+#: convolution-deconvolution.xml:29(para)
+msgid ""
+"In digital image processing physical units are sometimes ignored and "
+"convolution understood as simple discrete convolution of images <xi:include "
+"href=\"eq-convolution-discrete.xml\"/> It is possible to obtain this "
+"behaviour by disabling the option <guilabel>Normalize as integral</guilabel> "
+"in a particular function. You should be aware the result of the operation is "
+"then no longer a physical quantity sampled in space (it depends on pixel "
+"size) and the units are different. The only function which works this way by "
+"default is <link linkend=\"convolution-filter\">Convolution Filter</link>, "
+"where one of the operands is given as a small matrix of unitless numbers."
+msgstr ""
+"В цифровой обработке изображений физические единицы измерения иногда "
+"игнорируются и свёртка понимается как простая дискретная свёртка изображений "
+"<xi:include href=\"eq-convolution-discrete.xml\"/> Такое поведение можно "
+"включить выключив опцию <guilabel>Нормализовать как интеграл</guilabel> для "
+"данной функции. Необходимо принимать во внимание, что результат операции в "
+"данном случае перестанет быть физической величиной, дискретизованной в "
+"пространстве (он зависит от размера пикселя) и единицы измерения станут "
+"другими. Единственной функцией, которая работает таким образом по умолчанию "
+"является <link linkend=\"convolution-filter\">Фильтр свёртки</link>, где "
+"один из операндов это небольшая матрица безразмерных чисел."
+
+#: convolution-deconvolution.xml:42(title)
+msgid "Image convolution <gwy:icon name=\"convolve\"/>"
+msgstr "Свёртка изображений <gwy:icon name=\"convolve\"/>"
+
+#: convolution-deconvolution.xml:46(primary)
+#: convolution-deconvolution.xml:51(secondary)
+msgid "convolution"
+msgstr "свёртка"
+
+#: convolution-deconvolution.xml:47(secondary)
+#: convolution-deconvolution.xml:108(secondary)
+msgid "of two images"
+msgstr "двух изображений"
+
+#: convolution-deconvolution.xml:50(primary)
+#: convolution-deconvolution.xml:188(primary)
+msgid "transfer function"
+msgstr "передаточная функция"
+
+#: convolution-deconvolution.xml:55(guimenu)
+#: convolution-deconvolution.xml:112(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: convolution-deconvolution.xml:56(guisubmenu)
+#: convolution-deconvolution.xml:113(guisubmenu)
+msgid "Multidata"
+msgstr "Множественные данные"
+
+#: convolution-deconvolution.xml:57(guimenuitem)
+msgid "Convolve"
+msgstr "Свёртка"
+
+#: convolution-deconvolution.xml:60(para)
+msgid ""
+"Convolution of two images can be performed using Convolve (see <link linkend="
+"\"convolution-filter\">Convolution Filter</link> for convolution with a "
+"small kernel, entered numerically). The module has only a few options:"
+msgstr ""
+"Свёртку двух изображений можно произвести используя модуль Свёртка (см. "
+"также <link linkend=\"convolution-filter\">Фильтр свёртки</link> для свёртки "
+"с небольшим ядром, вводимым численно). Модуль имеет всего несколько "
+"параметров:"
+
+#: convolution-deconvolution.xml:69(guilabel)
+#: convolution-deconvolution.xml:126(guilabel)
+msgid "Convolution kernel"
+msgstr "Ядро свёртки"
+
+#: convolution-deconvolution.xml:71(listitem)
+msgid ""
+"The smaller image to convolve the larger image with, for instance a tip "
+"transfer function image. The dimensions of one pixel in both images must "
+"correspond."
+msgstr ""
+"Меньшее изображение, с которым будет производиться свёртка большего "
+"изображения, например, изображение передаточной функции зонда. Размерности "
+"одного пикселя в обоих изображениях должны соответствовать друг другу."
+
+#: convolution-deconvolution.xml:79(guilabel)
+msgid "Exterior type"
+msgstr "Тип внешней части"
+
+#: convolution-deconvolution.xml:83(link)
+msgid "Extend"
+msgstr "Расширить"
+
+#: convolution-deconvolution.xml:81(listitem)
+msgid ""
+"What values should be assumed for pixels outside the image (as in "
+"<placeholder-1/>)."
+msgstr ""
+"Какие значения должны присваиваться пикселям снаружи изображения (как в "
+"<placeholder-1/>)."
+
+#: convolution-deconvolution.xml:88(guilabel)
+msgid "Output size"
+msgstr "Размер результата"
+
+#: convolution-deconvolution.xml:92(guilabel)
+msgid "Crop to interior"
+msgstr "Обрезать до внутренней части"
+
+#: convolution-deconvolution.xml:94(guilabel)
+msgid "Keep size"
+msgstr "Сохранить размер"
+
+#: convolution-deconvolution.xml:96(guilabel)
+msgid "Extend to convolved"
+msgstr "Расширить до размера после свёртки"
+
+#: convolution-deconvolution.xml:90(listitem)
+msgid ""
+"The size of the resulting image with respect to which pixels entered the "
+"calculation. <placeholder-1/> cuts the image to consists only of pixels that "
+"are sufficiently far from the boundary that the exterior does not matter. "
+"<placeholder-2/> creates an image with the same as the input image. Finally, "
+"<placeholder-3/> means the resulting image will be extended on each side by "
+"half the kernel size."
+msgstr ""
+"Размер результирующего изображения по отношению к тому, какие из пикселей "
+"входили в расчёт. <placeholder-1/> обрезает изображение таким образом, чтобы "
+"в него входили только пиксели достаточно далеко от границы, чтобы граница не "
+"влияла на результат. <placeholder-2/> создаёт изображение такого же размера ."
+"как исходное. И, наконец, <placeholder-3/> означает. что результат будет "
+"расширен по каждой стороне на половину размера ядра."
+
+#: convolution-deconvolution.xml:103(title)
+msgid "Image deconvolution <gwy:icon name=\"deconvolve\"/>"
+msgstr "Деконволюция изображения <gwy:icon name=\"deconvolve\"/>"
+
+#: convolution-deconvolution.xml:107(primary)
+msgid "deconvolution"
+msgstr "деконволюция"
+
+#: convolution-deconvolution.xml:114(guimenuitem)
+msgid "Deconvolve"
+msgstr "Деконволюция"
+
+#: convolution-deconvolution.xml:117(para)
+msgid ""
+"A simple regularized deconvolution of two images can be performed using "
+"Deconvolve. L-curve method can be used to search for the optimum "
+"regularization parameter, however its applicatbility highly depends on the "
+"data. The module has the following options:"
+msgstr ""
+"Простую регуляризованную деконволюцию двух изображений можно произвести "
+"используя модуль Деконволюции. Метод L-кривой можно использовать для поиска "
+"оптимального параметра регуляризации, однако его применимость сильно зависит "
+"от вида данных. Этот модуль имеет следующие параметры:"
+
+#: convolution-deconvolution.xml:128(listitem)
+msgid "The kernel to be deconvolved from the current image."
+msgstr ""
+"Ядро, деконволюция с которым будет проводиться для текущего изображения."
+
+#: convolution-deconvolution.xml:134(guilabel)
+msgid "Sigma"
+msgstr "Параметр регуляризации"
+
+#: convolution-deconvolution.xml:136(listitem)
+msgid "Regularization parameter."
+msgstr "Параметр регуляризации"
+
+#: convolution-deconvolution.xml:142(guilabel)
+msgid "L-curve display"
+msgstr "Отображение L-кривой"
+
+#: convolution-deconvolution.xml:144(listitem)
+msgid ""
+"The data to be shown in the optional L-curve plot, when this is computed. "
+"The L-curve consist of two data sources: difference between the result "
+"convolved with the kernel and the original data and norm of the result. "
+"These two are plotted in a log-log graph providing a L-curve, but their "
+"dependences on the regularization parameters can be plotted also "
+"individually. The curvature of the resulting curve vs. regularization "
+"parameter gives the usual criterion for the best regularization parameters, "
+"seeking for the curve maximum."
+msgstr ""
+"Данные будут показаны на опциональном графике L-кривой, когда он будет "
+"рассчитан. L-кривая состоит из двух источников данных: разности между "
+"результатом свёртки с ядром и исходных данных и нормой результата. Эти два "
+"набора данных строятся на графике в двойном логарифмическом масштабе, в "
+"результате получается L-кривая, но их зависимость от параметров "
+"регуляризации также может быть построена отдельно. Кривизна получаемой "
+"кривой зависимости от параметра регуляризации даёт обычный критерий для "
+"поиска наилучших параметров регуляризации путём поиска максимума кривой."
+
+#: convolution-deconvolution.xml:157(guilabel)
+msgid "L-curve sigma range"
+msgstr "Диапазон сигма L-кривой"
+
+#: convolution-deconvolution.xml:159(listitem)
+msgid ""
+"Range of the regularization parameter to be used in the L-curve calculation. "
+"This is, similarly to the regularization parameter, logarithmic, so it can "
+"span very large range, not necessarily suitable for the particular data set."
+msgstr ""
+"Диапазон параметров регуляризации, который будет использоваться при расчёте "
+"L-кривой. Он, так же как и параметр регуляризации, логарифмический, поэтому "
+"может простираться в достаточно широких пределах, не обязательно подходящих "
+"к отдельному частному набору данных."
+
+#: convolution-deconvolution.xml:167(para)
+msgid ""
+"Output type <guilabel>Deconvolved</guilabel> produces the deconvolved image; "
+"<guilabel>Difference</guilabel> calculates the difference between "
+"reconvolved image and the input."
+msgstr ""
+"Тип вывода. <guilabel>Результат деконволюции</guilabel> даёт изображение "
+"деконволюции; <guilabel>Разница</guilabel> показывает разницу между "
+"изображением после свёртки обратно и входным изображением."
+
+#: convolution-deconvolution.xml:177(caption)
+msgid "Screenshot of the deconvolve dialogue after L-curve data were computed."
+msgstr ""
+"Снимок экрана диалогового окна деконволюции после того, как рассчитаны "
+"данные L-кривой."
+
+#: convolution-deconvolution.xml:184(title)
+msgid "Transfer function estimation"
+msgstr "Оценка передаточной функции"
+
+#: convolution-deconvolution.xml:189(secondary)
+msgid "estimation"
+msgstr "оценка"
+
+#: convolution-deconvolution.xml:192(primary)
+msgid "point spread function"
+msgstr "Функция рассеяния точки (PSF)"
+
+#: convolution-deconvolution.xml:194(para)
+msgid ""
+"The <emphasis>probe transfer function</emphasis> (or point spread function) "
+"can be estimated from measured data, even noisy, when the corresponding "
+"ideally sharp signal is available. Gwyddion currently implements a few "
+"relatively simple methods."
+msgstr ""
+"<emphasis>Передаточная функция зонда</emphasis> (или функция рассеяния "
+"точки, импульсный отклик, point spread function, PSF, ПФ) может быть оценена "
+"из измеренных данных, даже зашумлённых, если доступен соответствующий "
+"идеально чёткий сигнал. В Gwyddion на данный момент реализовано несколько "
+"относительно простых методов."
+
+#: convolution-deconvolution.xml:200(para)
+msgid ""
+"<menuchoice><guimenu>Data Processing</guimenu><guisubmenu>Statistics</"
+"guisubmenu><guimenuitem>Transfer Function Guess</guimenuitem></menuchoice>. "
+"The user interface of the module is and a typical performance on simulated "
+"noisy data is shown in the following figures."
+msgstr ""
+"<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Статистика</"
+"guisubmenu><guimenuitem>Оценка передаточной функции</guimenuitem></"
+"menuchoice>. Общий вид интерфейса пользователя для данного модуля и типичная "
+"его работа с смоделированными зашумленными данными показан на следующих "
+"рисунках."
+
+#: convolution-deconvolution.xml:209(para)
+msgid ""
+"The sharp signal is selected as <guilabel>Ideal response</guilabel>. It must "
+"have the same dimensions as the image. In contrast to the general Deconvolve "
+"module this module is optimized for the statistical properties of the "
+"transfer functions. There are currently three available deconvolution "
+"methods:"
+msgstr ""
+"Чёткий сигнал выбирается как <guilabel>Идеальный отклик</guilabel>. Он "
+"должен иметь те же размеры, что и изображение. В отличие от общего модуля "
+"деконволюции, этот модуль оптимизирован в плане статистических свойств "
+"передаточной функции. В настоящее время доступны три метода деконволюции:"
+
+#: convolution-deconvolution.xml:218(guilabel)
+msgid "Regularised filter"
+msgstr "Регуляризованный фильтр"
+
+#: convolution-deconvolution.xml:221(para)
+msgid ""
+"Simple frequency-space filter with constant regularisation term. It produces "
+"transfer function image of the same size as the input images. Option "
+"<guilabel>TF zoom</guilabel> can be used to display zoomed central part of "
+"the image."
+msgstr ""
+"Простой фильтр в пространстве частот с регуляризующим параметром. Он выдаёт "
+"изображение передаточной функции такого же размера, как и исходные "
+"изображения. Параметр <guilabel>Масштаб ПФ</guilabel> можно использовать "
+"чтобы показать увеличенную центральную часть изображения."
+
+#: convolution-deconvolution.xml:231(guilabel)
+msgid "Least squares"
+msgstr "Наименьших квадратов"
+
+#: convolution-deconvolution.xml:234(para)
+msgid ""
+"The transfer function is found by solving the least squares problem "
+"corresponding to the deconvolution. The size of transfer function can be "
+"chosen arbitrarily. Usually it is much smaller than the input images."
+msgstr ""
+"Передаточная функция находится путём решения задачи наименьших  квадратов, "
+"соответствующей деконволюции. Размер передаточной функции может быть выбран "
+"произвольно. Обычно он гораздо меньше, чем исходные изображения."
+
+#: convolution-deconvolution.xml:240(para)
+msgid ""
+"Parameter <guilabel>Size</guilabel> controls the transfer function image "
+"size. If <guilabel>Border</guilabel> is nonzero, the transfer function image "
+"is enlarged by this value before solving the least squares problem and then "
+"the border is cut. A small border of 2 or 3 often improves the result "
+"because errors tend to accumulate in the edge pixels. Both sizes can be "
+"estimated automatically using <guibutton>Estimate Size</guibutton>."
+msgstr ""
+"Параметр <guilabel>Размер</guilabel> управляет размером изображения "
+"передаточной функции. Если <guilabel>Граница</guilabel> ненулевая, "
+"изображение передаточной функции увеличивается на это значение перед "
+"решением методом наименьших квадратов и затем граница обрезается. Небольшое "
+"значение порядка 2 или 3 нередко улучшает результат поскольку ошибки имеют "
+"тенденцию накапливаться в граничных пикселях. Оба размера могут быть оценены "
+"автоматически используя <guibutton>Оценить размер</guibutton>."
+
+#: convolution-deconvolution.xml:253(guilabel)
+msgid "Wiener filter"
+msgstr "Фильтр Винера"
+
+#: convolution-deconvolution.xml:256(para)
+msgid ""
+"Pseudo-Wiener filter assuming the spectral density of the output can be "
+"estimated by the spectral density of the input image. It is again a "
+"frequency-domain filter, producing transfer function image of the same size "
+"as the input images. Option <guilabel>TF zoom</guilabel> can be used to "
+"display zoomed central part of the image."
+msgstr ""
+"Псевдо-фильтр Винера, предполагающий что спектральную плотность выходного "
+"изображения можно оценить по спектральной плотности входного. Это снова "
+"фильтр, работающий в пространстве частот и дающий передаточную функцию "
+"такого же размера, как исходные изображения. Опцию <guilabel>Масштаб ПФ</"
+"guilabel> можно использовать для того, чтобы показать увеличенную "
+"центральную часть изображения."
+
+#: convolution-deconvolution.xml:267(para)
+msgid ""
+"Two important parameters influence the result. The dimensionless "
+"regularisation parameter <xi:include href=\"eqi-sigma.xml\"/>, which is used "
+"in all the methods, but is not directly comparable between them. It can be "
+"chosen manually. Since suitable values can differ by several orders of "
+"magnitude, it is presented as base-10 logarithm. However, the module can "
+"find a suitable value also automatically when <guibutton>Fit Sigma</"
+"guibutton> is pressed."
+msgstr ""
+"Два важных параметра влияют на результат. безразмерный параметр "
+"регуляризации <xi:include href=\"eqi-sigma.xml\"/>, который используется во "
+"всех методах, но не сравним напрямую между ними. Он может быть выбран "
+"вручную. Поскольку подходящие значения могут отличаться на несколько "
+"порядков величины, он представлен как логарифм по основанию 10. Однако, "
+"модуль может найти подходящее значение автоматически если нажато "
+"<guibutton>Аппрокс. параметр регуляризации</guibutton>"
+
+#: convolution-deconvolution.xml:276(para)
+msgid ""
+"<guibutton>Windowing type</guibutton> determines the <link linkend="
+"\"windowing\">windowing function</link> applied to both input images before "
+"deconvolution. Unless the input data are periodic, windowing is a necessity "
+"to avoid cross-like artefacts in the transfer function. The default Welch "
+"window is usually a good choice."
+msgstr ""
+"<guibutton>Тип окна</guibutton> определяет <link linkend=\"windowing"
+"\">оконную функцию</link>, применяемую к обоим изображениям перед "
+"деконволюцией. Если исходные данные не являются периодическими, применение "
+"оконной функции необходимо для устранения похожих на кресты артефактов в "
+"передаточной функции. Применяемое по умолчанию окно Велча обычно является "
+"хорошим выбором."
+
+#: convolution-deconvolution.xml:283(para)
+msgid ""
+"A few characteristics of the transfer function are immediately displayed in "
+"the bottom part of the dialogue as <guilabel>Result</guilabel>:"
+msgstr ""
+"Несколько характеристик передаточной функции сразу же показаны в нижней "
+"части диалогового окна как <guilabel>Результат</guilabel>:"
+
+#: convolution-deconvolution.xml:290(guilabel)
+msgid "TF width"
+msgstr "ширина ПФ"
+
+#: convolution-deconvolution.xml:292(listitem)
+msgid ""
+"Width, calculated as square root of dispersion when the transfer function is "
+"taken as a distribution. Only the central peak is included in the "
+"calculation (which is important namely for regularised and Wiener filters). "
+"Usually, the optimal reconstruction has also small width."
+msgstr ""
+"Ширина, которая считается как квадратный корень от дисперсии если "
+"передаточная функция считается распределением. В расчёт включается только "
+"центральный пик (что важно особенно для регуляризованного фильтра и фильтра "
+"Винера). Обычно оптимальное восстановление имеет также малую ширину."
+
+#: convolution-deconvolution.xml:302(guilabel)
+msgid "TF height"
+msgstr "высота ПФ"
+
+#: convolution-deconvolution.xml:304(listitem)
+msgid ""
+"Maximum value of the transfer function. When it starts to decrease "
+"noticeably, the regularisation parameter is probably too high."
+msgstr ""
+"Максимальное значение передаточной функции. Когда оно начинает заметно "
+"уменьшаться, параметр регуляризации возможно становится слишком большим."
+
+#: convolution-deconvolution.xml:311(guilabel)
+msgid "TF norm"
+msgstr "норма ПФ"
+
+#: convolution-deconvolution.xml:313(listitem)
+msgid "Mean square value of the transfer function."
+msgstr "Среднеквадратичное значение передаточной функции."
+
+#: convolution-deconvolution.xml:319(guilabel)
+msgid "Difference norm"
+msgstr "Норма разницы"
+
+#: convolution-deconvolution.xml:321(listitem)
+msgid ""
+"Mean square value of the difference between the input image and ideal sharp "
+"image convolved with the reconstructed transfer function."
+msgstr ""
+"Среднеквадратичное значение разности между исходным изображением и идеально "
+"чётким изображением после свёртки его с восстановленной передаточной "
+"функцией."
+
+#: convolution-deconvolution.xml:327(para)
+msgid ""
+"The tab <guilabel>Output Options</guilabel> allows choosing the images the "
+"function will produce: the transfer function (<guilabel>Transfer function</"
+"guilabel>), its convolution with the ideal sharp image (<guilabel>Convolved</"
+"guilabel>) and/or the difference between the input and the convolved image "
+"(<guilabel>Difference</guilabel>). For methods which produce full-size "
+"transfer function images, <guilabel>Only zoomed part</guilabel> limits the "
+"output image size to the zoomed part displayed in the dialogue."
+msgstr ""
+"Вкладка <guilabel>Параметры вывода</guilabel> позволяет выбрать какие "
+"изображения будет выдавать функция: передаточную функцию "
+"(<guilabel>Передаточная функция</guilabel>), её свёртку с идеально чётким "
+"изображением (<guilabel>Результат свёртки</guilabel>) и/или разницу между "
+"входным изображением и изображением после свёртки (<guilabel>Разница</"
+"guilabel>). Для методов, которые получают изображения передаточной функции "
+"полного размера <guilabel>Только увеличенная часть</guilabel> ограничивает "
+"размер выходных изображений увеличенной их частью, показанной в диалоговом "
+"окне."
+
+#: convolution-deconvolution.xml:342(caption)
+msgid "Screenshot of the transfer function estimation module."
+msgstr "Снимок экрана модуля оценки передаточной функции."
+
+#: convolution-deconvolution.xml:352(caption)
+msgid "Sample results of the transfer function estimation module."
+msgstr "Тестовые результаты модуля оценки передаточной функции."
+
+#: convolution-deconvolution.xml:357(para)
+msgid ""
+"An alternative method of TF estimation is the fitting of an explicit "
+"function form, for instance Gaussian. The free parameters of the function "
+"are sought to minimise the sum of squared differences between measured data "
+"and ideal response convolved with the TF. Since the minimisation can be "
+"performed entirely in the frequency domain and does not require repeated "
+"convolution, this method is simple and fast, albeit somewhat crude. It is "
+"available as <menuchoice><guimenu>Data Processing</"
+"guimenu><guisubmenu>Statistics</guisubmenu><guimenuitem>Transfer Function "
+"Fit</guimenuitem></menuchoice> with three model functions currently "
+"implemented: fully symmetrical Gaussian, anisotropic Gaussian which can have "
+"different widths in the horizontal and vertical directions, and TF which is "
+"exponential in the frequency space."
+msgstr ""
+"Альтернативный способ оценки точечной функции зонда основывается на "
+"аппроксимации явно заданной формы функции, например, гауссовой. Свободные "
+"параметры функции ищутся таким образом чтобы минимизировать сумму квадратов "
+"расстояний между измеренными данными и результатом свёртки идеальных данных "
+"с точечной функцией отклика. Поскольку минимизация может проводиться "
+"полностью в пространстве частот и не требует повторений операции свёртки, то "
+"метод является простым и быстрым, хотя и несколько грубым. Он доступен в "
+"меню <menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Статистика</"
+"guisubmenu><guimenuitem>Аппроксимация передаточной функции</guimenuitem></"
+"menuchoice> с реализованными на данный момент тремя модельными функциями: "
+"полностью симметричной гауссовой, анизотропной гауссовой, которая может "
+"иметь различную ширину в горизонтальном и вертикальном направлениях и "
+"передаточной функцией, являющейся экспоненциальной в пространстве частот."

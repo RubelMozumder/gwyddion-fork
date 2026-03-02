@@ -1,0 +1,40 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+set style line 22 dt 2 pt 65 ps 1 lw 1.5 lc rgb '#e00000'
+
+name = 'fitfunc-two-gaussians-psdf'
+set samples 201
+set lmargin at screen 0.06
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+sigma1 = 1
+T1 = 3.0
+sigma2 = 2.0
+T2 = 0.8
+
+f1(x) = T1*sigma1**2/(2*sqrt(pi)) * exp(-(x*T1/2)**2)
+f2(x) = T2*sigma2**2/(2*sqrt(pi)) * exp(-(x*T2/2)**2)
+f(x) = f1(x) + f2(x)
+xm1 = sqrt(2)/T1
+xm2 = sqrt(2)/T2
+M = f(0)
+
+unset grid
+set key top right Left reverse samplen 1.5
+set xtics out nomirror ('0' 0 0, '√2/T₁' xm1 0, '√2/T₂' xm2 0)
+set ytics out nomirror ('0' 0 0, '' M 0)
+set xrange [0:5]
+set yrange [0:1.1*M]
+set arrow from xm1,0 to xm1,f(xm1) nohead ls 10
+set arrow from xm2,0 to xm2,f(xm2) nohead ls 10
+set style fill solid 0.2
+set label at first sqrt(0.5)/T1+sqrt(0.5)/T2,0.5*f(1.0/T2) 'Area = σ₁²+σ₂²' center
+set output name.'.svg'
+
+plot \
+    0/0 with lines title 'Two Gaussians (PSDF)' linestyle 2, \
+    f2(x) with lines notitle linestyle 22, \
+    f(x) with filledcurves y1=0 notitle linestyle 2
+

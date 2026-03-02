@@ -1,0 +1,24 @@
+set -e
+abs_top_srcdir="@abs_top_srcdir@"
+COMMON="$abs_top_srcdir/common"
+cache="$COMMON/cache"
+i="$2"
+t="TEMP-$1"
+echo "% filename $t" >"$t".tex
+@GSED@ 's/^\\input gwydefs.tex$/%\0/;T;r /dev/stdin' "$COMMON/prologue.tex" <"$COMMON/gwydefs.tex" >>"$t".tex
+@GSED@ '1,/<!\[CDATA\[/d;/\]\]>/,$d' "$i" >>"$t".tex
+cat "$COMMON/epilogue.tex" >>"$t".tex
+c=($(sha1sum "$t".tex))
+c="$cache/eq-${c[0]}.svg"
+if test -s "$c"; then
+  cp "$c" "$1".svg
+  rm -f "$t".tex
+  exit 0
+fi
+@PDFLATEX@ --interaction=batchmode "$t".tex
+@PDF2SVG@ "$t".pdf "$1".svg 1
+@PYTHON@ $COMMON/svgscale.py "$1".svg 2.0
+test -d "$cache" || mkdir "$cache" 2>/dev/null || test -d "$cache"
+cp "$1".svg "$c"
+rm "$t".*
+# vim: set ts=2 sw=2 et :

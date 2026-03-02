@@ -1,0 +1,316 @@
+'\" t
+.\"     Title: gwyddion
+.\"    Author: Yeti
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 11/05/2021
+.\"    Manual: Gwyddion
+.\"    Source: gwyddion
+.\"  Language: English
+.\"
+.TH "GWYDDION" "1" "11/05/2021" "gwyddion" "Gwyddion"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+gwyddion \- SPM data visualization and analysis
+.SH "SYNOPSIS"
+.HP \w'\fBgwyddion\fR\ 'u
+\fBgwyddion\fR [\fIOPTION\fR...] [\fIFILE\fR...]
+.SH "DESCRIPTION"
+.PP
+Gwyddion is a graphical SPM (Scanning Probe Microscope) data visualization and analysis program, using Gtk+\&.
+.SH "OPTIONS"
+.PP
+The program accepts all standard Gtk+, Gdk, and GtkGLExt options like
+\fB\-\-display\fR
+or
+\fB\-\-sync\fR\&. Please see documentation of these packages for description of toolkit options\&.
+.PP
+The behaviour of the remote control options
+\fB\-\-remote\-\fR\fB\fI*\fR\fR
+is undefined when more than one instance of Gwyddion is running on the display\&. They can choose an arbitrary instance to communicate to\&. The last remote control option given (including
+\fB\-\-new\-instance\fR) overrides all preceding ones\&.
+.PP
+If a directory is given as
+\fIFILE\fR
+argument the program opens a file chooser in this directory\&.
+.PP
+Gwyddion options:
+.PP
+\fB\-\-help\fR
+.RS 4
+Prints a brief help and terminates\&.
+.RE
+.PP
+\fB\-\-version\fR
+.RS 4
+Prints version information and terminates\&.
+.RE
+.PP
+\fB\-\-no\-splash\fR
+.RS 4
+Disables splash screen on program startup\&.
+.RE
+.PP
+\fB\-\-remote\-new\fR
+.RS 4
+Opens files given on the command line in an already running instance of Gwyddion on the display\&. Runs a new instance if none is running\&.
+.sp
+This is probably the most useful remote control option\&. File type associations are usually installed to run Gwyddion with this option\&.
+.RE
+.PP
+\fB\-\-remote\-existing\fR
+.RS 4
+Opens files given on the command line in an already running instance of Gwyddion on the display\&. Fails if none is running\&.
+.sp
+This is useful if you want to handle the case of Gwyddion not running differently than by starting it\&.
+.RE
+.PP
+\fB\-\-remote\-query\fR
+.RS 4
+Succeeds if an instance of Gwyddion is already running on the display and prints its instance identifier\&. Fails if none is running\&.
+.sp
+The instance identifier depends on the remote control backend in use\&. In some cases it is useful as a global window identifier, in some it is not\&. With libXmu this option prints the X11
+\fBWindow\fR, on Win32
+\fBHWND\fR
+is printed, while with LibUnique the startup id is printed\&.
+.RE
+.PP
+\fB\-\-new\-instance\fR
+.RS 4
+Runs a new instance of Gwyddion\&. It can also used to override preceding remote control options and to ensure a new instance is run when the default remote control behaviour is modified\&.
+.RE
+.PP
+\fB\-\-identify\fR
+.RS 4
+Instead of running the user interface and opening
+\fIFILE\fRs, it detects the file type for each and terminates\&.
+.sp
+The SPM file type printed corresponds to the description shown in the list of supported file formats in the user guide\&. The file type is followed (in square brackets) by the name of Gwyddion file import module that would be used to load the file and detection score\&. Scores considerably lower than 100 mean that although the detection produced a possible file type, it is unsure about it\&.
+.sp
+If the file type is not recognised at all,
+Unknown
+is printed as the file type\&. The program exit code is 1 if any
+\fIFILE\fR
+was not recognised\&.
+.RE
+.PP
+\fB\-\-check\fR
+.RS 4
+Instead of running the user interface and opening
+\fIFILE\fRs, it loads the files, performs a sanity check on them (printing errors to standard error output) and terminates\&.
+.RE
+.PP
+\fB\-\-disable\-gl\fR
+.RS 4
+Disables OpenGL entirely, including any checks whether it is available\&. This option, of course, has any effect only if Gwyddion was built with OpenGL support and one of the most visible effects is that 3D view becomes unavailable\&. However, you may find it useful if you encounter a system so broken that even checking for OpenGL capabilities leads to X server errors\&. It can also help when you run Gwyddion remotely using X11 forwarding and the start\-up time seems excessively long\&.
+.RE
+.PP
+\fB\-\-log\-to\-file\fR
+.RS 4
+Write messages from GLib, Gtk+, Gwyddion, etc\&. to
+~/\&.gwyddion/gwyddion\&.log
+or file given in
+\fBGWYDDION_LOGFILE\fR
+environment variable\&. This option is most useful on Unix as on Win32 messages are redirected to a file by default\&. Logging to a file and console are not exclusive; messages can go to both\&.
+.RE
+.PP
+\fB\-\-no\-log\-to\-file\fR
+.RS 4
+Prevents writing messages from GLib, Gtk+, Gwyddion, etc\&. to a file\&. This is most useful on Win32 where messages are written to a file by default\&.
+.RE
+.PP
+\fB\-\-log\-to\-console\fR
+.RS 4
+Print messages from GLib, Gtk+, Gwyddion, etc\&. to the console\&. More precisely, debugging messages are printed to the standard output, errors and warnings to the standard error\&. On Unix messages are printed to the console by default\&. Logging to a file and console are not exclusive; messages can go to both\&.
+.RE
+.PP
+\fB\-\-no\-log\-to\-file\fR
+.RS 4
+Disables printing messages to the console\&. This is most useful on Unix where messages are printed to the console by default\&.
+.RE
+.PP
+\fB\-\-disable\-modules=\fR\fB\fIMODULE,\&.\&.\&.\fR\fR
+.RS 4
+Prevents the registration modules of given names\&. This is mostly useful for development and debugging\&. For instance, you might want to use
+\fB\-\-disable\-modules=pygwy\fR
+when running under Valgrind for faster startup (and possibly to avoid extra errors)\&.
+.RE
+.PP
+\fB\-\-startup\-time\fR
+.RS 4
+Prints wall\-clock time taken by various startup (and shutdown) tasks\&. Useful only for developers and people going to complain about too slow startup\&.
+.RE
+.SH "ENVIRONMENT"
+.PP
+On Linux/Unix, following environment variables can be used to override compiled\-in installation paths (MS Windows version always looks to directories relative to path where it was installed)\&. Note they are intended to override system installation paths therefore they are not path lists, they can contain only a single path\&.
+.PP
+\fBGWYDDION_DATADIR\fR
+.RS 4
+Base data directory where resources (color gradients, OpenGL materials, \&...) were installed\&. Gwyddion looks into its
+gwyddion
+subdirectory for resources\&.
+.sp
+When it is unset, it defaults to compiled\-in value of
+\fI${datadir}\fR
+which is usually
+/usr/local/share\&.
+.RE
+.PP
+\fBGWYDDION_LIBDIR\fR
+.RS 4
+Base library directory where modules were installed\&. Gwyddion looks into its
+gwyddion/modules
+subdirectory for modules\&.
+.sp
+When it is unset, it defaults to compiled\-in value of
+\fI${libdir}\fR
+which is usually
+/usr/local/lib
+or
+/usr/local/lib64\&.
+.RE
+.PP
+\fBGWYDDION_LIBEXECDIR\fR
+.RS 4
+Base lib\-exec directory where plug\-ins were installed\&. Gwyddion looks into its
+gwyddion/plugins
+subdirectory for plug\-ins\&.
+.sp
+When it is unset, it defaults to compiled\-in value of
+\fI${libexecdir}\fR
+which is usually
+/usr/local/libexec\&.
+.RE
+.PP
+\fBGWYDDION_LOCALEDIR\fR
+.RS 4
+Locale data directory where message catalogs (translations) were installed\&.
+.sp
+When it is unset, it defaults to compiled\-in value of
+\fI${datadir}/locale\fR
+which is usually
+/usr/local/share/locale\&.
+.RE
+.PP
+Other variables that influence
+Gwyddion
+run\-time behaviour include
+\m[blue]\fBGLib+ variables\fR\m[]\&\s-2\u[1]\d\s+2
+and
+\m[blue]\fBGtk+ variables\fR\m[]\&\s-2\u[2]\d\s+2
+and some Gwyddion\-specific variables:
+.PP
+\fBGWYDDION_LOGFILE\fR
+.RS 4
+Name of file to redirect log messages to\&. On MS Windows, messages are always sent to a file as working with the terminal is cumbersome there\&. The default log file location,
+gwyddion\&.log
+in user\*(Aqs Documents and Settings, can be overridden with
+\fBGWYDDION_LOGFILE\fR\&. On Unix, messages go to the terminal by default and this environment variable has effect only if
+\fB\-\-log\-to\-file\fR
+is given\&.
+.RE
+.PP
+If
+Gwyddion
+is built with OpenMP support, it utilizes parallelization (not all data processing methods implement parallelization, but a sizable part does)\&. OpenMP environment variables such as
+\fBOMP_NUM_THREADS\fR
+can be used to tune it\&.
+.SH "FILES"
+.PP
+~/\&.gwyddion/settings
+.RS 4
+Saved user settings and tool states\&. Do not edit while Gwyddion is running, it will overwrite it at exit\&.
+.RE
+.PP
+~/\&.gwyddion/glmaterials, ~/\&.gwyddion/gradients, \&.\&.\&.
+.RS 4
+User directories with various resources (OpenGL materials, color gradients, \&.\&.\&.)\&.
+.RE
+.PP
+\fB$GWYDDION_DATADIR\fR/gwyddion/glmaterials, \fB$GWYDDION_DATADIR\fR/gwyddion/gradients \&.\&.\&.
+.RS 4
+The same for system\-wide resources\&.
+.RE
+.PP
+~/\&.gwyddion/pixmaps
+.RS 4
+Directory to place user icons to\&. This is mainly useful for installation of modules to home\&.
+.RE
+.PP
+\fB$GWYDDION_DATADIR\fR/gwyddion/pixmaps,
+.RS 4
+The same for system\-wide icons\&.
+.RE
+.PP
+~/\&.gwyddion/modules
+.RS 4
+Directory to place user modules to\&. They should be placed into
+file,
+graph,
+process,
+layer, and
+tools
+subdirectories according to their kind, though this is more a convention than anything else\&.
+.RE
+.PP
+\fB$GWYDDION_LIBDIR\fR/gwyddion/modules,
+.RS 4
+The same for system\-wide modules\&.
+.RE
+.PP
+~/\&.gwyddion/plugins
+.RS 4
+Directory to place user plug\-ins to\&. They should be placed into
+file
+and
+process
+subdirectories according to their kind\&.
+.RE
+.PP
+\fB$GWYDDION_LIBEXECDIR\fR/gwyddion/plugins,
+.RS 4
+The same for system\-wide plug\-ins\&.
+.RE
+.PP
+~/\&.gwyddion/pygwy
+.RS 4
+Directory to place user python modules or scripts to\&.
+.RE
+.SH "SEE ALSO"
+.PP
+\fBgwyddion-thumbnailer\fR(1),
+\fBgxsm\fR(1)
+.SH "AUTHOR"
+.PP
+\fBYeti\fR
+.RS 4
+Author.
+.RE
+.SH "NOTES"
+.IP " 1." 4
+GLib+ variables
+.RS 4
+\%http://library.gnome.org/devel/glib/stable/glib-running.html
+.RE
+.IP " 2." 4
+Gtk+ variables
+.RS 4
+\%http://library.gnome.org/devel/gtk/stable/gtk-running.html
+.RE

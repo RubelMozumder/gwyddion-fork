@@ -1,0 +1,357 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2009-2022 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Graph text data (raw)
+ * any
+ * Read[1]
+ * [1] At present, only simple two-column data, imported as graph curves, are supported.
+ **/
+
+/**
+ * [FILE-MAGIC-MISSING]
+ * Raw data, no particular format.
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyutils.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <libgwydgets/gwygraphmodel.h>
+#include <libgwydgets/gwygraphcurvemodel.h>
+#include <libgwydgets/gwydgettypes.h>
+#include <app/gwyapp.h>
+
+#include "err.h"
+
+enum {
+    PARAM_TITLE,
+    PARAM_X_LABEL,
+    PARAM_Y_LABEL,
+    PARAM_X_UNITS,
+    PARAM_Y_UNITS,
+    PARAM_CURVETYPE,
+};
+
+typedef struct {
+    GwyParams *params;
+    /* Loaded data and its cached properties. */
+    GwyGraphModel *gmodel;
+    gdouble *data;
+    guint nrows;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table;
+} ModuleGUI;
+
+static gboolean         module_register     (void);
+static GwyParamDef*     define_module_params(void);
+static gint             rawgraph_detect     (const GwyFileDetectInfo *fileinfo,
+                                             gboolean only_name);
+static GwyContainer*    rawgraph_load       (const gchar *filename,
+                                             GwyRunType mode,
+                                             GError **error);
+static GwyDialogOutcome run_gui             (ModuleArgs *args);
+static void             param_changed       (ModuleGUI *gui,
+                                             gint id);
+static void             preview             (gpointer user_data);
+static void             execute             (ModuleArgs *args);
+static gboolean         rawgraph_parse      (gchar *buffer,
+                                             ModuleArgs *args,
+                                             GError **error);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports simple text files as graph curves."),
+    "Yeti <yeti@gwyddion.net>",
+    "0.9",
+    "David Nečas (Yeti)",
+    "2009",
+};
+
+GWY_MODULE_QUERY2(module_info, rawgraph)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("rawgraph",
+                           N_("ASCII graph curve files"),
+                           (GwyFileDetectFunc)&rawgraph_detect,
+                           (GwyFileLoadFunc)&rawgraph_load,
+                           NULL,
+                           NULL);
+    /* We provide a detection function, but the loading method tries a bit harder, so let the user choose explicitly. */
+    gwy_file_func_set_is_detectable("rawgraph", FALSE);
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_file_func_current());
+    gwy_param_def_add_string(paramdef, PARAM_TITLE, "title", _("_Title"),
+                             GWY_PARAM_STRING_NULL_IS_EMPTY, NULL, _("Curve"));
+    gwy_param_def_add_string(paramdef, PARAM_X_LABEL, "x-label", _("_X label"),
+                             GWY_PARAM_STRING_NULL_IS_EMPTY, NULL, "x");
+    gwy_param_def_add_string(paramdef, PARAM_Y_LABEL, "y-label", _("_Y label"),
+                             GWY_PARAM_STRING_NULL_IS_EMPTY, NULL, "y");
+    gwy_param_def_add_string(paramdef, PARAM_X_UNITS, "x-units", _("X _units"),
+                             GWY_PARAM_STRING_EMPTY_IS_NULL, NULL, NULL);
+    gwy_param_def_add_string(paramdef, PARAM_Y_UNITS, "y-units", _("Y u_nits"),
+                             GWY_PARAM_STRING_EMPTY_IS_NULL, NULL, NULL);
+    gwy_param_def_add_enum(paramdef, PARAM_CURVETYPE, "curvetype", NULL,
+                           GWY_TYPE_GRAPH_CURVE_TYPE, GWY_GRAPH_CURVE_LINE_POINTS);
+
+    return paramdef;
+}
+
+static gint
+rawgraph_detect(const GwyFileDetectInfo *fileinfo,
+                gboolean only_name)
+{
+    const gchar *s;
+    gchar *end;
+    guint i;
+
+    if (only_name)
+        return 0;
+
+    s = fileinfo->head;
+    for (i = 0; i < 6; i++) {
+        g_ascii_strtod(s, &end);
+        if (end == s) {
+            /* If we encounter garbage at the first line, give it a one more chance. */
+            if (i || !(s = strchr(s, '\n')))
+                return 0;
+            goto next_line;
+        }
+        s = end;
+        g_ascii_strtod(s, &end);
+        if (end == s)
+            return 0;
+
+        s = end;
+        while (*s == ' ' || *s == '\t')
+            s++;
+        if (*s != '\n' && *s != '\r')
+            return 0;
+
+next_line:
+        do {
+            s++;
+        } while (g_ascii_isspace(*s));
+    }
+
+    return 50;
+}
+
+static GwyContainer*
+rawgraph_load(const gchar *filename,
+              GwyRunType mode,
+              GError **error)
+{
+    GError *err = NULL;
+    GwyContainer *container = NULL;
+    GwyGraphCurveModel *gcmodel;
+    GwyDialogOutcome outcome;
+    ModuleArgs args;
+    gchar *buffer;
+
+    if (mode != GWY_RUN_INTERACTIVE) {
+        g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_INTERACTIVE,
+                    _("ASCII graph import must be run as interactive."));
+        return NULL;
+    }
+
+    if (!g_file_get_contents(filename, &buffer, NULL, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+
+    gwy_clear(&args, 1);
+    if (!rawgraph_parse(buffer, &args, error))
+        goto fail;
+
+    args.params = gwy_params_new_from_settings(define_module_params());
+
+    args.gmodel = gwy_graph_model_new();
+    gcmodel = gwy_graph_curve_model_new();
+    gwy_graph_model_add_curve(args.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+    outcome = run_gui(&args);
+    gwy_params_save_to_settings(args.params);
+    if (outcome == GWY_DIALOG_CANCEL) {
+        err_CANCELLED(error);
+        goto fail;
+    }
+
+    execute(&args);
+    container = gwy_container_new();
+    gwy_container_set_object(container, gwy_app_get_graph_key_for_id(1), args.gmodel);
+
+fail:
+    g_free(buffer);
+    g_free(args.data);
+    GWY_OBJECT_UNREF(args.params);
+    GWY_OBJECT_UNREF(args.gmodel);
+
+    return container;
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args)
+{
+    static const gint entries[] = { PARAM_TITLE, PARAM_X_LABEL, PARAM_Y_LABEL, PARAM_X_UNITS, PARAM_Y_UNITS };
+    ModuleGUI gui;
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    GtkWidget *hbox, *graph;
+    guint i;
+
+    gui.args = args;
+    gui.dialog = gwy_dialog_new(_("Import Graph Data"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(20);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
+    gwy_dialog_add_content(dialog, hbox, TRUE, TRUE, 0);
+
+    table = gwy_param_table_new(args->params);
+    for (i = 0; i < G_N_ELEMENTS(entries); i++) {
+        gwy_param_table_append_entry(table, entries[i]);
+        gwy_param_table_entry_set_instant_changes(table, entries[i], TRUE);
+    }
+    gwy_param_table_append_combo(table, PARAM_CURVETYPE);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+    gwy_dialog_add_param_table(dialog, table);
+
+    graph = gwy_graph_new(args->gmodel);
+    gtk_widget_set_size_request(graph, 320, 240);
+    gtk_box_pack_start(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+    g_signal_connect_swapped(table, "param-changed", G_CALLBACK(param_changed), &gui);
+
+    return gwy_dialog_run(dialog);
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    GwyParams *params = gui->args->params;
+    GwyGraphModel *gmodel = gui->args->gmodel;
+    GwyGraphCurveModel *gcmodel = gwy_graph_model_get_curve(gmodel, 0);
+
+    if (id < 0 || id == PARAM_TITLE) {
+        g_object_set(gmodel, "title", gwy_params_get_string(params, PARAM_TITLE), NULL);
+        g_object_set(gcmodel, "description", gwy_params_get_string(params, PARAM_TITLE), NULL);
+    }
+    if (id < 0 || id == PARAM_X_LABEL)
+        g_object_set(gmodel, "axis-label-bottom", gwy_params_get_string(params, PARAM_X_LABEL), NULL);
+    if (id < 0 || id == PARAM_Y_LABEL)
+        g_object_set(gmodel, "axis-label-left", gwy_params_get_string(params, PARAM_Y_LABEL), NULL);
+    if (id < 0 || id == PARAM_CURVETYPE)
+        g_object_set(gcmodel, "mode", gwy_params_get_enum(params, PARAM_CURVETYPE), NULL);
+
+    if (id < 0 || id == PARAM_X_UNITS || id == PARAM_Y_UNITS)
+        gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+
+    execute(gui->args);
+}
+
+static void
+execute(ModuleArgs *args)
+{
+    GwyGraphModel *gmodel = args->gmodel;
+    GwyGraphCurveModel *gcmodel = gwy_graph_model_get_curve(gmodel, 0);
+    GwySIUnit *unitx, *unity;
+    gint i, ndata, power10x, power10y;
+    gdouble qx, qy;
+
+    unitx = gwy_si_unit_new_parse(gwy_params_get_string(args->params, PARAM_X_UNITS), &power10x);
+    unity = gwy_si_unit_new_parse(gwy_params_get_string(args->params, PARAM_Y_UNITS), &power10y);
+    g_object_set(gmodel, "si-unit-x", unitx, "si-unit-y", unity, NULL);
+    g_object_unref(unitx);
+    g_object_unref(unity);
+
+    qx = pow10(power10x);
+    qy = pow10(power10y);
+
+    ndata = args->nrows;
+    for (i = 0; i < ndata; i++) {
+        args->data[2*i] *= qx;
+        args->data[2*i + 1] *= qy;
+    }
+    gwy_graph_curve_model_set_data_interleaved(gcmodel, args->data, ndata);
+    gwy_graph_curve_model_enforce_order(gcmodel);
+}
+
+static gboolean
+rawgraph_parse(gchar *buffer,
+               ModuleArgs *args,
+               GError **error)
+{
+    GError *err = NULL;
+    gint ncols = 2;
+    gchar *line, *end;
+
+    /* Find the first line which parses as a number. */
+    for (line = gwy_str_next_line(&buffer); line; line = gwy_str_next_line(&buffer)) {
+        g_strstrip(line);
+        if (*line && (g_ascii_strtod(line, &end) || end > line))
+            break;
+    }
+    /* Alas, now the first line end is already overwritten by gwy_str_next_line(). Fix it. */
+    g_assert(buffer - line >= 2);
+    buffer -= 2;
+    buffer[1] = '\n';
+    while (buffer > line && !*buffer)
+        *buffer = ' ';
+
+    args->nrows = -1;
+    if (!(args->data = gwy_parse_doubles(line, NULL, 0, &args->nrows, &ncols, NULL, &err))) {
+        err_PARSE_DOUBLES(error, &err);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

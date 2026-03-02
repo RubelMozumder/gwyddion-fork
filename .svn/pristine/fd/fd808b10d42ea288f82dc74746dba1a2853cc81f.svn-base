@@ -1,0 +1,1000 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2005-2024 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-surf-spm">
+ *   <comment>Surf SPM data</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="DIGITAL SURF"/>
+ *     <match type="string" offset="0" value="DSCOMPRESSED"/>
+ *   </magic>
+ *   <glob pattern="*.sur"/>
+ *   <glob pattern="*.SUR"/>
+ *   <glob pattern="*.spro"/>
+ *   <glob pattern="*.SPRO"/>
+ *   <glob pattern="*.ssur"/>
+ *   <glob pattern="*.SSUR"/>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-FILEMAGIC]
+ * # Surf
+ * 0 string DIGITAL\ SURF Digital Surf SPM data
+ * 0 string DSCOMPRESSED Digital Surf SPM data
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Surf
+ * .sur
+ * Read
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/stats.h>
+#include <app/gwymoduleutils-file.h>
+#include <app/gwyapp.h>
+#include <glib/gstdio.h>
+#include <stdlib.h>
+#include "get.h"
+#include "err.h"
+#include "gwyzlib.h"
+
+#define MAGIC "DIGITAL SURF"
+#define MAGIC_COMPRESSED "DSCOMPRESSED"
+#define MAGIC_SIZE (sizeof(MAGIC) - 1)
+
+#define EXTENSION ".sur"
+
+#define get_CHARARRAY_ADD0(dest, p) get_CHARS_ADD0(dest, p, sizeof(dest)-1)
+
+enum { SURF_HEADER_SIZE = 512 };
+
+typedef enum {
+    SURF_PC        = 0,
+    SURF_MACINTOSH = 257
+} SurfFormatType;
+
+typedef enum {
+    SURF_PROFILE                           = 1,
+    SURF_SURFACE                           = 2,
+    SURF_BINARY                            = 3,
+    SURF_SERIES_PROFILES                   = 4,
+    SURF_SERIES_SURFACES                   = 5,
+    SURF_MERIDIAN_DISC                     = 6,
+    SURF_MULTILAYER_PROFILE                = 7,
+    SURF_MULTILAYER_SURFACE                = 8,
+    SURF_PARALLEL_DISC                     = 9,
+    SURF_INTENSITY_IMAGE                   = 10,
+    SURF_INTENSITY_SURFACE_DEPRECATED      = 11,
+    SURF_RGB_IMAGE                         = 12,
+    SURF_RGB_SURFACE_DEPRECATED            = 13,
+    SURF_FORCE_CURVE_DEPRECATED            = 14,
+    SURF_SERIES_OF_FORCE_CURVES_DEPRECATED = 15,
+    SURF_RGB_INTENSITY_SURFACE             = 16,
+    SURF_PARAMETRIC_PROFILE                = 17,
+    SURF_SERIES_OF_RGB_IMAGES              = 18,
+    SURF_SPECTRUM_STUDIABLE                = 20,
+    SURF_HYPERSPECTRAL_STUDIABLE           = 21,
+    SURF_FORCE_CURVE                       = 35,
+    SURF_SERIES_OF_FORCE_CURVES            = 36,
+    SURF_FORCE_VOLUME                      = 37,
+} SurfObjectType;
+
+typedef enum {
+    SURF_ACQ_UNKNOWN        = 0,
+    SURF_ACQ_STYLUS         = 1,
+    SURF_ACQ_OPTICAL        = 2,
+    SURF_ACQ_THERMOCOUPLE   = 3,
+    SURF_ACQ_UNKNOWN_TOO    = 4,
+    SURF_ACQ_STYLUS_SKID    = 5,
+    SURF_ACQ_AFM            = 6,
+    SURF_ACQ_STM            = 7,
+    SURF_ACQ_VIDEO          = 8,
+    SURF_ACQ_INTERFEROMETER = 9,
+    SURF_ACQ_LIGHT          = 10,
+} SurfAcqusitionType;
+
+typedef enum {
+    SURF_RANGE_NORMAL = 0,
+    SURF_RANGE_HIGH   = 1,
+} SurfRangeType;
+
+typedef enum {
+    SURF_SP_NORMAL      = 0,
+    SURF_SP_SATURATIONS = 1,
+} SurfSpecialPointsType;
+
+typedef enum {
+    SURF_INV_NONE = 0,
+    SURF_INV_Z    = 1,
+    SURF_FLIP_Z   = 2,
+    SURF_FLOP_Z   = 3,
+} SurfInversionType;
+
+typedef enum {
+    SURF_LEVELING_NONE = 0,
+    SURF_LEVELING_LSM  = 1,
+    SURF_LEVELING_MZ   = 2,
+} SurfLevelingType;
+
+typedef struct {
+    gsize uncompressed_size;
+    gsize compressed_size;
+} CompressedChunk;
+
+typedef struct {
+    gchar signature[12+1];
+    SurfFormatType format;
+    gint nobjects;
+    gint version;
+    SurfObjectType type;
+    gchar object_name[30+1];
+    gchar operator_name[30+1];
+    gint material_code;
+    SurfAcqusitionType acquisition;
+    SurfRangeType range;
+    SurfSpecialPointsType special_points;
+    gboolean absolute;
+    gdouble gauge_resolution;
+    gint w_size;
+    gint pointsize;
+    gint zmin;
+    gint zmax;
+    gint xres; /* number of points per line */
+    gint yres; /* number of lines */
+    guint nofpoints;
+    gdouble dx;
+    gdouble dy;
+    gdouble dz;
+    gchar xaxis[16+1];
+    gchar yaxis[16+1];
+    gchar zaxis[16+1];
+    gchar dx_unit[16+1];
+    gchar dy_unit[16+1];
+    gchar dz_unit[16+1];
+    gchar xlength_unit[16+1];
+    gchar ylength_unit[16+1];
+    gchar zlength_unit[16+1];
+    gdouble xunit_ratio;
+    gdouble yunit_ratio;
+    gdouble zunit_ratio;
+    gint imprint;
+    SurfInversionType inversion;
+    SurfLevelingType leveling;
+    gint seconds;
+    gint minutes;
+    gint hours;
+    gint day;
+    gint month;
+    gint year;
+    gint dayof;
+    gfloat measurement_duration;
+    gint compressed_size;
+    gint comment_size;
+    gint private_size;
+    gchar client_zone[128];
+    gdouble xoffset;
+    gdouble yoffset;
+    gdouble zoffset;
+    /* There used to be 32 bytes long reserved zone. Now some newer files define the following additional fields
+     * related to time series. */
+    gdouble t_spacing;
+    gdouble t_offset;
+    gchar t_axis_name[13+1];
+    gchar t_step_unit[13+1];
+
+    GwyDataField *dfield;
+    GwySIUnit *xyunit;
+    GwySIUnit *zunit;
+} SurfFile;
+
+/* New structure surfwriter to write directly the structure with cast gint16 of * enums */
+typedef struct {
+    char signature[12];
+    gint16 format;
+    guint16 nobjects;
+    gint16 version;
+    gint16 type;
+    char object_name[30];
+    char operator_name[30];
+    gint16 material_code;
+    gint16 acquisition;
+    gint16 range;
+    gint16 special_points;
+    gint16 absolute;
+    gfloat gauge_resolution;
+    gint32 w_size;
+    gint16 pointsize;
+    gint32 zmin;
+    gint32 zmax;
+    gint32 xres;
+    gint32 yres;
+    gint32 nofpoints;
+    gfloat dx;
+    gfloat dy;
+    gfloat dz;
+    char xaxis[16];
+    char yaxis[16];
+    char zaxis[16];
+    char dx_unit[16];
+    char dy_unit[16];
+    char dz_unit[16];
+    char xlength_unit[16];
+    char ylength_unit[16];
+    char zlength_unit[16];
+    gfloat xunit_ratio;
+    gfloat yunit_ratio;
+    gfloat zunit_ratio;
+    gint16 imprint;
+    gint16 inversion;
+    gint16 leveling;
+    char obsolete[12];
+    gint16 seconds;
+    gint16 minutes;
+    gint16 hours;
+    gint16 day;
+    gint16 month;
+    gint16 year;
+    gint16 dayof;
+    gfloat measurement_duration;
+    gint32 compressed_size;
+    char obsolete2[6];
+    gint16 comment_size;
+    gint16 private_size;
+    char client_zone[128];
+    gfloat xoffset;
+    gfloat yoffset;
+    gfloat zoffset;
+    char reservedzone[34];
+} SurfWriter;
+
+static gboolean      module_register        (void);
+static gint          surffile_detect        (const GwyFileDetectInfo *fileinfo,
+                                             gboolean only_name);
+static GwyContainer* surffile_load          (const gchar *filename,
+                                             GwyRunType mode,
+                                             GError **error);
+static gsize         surffile_load_one      (const guchar *buffer,
+                                             gsize size,
+                                             const gchar *filename,
+                                             GwyContainer *container,
+                                             gint *cid,
+                                             GError **error);
+static gboolean      fill_data_fields       (SurfFile *surffile,
+                                             const guchar *buffer,
+                                             GError **error);
+static GwyContainer* surffile_get_metadata  (SurfFile *surffile);
+static guchar*       decompress_chunked_data(const guchar *buffer,
+                                             gsize size,
+                                             gsize expected_size,
+                                             GError **error);
+static gboolean      surffile_save          (GwyContainer *data,
+                                             const gchar *filename,
+                                             G_GNUC_UNUSED GwyRunType mode,
+                                             GError **error);
+
+static const GwyEnum acq_modes[] = {
+    { "Unknown",                     SURF_ACQ_UNKNOWN,        },
+    { "Contact stylus",              SURF_ACQ_STYLUS,         },
+    { "Scanning optical gauge",      SURF_ACQ_OPTICAL,        },
+    { "Thermocouple",                SURF_ACQ_THERMOCOUPLE,   },
+    { "Unknown",                     SURF_ACQ_UNKNOWN_TOO,    },
+    { "Contact stylus with skid",    SURF_ACQ_STYLUS_SKID,    },
+    { "AFM",                         SURF_ACQ_AFM,            },
+    { "STM",                         SURF_ACQ_STM,            },
+    { "Video",                       SURF_ACQ_VIDEO,          },
+    { "Interferometer",              SURF_ACQ_INTERFEROMETER, },
+    { "Structured light projection", SURF_ACQ_LIGHT,          },
+};
+
+static inline gfloat
+GFLOAT_TO_LE(gfloat f)
+{
+#if G_BYTE_ORDER == G_LITTLE_ENDIAN
+    return f;
+#elif G_BYTE_ORDER == G_BIG_ENDIAN
+    union {
+        guint32 u;
+        gfloat f;
+    } v;
+
+    v.f = f;
+    v.u = GUINT32_SWAP_LE_BE(v.u);
+    return v.f;
+#else /* !G_LITTLE_ENDIAN && !G_BIG_ENDIAN */
+#error unknown ENDIAN type
+#endif /* !G_LITTLE_ENDIAN && !G_BIG_ENDIAN */
+};
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports Surf data files."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "0.14",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2006",
+};
+
+GWY_MODULE_QUERY2(module_info, surffile)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("surffile",
+                           N_("Surf files (.sur)"),
+                           (GwyFileDetectFunc)&surffile_detect,
+                           (GwyFileLoadFunc)&surffile_load,
+                           NULL,
+                           (GwyFileSaveFunc)&surffile_save);
+
+    return TRUE;
+}
+
+static gint
+surffile_detect(const GwyFileDetectInfo *fileinfo,
+                gboolean only_name)
+{
+    gint score = 0;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 15 : 0;
+
+    if (fileinfo->buffer_len > MAGIC_SIZE
+        && (!memcmp(fileinfo->head, MAGIC, MAGIC_SIZE) || !memcmp(fileinfo->head, MAGIC_COMPRESSED, MAGIC_SIZE))
+        && fileinfo->file_size >= SURF_HEADER_SIZE + 2)
+        score = 100;
+
+    return score;
+}
+
+/* This requires the buffer to be one byte larger (for fields with no termination, but padded with spaces). */
+static void
+get_CHARS_ADD0(gchar *dest, const guchar **p, guint size)
+{
+    memcpy(dest, *p, size);
+    *p += size;
+    dest[size] = '\0';
+    g_strstrip(dest);
+}
+
+static void
+read_and_fix_unit(gchar *ustr, const guchar **p)
+{
+    get_CHARS_ADD0(ustr, p, 16);
+    /* Fix µ symbol from old MS-DOS code pages to Latin1 code.  Apparently that can be found in the files. */
+    if (ustr[0] == '\xe6')
+        ustr[0] = '\xb5';
+}
+
+static GwyContainer*
+surffile_load(const gchar *filename,
+              G_GNUC_UNUSED GwyRunType mode,
+              GError **error)
+{
+    GwyContainer *container = NULL;
+    guchar *buffer = NULL;
+    gsize read_bytes, rb = 1, size = 0;
+    GError *err = NULL;
+    gint cid = 0;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+
+    container = gwy_container_new();
+    read_bytes = 0;
+    while (size - read_bytes > SURF_HEADER_SIZE) {
+        if (!(rb = surffile_load_one(buffer + read_bytes, size - read_bytes, filename, container, &cid, &err)))
+            break;
+        read_bytes += rb;
+    }
+
+    if (!cid && !rb) {
+        g_propagate_error(error, err);
+        GWY_OBJECT_UNREF(container);
+    }
+    else if (!rb) {
+        g_warning("File was loaded only partially.");
+        g_clear_error(&err);
+    }
+    else if (!cid) {
+        err_NO_DATA(error);
+        GWY_OBJECT_UNREF(container);
+    }
+
+    gwy_file_abandon_contents(buffer, size, NULL);
+
+    return container;
+}
+
+static gsize
+surffile_load_one(const guchar *buffer, gsize size, const gchar *filename,
+                  GwyContainer *container, gint *cid,
+                  GError **error)
+{
+    SurfFile surffile;
+    gint power10 = 0;
+    const guchar *p;
+    guchar *decomp_buf = NULL;
+    gsize expected_size, data_size;
+    gboolean is_compressed, ok = FALSE;
+    gint add = 0;
+
+    if (size < SURF_HEADER_SIZE + 2) {
+        err_TOO_SHORT(error);
+        return 0;
+    }
+
+    gwy_clear(&surffile, 1);
+    p = buffer;
+
+    get_CHARARRAY_ADD0(surffile.signature, &p);
+    if (!memcmp(surffile.signature, MAGIC_COMPRESSED, MAGIC_SIZE))
+        is_compressed = TRUE;
+    else if (!memcmp(surffile.signature, MAGIC, MAGIC_SIZE))
+        is_compressed = FALSE;
+    else {
+        err_FILE_TYPE(error, "Surf");
+        return 0;
+    }
+
+    surffile.format = gwy_get_guint16_le(&p);
+    surffile.nobjects = gwy_get_guint16_le(&p);
+    surffile.version = gwy_get_guint16_le(&p);
+    surffile.type = gwy_get_guint16_le(&p);
+    get_CHARARRAY_ADD0(surffile.object_name, &p);
+    get_CHARARRAY_ADD0(surffile.operator_name, &p);
+    surffile.material_code = gwy_get_guint16_le(&p);
+    surffile.acquisition = gwy_get_guint16_le(&p);
+    surffile.range = gwy_get_guint16_le(&p);
+    surffile.special_points = gwy_get_guint16_le(&p);
+    surffile.absolute = gwy_get_guint16_le(&p);
+    surffile.gauge_resolution = gwy_get_gfloat_le(&p);
+    surffile.w_size = gwy_get_gint32_le(&p);
+    surffile.pointsize = gwy_get_guint16_le(&p);
+    surffile.zmin = gwy_get_gint32_le(&p);
+    surffile.zmax = gwy_get_gint32_le(&p);
+    surffile.xres = gwy_get_gint32_le(&p);
+    surffile.yres = gwy_get_gint32_le(&p);
+    surffile.nofpoints = gwy_get_guint32_le(&p);
+
+    surffile.dx = gwy_get_gfloat_le(&p);
+    surffile.dy = gwy_get_gfloat_le(&p);
+    surffile.dz = gwy_get_gfloat_le(&p);
+    get_CHARARRAY_ADD0(surffile.xaxis, &p);
+    get_CHARARRAY_ADD0(surffile.yaxis, &p);
+    get_CHARARRAY_ADD0(surffile.zaxis, &p);
+    read_and_fix_unit(surffile.dx_unit, &p);
+    read_and_fix_unit(surffile.dy_unit, &p);
+    read_and_fix_unit(surffile.dz_unit, &p);
+    read_and_fix_unit(surffile.xlength_unit, &p);
+    read_and_fix_unit(surffile.ylength_unit, &p);
+    read_and_fix_unit(surffile.zlength_unit, &p);
+
+    surffile.xunit_ratio = gwy_get_gfloat_le(&p);
+    surffile.yunit_ratio = gwy_get_gfloat_le(&p);
+    surffile.zunit_ratio = gwy_get_gfloat_le(&p);
+    surffile.imprint = gwy_get_guint16_le(&p);
+    surffile.inversion = gwy_get_guint16_le(&p);
+    surffile.leveling = gwy_get_guint16_le(&p);
+    p += 12;
+
+    surffile.seconds = gwy_get_guint16_le(&p);
+    surffile.minutes = gwy_get_guint16_le(&p);
+    surffile.hours = gwy_get_guint16_le(&p);
+    surffile.day = gwy_get_guint16_le(&p);
+    surffile.month = gwy_get_guint16_le(&p);
+    surffile.year = gwy_get_guint16_le(&p);
+    surffile.dayof = gwy_get_guint16_le(&p);
+    surffile.measurement_duration = gwy_get_gfloat_le(&p);
+    surffile.compressed_size = gwy_get_guint32_le(&p);
+    p += 6;
+
+    surffile.comment_size = gwy_get_guint16_le(&p);
+    surffile.private_size = gwy_get_guint16_le(&p);
+
+    get_CHARARRAY(surffile.client_zone, &p);
+    surffile.xoffset = gwy_get_gfloat_le(&p);
+    surffile.yoffset = gwy_get_gfloat_le(&p);
+    surffile.zoffset = gwy_get_gfloat_le(&p);
+
+    surffile.t_spacing = gwy_get_gfloat_le(&p);
+    surffile.t_offset = gwy_get_gfloat_le(&p);
+    get_CHARARRAY_ADD0(surffile.t_axis_name, &p);
+    get_CHARARRAY_ADD0(surffile.t_step_unit, &p);
+
+    gwy_debug("fileformat: %d,  n_of_objects: %d, "
+              "version: %d, object_type: %d",
+              surffile.format, surffile.nobjects,
+              surffile.version, surffile.type);
+    gwy_debug("object name: <%s>", surffile.object_name);
+    gwy_debug("operator name: <%s>", surffile.operator_name);
+
+    gwy_debug("material code: %d, acquisition type: %d",
+              surffile.material_code, surffile.acquisition);
+    gwy_debug("range type: %d, special points: %d, absolute: %d",
+              surffile.range,
+              surffile.special_points, (gint)surffile.absolute);
+    gwy_debug("data point size: %d", surffile.pointsize);
+    gwy_debug("zmin: %d, zmax: %d", surffile.zmin, surffile.zmax);
+    gwy_debug("xres: %d, yres: %d (xres*yres = %d)",
+              surffile.xres, surffile.yres, (surffile.xres*surffile.yres));
+    gwy_debug("total number of points: %d", surffile.nofpoints);
+    gwy_debug("dx: %g, dy: %g, dz: %g",
+              surffile.dx, surffile.dy, surffile.dz);
+    gwy_debug("X axis name: %16s", surffile.xaxis);
+    gwy_debug("Y axis name: %16s", surffile.yaxis);
+    gwy_debug("Z axis name: %16s", surffile.zaxis);
+    gwy_debug("dx unit: %16s", surffile.dx_unit);
+    gwy_debug("dy unit: %16s", surffile.dy_unit);
+    gwy_debug("dz unit: %16s", surffile.dz_unit);
+    gwy_debug("X axis unit: %16s", surffile.xlength_unit);
+    gwy_debug("Y axis unit: %16s", surffile.ylength_unit);
+    gwy_debug("Z axis unit: %16s", surffile.zlength_unit);
+    gwy_debug("xunit_ratio: %g, yunit_ratio: %g, zunit_ratio: %g",
+              surffile.xunit_ratio, surffile.yunit_ratio, surffile.zunit_ratio);
+    gwy_debug("imprint: %d, inversion: %d, leveling: %d",
+              surffile.imprint, surffile.inversion, surffile.leveling);
+    gwy_debug("time: %d:%d:%d, date: %d-%d-%d",
+              surffile.hours, surffile.minutes, surffile.seconds,
+              surffile.year, surffile.month, surffile.day);
+    gwy_debug("private zone size: %d, comment size %d",
+              surffile.private_size, surffile.comment_size);
+    gwy_debug("compressed data size %d", surffile.compressed_size);
+
+    if (err_DIMENSION(error, surffile.xres) || err_DIMENSION(error, surffile.yres))
+        return 0;
+
+    add = surffile.comment_size + surffile.private_size;
+    data_size = surffile.pointsize/8*surffile.xres*surffile.yres;
+    if (is_compressed)
+        expected_size = SURF_HEADER_SIZE + add + surffile.compressed_size;
+    else
+        expected_size = SURF_HEADER_SIZE + add + data_size;
+    gwy_debug("total expected size %lu bytes", (gulong)expected_size);
+    if (err_SIZE_MISMATCH(error, expected_size, size, FALSE))
+        return 0;
+    gwy_debug("after data, %lu bytes still remain", (gulong)(size - expected_size));
+
+    sanitise_real_size(&surffile.dx, "x step");
+    sanitise_real_size(&surffile.dy, "y step");
+
+    p = buffer + SURF_HEADER_SIZE + add;
+
+    /*units*/
+    surffile.xyunit = gwy_si_unit_new_parse(surffile.dx_unit, &power10);
+    surffile.dx *= pow10(power10);
+    g_object_unref(surffile.xyunit);
+    surffile.xyunit = gwy_si_unit_new_parse(surffile.dy_unit, &power10);
+    surffile.dy *= pow10(power10);
+    surffile.zunit = gwy_si_unit_new_parse(surffile.dz_unit, &power10);
+
+    if (is_compressed) {
+        if (!(decomp_buf = decompress_chunked_data(p, surffile.compressed_size, data_size, error)))
+            goto fail;
+        p = decomp_buf;
+    }
+    if (!fill_data_fields(&surffile, p, error))
+        goto fail;
+
+    if (surffile.inversion == SURF_INV_Z)
+        gwy_data_field_invert(surffile.dfield, FALSE, FALSE, TRUE);
+    else if (surffile.inversion == SURF_FLIP_Z)
+        gwy_data_field_invert(surffile.dfield, FALSE, TRUE, TRUE);
+    else if (surffile.inversion == SURF_FLOP_Z)
+        gwy_data_field_invert(surffile.dfield, TRUE, FALSE, TRUE);
+
+    gwy_data_field_multiply(surffile.dfield, pow10(power10)*surffile.dz);
+    surffile.zoffset *= pow10(power10);
+    gwy_data_field_add(surffile.dfield, surffile.zoffset);
+
+    gwy_container_pass_object(container, gwy_app_get_data_key_for_id(*cid), surffile.dfield);
+    gwy_container_pass_object(container, gwy_app_get_data_meta_key_for_id(*cid), surffile_get_metadata(&surffile));
+    if (*surffile.object_name)
+        gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(*cid), surffile.object_name);
+    else if (*surffile.zaxis)
+        gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(*cid), surffile.zaxis);
+    else
+        gwy_app_channel_title_fall_back(container, *cid);
+    gwy_app_channel_check_nonsquare(container, *cid);
+    gwy_file_channel_import_log_add(container, *cid, NULL, filename);
+
+    (*cid)++;
+
+    ok = TRUE;
+
+fail:
+    g_free(decomp_buf);
+    GWY_OBJECT_UNREF(surffile.xyunit);
+    GWY_OBJECT_UNREF(surffile.zunit);
+
+    return ok ? expected_size : 0;
+}
+
+static gboolean
+fill_data_fields(SurfFile *surffile,
+                 const guchar *buffer,
+                 GError **error)
+{
+    GwyRawDataType datatype;
+    GwyDataField *field;
+    gdouble *data;
+    guint n;
+
+    n = surffile->xres*surffile->yres;
+    surffile->dfield = field = gwy_data_field_new(surffile->xres, surffile->yres,
+                                                  surffile->xres*surffile->dx, surffile->yres*surffile->dy,
+                                                  FALSE);
+
+    if (surffile->pointsize == 16)
+        datatype = GWY_RAW_DATA_SINT16;
+    else if (surffile->pointsize == 32)
+        datatype = GWY_RAW_DATA_SINT32;
+    else {
+        err_BPP(error, surffile->pointsize);
+        return FALSE;
+    }
+    data = gwy_data_field_get_data(field);
+    gwy_convert_raw_data(buffer, n, 1, datatype, GWY_BYTE_ORDER_LITTLE_ENDIAN, data, 1.0, 0.0);
+
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_xy(field), surffile->xyunit);
+    gwy_si_unit_assign(gwy_data_field_get_si_unit_z(field), surffile->zunit);
+
+    return TRUE;
+}
+
+#define HASH_STORE(key, fmt, field) \
+    gwy_container_set_string_by_name(meta, key, g_strdup_printf(fmt, surffile->field))
+
+static GwyContainer*
+surffile_get_metadata(SurfFile *surffile)
+{
+    GwyContainer *meta;
+    char date[40];
+
+    meta = gwy_container_new();
+
+    g_snprintf(date, sizeof(date), "%d. %d. %d",
+               surffile->day, surffile->month, surffile->year);
+
+    HASH_STORE("Version", "%u", version);
+    HASH_STORE("Operator name", "%s", operator_name);
+    HASH_STORE("Object name", "%s", object_name);
+    gwy_container_set_const_string_by_name(meta, "Date", date);
+    gwy_container_set_const_string_by_name(meta, "Acquisition type",
+                                           gwy_enum_to_string(surffile->acquisition,
+                                                              acq_modes, G_N_ELEMENTS(acq_modes)));
+
+    return meta;
+}
+
+static guchar*
+decompress_chunked_data(const guchar *buffer, gsize size, gsize expected_size, GError **error)
+{
+    const guchar *p = buffer;
+    guchar *outbuf = NULL, *outp;
+    CompressedChunk *chunks;
+    gsize total_uncsize = 0, total_csize = 0;
+    guint ndirs, idir;
+
+    /* First check if we can even read the list of compressed chunks. */
+    if (size < sizeof(guint32)) {
+        err_TRUNCATED_PART(error, "compressed directory");
+        return NULL;
+    }
+    ndirs = gwy_get_guint32_le(&p);
+    gwy_debug("ndirs %u", ndirs);
+    if (!ndirs) {
+        err_INVALID(error, "ndirs");
+        return NULL;
+    }
+    size -= sizeof(guint32);
+
+    if (size/ndirs < 2*sizeof(guint32)) {
+        err_TRUNCATED_PART(error, "compressed directory");
+        return NULL;
+    }
+
+    chunks = g_new(CompressedChunk, ndirs);
+    size -= 2*ndirs*sizeof(guint32);
+    for (idir = 0; idir < ndirs; idir++) {
+        chunks[idir].uncompressed_size = gwy_get_guint32_le(&p);
+        chunks[idir].compressed_size = gwy_get_guint32_le(&p);
+
+        if (size - total_csize < chunks[idir].compressed_size
+            || expected_size - total_uncsize < chunks[idir].uncompressed_size) {
+            err_INVALID(error, "compresed directory");
+            goto end;
+        }
+        total_csize += chunks[idir].compressed_size;
+        total_uncsize += chunks[idir].uncompressed_size;
+    }
+    if (err_SIZE_MISMATCH(error, expected_size, total_uncsize, TRUE))
+        goto end;
+
+    outbuf = outp = g_new(guchar, total_uncsize);
+    for (idir = 0; idir < ndirs; idir++) {
+        gsize remaining = chunks[idir].compressed_size, real_uncsize = chunks[idir].uncompressed_size;
+        if (!gwyzlib_unpack_compressed_data(p, &remaining, outp, &real_uncsize, error)) {
+            GWY_FREE(outbuf);
+            goto end;
+        }
+        outp += chunks[idir].uncompressed_size;
+    }
+
+end:
+    g_free(chunks);
+
+    return outbuf;
+}
+
+/* String fields should be padded with spaces (even though I've seen both spaces and NULs in the wild). */
+static void
+fill_string_field(gchar *target, const gchar *s, guint size)
+{
+    guint len = strlen(s);
+
+    if (len >= size) {
+        memcpy(target, s, size);
+        return;
+    }
+
+    memcpy(target, s, len);
+    memset(target + len, ' ', size - len);
+}
+
+static gboolean
+surffile_save(G_GNUC_UNUSED GwyContainer *data,
+              const gchar *filename,
+              G_GNUC_UNUSED GwyRunType mode,
+              GError **error)
+{
+    FILE *fh;
+    gboolean ok = TRUE;
+    SurfWriter surf;
+    gdouble zintmax = 1073741824.0;
+    gdouble zmaxreal, zminreal;
+    gdouble xreal, yreal;
+    gchar *dxunittmp, *dyunittmp, *dzunittmp;
+    GwySIUnit *xysi, *zsi;
+    gint k = 0;
+    GwyDataField *dfield;
+    const gdouble *points;
+    gint32 *integer_values;
+
+    memcpy(surf.signature, "DIGITAL SURF", 12);
+    surf.format = 0;
+    surf.nobjects = 1;
+    surf.version = 1;
+    surf.type = SURF_SURFACE;
+    fill_string_field(surf.object_name, "SCRATCH", sizeof(surf.object_name));
+    fill_string_field(surf.operator_name, "csm", sizeof(surf.operator_name));
+    surf.material_code = 0;
+    surf.acquisition = 0;
+    surf.range = 1;
+    surf.special_points = 0;
+    surf.absolute = 1;
+    surf.w_size = 0;
+    surf.gauge_resolution = 0;
+    surf.pointsize = 32;
+    surf.zmin = 0;
+    surf.zmax = zintmax;
+    fill_string_field(surf.xaxis, "X", sizeof(surf.xaxis));
+    fill_string_field(surf.yaxis, "Y", sizeof(surf.yaxis));
+    fill_string_field(surf.zaxis, "Z", sizeof(surf.zaxis));
+    surf.xunit_ratio = 1;
+    surf.yunit_ratio = 1;
+    surf.zunit_ratio = 1;
+    surf.imprint = 1;
+    surf.inversion = 0;
+    surf.leveling = 0;
+    memset(surf.obsolete, 0, sizeof(surf.obsolete));
+    surf.seconds = 0;
+    surf.minutes = 0;
+    surf.hours = 0;
+    surf.day = 5;
+    surf.month = 1;
+    surf.year = 2001;
+    surf.dayof = 0;
+    surf.measurement_duration = 1.0;
+    surf.compressed_size = 0;
+    memset(surf.obsolete2, 0, sizeof(surf.obsolete2));
+    surf.comment_size = 0;
+    surf.private_size = 0;
+    fill_string_field(surf.client_zone, "", sizeof(surf.client_zone));
+
+    surf.xoffset = 0.0;
+    surf.yoffset = 0.0;
+    surf.zoffset = 0.0;
+    fill_string_field(surf.reservedzone, "", sizeof(surf.reservedzone));
+
+    gwy_app_data_browser_get_current(GWY_APP_DATA_FIELD, &dfield, 0);
+    if (!dfield) {
+        err_NO_CHANNEL_EXPORT(error);
+        return FALSE;
+    }
+
+    if (!(fh = gwy_fopen(filename, "wb"))) {
+        err_OPEN_WRITE(error);
+        return FALSE;
+    }
+
+    /*header values*/
+    xysi = gwy_data_field_get_si_unit_xy(dfield);
+    zsi = gwy_data_field_get_si_unit_z(dfield);
+    dxunittmp = gwy_si_unit_get_string(xysi, GWY_SI_UNIT_FORMAT_PLAIN);
+    dyunittmp = gwy_si_unit_get_string(xysi, GWY_SI_UNIT_FORMAT_PLAIN);
+    dzunittmp = gwy_si_unit_get_string(zsi, GWY_SI_UNIT_FORMAT_PLAIN);
+    fill_string_field(surf.dx_unit, dxunittmp, sizeof(surf.dx_unit));
+    fill_string_field(surf.dy_unit, dyunittmp, sizeof(surf.dy_unit));
+    fill_string_field(surf.dz_unit, dzunittmp, sizeof(surf.dz_unit));
+    g_free(dxunittmp);
+    g_free(dyunittmp);
+    g_free(dzunittmp);
+
+    /*extrema*/
+    zmaxreal = gwy_data_field_get_max(dfield);
+    zminreal = gwy_data_field_get_min(dfield);
+    surf.xres = gwy_data_field_get_xres(dfield);
+    surf.yres = gwy_data_field_get_yres(dfield);
+    surf.nofpoints = surf.xres * surf.yres;
+    xreal = gwy_data_field_get_xreal(dfield);
+    yreal = gwy_data_field_get_yreal(dfield);
+
+    /*units*/
+    surf.dx = xreal/surf.xres;
+    surf.dy = yreal/surf.yres;
+    fill_string_field(surf.xlength_unit, surf.dx_unit, sizeof(surf.xlength_unit));
+    fill_string_field(surf.ylength_unit, surf.dy_unit, sizeof(surf.ylength_unit));
+    fill_string_field(surf.zlength_unit, surf.dz_unit, sizeof(surf.zlength_unit));
+    surf.dz = (zmaxreal - zminreal)/zintmax;
+    surf.zoffset = zminreal;
+
+    /*convert data into integer32*/
+    integer_values = g_new(gint32, surf.nofpoints);
+    points = gwy_data_field_get_data_const(dfield);
+
+    if (zminreal != zmaxreal) {
+        for (k = 0; k < surf.nofpoints; k++)
+            integer_values[k] = GWY_ROUND(floor(zintmax*(points[k] - zminreal)/(zmaxreal - zminreal)));
+    }
+    else {
+        gwy_clear(integer_values, surf.nofpoints);
+    }
+
+    /* byte order*/
+    surf.format = GINT16_TO_LE(surf.format);
+    surf.nobjects = GUINT16_TO_LE(surf.nobjects);
+    surf.version = GINT16_TO_LE(surf.version);
+    surf.type = GINT16_TO_LE(surf.type);
+    surf.material_code = GINT16_TO_LE(surf.material_code);
+    surf.acquisition = GINT16_TO_LE(surf.acquisition);
+    surf.range = GINT16_TO_LE(surf.range);
+    surf.special_points = GINT16_TO_LE(surf.special_points);
+    surf.absolute = GINT16_TO_LE(surf.absolute);
+    surf.w_size = GINT32_TO_LE(surf.pointsize);
+    surf.gauge_resolution = GFLOAT_TO_LE(surf.gauge_resolution);
+    surf.pointsize = GINT16_TO_LE(surf.pointsize);
+    surf.zmin = GINT32_TO_LE(surf.zmin);
+    surf.zmax = GINT32_TO_LE(surf.zmax);
+    surf.xres = GINT32_TO_LE(surf.xres);
+    surf.yres = GINT32_TO_LE(surf.yres);
+    surf.nofpoints = GINT32_TO_LE(surf.nofpoints);
+    surf.dx = GFLOAT_TO_LE(surf.dx);
+    surf.dy = GFLOAT_TO_LE(surf.dy);
+    surf.dz = GFLOAT_TO_LE(surf.dz);
+    surf.xunit_ratio = GFLOAT_TO_LE(surf.xunit_ratio);
+    surf.yunit_ratio = GFLOAT_TO_LE(surf.yunit_ratio);
+    surf.zunit_ratio = GFLOAT_TO_LE(surf.zunit_ratio);
+    surf.imprint = GINT16_TO_LE(surf.imprint);
+    surf.inversion = GINT16_TO_LE(surf.inversion);
+    surf.leveling = GINT16_TO_LE(surf.leveling);
+    surf.seconds = GINT16_TO_LE(surf.seconds);
+    surf.minutes = GINT16_TO_LE(surf.minutes);
+    surf.hours = GINT16_TO_LE(surf.hours);
+    surf.day = GINT16_TO_LE(surf.day);
+    surf.month = GINT16_TO_LE(surf.month);
+    surf.year = GINT16_TO_LE(surf.year);
+    surf.dayof = GINT16_TO_LE(surf.dayof);
+    surf.measurement_duration = GFLOAT_TO_LE(surf.measurement_duration);
+    surf.comment_size = GINT16_TO_LE(surf.comment_size);
+    surf.private_size = GINT16_TO_LE(surf.private_size);
+    surf.xoffset = GFLOAT_TO_LE(surf.xoffset);
+    surf.yoffset = GFLOAT_TO_LE(surf.yoffset);
+    surf.zoffset = GFLOAT_TO_LE(surf.zoffset);
+    for (k = 0; k < surf.nofpoints; k++) {
+        integer_values[k] = GINT32_TO_LE(integer_values[k]);
+    }
+
+    //write
+
+    if (fwrite(&surf.signature, sizeof(char), 12, fh) != 12
+        || fwrite(&surf.format, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.nobjects, sizeof(guint16), 1, fh) != 1
+        || fwrite(&surf.version, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.type, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.object_name, sizeof(char), 30, fh) != 30
+        || fwrite(&surf.operator_name, sizeof(char), 30, fh) != 30
+        || fwrite(&surf.material_code, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.acquisition, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.range, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.special_points, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.absolute, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.w_size, sizeof(gint32), 1, fh) != 1
+        || fwrite(&surf.gauge_resolution, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.pointsize, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.zmin, sizeof(gint32), 1, fh) != 1
+        || fwrite(&surf.zmax, sizeof(gint32), 1, fh) != 1
+        || fwrite(&surf.xres, sizeof(gint32), 1, fh) != 1
+        || fwrite(&surf.yres, sizeof(gint32), 1, fh) != 1
+        || fwrite(&surf.nofpoints, sizeof(gint32), 1, fh) != 1
+        || fwrite(&surf.dx, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.dy, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.dz, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.xaxis, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.yaxis, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.zaxis, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.dx_unit, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.dy_unit, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.dz_unit, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.xlength_unit, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.ylength_unit, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.zlength_unit, sizeof(char), 16, fh) != 16
+        || fwrite(&surf.xunit_ratio, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.yunit_ratio, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.zunit_ratio, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.imprint, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.inversion, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.leveling, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.obsolete, sizeof(char), 12, fh) != 12
+        || fwrite(&surf.seconds, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.minutes, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.hours, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.day, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.month, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.year, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.dayof, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.measurement_duration, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.compressed_size, sizeof(gint32), 1, fh) != 1
+        || fwrite(&surf.obsolete2, sizeof(char), 6, fh) != 6
+        || fwrite(&surf.comment_size, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.private_size, sizeof(gint16), 1, fh) != 1
+        || fwrite(&surf.client_zone, sizeof(char), 128, fh) != 128
+        || fwrite(&surf.xoffset, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.yoffset, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.zoffset, sizeof(gfloat), 1, fh) != 1
+        || fwrite(&surf.reservedzone, sizeof(char), 34, fh) != 34
+        || fwrite(integer_values, sizeof(gint32), surf.nofpoints, fh) != surf.nofpoints) {
+        err_WRITE(error);
+        ok = FALSE;
+        g_unlink(filename);
+    }
+
+    g_free(integer_values);
+    fclose(fh);
+
+    return ok;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

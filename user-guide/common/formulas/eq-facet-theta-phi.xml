@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eq-facet-theta-phi.xml 23151 2021-02-13 09:13:08Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informalequation id='eq-facet-theta-phi'>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref='eq-facet-theta-phi.svg' format='SVG'/>
+    </imageobject>
+    <textobject role='tex'>
+      <phrase>
+<![CDATA[
+\vec v = \left({\d z\over\d x}, {\d z\over\d y}\right)\;,\quad
+v = |\vec v|\;,\quad
+\vartheta = \atan v\;,\quad
+\varphi = \atan_2(v_y, -v_x)
+]]>
+      </phrase>
+    </textobject>
+  </mediaobject>
+</informalequation>
+<!-- vim: set ts=2 sw=2 et : -->

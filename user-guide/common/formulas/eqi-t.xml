@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-t.xml 21927 2019-02-26 15:26:23Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase><phrase role='mathvar'>t</phrase></mathphrase>
+  <alt>t</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:cc="http://creativecommons.org/ns#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     width="24"
+     height="24"
+     viewBox="0 0 24 24"
+     id="svg8233"
+     version="1.1"
+     inkscape:version="0.92+devel unknown"
+     sodipodi:docname="gwy_fft-24.svg">
+    <defs
+         id="defs8235">
+        <circle
+             stroke-width="0.5"
+             r="0.5"
+             id="gpDot" />
+        <path
+             d="M-1,0 h2 M0,-1 v2"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt0" />
+        <path
+             d="M-1,-1 L1,1 M1,-1 L-1,1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt1" />
+        <path
+             d="M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt2" />
+        <rect
+             height="2"
+             width="2"
+             y="-1"
+             x="-1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt3" />
+        <rect
+             height="2"
+             width="2"
+             y="-1"
+             x="-1"
+             fill="currentColor"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt4" />
+        <circle
+             r="1"
+             cy="0"
+             cx="0"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt5" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt6"
+             xlink:href="#gpPt5" />
+        <path
+             d="M0,-1.33 L-1.33,0.67 L1.33,0.67 z"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt7" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt8"
+             xlink:href="#gpPt7" />
+        <use
+             transform="rotate(180)"
+             stroke="currentColor"
+             id="gpPt9"
+             xlink:href="#gpPt7" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt10"
+             xlink:href="#gpPt9" />
+        <use
+             transform="rotate(45)"
+             stroke="currentColor"
+             id="gpPt11"
+             xlink:href="#gpPt3" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt12"
+             xlink:href="#gpPt11" />
+        <path
+             d="M0,1.330 L1.265,0.411 L0.782,-1.067 L-0.782,-1.076 L-1.265,0.411 z"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt13" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt14"
+             xlink:href="#gpPt13" />
+        <filter
+             width="1"
+             height="1"
+             y="0"
+             x="0"
+             filterUnits="objectBoundingBox"
+             id="textbox">
+            <feFlood
+                 id="feFlood4495"
+                 result="bgnd"
+                 flood-opacity="1"
+                 flood-color="white" />
+            <feComposite
+                 id="feComposite4497"
+                 operator="atop"
+                 in2="bgnd"
+                 in="SourceGraphic" />
+        </filter>
+        <filter
+             width="1"
+             height="1"
+             y="0"
+             x="0"
+             filterUnits="objectBoundingBox"
+             id="greybox">
+            <feFlood
+                 id="feFlood4500"
+                 result="grey"
+                 flood-opacity="1"
+                 flood-color="lightgrey" />
+            <feComposite
+                 id="feComposite4502"
+                 operator="atop"
+                 in2="grey"
+                 in="SourceGraphic" />
+        </filter>
+        <circle
+             stroke-width="0.5"
+             r="0.5"
+             id="gpDot-4" />
+        <path
+             d="M-1,0 h2 M0,-1 v2"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt0-5" />
+        <path
+             d="M-1,-1 L1,1 M1,-1 L-1,1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt1-2" />
+        <path
+             d="M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt2-5" />
+        <rect
+             height="2"
+             width="2"
+             y="-1"
+             x="-1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt3-9" />
+        <rect
+             height="2"
+             width="2"
+             y="-1"
+             x="-1"
+             fill="currentColor"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt4-3" />
+        <circle
+             r="1"
+             cy="0"
+             cx="0"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt5-8" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt6-8"
+             xlink:href="#gpPt5-8" />
+        <path
+             d="M0,-1.33 L-1.33,0.67 L1.33,0.67 z"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt7-4" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt8-3"
+             xlink:href="#gpPt7-4" />
+        <use
+             transform="rotate(180)"
+             stroke="currentColor"
+             id="gpPt9-5"
+             xlink:href="#gpPt7-4" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt10-0"
+             xlink:href="#gpPt9-5" />
+        <use
+             transform="rotate(45)"
+             stroke="currentColor"
+             id="gpPt11-5"
+             xlink:href="#gpPt3-9" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt12-9"
+             xlink:href="#gpPt11-5" />
+        <path
+             d="M0,1.330 L1.265,0.411 L0.782,-1.067 L-0.782,-1.076 L-1.265,0.411 z"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt13-3" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt14-4"
+             xlink:href="#gpPt13-3" />
+        <filter
+             width="1"
+             height="1"
+             y="0"
+             x="0"
+             filterUnits="objectBoundingBox"
+             id="textbox-6">
+            <feFlood
+                 id="feFlood4756"
+                 result="bgnd"
+                 flood-opacity="1"
+                 flood-color="white" />
+            <feComposite
+                 id="feComposite4758"
+                 operator="atop"
+                 in2="bgnd"
+                 in="SourceGraphic" />
+        </filter>
+        <filter
+             width="1"
+             height="1"
+             y="0"
+             x="0"
+             filterUnits="objectBoundingBox"
+             id="greybox-2">
+            <feFlood
+                 id="feFlood4761"
+                 result="grey"
+                 flood-opacity="1"
+                 flood-color="lightgrey" />
+            <feComposite
+                 id="feComposite4763"
+                 operator="atop"
+                 in2="grey"
+                 in="SourceGraphic" />
+        </filter>
+        <circle
+             stroke-width="0.5"
+             r="0.5"
+             id="gpDot-5" />
+        <path
+             d="M-1,0 h2 M0,-1 v2"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt0-3" />
+        <path
+             d="M-1,-1 L1,1 M1,-1 L-1,1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt1-20" />
+        <path
+             d="M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt2-0" />
+        <rect
+             height="2"
+             width="2"
+             y="-1"
+             x="-1"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt3-0" />
+        <rect
+             height="2"
+             width="2"
+             y="-1"
+             x="-1"
+             fill="currentColor"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt4-9" />
+        <circle
+             r="1"
+             cy="0"
+             cx="0"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt5-80" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt6-9"
+             xlink:href="#gpPt5-80" />
+        <path
+             d="M0,-1.33 L-1.33,0.67 L1.33,0.67 z"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt7-6" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt8-7"
+             xlink:href="#gpPt7-6" />
+        <use
+             transform="rotate(180)"
+             stroke="currentColor"
+             id="gpPt9-2"
+             xlink:href="#gpPt7-6" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt10-1"
+             xlink:href="#gpPt9-2" />
+        <use
+             transform="rotate(45)"
+             stroke="currentColor"
+             id="gpPt11-4"
+             xlink:href="#gpPt3-0" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt12-4"
+             xlink:href="#gpPt11-4" />
+        <path
+             d="M0,1.330 L1.265,0.411 L0.782,-1.067 L-0.782,-1.076 L-1.265,0.411 z"
+             stroke="currentColor"
+             stroke-width="0.222"
+             id="gpPt13-8" />
+        <use
+             stroke="none"
+             fill="currentColor"
+             id="gpPt14-49"
+             xlink:href="#gpPt13-8" />
+        <filter
+             width="1"
+             height="1"
+             y="0"
+             x="0"
+             filterUnits="objectBoundingBox"
+             id="textbox-8">
+            <feFlood
+                 id="feFlood5017"
+                 result="bgnd"
+                 flood-opacity="1"
+                 flood-color="white" />
+            <feComposite
+                 id="feComposite5019"
+                 operator="atop"
+                 in2="bgnd"
+                 in="SourceGraphic" />
+        </filter>
+        <filter
+             width="1"
+             height="1"
+             y="0"
+             x="0"
+             filterUnits="objectBoundingBox"
+             id="greybox-4">
+            <feFlood
+                 id="feFlood5022"
+                 result="grey"
+                 flood-opacity="1"
+                 flood-color="lightgrey" />
+            <feComposite
+                 id="feComposite5024"
+                 operator="atop"
+                 in2="grey"
+                 in="SourceGraphic" />
+        </filter>
+        <defs
+             id="defs5027">
+            <circle
+                 cy="0"
+                 cx="0"
+                 id="circle5089"
+                 r="0.5"
+                 stroke-width="0.5" />
+            <path
+                 inkscape:connector-curvature="0"
+                 id="path5091"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 d="M -1,0 H 1 M 0,-1 v 2" />
+            <path
+                 inkscape:connector-curvature="0"
+                 id="path5093"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 d="M -1,-1 1,1 M 1,-1 -1,1" />
+            <path
+                 inkscape:connector-curvature="0"
+                 id="path5095"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 d="M -1,0 H 1 M 0,-1 v 2 m -1,-2 2,2 m -2,0 2,-2" />
+            <rect
+                 id="rect5097"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 x="-1"
+                 y="-1"
+                 width="2"
+                 height="2" />
+            <rect
+                 id="rect5099"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 fill="currentColor"
+                 x="-1"
+                 y="-1"
+                 width="2"
+                 height="2" />
+            <circle
+                 id="circle5101"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 cx="0"
+                 cy="0"
+                 r="1" />
+            <use
+                 height="100%"
+                 width="100%"
+                 y="0"
+                 x="0"
+                 xlink:href="#gpPt5-80"
+                 id="use5103"
+                 fill="currentColor"
+                 stroke="none" />
+            <path
+                 inkscape:connector-curvature="0"
+                 id="path5105"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 d="m 0,-1.33 -1.33,2 h 2.66 z" />
+            <use
+                 height="100%"
+                 width="100%"
+                 y="0"
+                 x="0"
+                 xlink:href="#gpPt7-6"
+                 id="use5107"
+                 fill="currentColor"
+                 stroke="none" />
+            <use
+                 height="100%"
+                 width="100%"
+                 y="0"
+                 x="0"
+                 xlink:href="#gpPt7-6"
+                 id="use5109"
+                 stroke="currentColor"
+                 transform="scale(-1)" />
+            <use
+                 height="100%"
+                 width="100%"
+                 y="0"
+                 x="0"
+                 xlink:href="#gpPt9-2"
+                 id="use5111"
+                 fill="currentColor"
+                 stroke="none" />
+            <use
+                 height="100%"
+                 width="100%"
+                 y="0"
+                 x="0"
+                 xlink:href="#gpPt3-0"
+                 id="use5113"
+                 stroke="currentColor"
+                 transform="rotate(45)" />
+            <use
+                 height="100%"
+                 width="100%"
+                 y="0"
+                 x="0"
+                 xlink:href="#gpPt11-4"
+                 id="use5115"
+                 fill="currentColor"
+                 stroke="none" />
+            <path
+                 inkscape:connector-curvature="0"
+                 id="path5117"
+                 stroke-width="0.222"
+                 stroke="currentColor"
+                 d="M 0,1.33 1.265,0.411 0.782,-1.067 -0.782,-1.076 -1.265,0.411 Z" />
+            <use
+                 height="100%"
+                 width="100%"
+                 y="0"
+                 x="0"
+                 xlink:href="#gpPt13-8"
+                 id="use5119"
+                 fill="currentColor"
+                 stroke="none" />
+            <filter
+                 id="filter5125"
+                 filterUnits="objectBoundingBox"
+                 x="0"
+                 y="0"
+                 height="1"
+                 width="1">
+                <feFlood
+                     flood-color="white"
+                     flood-opacity="1"
+                     result="bgnd"
+                     id="feFlood5121" />
+                <feComposite
+                     in="SourceGraphic"
+                     in2="bgnd"
+                     operator="atop"
+                     id="feComposite5123" />
+            </filter>
+            <filter
+                 id="filter5131"
+                 filterUnits="objectBoundingBox"
+                 x="0"
+                 y="0"
+                 height="1"
+                 width="1">
+                <feFlood
+                     flood-color="lightgrey"
+                     flood-opacity="1"
+                     result="grey"
+                     id="feFlood5127" />
+                <feComposite
+                     in="SourceGraphic"
+                     in2="grey"
+                     operator="atop"
+                     id="feComposite5129" />
+            </filter>
+        </defs>
+    </defs>
+    <sodipodi:namedview
+         id="base"
+         pagecolor="#ffffff"
+         bordercolor="#666666"
+         borderopacity="1.0"
+         inkscape:pageopacity="0.0"
+         inkscape:pageshadow="2"
+         inkscape:zoom="31.047031"
+         inkscape:cx="11.604869"
+         inkscape:cy="12.046547"
+         inkscape:document-units="px"
+         inkscape:current-layer="layer1"
+         showgrid="true"
+         inkscape:window-width="1920"
+         inkscape:window-height="1028"
+         inkscape:window-x="0"
+         inkscape:window-y="33"
+         inkscape:window-maximized="1"
+         inkscape:snap-object-midpoints="true"
+         inkscape:snap-grids="true"
+         inkscape:document-rotation="0"
+         units="px">
+        <inkscape:grid
+             type="xygrid"
+             id="grid1px"
+             originx="0"
+             originy="0"
+             dotted="false"
+             snapvisiblegridlinesonly="false"
+             spacingx="0.5"
+             spacingy="0.5"
+             enabled="true"
+             visible="true"
+             units="px"
+             empspacing="2" />
+    </sodipodi:namedview>
+    <metadata
+         id="metadata8238">
+        <rdf:RDF>
+            <cc:Work
+                 rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type
+                     rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:title />
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <g
+         inkscape:label="Layer 1"
+         inkscape:groupmode="layer"
+         id="layer1"
+         transform="translate(-393.51587,-663.14807)">
+        <text
+             id="text4357"
+             y="672.25159"
+             x="411.81357"
+             style="color:#000000;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-size:11.72398472px;line-height:1;font-family:'Liberation Sans Narrow';-inkscape-font-specification:'Liberation Sans Narrow Bold Condensed';text-align:center;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:middle;shape-padding:0;overflow:visible;vector-effect:none;fill:#000000;stroke-width:0.2;paint-order:fill markers stroke;stroke:#000000;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+             xml:space="preserve"><tspan
+                 style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-family:'Liberation Sans Narrow';-inkscape-font-specification:'Liberation Sans Narrow Bold Condensed';stroke-width:0.2;stroke:#000000;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+                 y="672.25159"
+                 x="411.81357"
+                 id="tspan4355"
+                 sodipodi:role="line">T</tspan></text>
+        <text
+             xml:space="preserve"
+             style="color:#000000;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-size:11.72398472px;line-height:1;font-family:'Liberation Sans Narrow';-inkscape-font-specification:'Liberation Sans Narrow Bold Condensed';text-align:center;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:middle;shape-padding:0;overflow:visible;vector-effect:none;fill:#000000;stroke-width:0.2;paint-order:fill markers stroke;stroke:#000000;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+             x="405.14713"
+             y="672.25159"
+             id="text4361"><tspan
+                 sodipodi:role="line"
+                 id="tspan4359"
+                 x="405.14713"
+                 y="672.25159"
+                 style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-family:'Liberation Sans Narrow';-inkscape-font-specification:'Liberation Sans Narrow Bold Condensed';stroke-width:0.2;stroke:#000000;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none">F</tspan></text>
+        <text
+             id="text4365"
+             y="672.25159"
+             x="398.79581"
+             style="color:#000000;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-size:11.72398472px;line-height:1;font-family:'Liberation Sans Narrow';-inkscape-font-specification:'Liberation Sans Narrow Bold Condensed';text-align:center;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:middle;shape-padding:0;overflow:visible;vector-effect:none;fill:#000000;stroke-width:0.2;paint-order:fill markers stroke;stroke:#000000;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+             xml:space="preserve"><tspan
+                 style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-family:'Liberation Sans Narrow';-inkscape-font-specification:'Liberation Sans Narrow Bold Condensed';stroke-width:0.2;stroke:#000000;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+                 y="672.25159"
+                 x="398.79581"
+                 id="tspan4363"
+                 sodipodi:role="line">F</tspan></text>
+        <path
+             style="color:#000000;fill:none;stroke-width:1.39999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+             inkscape:connector-curvature="0"
+             stroke="rgb(  0,   0,   0)"
+             d="m 394.01435,675.74049 0.19193,0.01 0.19194,0.0192 0.19193,0.0288 0.19193,0.0384 0.19194,0.0576 0.19193,0.0576 0.19193,0.0768 0.19194,0.096 0.19193,0.096 0.19193,0.10556 0.19193,0.12476 0.19194,0.13435 0.19193,0.13436 0.19193,0.15354 0.19194,0.15355 0.19193,0.17274 0.19193,0.17274 0.19194,0.18234 0.19193,0.19193 0.19193,0.19193 0.19194,0.20153 0.19193,0.21113 0.19193,0.21112 0.19194,0.22073 0.19193,0.22072 0.19193,0.22072 0.19194,0.23032 0.19193,0.23032 0.19193,0.23032 0.19193,0.22073 0.19194,0.23032 0.19193,0.23032 0.19193,0.23032 0.19194,0.23032 0.19193,0.22072 0.19193,0.22072 0.19194,0.22072 0.19193,0.21113 0.19193,0.21113 0.19194,0.20153 0.19193,0.19193 0.19193,0.19193 0.19194,0.18234 0.19193,0.17274 0.19193,0.17274 0.19194,0.15355 0.19193,0.15354 0.19193,0.13436 0.19193,0.13435 0.19194,0.12476 0.19193,0.10556 0.19193,0.096 0.19194,0.096 0.19193,0.0768 0.19193,0.0576 0.19194,0.0576 0.19193,0.0384 0.19193,0.0288 0.19194,0.0192 0.19193,0.01 0.18234,-0.01 0.19193,-0.0192 0.19193,-0.0288 0.19194,-0.0384 0.19193,-0.0576 0.19193,-0.0576 0.19194,-0.0768 0.19193,-0.096 0.19193,-0.096 0.19193,-0.10556 0.19194,-0.12476 0.19193,-0.13435 0.19193,-0.13436 0.19194,-0.15354 0.19193,-0.15355 0.19193,-0.17274 0.19194,-0.17274 0.19193,-0.18234 0.19193,-0.19193 0.19194,-0.19193 0.19193,-0.20153 0.19193,-0.21113 0.19194,-0.21113 0.19193,-0.22072 0.19193,-0.22072 0.19194,-0.22072 0.19193,-0.23032 0.19193,-0.23032 0.19193,-0.23032 0.19194,-0.23032 0.19193,-0.22073 0.19193,-0.23032 0.19194,-0.23032 0.19193,-0.23032 0.19193,-0.22072 0.19194,-0.22072 0.19193,-0.22073 0.19193,-0.21112 0.19194,-0.21113 0.19193,-0.20153 0.19193,-0.19193 0.19194,-0.19193 0.19193,-0.18234 0.19193,-0.17274 0.19194,-0.17274 0.19193,-0.15355 0.19193,-0.15354 0.19193,-0.13436 0.19194,-0.13435 0.19193,-0.12476 0.19193,-0.10556 0.19194,-0.096 0.19193,-0.096 0.19193,-0.0768 0.19194,-0.0576 0.19193,-0.0576 0.19193,-0.0384 0.19194,-0.0288 0.19193,-0.0192 0.19193,-0.01"
+             id="path5037" />
+        <path
+             inkscape:connector-curvature="0"
+             stroke="rgb(255,   0,   0)"
+             d="m 394.01435,680.13576 0.19193,-0.22073 0.19194,-0.23032 0.19193,-0.23032 0.19193,-0.23032 0.19194,-0.22072 0.19193,-0.22072 0.19193,-0.22073 0.19194,-0.21112 0.19193,-0.21113 0.19193,-0.20153 0.19193,-0.19193 0.19194,-0.19193 0.19193,-0.18234 0.19193,-0.17274 0.19194,-0.17274 0.19193,-0.15355 0.19193,-0.15354 0.19194,-0.13436 0.19193,-0.13435 0.19193,-0.12476 0.19194,-0.10556 0.19193,-0.096 0.19193,-0.096 0.19194,-0.0768 0.19193,-0.0576 0.19193,-0.0576 0.19194,-0.0384 0.19193,-0.0288 0.19193,-0.0192 0.19193,-0.01 0.19194,0.01 0.19193,0.0192 0.19193,0.0288 0.19194,0.0384 0.19193,0.0576 0.19193,0.0576 0.19194,0.0768 0.19193,0.096 0.19193,0.096 0.19194,0.10556 0.19193,0.12476 0.19193,0.13435 0.19194,0.13436 0.19193,0.15354 0.19193,0.15355 0.19194,0.17274 0.19193,0.17274 0.19193,0.18234 0.19193,0.19193 0.19194,0.19193 0.19193,0.20153 0.19193,0.21113 0.19194,0.21112 0.19193,0.22073 0.19193,0.22072 0.19194,0.22072 0.19193,0.23032 0.19193,0.23032 0.19194,0.23032 0.19193,0.22073 0.18234,0.23032 0.19193,0.23032 0.19193,0.23032 0.19194,0.23032 0.19193,0.22072 0.19193,0.22072 0.19194,0.22072 0.19193,0.21113 0.19193,0.21113 0.19193,0.20153 0.19194,0.19193 0.19193,0.19193 0.19193,0.18234 0.19194,0.17274 0.19193,0.17274 0.19193,0.15355 0.19194,0.15354 0.19193,0.13436 0.19193,0.13435 0.19194,0.12476 0.19193,0.10556 0.19193,0.096 0.19194,0.096 0.19193,0.0768 0.19193,0.0576 0.19194,0.0576 0.19193,0.0384 0.19193,0.0288 0.19193,0.0192 0.19194,0.01 0.19193,-0.01 0.19193,-0.0192 0.19194,-0.0288 0.19193,-0.0384 0.19193,-0.0576 0.19194,-0.0576 0.19193,-0.0768 0.19193,-0.096 0.19194,-0.096 0.19193,-0.10556 0.19193,-0.12476 0.19194,-0.13435 0.19193,-0.13436 0.19193,-0.15354 0.19194,-0.15355 0.19193,-0.17274 0.19193,-0.17274 0.19193,-0.18234 0.19194,-0.19193 0.19193,-0.19193 0.19193,-0.20153 0.19194,-0.21113 0.19193,-0.21113 0.19193,-0.22072 0.19194,-0.22072 0.19193,-0.22072 0.19193,-0.23032 0.19194,-0.23032 0.19193,-0.23032 0.19193,-0.23032"
+             id="path5044"
+             style="color:#000000;fill:none;stroke:#e91616;stroke-width:1.39999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+</svg>

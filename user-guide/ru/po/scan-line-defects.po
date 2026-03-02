@@ -1,0 +1,779 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-documentation\n"
+"POT-Creation-Date: 2024-01-05 11:21+0400\n"
+"PO-Revision-Date: 2024-01-05 11:43+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.4.2\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: scan-line-defects.xml:6(title)
+msgid "Scan Line Artefacts"
+msgstr "Артефакты линий сканирования"
+
+#: scan-line-defects.xml:7(para)
+msgid ""
+"This section describes functions for marking and correction of various "
+"artefacts in SPM data related to the line by line acquisition. Scan line "
+"alignment and correction methods frequently involve heavy data modification "
+"which should be avoided if possible. Unfortunately, scan line defects are "
+"ubiquitous and, also frequently, correction may be the only way to proceed. "
+"Nevertheless, they should be applied with care."
+msgstr ""
+"Этот раздел описывает функции для выделения и исправления различных "
+"артефактов в данных СЗМ, связанных с получением данных линия за линией. "
+"Методы выравнивания и коррекции линий сканирования нередко требуют "
+"значительного изменения данных, которого следует по возможности избегать. К "
+"сожалению, дефекты линий сканирования встречаются очень широко, и, опять же, "
+"очень часто, их исправление может быть единственным способом работать с "
+"данными дальше. Тем не менее, данные методы должны использоваться с "
+"осторожностью."
+
+#: scan-line-defects.xml:15(para)
+msgid ""
+"See also section <link linkend=\"editing-correction\">Data Editing and "
+"Correction </link> for methods that deal with general local defects."
+msgstr ""
+"Также рекомендуется ознакомиться с разделом <link linkend=\"editing-"
+"correction\">Редактирование и исправление данных</link>, который посвящен "
+"более общим методам исправления локальных дефектов."
+
+#: scan-line-defects.xml:20(primary)
+msgid "defect correction"
+msgstr "исправление дефектов"
+
+#: scan-line-defects.xml:21(secondary)
+msgid "scan line"
+msgstr "линия сканирования"
+
+#: scan-line-defects.xml:24(title)
+msgid "Align Rows <gwy:icon name=\"line_level\"/>"
+msgstr "Выравнивание строк <gwy:icon name=\"line_level\"/>"
+
+#: scan-line-defects.xml:27(primary) scan-line-defects.xml:193(primary)
+msgid "line correction"
+msgstr "коррекция линий"
+
+#: scan-line-defects.xml:28(primary) scan-line-defects.xml:197(primary)
+msgid "row levelling"
+msgstr "выравнивание строк"
+
+#: scan-line-defects.xml:29(para)
+msgid ""
+"Profiles taken in the fast scanning axis (usually <include href=\"eqi-x.xml"
+"\"/>-axis) can be mutually shifted by some amount or have slightly different "
+"slopes. The basic line correction function <menuchoice><guimenu>Data "
+"Process</guimenu><guisubmenu>Correct Data</guisubmenu><guimenuitem>Align "
+"Rows</guimenuitem></menuchoice> deals with this type of discrepancy using "
+"several different correction algorithms:"
+msgstr ""
+"Профили, взятые вдоль оси быстрого сканирования (обычно ось <include href="
+"\"eqi-x.xml\"/>), могут быть взаимно сдвинуты на некоторое значение или "
+"иметь несколько иной уклон. Основные функции коррекции линий исправляют это "
+"несоответствие. Основная функция коррекции линий "
+"<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Исправить данные</"
+"guisubmenu><guimenuitem>Выровнять строки</guimenuitem></menuchoice> работает "
+"с этим типом несоответствий используя несколько разных алгоритмов коррекции:"
+
+#: scan-line-defects.xml:45(guilabel)
+msgid "Median"
+msgstr "Срединное"
+
+#: scan-line-defects.xml:48(para)
+msgid ""
+"A basic correction method, based on finding a representative height of each "
+"scan line and subtracting it, thus moving the lines to the same height. Here "
+"the line median is used as the representative height."
+msgstr ""
+"Основные методы коррекции основаны на расчёте некоторой высоты, "
+"представляющей данную линию скана, и её вычитании, тем самым перемещая линии "
+"на одинаковую высоту. Здесь в качестве такой высоты используется срединное "
+"значение линии скана."
+
+#: scan-line-defects.xml:58(guilabel)
+msgid "Modus"
+msgstr "Мода высоты"
+
+#: scan-line-defects.xml:61(para)
+msgid ""
+"This method differs from <guilabel>Median</guilabel> only in the quantity "
+"used: modus of the height distribution. Of course, the modus is only "
+"estimated because only a finite set of heights is avaiable."
+msgstr ""
+"Этот метод отличается от <guilabel>Срединного</guilabel> только используемым "
+"значением: модой распределения высоты. Разумеется, мода всего лишь "
+"оценивается поскольку доступен только конечный набор высот."
+
+#: scan-line-defects.xml:70(guilabel)
+msgid "Polynomial"
+msgstr "Полиномиальное"
+
+#: scan-line-defects.xml:73(para)
+msgid ""
+"The <guilabel>Polynomial</guilabel> method fits a polynomial of given degree "
+"and subtracts if from the line. For polynomial degree of 0 the mean value of "
+"each row is subtracted. Degree 1 means removal of linear slopes, degree 2 "
+"bow removal, etc."
+msgstr ""
+"Метод <guilabel>Полиномиальное</guilabel> аппроксимирует строку полиномом "
+"заданной степени и вычитает его значения из данных строки. Для нулевой "
+"степени полинома из каждой строки вычитается среднее значение, для степени 1 "
+"вычитается наклон, для степени 2 дуга окружности, и т.д."
+
+#: scan-line-defects.xml:83(guilabel)
+msgid "Median difference"
+msgstr "Срединное разностей"
+
+#: scan-line-defects.xml:86(para)
+msgid ""
+"In contrast to shifting a representative height for each line, "
+"<guimenuitem>Median difference</guimenuitem> shifts the lines so that the "
+"median of height differences (between vertical neighbour pixels) becomes "
+"zero. Therefore it better preserves large features while it is more "
+"sensitive to completely bogus lines."
+msgstr ""
+"В отличие от методов сдвига характерной высоты каждой строки, "
+"<guimenuitem>Срединное разности</guimenuitem> сдвигает линии таким образом, "
+"что срединное значение разницы (между соседними по вертикали точками) "
+"становилось равным нулю. Следовательно, она лучше сохраняет крупные детали, "
+"в то же время она более чувствительна к сильно испорченным строкам."
+
+#: scan-line-defects.xml:97(guilabel)
+msgid "Matching"
+msgstr "Соответствие"
+
+#: scan-line-defects.xml:100(para)
+msgid ""
+"This algorithm is somewhat experimental but it may be useful sometimes. It "
+"minimizes a certain line difference function that gives more weight to flat "
+"areas and less weight to areas with large slopes."
+msgstr ""
+"Этот алгоритм в некоторой степени можно считать экспериментальным, однако "
+"иногда он может пригодиться. Он минимизирует определённую функцию разности "
+"линий, которая придаёт больший вес плоским областям и меньший областям с "
+"большими наклонами."
+
+#: scan-line-defects.xml:109(guilabel)
+msgid "Facet-level tilt"
+msgstr "Наклон с выравниванием граней"
+
+#: scan-line-defects.xml:112(para)
+msgid ""
+"Inspired by <link linkend=\"facet-level\">Facet level</link>, this method "
+"tilts individual scan lines to make the prevalent normals vertical. This "
+"only removes tilt; line height offsets are preserved. In one dimension it is "
+"generally a somewhat less effective strategy than for images. However, it "
+"can correct the tilt in some cases when other methods do not work at all."
+msgstr ""
+"Этот метод был создан вдохновляясь модулем <link linkend=\"facet-level"
+"\">Выравнивания граней</link>, он наклоняет отдельные линии сканирования "
+"таким образом, чтобы сделать самые часто встречающиеся векторы нормали "
+"вертикальными. Это убирает только наклон; смещения линий по высоте "
+"сохраняются. В одномерном случае это несколько менее эффективный подход по "
+"сравнению с изображениями. Однако, этот метод может исправлять наклон в "
+"некоторых сложных случаях, когда другие методы вообще не работают."
+
+#: scan-line-defects.xml:123(guilabel)
+msgid "Trimmed mean"
+msgstr "Усечённое среднее"
+
+#: scan-line-defects.xml:126(para)
+msgid ""
+"Trimmed mean lies between the standard mean value and median, depending on "
+"how large fraction of lowest and highest values are trimmed. For no trimming "
+"(0) this method is equivalent to mean value subtraction, i.e. "
+"<guilabel>Polynomial</guilabel> with degree 0, for maximum possible trimming "
+"(0.5) it is equivalent to <guilabel>Median</guilabel>."
+msgstr ""
+"Усечённое среднее лежит между обычным средним значением и срединным, в "
+"зависимости от того, насколько большая часть наибольших и наименьших "
+"значений будет отброшена. Для нулевого усечения (0) этот метод будет "
+"эквивалентен вычитанию среднего значения или <guilabel>Полиномиальному</"
+"guilabel> со степенью 0, для максимально возможного усечения (0.5) он "
+"эквивалентен <guilabel>Срединному</guilabel>."
+
+#: scan-line-defects.xml:137(guilabel)
+msgid "Trimmed mean of differences"
+msgstr "Усечённое среднее разностей"
+
+#: scan-line-defects.xml:140(para)
+msgid ""
+"This method similarly offers a continuous transition between "
+"<guilabel>Median difference</guilabel> and mean value subtraction. It makes "
+"zero the trimmed means of height differences (between vertical neighbour "
+"pixels). For the maximum possible trimming (0.5) it is equivalent to "
+"<guilabel>Median difference</guilabel>. Since the mean difference is the "
+"same as the difference of mean values (unlike for medians), for no trimming "
+"(0) it is again equivalent to <guilabel>Polynomial</guilabel> with degree 0."
+msgstr ""
+"Этот метод похожим образом предлагает непрерывный переход между "
+"<guilabel>Срединным разности</guilabel> и вычетом среднего значения. Он "
+"делает нулевыми усечённые средние разности высот (между соседними по "
+"вертикали пикселями). Для максимально возможного усечения (0.5) он "
+"эквивалентен <guilabel>Срединному разности</guilabel>. Поскольку средняя "
+"разность эквивалентна разнице средних значений (в отличие от срединных), для "
+"отсутствия усечения (0) он в свою очередь будет эквивалентен "
+"<guilabel>Полиномиальному</guilabel> со степенью 0."
+
+#: scan-line-defects.xml:153(para)
+msgid ""
+"Similarly as in the two-dimensional <link linkend=\"polynomial-level"
+"\">polynomial levelling</link>, the background, i.e. values subtracted from "
+"individual rows can be extracted to another image. Or plotted in a graph "
+"since the value is the same for the entire row."
+msgstr ""
+"Также, как и для двумерного <link linkend=\"polynomial-level"
+"\">полиномиального выравнивания</link>, фон, т.е. значения, которые "
+"вычитаются из каждой строки, можно извлечь в другое изображение. Или "
+"построить в виде графика поскольку значения будут одинаковыми для всей "
+"строки."
+
+#: scan-line-defects.xml:159(para)
+msgid ""
+"The line correction function support masking, allowing the exclusion of "
+"large features that could distract the correction algorithms. The masking "
+"options are offered only if a mask is present though. Note the <link linkend="
+"\"path-level\">Path level</link> tools described below offers a different "
+"method of choosing the image parts important for alignment. It can be more "
+"convenient in some cases."
+msgstr ""
+"Функция коррекции линий поддерживает использование маски, что позволяет "
+"исключить из рассмотрения крупные объекты на изображении, которые могут "
+"препятствовать корректной работе алгоритмов. Опции работы с масками будут "
+"представлены только если маска присутствует на данном изображении. Следует "
+"заметить, что инструмент <link linkend=\"path-level\">Выровнять вдоль линии</"
+"link> описанный ниже предоставляет другой способ выбрать фрагменты "
+"изображения, которые должны быть выровнены. Этот подход может быть более "
+"удобным в ряде случаев."
+
+#: scan-line-defects.xml:169(keycap)
+msgid "Ctrl-F"
+msgstr "Ctrl-F"
+
+#: scan-line-defects.xml:169(guimenuitem)
+msgid "Repeat Last"
+msgstr "Повторить последний"
+
+#: scan-line-defects.xml:168(tip)
+msgid ""
+"Use <placeholder-1/> (<placeholder-2/>) to run the line correction with the "
+"same settings on several images without going through the dialogue."
+msgstr ""
+"Можно использовать <placeholder-1/> (<placeholder-2/>) чтобы применить "
+"коррекцию с теми же настройками к нескольким изображениям не заходя в "
+"диалоговое окно."
+
+#: scan-line-defects.xml:178(caption)
+msgid ""
+"Line correction example: an image with defects (left), the row alignment "
+"dialogue previewing the median correction (centre), and extracted row "
+"background (right). Note the false colour scales are not the same in the "
+"three images."
+msgstr ""
+"Пример коррекции линий: изображение с дефектами (слева), диалог выравнивания "
+"строк с предпросмотром коррекции по срединному (по центру), и извлекаемый "
+"фон строк (справа). Следует заметить, что масштабы шкалы псевдоцвета на этих "
+"изображениях будут различны."
+
+#: scan-line-defects.xml:188(title)
+msgid "Path Levelling Tool <gwy:icon name=\"path_level\"/>"
+msgstr "Инструмент выравнивания вдоль линии <gwy:icon name=\"path_level\"/>"
+
+#: scan-line-defects.xml:191(primary)
+msgid "path levelling"
+msgstr "выравнивание линии"
+
+#: scan-line-defects.xml:194(secondary) scan-line-defects.xml:198(secondary)
+msgid "along paths"
+msgstr "вдоль линии"
+
+#: scan-line-defects.xml:200(para)
+msgid ""
+"The <guilabel>Path Levelling</guilabel> tool can be used to correct the "
+"heights in an arbitrary subset of rows in complicated images."
+msgstr ""
+"Инструмент <guilabel>Выровнять вдоль линии</guilabel> может использоваться "
+"для коррекции высот в выбранном подмножестве строк на сложных изображениях."
+
+#: scan-line-defects.xml:205(para)
+msgid ""
+"First, one selects a number of straight lines on the data. The intersections "
+"of these lines with the rows then form a set of points in each row that is "
+"used for levelling. The rows are moved up or down to minimize the difference "
+"between the heights of the points of adjacent rows. Rows that are not "
+"intersected by any line are not moved (relatively to neighbouring rows)."
+msgstr ""
+"Вначале необходимо выбрать несколько прямых линий на данных. Пересечения "
+"этих линий со строками затем формируют набор точек в каждой строке, которые "
+"будут использованы для выравнивания. Строки сдвигаются вверх и вниз с целью "
+"минимизации разницы высоты точек в граничащих строках. Строки, которые не "
+"пересекаются ни одной линий не сдвигаются (относительно соседних строк)."
+
+#: scan-line-defects.xml:218(caption)
+msgid ""
+"Path Level example: (a) uncorrected data with steps that the automated "
+"method may fail to correct, two suitable levelling lines are selected; "
+"(b) the result of Path Level application with line width 5."
+msgstr ""
+"Пример выравнивания вдоль линии: (a) исходные данные со ступенями, которые "
+"автоматические способы могут исправлять с ошибками, выбраны две подходящих "
+"выравнивающих линии; (b) результат применения выравнивания вдоль линии с "
+"шириной линии 5."
+
+#: scan-line-defects.xml:228(title)
+msgid "Step Line Correction"
+msgstr "Линейная коррекция ступеней"
+
+#: scan-line-defects.xml:231(para)
+msgid ""
+"Function <guimenuitem>Step Line Correction</guimenuitem> attempts to deal "
+"with height jumps that may occur in the middle of a scan line. It tries to "
+"identify misaligned segments within the rows and correct the height of each "
+"such segment individually by subtracting its mean value. Therefore it is "
+"often able to correct data with discontinuities in the middle of a row."
+msgstr ""
+"Функция <guimenuitem>Линейная коррекция ступеней</guimenuitem> пытается "
+"работать со сдвигами, которые происходят посреди линии скана. Она пытается "
+"определить смещённые сегменты в строках и исправить высоту каждого подобного "
+"сегмента индивидуально вычетом среднего значения. Вследствие этого, она "
+"нередко может исправить данные с разрывом в середине строки."
+
+#: scan-line-defects.xml:238(para)
+msgid ""
+"This function is somewhat experimental and the exact way it works can be "
+"subject to further changes. Note that it still alignes all rows similarly to "
+"the Mean method in <link linkend=\"line-correction\">Align rows</link>. See "
+"<link linkend=\"line-correction-block\">Block line correction</link> for a "
+"method which attempts to only remove the jumps, preserving everything else."
+msgstr ""
+"Эту функцию следует считать несколько экспериментальным и точный алгоритм её "
+"работы может изменяться в дальнейшем. Следует заметить, что она по прежнему "
+"выравнивает все строки подобно методу Среднее в модуле <link linkend=\"line-"
+"correction\">Выровнять строки</link>. См. функцию <link linkend=\"line-"
+"correction-block\">Блочная коррекция ступеней</link> как метод, который "
+"пытается убрать прыжки высоты, сохраняя остальные параметры."
+
+#: scan-line-defects.xml:248(title)
+msgid "Block Line Correction"
+msgstr "Блочная коррекция ступеней"
+
+#: scan-line-defects.xml:251(para)
+msgid ""
+"Function <guimenuitem>Block Line Correction</guimenuitem> also attempts to "
+"correct jumps that may occur in the middle of a scan line. It also tries to "
+"change the image as little as possible, i.e. less than <link linkend=\"line-"
+"correction-step\">Step line correction</link> which applies somewhat "
+"aggressive correction (and is thus generally more successful at removing the "
+"jumps as long as one does not mind the accompanying scan line flattening)."
+msgstr ""
+"Функция <guimenuitem>Блочная коррекция ступеней</guimenuitem> также пытается "
+"исправить прыжки высоты, которые могут происходить внутри линии "
+"сканирования. Она также пытается менять изображение как можно меньше, т.е. "
+"меньше, чем <link linkend=\"line-correction-step\">Линейная коррекция "
+"ступеней</link>, которая применяет несколько более агрессивный способ "
+"исправления (и, следовательно, в общем случае более успешно удаляет все "
+"точки прыжков, до тех пор, пока сопутствующее выпрямление линии сканирования "
+"не начинает мешать дальнейшей работе)."
+
+#: scan-line-defects.xml:259(para)
+msgid ""
+"The block line correction identifies the sudden jumps, computes their "
+"heights and then shifts height in entire blocks of scan lines between them. "
+"That is where the name <quote>block</quote> comes from. In regions where no "
+"sudden jump occured mutual the height relations bewtween scan lines are "
+"perfectly preserved."
+msgstr ""
+"Блочная коррекция ступеней находит внезапные прыжки, рассчитывает их высоту "
+"и затем смещает высоту отдельных блоков внутри линии сканирования между "
+"прыжками. Отсюда возникает слово <quote>блочная</quote> в её названии. В "
+"областях, где нет таких прыжков, соотношения высоты между строками "
+"сканирования сохраняются как они были."
+
+#: scan-line-defects.xml:266(para)
+msgid ""
+"Since entire blocks are shifted the direction of scanning is important in "
+"determining which pixels from a contiguous block. It has to be selected as "
+"<guilabel>Scanning direction</guilabel>. The directions are labelled as for "
+"scanning from top to bottom in the slow axis. For scanning from the bottom "
+"upwards the meaning is reversed. If the functions seems unable to notice "
+"obvious jumps check that the direction is correct."
+msgstr ""
+"Поскольку смещаются целые блоки, важную роль играет направление "
+"сканирования, поскольку оно определяет какие пиксели формируют непрерывный "
+"блок. Оно должно быть выбрано в пункте настроек <guilabel>Направление "
+"сканирования</guilabel>. Направления указаны как при сканировании сверху "
+"вниз в медленной оси сканирования. При сканировании снизу вверх их значения "
+"инвертированы. Если функция испытывает затруднения в обнаружении очевидных "
+"скачков проверьте, что направление сканирования задано правильно."
+
+#: scan-line-defects.xml:279(caption)
+msgid ""
+"Step artefacts examples for top-to-bottom scanning in the slow axis. Left: "
+"left-to-right. Right: right-to-left."
+msgstr ""
+"Примеры артефактов в форме ступеней при сканировании сверху вниз в медленной "
+"оси. Слева: слева направо. Справа: справа налево."
+
+#: scan-line-defects.xml:285(para)
+msgid ""
+"<guilabel>Threshold</guilabel> determines the sensitivity, in other words "
+"how large jumps are considered discontinuities. It is given as a multiple of "
+"the root mean square of all differences between two vertical neighbour "
+"pixels. By selecting <guilabel>Marked discontinuities</guilabel> in "
+"<guilabel>Display</guilabel> one can get an overview of all locations where "
+"the height difference exceeds given threshold. The option <guilabel>Marked "
+"block boundaries</guilabel> is probably more useful as is shows where a "
+"discontinuity spans the entire image width and is, therefore, considered a "
+"boundary between two blocks. The number of total detected jumps is displayed "
+"below <guilabel>Threshold</guilabel>."
+msgstr ""
+"<guilabel>Порог</guilabel> задаёт чувствительность, т.е., другими словами, "
+"насколько большие прыжки будут считаться нарушением непрерыности. Он "
+"задаётся как множитель среднего квадратичного всех различий между двумя "
+"соседними пикселями по вертикали. При выборе <guilabel>Помеченные разрывы</"
+"guilabel> на вкладке <guilabel>Показать</guilabel> можно посмотреть все "
+"места, где разница высоты превышает заданный порог. Опция "
+"<guilabel>Помеченные границы блоков</guilabel> возможно будет более "
+"полезной, поскольку она показывает где происходит нарушение непрерывности, и "
+"где будут гранизы между двух блоков. Общее количество обнаруженных скачков "
+"показывается под опцией <guilabel>Порог</guilabel>."
+
+#: scan-line-defects.xml:298(title)
+msgid "Mean Good Profile"
+msgstr "Хороший средний профиль"
+
+#: scan-line-defects.xml:302(primary)
+msgid "profile extraction"
+msgstr "извлечение профиля"
+
+#: scan-line-defects.xml:303(secondary)
+msgid "mean scan line"
+msgstr "средняя линия сканирования"
+
+#: scan-line-defects.xml:305(para)
+msgid ""
+"Taking mean or median rows from the entire image using <link linkend=\"line-"
+"stats\">Row/Column Statistics tool</link> can provide clean profiles from "
+"images formed by repeated scanning of the same feature. This is sometimes "
+"done with slow scanning axis disabled entirely, other times with scanning "
+"enabled but with much reduced range in the slow axis. If defects are present "
+"they should be excluded by masking. When both forward and backward scans are "
+"available, comparing them can help determining which parts of the profiles "
+"are good and which contain defects."
+msgstr ""
+"Выбирая среднюю или срединную строку всего изображения используя <link "
+"linkend=\"line-stats\">Инструмент статистики строк/столбцов</link> можно "
+"получить чистые профили изображения, образованного повторяющимся "
+"сканированием одной и той же характерной части. Это иногда делается путём "
+"полного отключения медленной оси сканирования, и с включенной осью, но со "
+"значительно уменьшенным диапазоном сканирования вдоль медленной оси. Если на "
+"изображении присутствуют дефекты, их надо исключить с использованием маски. "
+"Если доступны и прямой, и обратный сканы, их сравнение позволяет определить "
+"какая часть профилей является хорошей и какая содержит дефекты."
+
+#: scan-line-defects.xml:315(para)
+msgid ""
+"The <guimenuitem>Mean Good Profile</guimenuitem> function simplifies this in "
+"a couple of common situations:"
+msgstr ""
+"Функция <guimenuitem>Хороший средний профиль</guimenuitem> упрощает этот "
+"подход в ряде типичных ситуаций:"
+
+#: scan-line-defects.xml:321(guilabel)
+msgid "Second image"
+msgstr "Второе изображение"
+
+#: scan-line-defects.xml:323(guilabel) scan-line-defects.xml:330(guilabel)
+msgid "Trim fraction"
+msgstr "Степень обрезки"
+
+#: scan-line-defects.xml:320(listitem)
+msgid ""
+"If only two images are available, select the other image as <placeholder-1/"
+">. A portion of pixels with the highest inter-image differences is then "
+"thrown away, as controlled by <placeholder-2/>. The rest is used to "
+"calculate column-wise mean values, producing the cleaned up mean profile."
+msgstr ""
+"Если доступны только два изображения, выберите другое изображение в качестве "
+"<placeholder-1/>. Набор пикселей с максимальным различием между изображения "
+"будет отброшен, что контролируется опцией <placeholder-2/>. Остальные "
+"используются чтобы рассчитать среднее значение в столбце, в результате "
+"получается очищенный средний профиль."
+
+#: scan-line-defects.xml:327(listitem)
+msgid ""
+"If only one image is available, inter-image comparison is not possible. "
+"Therefore, simple column-wise trimmed mean is used instead. <placeholder-1/> "
+"again controls the portion of pixels thrown away – in this case the fraction "
+"applies to each image column independently."
+msgstr ""
+"Если доступно только одно изображение, сравнение изображений становится "
+"невозможным. Следовательно, простое усеченное среднее по столбцам "
+"используется вместо него. <placeholder-1/> снова контролирует количество "
+"отбрасываемых пикселей - в этом случае эта доля применяется к каждому "
+"столбцу изображения независимо."
+
+#: scan-line-defects.xml:334(para)
+msgid ""
+"In both modes either the profile graph is shown, or the image with "
+"corresponding mask of excluded pixels. The module also shows the variation, "
+"i.e. the integral of the absolute value of the derivative. Large variation "
+"means more noisy or jagged profile. Hence, lower values usually correspond "
+"to better profiles."
+msgstr ""
+"В обоих режимах показывается либо график профиля, либо изображение с "
+"соответствующей маской исключаемых пикселей. Модуль также показывает "
+"вариацию, т.е. интеграл модуля производной. Большое значение вариации "
+"соответствует более шумному или рваному профилю. Следовательно, меньшие "
+"значения обычно соответствуют более хорошим профилям."
+
+#: scan-line-defects.xml:342(title)
+msgid "Mark Inverted Rows"
+msgstr "Пометить инвертированные строки"
+
+#: scan-line-defects.xml:345(para)
+msgid ""
+"Function <guimenuitem>Mark Inverted Rows</guimenuitem> finds scan lines with "
+"vertically inverted features and marks them with a mask. Line inversion is "
+"an artefact which occasionally occurs for instance in Magnetic Force "
+"Microscopy. Since the line is generally only inverted very approximately, "
+"value inversion would be a poor correction and one should usually use <link "
+"linkend=\"remove-data-under-mask\">Laplace's interpolation</link> for "
+"correction."
+msgstr ""
+"Функция <guimenuitem>Пометить инвертированные строки</guimenuitem> находит "
+"линии изображения с перевёрнутыми вертикально особенностями и помечает их "
+"маской. Инверсия строк это пример артефакта, который случается, например, в "
+"магнитно-силовой микроскопии. Поскольку строка обычно перевёрнута сильно "
+"приблизительно, простая смена знака будет плохим вариантом исправления и "
+"обычно нужно использовать <link linkend=\"remove-data-under-mask"
+"\">интерполяцию функцией Лапласа</link> для исправления."
+
+#: scan-line-defects.xml:357(title)
+msgid "Mark Scars <gwy:icon name=\"mark_scars\"/>"
+msgstr "Пометить царапины <gwy:icon name=\"mark_scars\"/>"
+
+#: scan-line-defects.xml:362(guimenu) scan-line-defects.xml:430(guimenu)
+#: scan-line-defects.xml:452(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: scan-line-defects.xml:363(guisubmenu) scan-line-defects.xml:431(guisubmenu)
+msgid "Correct Data"
+msgstr "Исправить данные"
+
+#: scan-line-defects.xml:364(guimenuitem)
+msgid "Mark Scars"
+msgstr "Пометить царапины"
+
+#: scan-line-defects.xml:367(para)
+msgid ""
+"Similarly, the <classname>Mark Scars</classname> module can create a mask of "
+"the points treated as scars. Unlike <link linkend=\"remove-scars\">Remove "
+"Scars</link> which directly interpolates the located defects, this module "
+"lets you interactively set several parameters which can fine-tune the scar "
+"selection process:"
+msgstr ""
+"Подобным образом, модуль <classname>Пометить царапины</classname> может "
+"создавать маску точек, рассматриваемых как царапины. В отличие от "
+"модуля<link linkend=\"remove-scars\">Удалить царапины</link>, который "
+"напрямую интерполирует обнаруженные дефекты, этот модуль позволяет "
+"интерактивно задавать несколько параметров для тонкой настройки процесса "
+"выделения царапин:"
+
+#: scan-line-defects.xml:376(listitem)
+msgid ""
+"Maximum width – only scars that are as thin or thinner than this value (in "
+"pixels) will be marked."
+msgstr ""
+"Максимальная ширина – только те царапины, толщина которых равна или меньше "
+"заданного значения (в пикселях), будут помечены."
+
+#: scan-line-defects.xml:380(listitem)
+msgid ""
+"Minimum length – only scars that are as long or longer than this value (in "
+"pixels) will be marked."
+msgstr ""
+"Минимальная длина – только царапины, которые равны или длиннее заданной "
+"величины (в пикселях) будут помечены."
+
+#: scan-line-defects.xml:384(listitem)
+msgid ""
+"Hard threshold – the minimum difference of the value from the neighbouring "
+"upper and lower lines to be considered a defect. The units are relative to "
+"image RMS."
+msgstr ""
+"Жёсткий порог – минимальная разница значений относительно соседних верхней и "
+"нижней линии, которая будет считаться дефектом. Единицы считаются "
+"относительно среднеквадратичного отклонения изображения."
+
+#: scan-line-defects.xml:389(listitem)
+msgid ""
+"Soft threshold – values differing at least this much do not form defects "
+"themselves, but they are attached to defects obtained from the hard "
+"threshold if they touch one."
+msgstr ""
+"Мягкий порог – значения, отличающиеся не меньше, чем на заданную величину не "
+"образуют дефектов сами, но присоединяются к дефектам полученным по жёсткому "
+"порогу если они граничат с ними."
+
+#: scan-line-defects.xml:394(listitem)
+msgid ""
+"Positive, Negative, Both – the type of defects to remove. Positive means "
+"defects with outlying values above the normal values (peaks), negative means "
+"defects with outlying values below the normal values (holes)."
+msgstr ""
+"Положительные, Отрицательные, Оба – типы дефектов, которые будут удалены. "
+"Положительные означают дефекты с выпадающими значениями выше нормальных "
+"(пики), отрицательные – дефекты с выпадающими значениями ниже нормальных "
+"(дыры)."
+
+#: scan-line-defects.xml:401(para)
+msgid ""
+"After clicking <guibutton>Ok</guibutton> the new scar mask will be applied "
+"to the image. Other modules or tools can then be run to edit this data."
+msgstr ""
+"После нажатия на кнопку <guibutton>Ok</guibutton> новая маска царапин будет "
+"наложена на изображение. Другие модули и инструменты могут затем применяться "
+"для редактирования этих данных."
+
+#: scan-line-defects.xml:411(phrase)
+msgid "Scrars removal example"
+msgstr "Пример удаления царапин"
+
+#: scan-line-defects.xml:413(caption)
+msgid ""
+"Scars marking and removal example: (a) original data with defects, (b) data "
+"with marked defects, (c) corrected data."
+msgstr ""
+"Пример выделения и удаления царапин: (a) исходные данные с дефектами, (b) "
+"данные с помеченными дефектами, (c) исправленные данные."
+
+#: scan-line-defects.xml:423(title)
+msgid "Remove Scars <gwy:icon name=\"scars\"/>"
+msgstr "Удалить царапины <gwy:icon name=\"scars\"/>"
+
+#: scan-line-defects.xml:426(primary)
+msgid "scars correction"
+msgstr "коррекция царапин"
+
+#: scan-line-defects.xml:427(primary)
+msgid "strokes correction"
+msgstr "коррекция штрихов"
+
+#: scan-line-defects.xml:432(guimenuitem)
+msgid "Remove Scars"
+msgstr "Удалить царапины"
+
+#: scan-line-defects.xml:435(para)
+msgid ""
+"Scars (or stripes, strokes) are parts of the image that are corrupted by a "
+"very common scanning error: local fault of the closed loop. Line defects are "
+"usually parallel to the fast scanning axis in the image. This function will "
+"automatically find and remove these scars, using neighbourhood lines to "
+"<quote>fill-in</quote> the gaps. The method is run with the last settings "
+"used in <link linkend=\"mark-scars\">Mark Scars</link>."
+msgstr ""
+"Царапины (полосы, штрихи) – части изображения, повреждённые очень "
+"распространённой ошибкой сканирования: локальным сбоем петли обратной связи. "
+"Линейные дефекты обычно параллельны оси быстрого сканирования изображения. "
+"Эта функция автоматически находит и удаляет эти царапины. используя соседние "
+"линии чтобы <quote>заполнить</quote> пустоты. Метод запускается с "
+"настройками, установленными при последнем использовании функции <quote><link "
+"linkend=\"mark-scars\">пометить царапины</link></quote>."
+
+#: scan-line-defects.xml:446(title)
+msgid "XY Denoising <gwy:icon name=\"xy_denoise\"/>"
+msgstr "Удаление шума XY <gwy:icon name=\"xy_denoise\"/>"
+
+#: scan-line-defects.xml:449(primary)
+msgid "xy denoising"
+msgstr "удаление шума xy"
+
+#: scan-line-defects.xml:453(guisubmenu)
+msgid "Multidata"
+msgstr "Множественные данные"
+
+#: scan-line-defects.xml:454(guimenuitem)
+msgid "XY denoise"
+msgstr "Удалить шум XY"
+
+#: scan-line-defects.xml:457(para)
+msgid ""
+"The function denoises and image on the basis of two measurements of the same "
+"area – one performed in <include href=\"eqi-x.xml\"/> direction and one in "
+"<include href=\"eqi-y.xml\"/> direction (and rotated back to be aligned the "
+"same way as the <include href=\"eqi-x.xml\"/>-direction one). It is based on "
+"work of E. Anguiano and M. Aguilar (see [<link linkend=\"xy-denoise-"
+"ref-1\">1</link>])."
+msgstr ""
+"Функция убирает шум на изображении на основе двух измерений одной и той же "
+"области – одного при сканировании вдоль оси <include href=\"eqi-x.xml\"/> и "
+"второго вдоль оси <include href=\"eqi-y.xml\"/> (и повернутым таким образом, "
+"чтобы оказаться ориентированными таким же способом, как изображении при "
+"сканировании вдоль <include href=\"eqi-x.xml\"/>). Она основана на работах "
+"E. Anguiano и M. Aguilar (см. [<link linkend=\"xy-denoise-ref-1\">1</link>])."
+
+#: scan-line-defects.xml:467(para)
+msgid ""
+"The denoising works by performing the Fourier transform of both images, "
+"combining the information them in the frequency space, and then using "
+"backward Fourier transform in order to get the denoised image. It is useful "
+"namely for the removal of large scars and fast scanning axis stripes."
+msgstr ""
+"Удаление шума работает путём применения преобразования Фурье к обоим "
+"изображениям, комбинировании информации в пространстве частот, и затем "
+"использовании обратного преобразования Фурье для получения изображения, "
+"очищенного от шума. Оно полезно для удаления больших царапин и полос в "
+"направлении быстрой оси сканирования."
+
+#: scan-line-defects.xml:474(para)
+msgid ""
+"The images do not appear symmetrically in the procedure. By using option "
+"<guilabel>Average denoising directions</guilabel> one can apply it in both "
+"ways and average the results."
+msgstr ""
+"Изображения не используются симметрично в данной процедуре. Используя опцию "
+"<guilabel>Усреднить направления удаления шума</guilabel> можно применить "
+"опцию в обоих направлениях и усреднить результаты."
+
+#: scan-line-defects.xml:484(caption)
+msgid ""
+"XY denoise procedure simulation: A) original data, B) simulated measurement "
+"in x axis, C) simulated measurement in y axis, D) denoised image."
+msgstr ""
+"Модель процедуры удаления шума XY: A) исходные данные, B) модель измерения "
+"по оси x, C) модель измерения по оси Y, D) изображение без шума."
+
+#: scan-line-defects.xml:493(title)
+msgid "References"
+msgstr "Источники"
+
+#: scan-line-defects.xml:494(para)
+msgid ""
+"[1] E. Anguiano and M. Aguilar: A cross-measurement procedure (CMP) for near "
+"noise-free imaging in scanning microscopes. Ultramicroscopy, 76 (1999) 47 "
+"<ulink url=\"http://dx.doi.org/10.1016/S0304-3991(98)00074-6\">doi:10.1016/"
+"S0304-3991(98)00074-6</ulink>"
+msgstr ""
+"[1] E. Anguiano and M. Aguilar: A cross-measurement procedure (CMP) for near "
+"noise-free imaging in scanning microscopes. Ultramicroscopy, 76 (1999) 47 "
+"<ulink url=\"http://dx.doi.org/10.1016/S0304-3991(98)00074-6\">doi:10.1016/"
+"S0304-3991(98)00074-6</ulink>"
+
+#~ msgid "row leveling"
+#~ msgstr "выравнивание строк"
+
+#~ msgid ""
+#~ "[1] <ulink url=\"http://dx.doi.org/10.1016/S0304-3991(98)00074-6\"> E. "
+#~ "Anguiano and M. Aguilar, Ultramicroscopy, 76 (1999) 47 </ulink>"
+#~ msgstr ""
+#~ "[1] <ulink url=\"http://dx.doi.org/10.1016/S0304-3991(98)00074-6\"> E. "
+#~ "Anguiano and M. Aguilar, Ultramicroscopy, 76 (1999) 47 </ulink>"

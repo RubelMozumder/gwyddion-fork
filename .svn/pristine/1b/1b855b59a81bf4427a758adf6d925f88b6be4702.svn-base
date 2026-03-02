@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<informaltable id="table-grain-quantities">
+  <tgroup cols="3">
+    <?dblatex lll?>
+    <thead>
+      <row>
+        <entry>Символ</entry>
+        <entry>Группа</entry>
+        <entry>Название</entry>
+      </row>
+    </thead>
+    <tbody>
+      <row>
+        <entry><varname>x_c</varname></entry>
+        <entry>Положение</entry>
+        <entry>Положение центра по x</entry>
+      </row>
+      <row>
+        <entry><varname>y_c</varname></entry>
+        <entry>Положение</entry>
+        <entry>Положение центра по y</entry>
+      </row>
+      <row>
+        <entry><varname>z_min</varname></entry>
+        <entry>Value</entry>
+        <entry>Минимальное значение</entry>
+      </row>
+      <row>
+        <entry><varname>z_max</varname></entry>
+        <entry>Value</entry>
+        <entry>Максимальное значение</entry>
+      </row>
+      <row>
+        <entry><varname>z_m</varname></entry>
+        <entry>Value</entry>
+        <entry>Среднее значение</entry>
+      </row>
+      <row>
+        <entry><varname>z_med</varname></entry>
+        <entry>Value</entry>
+        <entry>Срединное значение</entry>
+      </row>
+      <row>
+        <entry><varname>z_rms</varname></entry>
+        <entry>Value</entry>
+        <entry>Среднеквадратичное значение</entry>
+      </row>
+      <row>
+        <entry><varname>b_min</varname></entry>
+        <entry>Value</entry>
+        <entry>Минимальное значение на границе</entry>
+      </row>
+      <row>
+        <entry><varname>b_max</varname></entry>
+        <entry>Value</entry>
+        <entry>Максимальное значение на границе</entry>
+      </row>
+      <row>
+        <entry><varname>A_px</varname></entry>
+        <entry>Площадь</entry>
+        <entry>Площадь в пикселях</entry>
+      </row>
+      <row>
+        <entry><varname>A_0</varname></entry>
+        <entry>Площадь</entry>
+        <entry>Площадь проекции</entry>
+      </row>
+      <row>
+        <entry><varname>A_s</varname></entry>
+        <entry>Площадь</entry>
+        <entry>Площадь поверхности</entry>
+      </row>
+      <row>
+        <entry><varname>a_eq</varname></entry>
+        <entry>Площадь</entry>
+        <entry>Сторона эквивалентного квадрата</entry>
+      </row>
+      <row>
+        <entry><varname>r_eq</varname></entry>
+        <entry>Площадь</entry>
+        <entry>Радиус эквивалентного диска</entry>
+      </row>
+      <row>
+        <entry><varname>A_h</varname></entry>
+        <entry>Площадь</entry>
+        <entry>Площадь выше половинной высоты</entry>
+      </row>
+      <row>
+        <entry><varname>A_c</varname></entry>
+        <entry>Площадь</entry>
+        <entry>Площадь выпуклой оболочки</entry>
+      </row>
+      <row>
+        <entry><varname>V_0</varname></entry>
+        <entry>Объём</entry>
+        <entry>Объём между нулевой плоскостью и поверхностью</entry>
+      </row>
+      <row>
+        <entry><varname>V_min</varname></entry>
+        <entry>Объём</entry>
+        <entry>Объём между поверхностью и плоскостью, проходящей через минимум зерна</entry>
+      </row>
+      <row>
+        <entry><varname>V_L</varname></entry>
+        <entry>Объём</entry>
+        <entry>Объём между поверхностью и фоном, вычисленным по Лапласу</entry>
+      </row>
+      <row>
+        <entry><varname>L_b0</varname></entry>
+        <entry>Граница</entry>
+        <entry>Длина границы проекции</entry>
+      </row>
+      <row>
+        <entry><varname>D_min</varname></entry>
+        <entry>Граница</entry>
+        <entry>Минимальный ограничивающий размер</entry>
+      </row>
+      <row>
+        <entry><varname>phi_min</varname></entry>
+        <entry>Граница</entry>
+        <entry>Направление минимального ограничивающего размера</entry>
+      </row>
+      <row>
+        <entry><varname>D_max</varname></entry>
+        <entry>Граница</entry>
+        <entry>Максимальный ограничивающий размер</entry>
+      </row>
+      <row>
+        <entry><varname>phi_max</varname></entry>
+        <entry>Граница</entry>
+        <entry>Направление максимального ограничивающего размера</entry>
+      </row>
+      <row>
+        <entry><varname>R_i</varname></entry>
+        <entry>Граница</entry>
+        <entry>Максимальный радиус вписанного диска</entry>
+      </row>
+      <row>
+        <entry><varname>x_i</varname></entry>
+        <entry>Граница</entry>
+        <entry>Положение центра по x максимального вписанного диска</entry>
+      </row>
+      <row>
+        <entry><varname>y_i</varname></entry>
+        <entry>Граница</entry>
+        <entry>Положение центра по y максимального вписанного диска</entry>
+      </row>
+      <row>
+        <entry><varname>R_e</varname></entry>
+        <entry>Граница</entry>
+        <entry>Минимальный радиус описанной окружности</entry>
+      </row>
+      <row>
+        <entry><varname>x_e</varname></entry>
+        <entry>Граница</entry>
+        <entry>Положение центра по x минимальной описанной окружности</entry>
+      </row>
+      <row>
+        <entry><varname>y_e</varname></entry>
+        <entry>Граница</entry>
+        <entry>Положение центра по y минимальной описанной окружности</entry>
+      </row>
+      <row>
+        <entry><varname>R_m</varname></entry>
+        <entry>Граница</entry>
+        <entry>Средний радиус</entry>
+      </row>
+      <row>
+        <entry><varname>M_min</varname></entry>
+        <entry>Граница</entry>
+        <entry>Минимальный диаметр Мартина</entry>
+      </row>
+      <row>
+        <entry><varname>omega_min</varname></entry>
+        <entry>Граница</entry>
+        <entry>Направление минимального диаметра Мартина</entry>
+      </row>
+      <row>
+        <entry><varname>M_max</varname></entry>
+        <entry>Граница</entry>
+        <entry>Максимальный диаметр Мартина</entry>
+      </row>
+      <row>
+        <entry><varname>omega_max</varname></entry>
+        <entry>Граница</entry>
+        <entry>Направление максимального диаметра Мартина</entry>
+      </row>
+      <row>
+        <entry><varname>theta</varname></entry>
+        <entry>Уклон</entry>
+        <entry>Наклон θ</entry>
+      </row>
+      <row>
+        <entry><varname>phi</varname></entry>
+        <entry>Уклон</entry>
+        <entry>Наклон φ</entry>
+      </row>
+      <row>
+        <entry><varname>x_0</varname></entry>
+        <entry>Кривизна</entry>
+        <entry>Положение центра кривизны по x</entry>
+      </row>
+      <row>
+        <entry><varname>y_0</varname></entry>
+        <entry>Кривизна</entry>
+        <entry>Положение центра кривизны по y</entry>
+      </row>
+      <row>
+        <entry><varname>z_m</varname></entry>
+        <entry>Кривизна</entry>
+        <entry>Значение z центра кривизны</entry>
+      </row>
+      <row>
+        <entry><varname>kappa_1</varname></entry>
+        <entry>Кривизна</entry>
+        <entry>Кривизна 1</entry>
+      </row>
+      <row>
+        <entry><varname>kappa_2</varname></entry>
+        <entry>Кривизна</entry>
+        <entry>Кривизна 2</entry>
+      </row>
+      <row>
+        <entry><varname>phi_1</varname></entry>
+        <entry>Кривизна</entry>
+        <entry>Угол кривизны 1</entry>
+      </row>
+      <row>
+        <entry><varname>phi_2</varname></entry>
+        <entry>Кривизна</entry>
+        <entry>Угол кривизны 2</entry>
+      </row>
+      <row>
+        <entry><varname>a_e1</varname></entry>
+        <entry>Момент</entry>
+        <entry>Большая полуось эквивалентного эллипса</entry>
+      </row>
+      <row>
+        <entry><varname>a_e2</varname></entry>
+        <entry>Момент</entry>
+        <entry>Малая полуось эквивалентного эллипса</entry>
+      </row>
+      <row>
+        <entry><varname>phi_e1</varname></entry>
+        <entry>Момент</entry>
+        <entry>Ориентация эквивалентного эллипса</entry>
+      </row>
+    </tbody>
+  </tgroup>
+</informaltable>

@@ -1,0 +1,37 @@
+#!/bin/bash
+set -e
+setup=setup32
+. ./$setup
+. ./get-build-triple
+rm -rf "$target_prefix"
+pushd "$source_dir"
+export CFLAGs="-O3 -ffast-math"
+./autogen.sh --host=i686-w64-mingw32 --build=$build --prefix="$target_prefix" \
+             --enable-maintainer-mode --disable-gtk-doc --without-x \
+             --disable-dependency-tracking \
+             --without-libiconv-prefix --without-libintl-prefix \
+             --disable-schemas-install --disable-desktop-file-update \
+             --without-perl --without-python --without-ruby \
+             --without-kde4-thumbnailer --enable-pygwy \
+             --with-hdf5 \
+             --enable-module-bundling \
+             PYTHON="wine $python_dir/python.exe" \
+             PYTHON_INCLUDES="-I$python_dir/include" \
+             PYTHON_LDFLAGS="-L$python_dir/libs -lpython27" \
+             CPPFLAGS="-I$python_dir/include -I$python_dir/include/pygtk-2.0" \
+             PYGTK_CFLAGS="-I$python_dir/include" \
+             PYGTK_LIBS="-L$python_dir/libs" \
+             PYGTK_CODEGENDIR="$python_dir/Lib/site-packages/gtk-2.0/codegen"
+# FIXME: Somehow, we get forward and backward slashes mixed up in one path and
+# it causes trouble.
+find . -name Makefile | xargs sed -i 's%\\Lib\\site-packages%/Lib/site-packages%g'
+make
+make -C po update-gmo
+make install
+popd
+./copysysfiles $setup
+cp -v Licenses/*.txt $target_prefix
+./expandnsi $setup <"$source_dir/data/gwyddion.nsit" >"$target_prefix/gwyddion.nsi"
+pushd "$target_prefix"
+wine "$nsis_compiler" gwyddion.nsi
+popd

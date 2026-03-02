@@ -1,0 +1,8 @@
+--- gtk+-2.24.31/gtk/gtk-builder-convert.orig	2015-12-28 16:42:28.000000000 +0100
++++ gtk+-2.24.31/gtk/gtk-builder-convert	2019-04-06 13:48:03.614160102 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python2
+ #
+ # Copyright (C) 2006-2008 Async Open Source
+ #                         Henrique Romano <henrique@async.com.br>

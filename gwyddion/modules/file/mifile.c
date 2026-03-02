@@ -1,0 +1,1159 @@
+/*
+ *  $Id: mifile.c 26264 2024-03-22 10:29:32Z yeti-dn $
+ *  Copyright (C) 2005 Chris Anderson, Molecular Imaging Corp.
+ *  E-mail: sidewinder.asu@gmail.com
+ *
+ *  Copyright (C) 2006-2024 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-mi-spm">
+ *   <comment>Molecular Imaging SPM data</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="fileType      Image"/>
+ *     <match type="string" offset="0" value="fileType      Spectroscopy"/>
+ *   </magic>
+ *   <glob pattern="*.mi"/>
+ *   <glob pattern="*.MI"/>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-FILEMAGIC]
+ * # Molecular Imaging new MI format
+ * 0 string fileType\ \ \ \ \ \ Image\x0a Molecular Imaging MI image SPM data
+ * 0 string fileType\ \ \ \ \ \ Spectroscopy\x0a Molecular Imaging MI spectroscopy SPM data
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Molecular Imaging MI
+ * .mi
+ * Read SPS:Limited[1] Curvemap
+ * [1] Spectra curves are imported as graphs, positional information is lost.
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <stdlib.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyutils.h>
+#include <libprocess/datafield.h>
+#include <libgwydgets/gwygraphmodel.h>
+#include <libgwydgets/gwygraphbasics.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwymoduleutils-file.h>
+#include <app/data-browser.h>
+
+#include "err.h"
+
+#define IMAGE_MAGIC "fileType      Image"
+#define IMAGE_MAGIC_SIZE (sizeof(IMAGE_MAGIC) - 1)
+#define SPECT_MAGIC "fileType      Spectroscopy"
+#define SPECT_MAGIC_SIZE (sizeof(SPECT_MAGIC) - 1)
+
+#define EXTENSION ".mi"
+#define KEY_LEN 14
+
+typedef enum {
+    HEADER_ANY = 0,
+    HEADER_BUFFER_LABEL,
+    HEADER_BUFFER_UNIT,
+} HeaderContext;
+
+typedef enum {
+    MI_ASCII = 0,
+    MI_BINARY = 2,    /* This means 16-bit data, except for new spectra where it means a float. Fuck. */
+    MI_BINARY32 = 4,
+    MI_ASCII_MULTICOL_FLAG = 0x100u,
+} MIDataType;
+
+/* These two structs are for MI Image Files only */
+typedef struct {
+    gchar *id;
+    const guchar *data;
+    GHashTable *meta;
+} MIData;
+
+typedef struct {
+    gint xres;
+    gint yres;
+    guint n;
+    MIData *buffers;
+    GHashTable *meta;
+} MIFile;
+
+/* These structs are for MI Spectroscopy Files only */
+typedef struct {
+    gchar *label;
+    gchar *unit;
+} MISpectData;
+
+typedef struct {
+    guint len;
+    guint bufno;
+    gdouble tstart;
+    gdouble dt;
+    gdouble xstart;
+    gdouble dx;
+    const gchar *label;
+} MISpectChunk;
+
+typedef struct {
+    gint num_buffers;
+    guint sumlen;
+    guint maxchunklen;
+    MISpectData *buffers;
+
+    gint num_points;
+    GArray *chunks;
+    GHashTable *meta;
+
+    /* Curve maps only. */
+    gboolean is_curve_map;
+    gboolean is_floating_point;
+    gint xres;
+    gint yres;
+    gdouble xreal;
+    gdouble yreal;
+} MISpectFile;
+
+typedef struct {
+    const gchar *key;
+    const gchar *meta;
+    const gchar *format;
+} MetaDataFormat;
+
+typedef struct {
+    gint key;
+    gint meta;
+    gint format;
+} MetaDataFlatFormat;
+
+static gboolean      module_register       (void);
+static gint          mifile_detect         (const GwyFileDetectInfo *fileinfo,
+                                            gboolean only_name);
+static GwyContainer* mifile_load           (const gchar *filename,
+                                            GwyRunType mode,
+                                            GError **error);
+static guint         find_data_start       (const guchar *buffer,
+                                            gsize size,
+                                            MIDataType *data_type);
+static guint         image_file_read_header(MIFile *mifile,
+                                            gchar *buffer,
+                                            GError **error);
+static guint         spect_file_read_header(MISpectFile *mifile,
+                                            gchar *buffer,
+                                            GError **error);
+static GwyContainer* read_image_data       (MIFile *mifile,
+                                            const guchar *buffer,
+                                            MIDataType data_type,
+                                            gboolean ismulticol,
+                                            gsize header_size,
+                                            const gchar *filename,
+                                            GError **error);
+static GwyContainer* read_graph_data       (MISpectFile *mifile,
+                                            const guchar *buffer,
+                                            gsize size,
+                                            MIDataType data_type,
+                                            gboolean ismulticol,
+                                            gsize header_size,
+                                            GError **error);
+static GwyContainer* read_curve_map_data   (MISpectFile *mifile,
+                                            const guchar *buffer,
+                                            MIDataType data_type,
+                                            gsize header_size,
+                                            const gchar *filename,
+                                            GError **error);
+static void          image_file_free       (MIFile *mifile);
+static void          spect_file_free       (MISpectFile *mifile);
+static gboolean      mifile_get_double     (GHashTable *meta,
+                                            const gchar *key,
+                                            gdouble *value);
+static void          process_metadata      (MIFile *mifile,
+                                            guint id,
+                                            gboolean no_rescale,
+                                            GwyContainer *container);
+static gchar**       split_to_nparts       (const gchar *str,
+                                            const gchar *sep,
+                                            guint n);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports Molecular Imaging MI data files."),
+    "Chris Anderson <sidewinder.asu@gmail.com>",
+    "0.19",
+    "Chris Anderson, Molecular Imaging Corp.",
+    "2006",
+};
+
+GWY_MODULE_QUERY2(module_info, mifile)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("mifile",
+                           N_("PicoView Data Files (.mi)"),
+                           (GwyFileDetectFunc)&mifile_detect,
+                           (GwyFileLoadFunc)&mifile_load,
+                           NULL,
+                           NULL);
+
+    return TRUE;
+}
+
+static gint
+mifile_detect(const GwyFileDetectInfo *fileinfo, gboolean only_name)
+{
+    gint score = 0;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 20 : 0;
+
+    if (fileinfo->buffer_len > IMAGE_MAGIC_SIZE
+        && (!memcmp(fileinfo->head, IMAGE_MAGIC, IMAGE_MAGIC_SIZE)
+            || !memcmp(fileinfo->head, SPECT_MAGIC, SPECT_MAGIC_SIZE)))
+        score = 100;
+
+    return score;
+}
+
+static GwyContainer*
+mifile_load(const gchar *filename,
+            G_GNUC_UNUSED GwyRunType mode,
+            GError **error)
+{
+    MIFile *mifile_img = NULL;
+    MISpectFile *mifile_spect = NULL;
+    GwyContainer *container = NULL;
+    guchar *buffer = NULL;
+    gsize size = 0;
+    GError *err = NULL;
+    gsize header_size, expected_size;
+    gchar *p;
+    gboolean ok = TRUE;
+    MIDataType data_type = MI_BINARY;
+    gboolean isimage = TRUE, ismulticol = FALSE;
+
+    /* Open the file and load in its contents into "buffer" */
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+
+    /* Make sure file is of reasonable size */
+    if (size <= MAX(IMAGE_MAGIC_SIZE, SPECT_MAGIC_SIZE))
+        ok = FALSE;
+
+    /* Find out if this is an Image or Spectroscopy file */
+    if (!strncmp(buffer, IMAGE_MAGIC, IMAGE_MAGIC_SIZE))
+        isimage = TRUE;
+    else if (!strncmp(buffer, SPECT_MAGIC, SPECT_MAGIC_SIZE))
+        isimage = FALSE;
+    else
+        ok = FALSE;
+
+    gwy_debug("isimage: %d    ok: %d", isimage, ok);
+
+    /* Find out the length of the file header (and binary/ascii mode) */
+    header_size = find_data_start(buffer, size, &data_type);
+    if (!header_size)
+         ok = FALSE;
+
+    gwy_debug("header_size: %lu", header_size);
+    if (data_type & MI_ASCII_MULTICOL_FLAG) {
+        ismulticol = TRUE;
+        data_type &= ~MI_ASCII_MULTICOL_FLAG;
+    }
+
+    /* Report error if file is invalid */
+    if (!ok) {
+        err_FILE_TYPE(error, "MI");
+        gwy_file_abandon_contents(buffer, size, NULL);
+        return NULL;
+    }
+    /* Load the header information into the appropriate structure */
+    p = g_strndup(buffer, header_size);
+    if (isimage) {
+        mifile_img = g_new0(MIFile, 1);
+        ok = image_file_read_header(mifile_img, p, error);
+        ok = ok && !err_DIMENSION(error, mifile_img->xres);
+        ok = ok && !err_DIMENSION(error, mifile_img->yres);
+        if (data_type != MI_ASCII) {
+            expected_size = header_size + data_type*mifile_img->n * mifile_img->xres*mifile_img->yres;
+            gwy_debug("size: %zu, expected: %zu", size - header_size, expected_size - header_size);
+            ok = ok && !err_SIZE_MISMATCH(error, expected_size, size, FALSE);
+        }
+        if (!ok)
+            image_file_free(mifile_img);
+    }
+    else {
+        mifile_spect = g_new0(MISpectFile, 1);
+        ok = spect_file_read_header(mifile_spect, p, error);
+        if (ok && mifile_spect->is_curve_map) {
+            ok = ok && !err_DIMENSION(error, mifile_spect->xres);
+            ok = ok && !err_DIMENSION(error, mifile_spect->yres);
+            /* XXX: The data format is still a mystery. */
+            if (data_type != MI_ASCII) {
+                expected_size = header_size + sizeof(gfloat)*mifile_spect->sumlen;
+                gwy_debug("size: %zu, expected: %zu", size - header_size, expected_size - header_size);
+                ok = ok && !err_SIZE_MISMATCH(error, expected_size, size, FALSE);
+            }
+            if (ok && mifile_spect->chunks->len % (mifile_spect->xres * mifile_spect->yres) != 0) {
+                err_INVALID(error, "chunk");
+            }
+        }
+        else {
+            ok = ok && !err_DIMENSION(error, mifile_spect->num_points);
+        }
+        if (!ok)
+            spect_file_free(mifile_spect);
+    }
+    g_free(p);
+
+    if (!ok) {
+        gwy_file_abandon_contents(buffer, size, NULL);
+        return NULL;
+    }
+
+    /* Load the image data or spectroscopy data (graph/curve map). */
+    if (isimage) {
+        container = read_image_data(mifile_img, buffer, data_type, ismulticol, header_size, filename, error);
+        image_file_free(mifile_img);
+    }
+    else if (!mifile_spect->is_curve_map) {
+        container = read_graph_data(mifile_spect, buffer, size, data_type, ismulticol, header_size, error);
+        spect_file_free(mifile_spect);
+    }
+    else {
+        if (data_type == MI_ASCII) {
+            err_UNSUPPORTED(error, "data");
+            GWY_OBJECT_UNREF(container);
+        }
+        else {
+            container = read_curve_map_data(mifile_spect, buffer, data_type, header_size, filename, error);
+            spect_file_free(mifile_spect);
+        }
+    }
+
+    gwy_file_abandon_contents(buffer, size, NULL);
+
+    return container;
+}
+
+static GwyContainer*
+read_image_data(MIFile *mifile, const guchar *buffer,
+                MIDataType data_type, gboolean ismulticol, gsize header_size, const gchar *filename,
+                GError **error)
+{
+    GwyContainer *container;
+    MIData *midata;
+    GwyDataField *dfield;
+    gdouble *d, *v;
+    const guchar *p = buffer + header_size;
+    gchar *end;
+    gsize pos = header_size;
+    guint i;
+    gint xres = mifile->xres, yres = mifile->yres, k;
+
+    container = gwy_container_new();
+
+    /* Load image data. */
+    if (ismulticol) {
+        g_assert(data_type == MI_ASCII);
+
+        /* The first line again specifies the labels and units. But we already have them from the file header. */
+        while (*p && *p != '\n' && *p != '\r')
+            p++;
+
+        k = xres*yres;
+        if (!(v = gwy_parse_doubles(p, NULL, GWY_PARSE_DOUBLES_FREE_FORM, &mifile->n, &k, NULL, error))) {
+            g_object_unref(container);
+            return NULL;
+        }
+
+        for (i = 0; i < mifile->n; i++) {
+            dfield = gwy_data_field_new(xres, yres, 1.0, 1.0, FALSE);
+            d = gwy_data_field_get_data(dfield);
+            for (k = 0; k < xres*yres; k++)
+                d[k] = v[k*mifile->n + i];
+            gwy_data_field_invert(dfield, TRUE, FALSE, FALSE);
+            gwy_container_pass_object(container, gwy_app_get_data_key_for_id(i), dfield);
+            process_metadata(mifile, i, TRUE, container);
+            gwy_file_channel_import_log_add(container, i, NULL, filename);
+        }
+
+        g_free(v);
+
+        return container;
+    }
+
+    for (i = 0; i < mifile->n; i++) {
+        dfield = gwy_data_field_new(xres, yres, 1.0, 1.0, FALSE);
+        d = gwy_data_field_get_data(dfield);
+        midata = mifile->buffers + i;
+        midata->data = buffer + pos;
+
+        if (data_type == MI_BINARY) {
+            for (k = 0; k < yres; k++) {
+                gwy_convert_raw_data(midata->data + (yres-1 - k)*xres*sizeof(gint16), xres, 1,
+                                     GWY_RAW_DATA_SINT16, GWY_BYTE_ORDER_LITTLE_ENDIAN, d + k*xres,
+                                     1.0/32768.0, 0.0);
+            }
+            pos += sizeof(gint16) * xres*yres;
+        }
+        else if (data_type == MI_BINARY32) {
+            for (k = 0; k < yres; k++) {
+                gwy_convert_raw_data(midata->data + (yres-1 - k)*xres*sizeof(gint32), xres, 1,
+                                     GWY_RAW_DATA_SINT32, GWY_BYTE_ORDER_LITTLE_ENDIAN, d + k*xres,
+                                     1.0/2147483648.0, 0.0);
+            }
+            pos += sizeof(gint32) * xres*yres;
+        }
+        else {
+            if (!gwy_parse_doubles(p, d, GWY_PARSE_DOUBLES_FREE_FORM, &yres, &xres, &end, error)) {
+                g_object_unref(container);
+                g_object_unref(dfield);
+                return NULL;
+            }
+            p = end;
+            gwy_data_field_multiply(dfield, 1.0/23768.0);
+            gwy_data_field_invert(dfield, TRUE, FALSE, FALSE);
+        }
+
+        gwy_container_pass_object(container, gwy_app_get_data_key_for_id(i), dfield);
+        process_metadata(mifile, i, FALSE, container);
+        gwy_file_channel_import_log_add(container, i, NULL, filename);
+    }
+
+    return container;
+}
+
+static GwyContainer*
+read_graph_data(MISpectFile *mifile, const guchar *buffer, gsize size,
+                MIDataType data_type, G_GNUC_UNUSED gboolean ismulticol, gsize header_size,
+                GError **error)
+{
+    GwyContainer *container;
+    GwyGraphModel *gmodel;
+    gdouble *xdata, *ydata;
+    gsize pos;
+    guint i, j;
+    const guchar *line;
+    gchar *data = NULL, *p;
+    gchar **lineparts;
+
+    /* Load spectroscopy data. */
+    container = gwy_container_new();
+    gwy_debug("data type=%d", data_type);
+    gwy_debug("num_buffers %d", mifile->num_buffers);
+
+    xdata = g_new0(gdouble, mifile->maxchunklen);
+    ydata = g_new0(gdouble, mifile->maxchunklen);
+    pos = header_size;
+    if (data_type == MI_ASCII) {
+        p = data = g_strndup(buffer + header_size, size - header_size);
+        line = gwy_str_next_line(&p);
+    }
+
+    /* FIXME: Probably only chunks with the same buffer number should belong to the same graph. I do not have
+     * relevant data examples. */
+    gmodel = gwy_graph_model_new();
+    g_object_set(gmodel, "title", _("Spectroscopy Graph"), NULL);
+    if (mifile->num_buffers >= 2) {
+        GwySIUnit *xunit = gwy_si_unit_new(mifile->buffers[0].unit), *yunit = gwy_si_unit_new(mifile->buffers[1].unit);
+
+        g_object_set(gmodel,
+                     "si-unit-x", xunit, "si-unit-y", yunit,
+                     "axis-label-bottom", mifile->buffers[0].label, "axis-label-left", mifile->buffers[1].label,
+                     NULL);
+        g_object_unref(xunit);
+        g_object_unref(yunit);
+    }
+
+    gwy_container_set_object(container, gwy_app_get_graph_key_for_id(1), gmodel);
+
+    for (j = 0; j < mifile->chunks->len; j++) {
+        const MISpectChunk *chunk = &g_array_index(mifile->chunks, MISpectChunk, j);
+        GwyGraphCurveModel *cmodel;
+
+        /* Apparetly means approach/retract. */
+        gwy_debug("bufno %u", chunk->bufno);
+        if (data_type == MI_ASCII) {
+            for (i = 0; i < chunk->len; i++) {
+                if (!(line = gwy_str_next_line(&p)) || !(lineparts = split_to_nparts(line, " \t\n\r", 3))) {
+                    g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_DATA,
+                                _("Cannot parse data values at line %d."), j+1);
+                    GWY_OBJECT_UNREF(container);
+                    goto fail;
+                }
+                xdata[i] = g_ascii_strtod(lineparts[1], NULL);
+                ydata[i] = g_ascii_strtod(lineparts[2], NULL);
+                g_strfreev(lineparts);
+            }
+        }
+        else {
+            for (i = 0; i < chunk->len; i++)
+                xdata[i] = chunk->xstart + i*chunk->dx;
+            gwy_convert_raw_data(buffer + pos, chunk->len, 1,
+                                 GWY_RAW_DATA_FLOAT, GWY_BYTE_ORDER_LITTLE_ENDIAN, ydata, 1.0, 0.0);
+            pos += chunk->len*sizeof(gfloat);
+        }
+
+        cmodel = gwy_graph_curve_model_new();
+        gwy_graph_curve_model_set_data(cmodel, xdata, ydata, chunk->len);
+        gwy_graph_curve_model_enforce_order(cmodel);
+        g_object_set(cmodel,
+                     "mode", GWY_GRAPH_CURVE_LINE,
+                     "color", gwy_graph_get_preset_color(j),
+                     NULL);
+        if (chunk->label)
+            g_object_set(cmodel, "description", chunk->label, NULL);
+        else {
+            gchar *desc = g_strdup_printf("Curve %d", j+1);
+            g_object_set(cmodel, "description", desc, NULL);
+            g_free(desc);
+        }
+        gwy_graph_model_add_curve(gmodel, cmodel);
+        g_object_unref(cmodel);
+    }
+
+fail:
+    g_object_unref(gmodel);
+    g_free(data);
+    g_free(xdata);
+    g_free(ydata);
+
+    return container;
+}
+
+static GwyContainer*
+read_curve_map_data(MISpectFile *mifile, const guchar *buffer,
+                    MIDataType data_type, gsize header_size, const gchar *filename,
+                    GError **error)
+{
+    GwyContainer *container;
+    const MISpectChunk *chunk;
+    //MISpectData *midata;
+    GwyLawn *lawn;
+    GArray *chunks = mifile->chunks;
+    gsize pos = header_size;
+    gint xres = mifile->xres, yres = mifile->yres, nsegments, i, j, nabscissa;
+    guint k, kpix, m, len, off;
+    gdouble *d;
+    gint *segments;
+
+    if (data_type != MI_BINARY) {
+        err_UNSUPPORTED(error, "data");
+        return NULL;
+    }
+
+    nsegments = chunks->len/(xres*yres);
+    gwy_debug("num_buffers %d", mifile->num_buffers);
+    /* The curve set has to be uniform across pixels. So decide which curves we have and stick to it. */
+    nabscissa = 0;
+    if (g_array_index(chunks, MISpectChunk, 0).dt != 0.0) {
+        nabscissa++;
+        if (g_array_index(chunks, MISpectChunk, 0).dx != 0.0)
+            nabscissa++;
+    }
+    gwy_debug("nsegments %d, nabscissae %d", nsegments, nabscissa);
+
+    /* TODO: Handle curve labels, units, segments, etc. */
+    container = gwy_container_new();
+    lawn = gwy_lawn_new(xres, yres, mifile->xreal, mifile->yreal, 1 + nabscissa, nsegments);
+    gwy_si_unit_set_from_string(gwy_lawn_get_si_unit_xy(lawn), "m");
+    if (nabscissa >= 1) {
+        gwy_lawn_set_curve_label(lawn, 0, "Time");
+        gwy_si_unit_set_from_string(gwy_lawn_get_si_unit_curve(lawn, 0), "s");
+        if (nabscissa >= 2) {
+            if (mifile->num_buffers >= 1) {
+                gwy_lawn_set_curve_label(lawn, 1, mifile->buffers[0].label);
+                gwy_si_unit_set_from_string(gwy_lawn_get_si_unit_curve(lawn, 1), mifile->buffers[0].unit);
+            }
+            else {
+                gwy_lawn_set_curve_label(lawn, 1, "Distance");
+                gwy_si_unit_set_from_string(gwy_lawn_get_si_unit_curve(lawn, 1), "m");
+            }
+        }
+    }
+    if (mifile->num_buffers >= 2) {
+        gwy_lawn_set_curve_label(lawn, nabscissa, mifile->buffers[1].label);
+        gwy_si_unit_set_from_string(gwy_lawn_get_si_unit_curve(lawn, nabscissa), mifile->buffers[1].unit);
+    }
+
+    for (k = 0; k < nsegments; k++) {
+        chunk = &g_array_index(mifile->chunks, MISpectChunk, k);
+        if (chunk->label)
+            gwy_lawn_set_segment_label(lawn, k, chunk->label);
+    }
+
+    d = g_new(gdouble, nsegments*(1u + nabscissa)*mifile->maxchunklen);
+    segments = g_new(gint, 2*nsegments);
+    /* Load cuve map data. */
+    for (i = 0; i < yres; i++) {
+        for (j = 0; j < xres; j++) {
+            kpix = (i*xres + j)*nsegments;
+            len = 0;
+            for (k = 0; k < nsegments; k++) {
+                chunk = &g_array_index(mifile->chunks, MISpectChunk, kpix + k);
+                segments[2*k] = len;
+                len += chunk->len;
+                segments[2*k+1] = len;
+            }
+            gwy_convert_raw_data(buffer + pos, len, 1, GWY_RAW_DATA_FLOAT, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                                 d + len*nabscissa, 1.0, 0.0);
+            if (nabscissa >= 1) {
+                chunk = &g_array_index(mifile->chunks, MISpectChunk, kpix);
+                /* Add time as a monotonic abscissa, even though the file zeroes it more often. */
+                off = 0;
+                for (m = 0; m < len; m++)
+                    d[off++] = chunk->tstart + m*chunk->dt;
+                if (nabscissa >= 2) {
+                    for (k = 0; k < nsegments; k++) {
+                        chunk = &g_array_index(mifile->chunks, MISpectChunk, kpix + k);
+                        for (m = 0; m < chunk->len; m++)
+                            d[off++] = chunk->xstart + m*chunk->dx;
+                    }
+                }
+            }
+            gwy_lawn_set_curves(lawn, j, i, len, d, NULL);
+            gwy_lawn_curve_set_segments(lawn, j, i, segments);
+
+            pos += sizeof(gfloat) * len;
+        }
+    }
+
+    gwy_container_pass_object(container, gwy_app_get_lawn_key_for_id(i), lawn);
+    // TODO process_metadata(mifile, i, FALSE, container);
+    gwy_file_curve_map_import_log_add(container, 0, NULL, filename);
+
+    g_free(d);
+    g_free(segments);
+
+    return container;
+}
+
+static guint
+find_data_start(const guchar *buffer, gsize size, MIDataType *data_type)
+{
+    static const GwyEnum data_type_markers[] = {
+        { "\n",                    MI_BINARY,                         },
+        { "BINARY\n",              MI_BINARY,                         },
+        { "BINARY_32\n",           MI_BINARY32,                       },
+        { "ASCII\n",               MI_ASCII,                          },
+        { "ASCII\r\n",             MI_ASCII,                          },
+        { "ASCII_MULTICOLUMN\n",   MI_ASCII | MI_ASCII_MULTICOL_FLAG, },
+        { "ASCII_MULTICOLUMN\r\n", MI_ASCII | MI_ASCII_MULTICOL_FLAG, },
+    };
+    static const gchar data_marker[KEY_LEN+1] = "data          ";
+    const guchar *data;
+    guint i, len, pos = 0;
+
+    data = g_strstr_len(buffer, size, data_marker);
+    if (!data) {
+        gwy_debug("cannot find the data marked");
+        return 0;
+    }
+    gwy_debug("data marker at 0x%lx", (gulong)(data - buffer));
+
+    data += KEY_LEN;
+    pos = data - buffer;
+    for (i = 0; i < G_N_ELEMENTS(data_type_markers); i++) {
+        len = strlen(data_type_markers[i].name);
+        if (size - pos > len && !memcmp(data, data_type_markers[i].name, len)) {
+            *data_type = data_type_markers[i].value;
+            gwy_debug("data type (according to marker) %u", *data_type);
+            return pos + len;
+        }
+    }
+    gwy_debug("data marker type is not known");
+    return 0;
+}
+
+static guint
+image_file_read_header(MIFile *mifile, gchar *buffer, GError **error)
+{
+    MIData *data = NULL;
+    GHashTable *meta;
+    gchar *line, *key, *value = NULL;
+
+    mifile->meta = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    mifile->xres = mifile->yres = 0;
+    meta = mifile->meta;
+    while ((line = gwy_str_next_line(&buffer))) {
+        if (!strncmp(line, "bufferLabel   ", KEY_LEN)) {
+            mifile->n++;
+            mifile->buffers = g_renew(MIData, mifile->buffers, mifile->n);
+            data = mifile->buffers + (mifile->n - 1);
+            data->meta = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+            data->data = NULL;
+            data->id = g_strstrip(g_strdup(line + KEY_LEN));
+            gwy_debug("new buffer <%s>", data->id);
+            meta = data->meta;
+        }
+        if (line[0] == ' ')
+            continue;
+
+        key = g_strstrip(g_strndup(line, KEY_LEN));
+        value = g_strstrip(g_strdup(line + KEY_LEN));
+        g_hash_table_replace(meta, key, value);
+
+        if (!strcmp(key, "xPixels"))
+            mifile->xres = atol(value);
+        if (!strcmp(key, "yPixels"))
+            mifile->yres = atol(value);
+    }
+
+    if (!mifile->n)
+        err_NO_DATA(error);
+
+    return mifile->n;
+}
+
+static guint
+spect_file_read_header(MISpectFile *mifile, gchar *buffer, GError **error)
+{
+    MISpectData *data = NULL;
+    GHashTable *meta;
+    gchar *line, *key, *value = NULL;
+    gchar **parts;
+    gint i, sum, ncols;
+    HeaderContext ctx = HEADER_ANY;
+
+    mifile->meta = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    meta = mifile->meta;
+    sum = 0;
+
+    mifile->chunks = g_array_new(FALSE, TRUE, sizeof(MISpectChunk));
+
+    while ((line = gwy_str_next_line(&buffer))) {
+        if (!strncmp(line, "bufferLabel   ", KEY_LEN)) {
+            mifile->num_buffers++;
+            mifile->buffers = g_renew(MISpectData, mifile->buffers, mifile->num_buffers);
+            data = mifile->buffers + (mifile->num_buffers - 1);
+            data->unit = NULL;
+
+            /* store buffer label */
+            data->label = g_strstrip(g_strdup(line + KEY_LEN));
+            gwy_debug("new buffer <%s>", data->label);
+            ctx = HEADER_BUFFER_LABEL;
+            continue;
+        }
+
+        if (ctx == HEADER_BUFFER_LABEL) {
+            if (!strncmp(line, "bufferUnit    ", KEY_LEN)) {
+                data->unit = g_strstrip(g_strdup(line + KEY_LEN));
+                ctx = HEADER_BUFFER_UNIT;
+                continue;
+            }
+            err_INVALID(error, "bufferUnit");
+        }
+
+        if (ctx == HEADER_BUFFER_UNIT) {
+            if (!strncmp(line, "grid          ", KEY_LEN)) {
+                parts = g_strsplit_set(line + KEY_LEN, " \t", 6);
+                if (g_strv_length(parts) > 4) {
+                    mifile->xreal = g_ascii_strtod(parts[1], NULL);
+                    mifile->yreal = g_ascii_strtod(parts[2], NULL);
+                    mifile->xres = atol(parts[3]);
+                    mifile->yres = atol(parts[4]);
+                    mifile->is_curve_map = TRUE;
+                    gwy_debug("grid %d x %d (%g x %g)", mifile->xres, mifile->yres, mifile->xreal, mifile->yreal);
+                }
+                ctx = HEADER_ANY;
+                g_strfreev(parts);
+                continue;
+            }
+        }
+        ctx = HEADER_ANY;
+
+        if (line[0] == ' ')
+            continue;
+
+        key = g_strstrip(g_strndup(line, KEY_LEN));
+        value = g_strstrip(g_strdup(line + KEY_LEN));
+        g_hash_table_replace(meta, key, value);
+
+        /* Old files contain the actual number of data points here, but new files just say 0 as chunks can have
+         * varying data point counts. Only check that the sizes match when num_points is non-zero. */
+        if (!strcmp(key, "DataPoints")) {
+            mifile->num_points = atol(value);
+            /* XXX: This seems to be correlated, but is it really the right flag? */
+            mifile->is_floating_point = (mifile->num_points == 0);
+        }
+
+        if (!strcmp(key, "chunk")) {
+            MISpectChunk chunk;
+
+            gwy_clear(&chunk, 1);
+            parts = g_strsplit_set(value, " \t", 0);
+            ncols = g_strv_length(parts);
+            if (ncols > 1) {
+                chunk.bufno = atol(parts[0]);
+                chunk.len = atol(parts[1]);
+                if (ncols > 3) {
+                    chunk.tstart = g_ascii_strtod(parts[2], NULL);
+                    chunk.dt = g_ascii_strtod(parts[3], NULL);
+                    if (ncols > 5) {
+                        chunk.xstart = g_ascii_strtod(parts[4], NULL);
+                        chunk.dx = g_ascii_strtod(parts[5], NULL);
+                        if (ncols > 7) {
+                            chunk.label = g_intern_string(parts[7]);
+                        }
+                    }
+                }
+                sum += chunk.len;
+                g_array_append_val(mifile->chunks, chunk);
+            }
+            g_strfreev(parts);
+        }
+    }
+    mifile->sumlen = sum;
+
+    if (!mifile->chunks->len)
+        mifile->num_buffers = 0;
+    else {
+        for (i = 0; i < mifile->chunks->len; i++) {
+            const MISpectChunk *chunk = &g_array_index(mifile->chunks, MISpectChunk, i);
+            mifile->maxchunklen = MAX(mifile->maxchunklen, chunk->len);
+        }
+    }
+
+    if (!mifile->is_curve_map) {
+        if (mifile->num_points && sum != mifile->num_points) {
+            gwy_debug("DataPoints %u does not match the sum of chunk lengths %u.", mifile->num_points, sum);
+        }
+        mifile->num_points = sum;
+    }
+
+    if (!mifile->num_buffers)
+        err_NO_DATA(error);
+
+    return mifile->num_buffers;
+}
+
+static void
+image_file_free(MIFile *mifile)
+{
+    guint i;
+
+    for (i = 0; i < mifile->n; i++) {
+        g_hash_table_destroy(mifile->buffers[i].meta);
+        g_free(mifile->buffers[i].id);
+    }
+    g_free(mifile->buffers);
+    g_hash_table_destroy(mifile->meta);
+    g_free(mifile);
+}
+
+static void
+spect_file_free(MISpectFile *mifile)
+{
+    guint i;
+
+    for (i = 0; i < mifile->num_buffers; i++) {
+        if (mifile->buffers[i].label)
+            g_free(mifile->buffers[i].label);
+        if (mifile->buffers[i].unit)
+            g_free(mifile->buffers[i].unit);
+    }
+    g_free(mifile->buffers);
+    g_hash_table_destroy(mifile->meta);
+    if (mifile->chunks)
+        g_array_free(mifile->chunks, TRUE);
+    g_free(mifile);
+}
+
+static gboolean
+mifile_get_double(GHashTable *meta,
+                  const gchar *key,
+                  gdouble *value)
+{
+    gchar *p, *end;
+    gdouble r;
+
+    p = g_hash_table_lookup(meta, key);
+    if (!p)
+        return FALSE;
+
+    r = g_ascii_strtod(p, &end);
+    if (end == p)
+        return FALSE;
+
+    *value = r;
+    return TRUE;
+}
+
+static void
+process_metadata(MIFile *mifile,
+                 guint id,
+                 gboolean no_rescale,
+                 GwyContainer *container)
+{
+#ifdef GWY_RELOC_SOURCE
+    /* @flat: MetaDataFlatFormat */
+    /* @fields: key, meta, format */
+    static const MetaDataFormat global_metadata[] = {
+        { "version", "Version", "%s" },
+        { "dateAcquired", "Date acquired", "%s" },
+        { "mode", "mode", "%s" },
+        { "xSensitivity", "xSensitivity", "%s" },
+        { "xNonlinearity", "xNonlinearity", "%s" },
+        { "xHysteresis", "xHysteresis", "%s" },
+        { "ySensitivity", "ySensitivity", "%s" },
+        { "yNonlinearity", "yNonlinearity", "%s" },
+        { "yHysteresis", "yHysteresis", "%s" },
+        { "zSensitivity", "zSensitivity", "%s" },
+        { "reverseX", "reverseX", "%s" },
+        { "reverseY", "reverseY", "%s" },
+        { "reverseZ", "reverseZ", "%s" },
+        { "xDacRange", "xDacRange", "%s" },
+        { "yDacRange", "yDacRange", "%s" },
+        { "zDacRange", "zDacRange", "%s" },
+        { "xPixels", "xPixels", "%s" },
+        { "yPixels", "yPixels", "%s" },
+        { "xOffset", "xOffset", "%s" },
+        { "yOffset", "yOffset", "%s" },
+        { "xLength", "xLength", "%s" },
+        { "yLength", "yLength", "%s" },
+        /*{ "scanUp", "scanUp", "%s" },*/
+        { "scanSpeed", "scanSpeed", "%s" },
+        { "scanAngle", "scanAngle", "%s" },
+        { "servoSetpoint", "servoSetpoint", "%s" },
+        { "biasSample", "biasSample", "%s" },
+        { "bias", "bias", "%s" },
+        { "servoIGain", "servoIGain", "%s" },
+        { "servoPGain", "servoPGain", "%s" },
+        { "servoRange", "servoRange", "%s" },
+        { "servoInputGain", "servoInputGain", "%s" },
+    };
+#else  /* {{{ */
+    /* This code block was GENERATED by flatten.py.
+       When you edit global_metadata[] data above,
+       re-run flatten.py SOURCE.c. */
+    static const gchar global_metadata_key[] =
+        "version\000dateAcquired\000mode\000xSensitivity\000xNonlinearity\000"
+        "xHysteresis\000ySensitivity\000yNonlinearity\000yHysteresis\000zSens"
+        "itivity\000reverseX\000reverseY\000reverseZ\000xDacRange\000yDacRang"
+        "e\000zDacRange\000xPixels\000yPixels\000xOffset\000yOffset\000xLengt"
+        "h\000yLength\000scanSpeed\000scanAngle\000servoSetpoint\000biasSampl"
+        "e\000bias\000servoIGain\000servoPGain\000servoRange\000servoInputGai"
+        "n";
+
+    static const gchar global_metadata_meta[] =
+        "Version\000Date acquired\000mode\000xSensitivity\000xNonlinearity"
+        "\000xHysteresis\000ySensitivity\000yNonlinearity\000yHysteresis\000z"
+        "Sensitivity\000reverseX\000reverseY\000reverseZ\000xDacRange\000yDac"
+        "Range\000zDacRange\000xPixels\000yPixels\000xOffset\000yOffset\000xL"
+        "ength\000yLength\000scanSpeed\000scanAngle\000servoSetpoint\000biasS"
+        "ample\000bias\000servoIGain\000servoPGain\000servoRange\000servoInpu"
+        "tGain";
+
+    static const gchar global_metadata_format[] =
+        "%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s"
+        "\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s"
+        "\000%s\000%s\000%s\000%s\000%s\000%s\000%s\000%s";
+
+    static const MetaDataFlatFormat global_metadata[] = {
+        { 0, 0, 0 },
+        { 8, 8, 3 },
+        { 21, 22, 6 },
+        { 26, 27, 9 },
+        { 39, 40, 12 },
+        { 53, 54, 15 },
+        { 65, 66, 18 },
+        { 78, 79, 21 },
+        { 92, 93, 24 },
+        { 104, 105, 27 },
+        { 117, 118, 30 },
+        { 126, 127, 33 },
+        { 135, 136, 36 },
+        { 144, 145, 39 },
+        { 154, 155, 42 },
+        { 164, 165, 45 },
+        { 174, 175, 48 },
+        { 182, 183, 51 },
+        { 190, 191, 54 },
+        { 198, 199, 57 },
+        { 206, 207, 60 },
+        { 214, 215, 63 },
+        { 222, 223, 66 },
+        { 232, 233, 69 },
+        { 242, 243, 72 },
+        { 256, 257, 75 },
+        { 267, 268, 78 },
+        { 272, 273, 81 },
+        { 283, 284, 84 },
+        { 294, 295, 87 },
+        { 305, 306, 90 },
+    };
+#endif  /* }}} */
+
+#ifdef GWY_RELOC_SOURCE
+    /* @flat: MetaDataFlatFormat */
+    /* @fields: key, meta, format */
+    static const MetaDataFormat local_metadata[] = {
+        { "trace", "trace", "%s" },
+    };
+#else  /* {{{ */
+    /* This code block was GENERATED by flatten.py.
+       When you edit local_metadata[] data above,
+       re-run flatten.py SOURCE.c. */
+    static const gchar local_metadata_key[] =
+        "trace";
+
+    static const gchar local_metadata_meta[] =
+        "trace";
+
+    static const gchar local_metadata_format[] =
+        "%s";
+
+    static const MetaDataFlatFormat local_metadata[] = {
+        { 0, 0, 0 },
+    };
+#endif  /* }}} */
+
+    MIData *data;
+    GwyContainer *meta;
+    GwyDataField *dfield;
+    const gchar *mode, *s;
+    gchar *bufferUnit;
+    gint power10;
+    gdouble bufferRange, q;
+    GString *str;
+    gchar *p;
+    guint i;
+    gdouble xLength, yLength;
+
+    dfield = GWY_DATA_FIELD(gwy_container_get_object(container, gwy_app_get_data_key_for_id(id)));
+    /* Make "data" point to the selected buffer */
+    data = mifile->buffers + id;
+
+    /* Get the buffer mode */
+    mode = g_hash_table_lookup(data->meta, "bufferLabel");
+
+    /* Set the container's title to whatever the buffer mode is */
+    gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(id), mode ? mode : "Unknown Channel");
+
+    /* Fix z-value scale */
+    power10 = 0;
+    bufferUnit = g_hash_table_lookup(data->meta, "bufferUnit");
+    if (bufferUnit)
+        gwy_si_unit_set_from_string_parse(gwy_data_field_get_si_unit_z(dfield), bufferUnit, &power10);
+    q = pow10(power10);
+    if (!no_rescale && mifile_get_double(data->meta, "bufferRange", &bufferRange))
+        q *= bufferRange;
+    gwy_data_field_multiply(dfield, q);
+
+    /* Fix x-y value scale */
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(dfield), "m");
+
+    if (!mifile_get_double(mifile->meta, "xLength", &xLength)) {
+        g_warning("Missing or invalid x length");
+        xLength = 1e-9;
+    }
+    if (xLength <= 0.0)
+        xLength = 1.0; /* Needed for 0-d calibration images */
+    gwy_data_field_set_xreal(dfield, xLength);
+
+    if (!mifile_get_double(mifile->meta, "yLength", &yLength)) {
+        g_warning("Missing or invalid y length");
+        yLength = 1e-9;
+    }
+    if (yLength <= 0.0)
+        yLength = 1.0; /* Needed for 0-d calibration images */
+    gwy_data_field_set_yreal(dfield, yLength);
+
+    /* Store Metadata */
+    meta = gwy_container_new();
+    str = g_string_new(NULL);
+
+    /* Global */
+    for (i = 0; i < G_N_ELEMENTS(global_metadata); i++) {
+        s = global_metadata_key + global_metadata[i].key;
+        if (!(p = g_hash_table_lookup(mifile->meta, s)))
+            continue;
+
+        s = global_metadata_format + global_metadata[i].format;
+        g_string_printf(str, s, p);
+        s = global_metadata_meta + global_metadata[i].meta;
+        gwy_container_set_const_string_by_name(meta, s, str->str);
+    }
+
+    /* Local */
+    for (i = 0; i < G_N_ELEMENTS(local_metadata); i++) {
+        s = local_metadata_key + local_metadata[i].key;
+        if (!(p = g_hash_table_lookup(data->meta, s)))
+            continue;
+
+        s = local_metadata_format + local_metadata[i].format;
+        g_string_printf(str, s, p);
+        s = local_metadata_meta + local_metadata[i].meta;
+        gwy_container_set_const_string_by_name(meta, s, str->str);
+    }
+
+
+    /* Store "Special" metadata */
+
+    /*
+    if ((p = g_hash_table_lookup(data->meta, "Date"))
+        && (s = g_hash_table_lookup(data->meta, "time")))
+        gwy_container_set_string_by_name(meta, "Date", g_strconcat(p, " ", s, NULL));
+    */
+
+    if ((p = g_hash_table_lookup(mifile->meta, "scanUp"))) {
+        if (g_str_equal(p, "FALSE"))
+            gwy_container_set_const_string_by_name(meta, "Scanning direction", "Top to bottom");
+        else if (g_str_equal(p, "TRUE"))
+            gwy_container_set_const_string_by_name(meta, "Scanning direction", "Bottom to top");
+    }
+
+    /*
+    if ((p = g_hash_table_lookup(data->meta, "collect_mode"))) {
+        if (!strcmp(p, "1"))
+            gwy_container_set_string_by_name(meta, "Line direction", g_strdup("Left to right"));
+        else if (!strcmp(p, "2"))
+            gwy_container_set_string_by_name(meta, "Line direction", g_strdup("Right to left"));
+    }
+    */
+
+    if (gwy_container_get_n_items(meta)) {
+        g_string_printf(str, "/%d/meta", id);
+        gwy_container_set_object_by_name(container, str->str, meta);
+    }
+    g_object_unref(meta);
+
+    g_string_free(str, TRUE);
+}
+
+static gchar**
+split_to_nparts(const gchar *str, const gchar *sep, guint n)
+{
+    gchar **parts;
+
+    parts = g_strsplit_set(str, sep, n);
+    if (g_strv_length(parts) != n) {
+        g_strfreev(parts);
+        return NULL;
+    }
+
+    return parts;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

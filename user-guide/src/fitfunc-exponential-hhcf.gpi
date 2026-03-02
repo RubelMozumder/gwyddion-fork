@@ -1,0 +1,29 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+name = 'fitfunc-exponential-hhcf'
+set samples 201
+set lmargin at screen 0.09
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+sigma = 1
+T = 1
+
+f(x) = 2*sigma**2 * (1 - exp(-abs(x/T)))
+xm = T
+M = f(100*T)
+
+unset grid
+set key bottom right Left reverse samplen 1.5
+set xtics out nomirror ('0' 0 0, 'T' xm 0)
+set ytics out nomirror ('0' 0 0, '2σ²' M 0)
+set xrange [0:5]
+set yrange [0:1.1*M]
+set arrow from xm,0 to xm,f(xm) nohead ls 10
+set arrow from 0,M to 5,M nohead ls 10
+set output name.'.svg'
+
+plot \
+    f(x) with lines title 'Exponential (HHCF)' linestyle 3
+

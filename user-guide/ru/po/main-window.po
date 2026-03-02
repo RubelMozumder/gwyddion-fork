@@ -1,0 +1,248 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2022-01-07 21:20+0400\n"
+"PO-Revision-Date: 2022-01-07 21:23+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: main-window.xml:6(title)
+msgid "Main Window"
+msgstr "Главное окно"
+
+#: main-window.xml:7(primary)
+msgid "Toolbox"
+msgstr "Окно инструментов"
+
+#: main-window.xml:8(para)
+msgid ""
+"The main window, also called toolbox, is one of the two Gwyddion windows "
+"that appear after program start (with no files given to open), the other is "
+"the <link linkend=\"data-browser\">data browser</link>. Closing the main "
+"window causes Gwyddion to exit."
+msgstr ""
+"Главное окно, также называемое окном инструментов, является одним из двух "
+"окон, которые запускаются при старте Gwyddion (если не заданы файлы, которые "
+"нужно открыть), другое — это <link linkend=\"data-browser\">браузер данных</"
+"link>. Закрытие этого окна приводит к выходу из Gwyddion."
+
+#: main-window.xml:14(para)
+msgid ""
+"The toolbox contains the set of Gwyddion menus and from several rows of "
+"buttons connected with common functions and tools. The menus group the "
+"functions as follows:"
+msgstr ""
+"Окно инструментов содержит набор меню Gwyddion и несколько строк с кнопками, "
+"связанными с обычными функциями и инструментами. В меню функции "
+"сгруппированы следующим образом:"
+
+#: main-window.xml:22(guimenu)
+msgid "File"
+msgstr "Файл"
+
+#: main-window.xml:25(para)
+msgid ""
+"associates commands that are used for <link linkend=\"managing-files\">file "
+"loading and saving</link>. Certain global commands (e. g. <guimenuitem>Exit</"
+"guimenuitem>) are located here too. The <link linkend=\"document-history"
+"\">history of recently opened files</link> can be browsed with "
+"<menuchoice><guimenu>File</guimenu><guisubmenu>Open Recent</"
+"guisubmenu><guimenuitem>Document History</guimenuitem></menuchoice>."
+msgstr ""
+"объединяет команды, которые используются для <link linkend=\"managing-files"
+"\">загрузки и сохранения файлов</link>. Некоторые из глобальных команд "
+"(например, <guimenuitem>Выход</guimenuitem>) также расположены здесь. <link "
+"linkend=\"document-history\">История недавно открытых файлов</link> может "
+"просматриваться командой <menuchoice><guimenu>Файл</"
+"guimenu><guisubmenu>Последние файлы</guisubmenu><guimenuitem>Предыдущие "
+"документы</guimenuitem></menuchoice>."
+
+#: main-window.xml:41(guimenu)
+msgid "Edit"
+msgstr "Правка"
+
+#: main-window.xml:44(para)
+msgid ""
+"provides history manipulation commands (<guimenuitem>Undo</guimenuitem>, "
+"<guimenuitem>Redo</guimenuitem>) and editors of miscellaneous global "
+"resources, such as gradients and materials for false colour and 3D data "
+"representation or the default colour used for <link linkend=\"presentations-"
+"masks\">data masking</link>."
+msgstr ""
+"предоставляет команды управления историей редактирования "
+"(<guimenuitem>Отменить</guimenuitem>, <guimenuitem>Повторить</guimenuitem>) "
+"и редакторы для различных глобальных ресурсов, таких как градиенты и "
+"материалы для представления данных в шкале пседоцвета и трёхмерном виде или "
+"цвета по умолчанию, используемого для <link linkend=\"presentations-masks"
+"\">масок</link>."
+
+#: main-window.xml:56(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: main-window.xml:59(para)
+msgid ""
+"is built automatically from all data processing modules available in the "
+"Gwyddion module directory (depending on the operating system). This menu "
+"together with <guilabel>Tools</guilabel> panel of buttons contain most of "
+"the commands you will need at analysing your SPM data. A subset of these "
+"functions is also available in <guilabel>Data Process</guilabel> button "
+"panel. These buttons serve as shortcuts to commonly used functions from "
+"<guimenu>Data Process</guimenu> menu. All functions accessible from "
+"<guilabel>Data Process</guilabel> button panel can be found in the menu too."
+msgstr ""
+"автоматически строится из всех модулей обработки данных, расположенных в "
+"каталоге module установки Gwyddion (зависит от операционной системы). Это "
+"меню вместе с панелью кнопок <guilabel>Инструменты</guilabel> содержит "
+"большую часть команд, которые могут понадобиться для анализа данных СЗМ. "
+"Подмножество этих функций также доступно на панели кнопок "
+"<guilabel>Обработка данных</guilabel>. Эти кнопки служат кнопками быстрого "
+"запуска часто используемых функций из одноимённого меню. Все функции, "
+"доступные на этой панели, также можно найти и в меню."
+
+#: main-window.xml:76(guimenu)
+msgid "Graph"
+msgstr "График"
+
+#: main-window.xml:79(para)
+msgid ""
+"is similar to <guimenu>Data Process</guimenu>, except it consists of graph "
+"functions. <link linkend=\"graph-processing\">Graph processing</link> "
+"includes function fitting, exporting graph data etc. Button panel "
+"<guilabel>Graph</guilabel> again contains a subset of the commonly used "
+"functions from <guimenu>Graph</guimenu> menu."
+msgstr ""
+"подобен <guimenu>Обработке данных</guimenu>, за исключением того, что "
+"состоит из функций для работы с графиками. <link linkend=\"graph-processing"
+"\">Обработка графиков</link> включает в себя аппроксимацию функциями, "
+"экспорт данных графиков и т.п. Панель кнопок <guilabel>График</guilabel> "
+"снова содержит подмножество наиболее часто используемых функций меню "
+"<guimenu>График</guimenu>."
+
+#: main-window.xml:92(guimenu)
+msgid "Volume Data"
+msgstr "Объёмные данные"
+
+#: main-window.xml:95(para)
+msgid ""
+"is similar to <guimenu>Data Process</guimenu>, except it consists of <link "
+"linkend=\"volume-data\">volume data</link> functions."
+msgstr ""
+"подобно функциям <guimenu>Обработки данных</guimenu>, за исключением того, "
+"что содержит функции работы с <link linkend=\"volume-data\">объёмными "
+"данными</link>."
+
+#: main-window.xml:104(guimenu)
+msgid "XYZ Data"
+msgstr "Данные XYZ"
+
+#: main-window.xml:107(para)
+msgid ""
+"is similar to <guimenu>Data Process</guimenu>, except it consists of <link "
+"linkend=\"xyz-data\">XYZ data</link> functions."
+msgstr ""
+"подобно функциям <guimenu>Обработки данных</guimenu>, за исключением того, "
+"что содержит функции работы с <link linkend=\"xyz-data\">данными XYZ</link>."
+
+#: main-window.xml:116(guimenu)
+msgid "Curve Maps"
+msgstr "Карты кривых"
+
+#: main-window.xml:119(para)
+msgid ""
+"is similar to <guimenu>Data Process</guimenu>, except it consists of <link "
+"linkend=\"curve-maps\">curve map</link> data functions."
+msgstr ""
+"подобно функциям <guimenu>Обработки данных</guimenu>, за исключением того, "
+"что содержит функции работы с данными <link linkend=\"curve-maps\">карт "
+"кривых</link>."
+
+#: main-window.xml:128(guimenu)
+msgid "Info"
+msgstr "Информация"
+
+#: main-window.xml:131(para)
+msgid ""
+"contains commands that provide various auxiliary information about "
+"<application>Gwyddion</application>, such as program version or the list of "
+"loaded modules and their functions."
+msgstr ""
+"содержит команды, которые представляют вспомогательную информацию о "
+"<application>Gwyddion</application>, такие как версия программы и список "
+"загруженных модулей вместе с содержащимися в них функциями. Также там "
+"находится команда включения браузера данных."
+
+#: main-window.xml:139(para)
+msgid ""
+"Finally, you can find some rows of buttons in the main window. Buttons in "
+"<guilabel>View</guilabel> panel offer zooming functions (that are often more "
+"easily invoked by keyboard shortcuts or just resizing the data window) and "
+"<link linkend=\"opengl-3d-view\">3D data display</link>. Panels "
+"<guilabel>Data Process</guilabel> and <guilabel>Graph</guilabel> contain "
+"selected functions from <guimenu>Data Process</guimenu> and <guimenu>Graph</"
+"guimenu> menus as described above."
+msgstr ""
+"И, наконец, можно найти в главном окне несколько рядов кнопок. Кнопки в "
+"панели <guilabel>Вид</guilabel> предоставляют различные функции "
+"масштабирования (которые чаще проще вызвать с помощью комбинации клавиш или "
+"просто изменяя размер окна данных) и представления данных в <link linkend="
+"\"opengl-3d-view\">трёхмерном виде</link>. Панели <guilabel>Обработка "
+"данных</guilabel> и <guilabel>График</guilabel> содержат избранные функции "
+"из меню <guimenu>Обработка данных</guimenu> и <guimenu>График</guimenu>, "
+"описанные выше."
+
+#: main-window.xml:148(para)
+msgid ""
+"Panel <guilabel>Tools</guilabel> contains <link linkend=\"tools\">tools</"
+"link>, i.e. functions that directly work with selections on data windows. "
+"These functions are accessible only from this button panel."
+msgstr ""
+"Панель <guilabel>Инструменты</guilabel> содержит <link linkend=\"tools"
+"\">инструменты</link>, т.е. функции, которые напрямую работают с выбранным в "
+"окне данных. Эти функции доступны только с этой панели кнопок."
+
+#: main-window.xml:154(para)
+msgid ""
+"The toolbox button groups can be modified using <menuchoice><guimenu>Edit</"
+"guimenu><guimenuitem>Toolbox</guimenuitem></menuchoice>, including the "
+"complete removal of some groups and creation of different ones."
+msgstr ""
+"Группы кнопок в панели инструментов можно менять используя меню "
+"<menuchoice><guimenu>Правка</guimenu><guimenuitem>Панель инструментов</"
+"guimenuitem></menuchoice>, вплоть до полного удаления отдельных групп и "
+"создания абсолютно новых."
+
+#: main-window.xml:170(filename)
+msgid "chip.gwy"
+msgstr "chip.gwy"
+
+#: main-window.xml:168(caption)
+msgid ""
+"Main window and a data window showing microchip surface (Gwyddion sample "
+"file <placeholder-1/>)."
+msgstr ""
+"Главное окно и окно данных, показывающее поверхность микросхемы (образец "
+"файла Gwyddion <placeholder-1/>)."
+
+#~ msgid "Meta"
+#~ msgstr "Мета"
+
+#~ msgid ""
+#~ "contains commands that provide various auxiliary information. Namely "
+#~ "height field <link linkend=\"metadata\">metadata</link> (e.g. scanning "
+#~ "speed, tip voltage, etc.) and information about <application>Gwyddion</"
+#~ "application> itself."
+#~ msgstr ""
+#~ "содержит команды, которые предоставляют различную вспомогательную "
+#~ "информацию. А именно <link linkend=\"metadata\">метаданные</link> для "
+#~ "полей высот (т.е. скорость сканирования, напряжение на зонде и т.п.) и "
+#~ "информацию о самой программе <application>Gwyddion</application>."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

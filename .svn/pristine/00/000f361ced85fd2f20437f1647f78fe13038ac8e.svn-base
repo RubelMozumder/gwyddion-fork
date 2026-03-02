@@ -1,0 +1,515 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='volume-data-processing'>
+  <title>Volume Data Processing</title>
+  <para>
+    Gwyddion currently provides several basic functions for visualisation
+    of volume data and extraction of lower-dimensional data (images, curves)
+    from them.  A few specialised functions, focused on processing volume
+    data as curves (or spectra) in each pixel, are also available.  They are
+    all present in the <guimenu>Volume Data</guimenu> menu of the toolbox.
+  </para>
+  <para>
+    Volume data are often interpreted in Gwyddion as a set of curves, each
+    attached to one pixel in the <xi:include href='eqi-xy.xml'/> plane, or
+    alternately stack of images along the <xi:include href='eqi-z.xml'/>
+    axis. This means the volume data functions may treat the
+    <xi:include href='eqi-z.xml'/> axis specially.  If you intend to import
+    volume data with two spatial and one special dimensions to Gwyddion make
+    sure that the special axis corresponds to <xi:include href='eqi-z.xml'/>.
+  </para>
+  <sect2 id='basic-volume-operations'>
+    <title>Basic Operations</title>
+    <para>
+      Elementary operations with volume data include:
+    </para>
+    <variablelist>
+      <varlistentry id='volume-calibrate'>
+        <term>
+          <guimenuitem>Dimensions and Units</guimenuitem>
+          <gwy:icon name='volume_dimensions'/>
+        </term>
+        <listitem>
+          <para>
+            It changes the physical dimensions, units or value scales and also
+            lateral offsets. This is useful to correct raw data that have
+            been imported with wrong physical scales or as a simple manual
+            recalibration of dimensions and values.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='volume-invert'>
+        <term>
+          <guimenuitem>Invert Value</guimenuitem>
+          <gwy:icon name='volume_invert'/>
+        </term>
+        <listitem>
+          <para>
+            This function inverts the signs of all values in the volume data.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='volume-extract-preview'>
+        <term><guimenuitem>Extract Preview</guimenuitem></term>
+        <listitem>
+          <para>
+            The preview image of the volume data is copied to a new image
+            in the file.
+            Frequently the preview is an image that could be equivalently
+            obtained using <link linkend='volume-slice'>Cut and Slice</link>
+            or <link linkend='volume-linestat'>Summarize Profiles</link>.
+            And using these functions create images of well-defined quantities.
+            However, if you simply want to get the preview image, whatever it
+            happens to be, this function will do just that.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='volume-swap-axes'>
+        <term>
+          <guimenuitem>Swap Axes</guimenuitem>
+          <gwy:icon name='volume_swap_axes'/>
+        </term>
+        <listitem>
+          <para>
+            Since the <xi:include href='eqi-z.xml'/> axis is treated somewhat
+            differently than the <xi:include href='eqi-xy.xml'/> plane,
+            it can be useful to change the roles of the axes.  This function
+            rotates and/or mirrors the volume data so that any of the current
+            <xi:include href='eqi-x.xml'/>, <xi:include href='eqi-y.xml'/>
+            and <xi:include href='eqi-z.xml'/> axes will become any chosen
+            Cartesian axis in the transformed data.
+          </para>
+          <para>
+            The dialogue ensures the transformation is non-degenerate.  When
+            you select a transformation that would be degenerate, another axis
+            is adjusted to prevent this.  Otherwise, you can perform any
+            combination of mirroring and rotations by multiples of 90 degrees
+            around Cartesian axes.
+          </para>
+          <para>
+            If the volume data have a <xi:include href='eqi-z.xml'/>-axis
+            calibration and <xi:include href='eqi-z.xml'/> becomes some other
+            axis the calibration will be lost.  A warning is shown when this
+            occurs.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='volume-zcalibration'>
+        <term>
+          <guimenuitem>Z Calibration</guimenuitem>
+          <gwy:icon name='volume_calibrate'/>
+        </term>
+        <listitem>
+          <para>
+            When the <xi:include href='eqi-z.xml'/>-axis is non-spatial the
+            sampling along it may be sometimes irregular, unlike the imaging
+            axes <xi:include href='eqi-x.xml'/>
+            and <xi:include href='eqi-y.xml'/> that are always regular.  In
+            Gwyddion this is represented by associating certain
+            one-dimensional data with the
+            <xi:include href='eqi-z.xml'/>-axis, called the Z calibration.
+          </para>
+          <para>
+            This function can display the Z calibration, remove it, extract it
+            as a graph curve, take calibration from another volume data or
+            attach a new calibration from a text file.
+            For attaching a calibration, each line of the file must contain
+            one value specifying the true <xi:include href='eqi-z.xml'/>-axis
+            value for the corresponding plane and, of course, the number of
+            lines must correspond to the number of image planes in the volume
+            data.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='volume-slice'>
+    <title>
+      Image and Profile Extraction <gwy:icon name='volume_slice'/>
+    </title>
+    <para>
+      Profiles along any axis and image slices in planes orthogonal to any axis
+      can be extracted with
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guimenuitem>Cut and Slice</guimenuitem>
+      </menuchoice>.
+    </para>
+    <para>
+      The image slice in the selected plane, called <guilabel>Base
+      plane</guilabel>, is always shown in the left part and the profile along
+      the remaining orthogonal axis is shown in the right part of the dialogue.
+      You can change the where the line profile is taken by moving the selected
+      point in the image.  Conversely, the image plane location can be moved by
+      selecting a point in the profile graph.  Both can be also entered
+      numerically as <guilabel>X</guilabel>, <guilabel>Y</guilabel>
+      and <guilabel>Z</guilabel> (in pixel coordinates).
+    </para>
+    <para>
+      You can choose between image and profile extraction freely by changing
+      <guilabel>Output type</guilabel>.  Changing the output type only
+      influences whether the module creates the image on the left or the
+      profile graph on the right when you press <guibutton>OK</guibutton>.
+    </para>
+    <para>
+      It is also possible to take multiple profiles or image slices at the
+      same time.  If <guilabel>Extract multiple items</guilabel> is enabled
+      a list of selected points will appear on the right.  In this case the
+      output type influences the selection.  In the
+      <guilabel>Image slice</guilabel> mode you can select only one point in
+      the image (determining the profile shown in the graph) but multiple
+      points in the graph, each determining one output image plane.
+      Conversely, in the <guilabel>Line graph</guilabel> mode you can select
+      only one point in the graph (determining the image plane shown) but
+      multiple points in the image, determining where the line profiles will
+      be taken.
+    </para>
+    <para>
+      Switching betwen the output types when mutli-item extraction is enabled
+      reduces the selected coordinate set to a single point.  You can also use
+      the <guibutton>Reset</guibutton> button to reduce the selection to the
+      default single point if you want to start afresh.
+    </para>
+    <informalfigure id='fig-volume-slice'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='volume-slice.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the Cut and Slice volume data processing module,
+          showing the simultaneous extraction of three line profiles along
+          the <xi:include href='eqi-z.xml'/>-axis.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='volume-export-text'>
+    <title>Text Export</title>
+    <para>
+      Volume data can be exported to text files in several formats using
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guimenuitem>Export Text</guimenuitem>
+      </menuchoice>.
+      The possible output formats are
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          VTK structured grid
+        </term>
+        <listitem>
+          <para>
+            Format indented for direct loading into
+            <ulink url='https://www.vtk.org/'>VTK</ulink>-based software
+            such as <ulink url='https://www.paraview.org/'>ParaView</ulink>.
+            The values are dumped as a block of <code>STRUCTURED_POINTS</code>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          One Z-profile per line
+        </term>
+        <listitem>
+          <para>
+            Each line of the output file consists of one
+            <xi:include href='eqi-z.xml'/>-profile.  There are as many lines
+            as there are points in each <xi:include href='eqi-xy.xml'/>
+            plane (image) of the volume data.  The profiles are ordered by row,
+            then by column (the usual order for image pixels).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          One XY-layer per line
+        </term>
+        <listitem>
+          <para>
+            Each line of the output file consists of one
+            <xi:include href='eqi-xy.xml'/> image plane, stored by row, then
+            by column (the usual order for image pixels).  There are as many
+            lines as there are <xi:include href='eqi-z.xml'/>-levels in the
+            volume data.  The layers are stored in order of increasing
+            <xi:include href='eqi-z.xml'/>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Blank line separated matrices
+        </term>
+        <listitem>
+          <para>
+            Each line of the output file consists of one image row in one
+            <xi:include href='eqi-xy.xml'/> plane.  After one entire plane is
+            stored a blank line separates the next plane. The layers again
+            stored in order of increasing <xi:include href='eqi-z.xml'/>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='volume-linestat'>
+    <title>
+      Line Profile Characterisation <gwy:icon name='volume_line_stats'/>
+    </title>
+    <para>
+      Basic overall characterisation of profiles along the
+      <xi:include href='eqi-z.xml'/>-axis can be performed using
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guimenuitem>Summarize Profiles</guimenuitem>
+      </menuchoice>.
+      This function creates an image formed by statistical characteristics of
+      profiles taken along the <xi:include href='eqi-z.xml'/>-axis.  The
+      set of available statistical quantities is the same as in the
+      <link linkend='line-stats'>Row/column statistics tool</link>.
+    </para>
+    <para>
+      The dual image/graph selection generally works very similarly to
+      <link linkend='volume-slice'>Image and profile extractions</link>.
+      The main difference is that an interval can be selected in the graph,
+      defining the part of the image stack from which the statistical
+      characteristics will be calculated.  The interval can be also entered
+      numerically using the <guilabel>Range</guilabel> entries.
+    </para>
+    <para>
+      The image on the left shows the calculated characteristics and
+      corresponds to the output of the module.  Selecting a different point in
+      the image changes the profile displayed in the graph, which can be useful
+      for choosing a suitable range.  The value for the selected profile is
+      displayed below the statistical quantity selector.  However, choosing
+      a profile does not influence the output in any way.
+    </para>
+  </sect2>
+  <sect2 id='volume-planestat'>
+    <title>
+      Plane Characterisation <gwy:icon name='volume_plane_stats'/>
+    </title>
+    <para>
+      Basic overall characterisation of <xi:include href='eqi-xy.xml'/> planes
+      can be performed using
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guimenuitem>Summarize Planes</guimenuitem>
+      </menuchoice>.
+      This function creates a graph formed by statistical characteristics of
+      individual <xi:include href='eqi-xy.xml'/>-planes in the volume data
+      or their parts.  The set of available quantities is a subset of those
+      calculated by <link linkend='stat-quantities'>Statistical quantities
+      tool</link>.  A few quantities can take some time to calculate for all
+      layers.
+    </para>
+    <para>
+      The dual image/graph selection generally works very similarly to
+      <link linkend='volume-slice'>Image and profile extractions</link>.
+      The main difference is that a rectangular region can be selected in the
+      image plane, defining a rectangle from which the statistical
+      characteristics will be calculated.  The rectangle can be also entered
+      numerically using the <guilabel>Origin</guilabel> and
+      <guilabel>Size</guilabel> controls.
+    </para>
+    <para>
+      The graph on the right shows the calculated characteristics and
+      corresponds to the output of the module.  Selecting a different position
+      in the graph changes the <xi:include href='eqi-xy.xml'/> plane displayed
+      in the image, which can be useful for choosing a suitable region.  The
+      value for the selected plane is displayed below the statistical
+      quantity selector.  However, choosing a plane does not influence the
+      output in any way.
+    </para>
+  </sect2>
+  <sect2 id='volume-arithmetic'>
+    <title>
+      Arithmetic
+      <gwy:icon name='volume_arithmetic'/>
+    </title>
+    <para>
+      Arithmetic with volume data works exactly the same as
+      <link linkend='data-arithmetic'>image data arithmetic</link>,
+      including the same
+      <link linkend='expression-syntax'>expression syntax</link>.
+    </para>
+    <para>
+      The preview shows the average over all levels and the set of automatic
+      variables is slightly different:
+    </para>
+    <para>
+      <informaltable id='table-volume-arithmetic-variables'>
+        <tgroup cols='2'>
+          <?dblatex lX?>
+          <thead>
+            <row>
+              <entry>Variable</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><varname>d1</varname>, …, <varname>d8</varname></entry>
+              <entry>
+                Data value at the voxel.  The value is in base physical units,
+                e.g. for current of 15 nA, the value of <varname>d1</varname>
+                is 1.5e-8.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>x</varname></entry>
+              <entry>
+                Horizontal coordinate of the voxel (in real units).  It is the
+                same in all volume data due to the compatibility requirement.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>y</varname></entry>
+              <entry>
+                Vertical coordinate of the voxel (in real units).  It is
+                the same in all volume data due to the compatibility
+                requirement.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>z</varname></entry>
+              <entry>
+                Depth (level) coordinate of the voxel (in real units).  It is
+                the same in all volume data due to the compatibility
+                requirement.
+              </entry>
+            </row>
+            <row>
+              <entry><varname>zcal</varname></entry>
+              <entry>
+                Calibrated <xi:include href='eqi-z.xml'/>-coordinate of the
+                voxel (in real units) if the volume data have
+                <xi:include href='eqi-z.xml'/>-axis calibration
+                (see <link linkend='volume-zcalibration'>Z calibrations</link>).
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </sect2>
+  <sect2 id='volume-clustering'>
+    <title>
+      K-means and K-medians clustering
+      <gwy:icon name='volume_kmeans'/>
+      <gwy:icon name='volume_kmedians'/>
+    </title>
+    <para>
+      Techniques of imaging spectroscopy like F-D in QNM (Quantitative Nanomechanical Mapping) applications,
+      I-V in semiconductor engineering, Raman in material characterization
+      require to measure spectrum per each point of data grid on sample surface.
+      Working with obtained array is not so simple, as we need to work with
+      thousands of spectra and analyze each of them. If the sample of interest
+      has limited number of regions with very similar spectra inside each region,
+      some technique grouping similar spectra together can be of great help.
+      One possible way of doing so is using clustering analysis. In
+      <application>Gwyddion</application> currently two methods is implemented:
+      K-means and K-medians.
+    </para>
+    <para>
+      Both algorithms are intended to find <xi:include href='eqi-K.xml'/> clusters with similar spectra
+      inside the cluster and maximally different between clusters. So
+      <guilabel>Number of clusters</guilabel> is how many clusters <xi:include href='eqi-K.xml'/> you
+      want to obtain in the result. <guilabel>Convergence precision digits</guilabel>
+      and <guilabel>Max. iterations</guilabel> regulate convergence
+      criteria of algorithms that stop either if required precision of cluster centers
+      position is achieved or allowed number of convergence cycles is exceeded.
+      Higher precision require more steps to achieve, second limit is mostly
+      intended to get rid of endless loops if the precision is to high for
+      this set of data.
+    </para>
+    <para>
+      <guilabel>Normalize</guilabel> is somewhat experimental technique that
+      qives nice results for imaging spectroscopy. If you are not interested
+      in spectral intensities and want to cluster data by similarity of
+      middle-frequencies of spectral features (it is typical, for example, for Raman
+      microscopy), than enable this checkbox. It removes low frequency background by
+      substraction of minimum withing the moving window, and then normalizes spectrum
+      to make average intensity be equal 1.0. Both modules outputs two datafields:
+      one shows to which cluster belongs the current spectrum, another shows error —
+      difference between the current spectrum and center of corresponding cluster.
+      If normalization is enabled than third datafield shows values the spectral
+      intensities was divided by during normalization (after low-freq. filtering).
+      Also graph with spectra corresponding to the centers of clusters is extracted.
+    </para>
+    <para>
+      Algorithms beside this two modules are based on usual unsupervized learning clustering:
+      K-means and K-medians, correspondingly. We consider each spectrum (graph extracted along
+      <xi:include href='eqi-z.xml'/>-axis) to be the point in multidimensial space
+      with the number of dimensions equal number of data point in the graph. We define
+      distance between points as square root from sum of squared differencies along
+      each direction (<xi:include href='eqi-L-to-2.xml'/>-norm). Than we initialize both algorithms by choosing random <xi:include href='eqi-K.xml'/> points
+      from the volume data as cluster centers. Than the usual two step algorithm is applied:
+      we assign each point to the cluster whose center is nearest to the point and then move
+      centers of the clusters. The difference between two modules is how to
+      calculate the cluster center: it is mean value of cluster points for K-means and median
+      along each direction for K-medians. The results from the last iteration are
+      returned back to the program.
+    </para>
+    <para>
+      <guilabel>Remove outliers</guilabel> for K-means modifies algorithm
+      for calculation of cluster centers to include only datapoints within
+      <guilabel>Outliers threshold</guilabel> multiplied by data variation
+      <xi:include href='eqi-sigma.xml'/> for each cluster.
+      It removes single distinct bogus data points (like spikes,
+      cosmic rays in Raman spectroscopy and so on) from calculation,
+      making cluster centers somewhere more clean and distinct
+      and also can shift border between intermixing clusters to more
+      correct place between two centers of maximal point densities not
+      disturbed by far outliers.
+    </para>
+  </sect2>
+  <sect2 id='volume-mfm'>
+    <title>Magnetic force microscopy</title>
+    <para>
+      A few volume data functions are dedicated to MFM data processing.  They
+      are generally analogous to their image counterparts.
+    </para>
+    <para id='volume-mfm-data-conversion'>
+      Conversion of MFM data to force gradient is exactly the same for volume
+      and image data.  Therefore, the summary of
+      <link linkend='mfm-data-conversion'>image MFM data conversion</link>
+      applies to volume data unchanged.
+    </para>
+    <para id='volume-transfer-function-guess'>
+      The transfer function estimation
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guimenuitem>Transfer Function Guess</guimenuitem>
+      </menuchoice>
+      is also quite similar to
+      <link linkend='transfer-function-guess'>image transfer function
+      estimation</link>.  The TF is estimated for each level in the volume data
+      and its various properties plotted as graphs.  Which graphs are
+      plotted can be selected in the <guilabel>Output Options</guilabel> tab.
+      The regularisation parameter <xi:include href='eqi-sigma.xml'/> can be
+      the same for all levels, or it can be estimated for each level by
+      enabling <guilabel>Estimate sigma for each level</guilabel>.  The
+      computation then takes notably longer.  For the <guilabel>Least
+      squares</guilabel> method, even the transfer function size can be
+      estimated for each level when <guilabel>Estimate size for each
+      level</guilabel> is enabled.  The size given in the dialogue then
+      determines the size of the output – and thus maximum possible size.
+      Smaller transfer functions are extended with zeros to this size.
+    </para>
+    <para id='volume-stray-field'>
+      The stray field consistency check
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guimenuitem>Stray Field Consistency</guimenuitem>
+      </menuchoice>
+      recalculates the field to a different height similarly to
+      <link linkend='mfm-field-shift'>MFM field shift</link>.  However, since
+      the volume data contains images corresponding to many different levels,
+      it is possible to calculate the field for each and compare it to the
+      calculated field.  And this is what the module does.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

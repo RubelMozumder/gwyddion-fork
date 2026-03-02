@@ -1,0 +1,980 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2015-2023 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/brick.h>
+#include <libprocess/gwyprocess.h>
+#include <libgwydgets/gwynullstore.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+
+#define RUN_MODES (GWY_RUN_NONINTERACTIVE | GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+};
+
+enum {
+    MAXOBJECTS = 64,
+};
+
+enum {
+    COLUMN_I, COLUMN_X, COLUMN_Y, COLUMN_Z, NCOLUMNS
+};
+
+enum {
+    PARAM_XPOS,
+    PARAM_YPOS,
+    PARAM_ZPOS,
+    PARAM_MULTISELECT,
+    PARAM_BASE_PLANE,
+    PARAM_OUTPUT_TYPE,
+    PARAM_TARGET_GRAPH,
+};
+
+typedef enum {
+    PLANE_XY = 0,
+    PLANE_YZ = 1,
+    PLANE_ZX = 2,
+    PLANE_YX = 3,
+    PLANE_ZY = 4,
+    PLANE_XZ = 6,
+} SliceBasePlane;
+
+typedef enum {
+    OUTPUT_IMAGES = 0,
+    OUTPUT_GRAPHS = 1,
+    /* We might want to output curves as SPS... */
+} SliceOutputType;
+
+typedef struct {
+    gint x;
+    gint y;
+    gint z;
+} SlicePos;
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    GArray *allpos;
+    GwyDataLine *zcalibration;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GwyContainer *data;
+    GwyDataField *image;
+    GwyGraphModel *gmodel;
+    GwySelection *iselection;
+    GwySelection *gselection;
+    GwyParamTable *table_options;
+    GwyParamTable *table_coords;
+    GtkWidget *dialog;
+    GtkWidget *dataview;
+    GwyNullStore *store;
+    GtkWidget *coordlist;
+    GtkWidget *scwin;
+    gint current_object;
+    gboolean changing_selection;
+} ModuleGUI;
+
+static gboolean         module_register            (void);
+static GwyParamDef*     define_module_params       (void);
+static void             slice                      (GwyContainer *data,
+                                                    GwyRunType run);
+static GwyDialogOutcome run_gui                    (ModuleArgs *args,
+                                                    GwyContainer *data,
+                                                    gint id);
+static void             param_changed              (ModuleGUI *gui,
+                                                    gint id);
+static void             execute                    (ModuleArgs *args,
+                                                    GwyContainer *data,
+                                                    gint id);
+static void             preview                    (gpointer user_data);
+static void             extract_one_image          (ModuleArgs *args,
+                                                    GwyContainer *data,
+                                                    gint id,
+                                                    gint idx);
+static GtkWidget*       create_coordlist           (ModuleGUI *gui);
+static void             dialog_response_after      (GtkDialog *dialog,
+                                                    gint response,
+                                                    ModuleGUI *gui);
+static void             point_selection_changed    (ModuleGUI *gui,
+                                                    gint id,
+                                                    GwySelection *selection);
+static void             plane_selection_changed    (ModuleGUI *gui,
+                                                    gint id,
+                                                    GwySelection *selection);
+static void             coordlist_selection_changed(GtkTreeSelection *selection,
+                                                    ModuleGUI *gui);
+static void             collapse_selection         (ModuleGUI *gui);
+static void             update_position            (ModuleGUI *gui,
+                                                    const SlicePos *pos,
+                                                    gboolean assume_changed);
+static void             update_multiselection      (ModuleGUI *gui);
+static void             extract_image_plane        (ModuleArgs *args,
+                                                    GwyDataField *dfield,
+                                                    guint idx);
+static void             extract_graph_curve        (ModuleArgs *args,
+                                                    GwyGraphCurveModel *gcmodel,
+                                                    gint idx);
+static void             extract_gmodel             (ModuleArgs *args,
+                                                    GwyGraphModel *gmodel);
+static void             append_current_pos         (ModuleArgs *args);
+static void             fill_pos_from_params       (GwyParams *params,
+                                                    SlicePos *pos);
+static void             sanitise_params            (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Extracts image planes and line graphs from volume data."),
+    "Yeti <yeti@gwyddion.net>",
+    "3.1",
+    "David Nečas (Yeti)",
+    "2015",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_slice)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_slice",
+                             (GwyVolumeFunc)&slice,
+                             N_("/_Basic Operations/Cut and _Slice..."),
+                             GWY_STOCK_VOLUME_SLICE,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("Extract image planes and line graphs"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum base_planes[] = {
+        { "XY", PLANE_XY, },
+        { "YZ", PLANE_YZ, },
+        { "ZX", PLANE_ZX, },
+        { "YX", PLANE_YX, },
+        { "ZY", PLANE_ZY, },
+        { "XZ", PLANE_XZ, },
+    };
+    static const GwyEnum output_types[] = {
+        { N_("Image slice"), OUTPUT_IMAGES, },
+        { N_("Line graph"),  OUTPUT_GRAPHS, },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_int(paramdef, PARAM_XPOS, "xpos", _("_X"), -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_YPOS, "ypos", _("_Y"), -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_ZPOS, "zpos", _("_Z"), -1, G_MAXINT, -1);
+    gwy_param_def_add_boolean(paramdef, PARAM_MULTISELECT, "multiselect", _("Extract _multiple"), FALSE);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_BASE_PLANE, "base_plane", _("_Base plane"),
+                              base_planes, G_N_ELEMENTS(base_planes), PLANE_XY);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_OUTPUT_TYPE, "output_type", _("Output type"),
+                              output_types, G_N_ELEMENTS(output_types), PLANE_XY);
+    gwy_param_def_add_target_graph(paramdef, PARAM_TARGET_GRAPH, "target_graph", NULL);
+    return paramdef;
+}
+
+static void
+slice(GwyContainer *data, GwyRunType run)
+{
+    ModuleArgs args;
+    GwyDialogOutcome outcome;
+    gint id;
+
+    g_return_if_fail(run & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &args.brick,
+                                     GWY_APP_BRICK_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_BRICK(args.brick));
+
+    args.zcalibration = gwy_brick_get_zcalibration(args.brick);
+    if (args.zcalibration && gwy_brick_get_zres(args.brick) != gwy_data_line_get_res(args.zcalibration))
+        args.zcalibration = NULL;
+    args.allpos = g_array_new(FALSE, FALSE, sizeof(SlicePos));
+    args.params = gwy_params_new_from_settings(define_module_params());
+    sanitise_params(&args);
+    append_current_pos(&args);
+
+    if (run == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, id);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+    }
+    execute(&args, data, id);
+
+end:
+    g_object_unref(args.params);
+    g_array_free(args.allpos, TRUE);
+}
+
+static void
+append_position(GwyParamTable *table, gint id, gint res)
+{
+    gwy_param_table_append_slider(table, id);
+    gwy_param_table_slider_restrict_range(table, id, 0, res-1);
+    gwy_param_table_set_unitstr(table, id, _("px"));
+    gwy_param_table_slider_set_mapping(table, id, GWY_SCALE_MAPPING_LINEAR);
+    gwy_param_table_slider_add_alt(table, id);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GwyBrick *brick = args->brick;
+    GtkWidget *hbox, *graph, *align;
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    GwyGraphArea *area;
+    ModuleGUI gui;
+    GwyDialogOutcome outcome;
+    GwyGraphCurveModel *gcmodel;
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.store = gwy_null_store_new(1);
+    gui.data = gwy_container_new();
+    gui.image = gwy_data_field_new(PREVIEW_SIZE, PREVIEW_SIZE, 1.0, 1.0, TRUE);
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), gui.image);
+    if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.gmodel = gwy_graph_model_new();
+    g_object_set(gui.gmodel, "label-visible", FALSE, NULL);
+    extract_gmodel(args, gui.gmodel);
+    gcmodel = gwy_graph_curve_model_new();
+    gwy_graph_model_add_curve(gui.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+    gui.dialog = gwy_dialog_new(_("Slice Volume Data"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(0);
+    gwy_dialog_add_content(dialog, hbox, FALSE, FALSE, 4);
+
+    align = gtk_alignment_new(0.0, 0.0, 0.0, 0.0);
+    gtk_box_pack_start(GTK_BOX(hbox), align, FALSE, FALSE, 0);
+
+    gui.dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    gui.iselection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(gui.dataview), 0, "Point", 1, TRUE);
+    gtk_container_add(GTK_CONTAINER(align), gui.dataview);
+
+    graph = gwy_graph_new(gui.gmodel);
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gtk_widget_set_size_request(graph, PREVIEW_SIZE, PREVIEW_SIZE);
+    gtk_box_pack_start(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+
+    area = GWY_GRAPH_AREA(gwy_graph_get_area(GWY_GRAPH(graph)));
+    gwy_graph_area_set_status(area, GWY_GRAPH_STATUS_XLINES);
+    gui.gselection = gwy_graph_area_get_selection(area, GWY_GRAPH_STATUS_XLINES);
+
+    hbox = gwy_hbox_new(24);
+    gwy_dialog_add_content(dialog, hbox, TRUE, TRUE, 4);
+
+    table = gui.table_options = gwy_param_table_new(args->params);
+    gwy_param_table_append_header(table, -1, _("Output Options"));
+    gwy_param_table_append_combo(table, PARAM_BASE_PLANE);
+    gwy_param_table_append_radio(table, PARAM_OUTPUT_TYPE);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_target_graph(table, PARAM_TARGET_GRAPH, gui.gmodel);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_coords = gwy_param_table_new(args->params);
+    gwy_param_table_append_header(table, -1, _("Positions"));
+
+    append_position(table, PARAM_XPOS, gwy_brick_get_xres(brick));
+    gwy_param_table_alt_set_brick_pixel_x(table, PARAM_XPOS, brick);
+    append_position(table, PARAM_YPOS, gwy_brick_get_yres(brick));
+    gwy_param_table_alt_set_brick_pixel_y(table, PARAM_YPOS, brick);
+    append_position(table, PARAM_ZPOS, gwy_brick_get_zres(brick));
+    if (args->zcalibration)
+        gwy_param_table_alt_set_calibration(table, PARAM_ZPOS, args->zcalibration);
+    else
+        gwy_param_table_alt_set_brick_pixel_z(table, PARAM_ZPOS, brick);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_checkbox(table, PARAM_MULTISELECT);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    gui.scwin = create_coordlist(&gui);
+    gtk_box_pack_start(GTK_BOX(hbox), gui.scwin, FALSE, TRUE, 0);
+
+    g_signal_connect_swapped(gui.table_options, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_coords, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.gselection, "changed", G_CALLBACK(plane_selection_changed), &gui);
+    g_signal_connect_swapped(gui.iselection, "changed", G_CALLBACK(point_selection_changed), &gui);
+    g_signal_connect_after(dialog, "response", G_CALLBACK(dialog_response_after), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.store);
+    g_object_unref(gui.gmodel);
+    g_object_unref(gui.image);
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+render_coord_cell(GtkCellLayout *layout,
+                  GtkCellRenderer *renderer,
+                  GtkTreeModel *model,
+                  GtkTreeIter *iter,
+                  gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    SlicePos *pos;
+    gchar buf[32];
+    guint idx, id;
+
+    id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(layout), "id"));
+    gtk_tree_model_get(model, iter, 0, &idx, -1);
+
+    if (id == COLUMN_I)
+        g_snprintf(buf, sizeof(buf), "%d", idx + 1);
+    else {
+        g_return_if_fail(idx < gui->args->allpos->len);
+        pos = &g_array_index(gui->args->allpos, SlicePos, idx);
+        if (id == COLUMN_X)
+            g_snprintf(buf, sizeof(buf), "%d", pos->x);
+        else if (id == COLUMN_Y)
+            g_snprintf(buf, sizeof(buf), "%d", pos->y);
+        else if (id == COLUMN_Z)
+            g_snprintf(buf, sizeof(buf), "%d", pos->z);
+    }
+
+    g_object_set(renderer, "text", buf, NULL);
+}
+
+static GtkWidget*
+create_coordlist(ModuleGUI *gui)
+{
+    static const gchar *titles[NCOLUMNS] = { "n", "x", "y", "z" };
+
+    GtkTreeModel *model;
+    GtkTreeViewColumn *column;
+    GtkCellRenderer *renderer;
+    GtkTreeSelection *selection;
+    GtkWidget *label, *scwin;
+    GString *str;
+    guint i;
+
+    model = GTK_TREE_MODEL(gui->store);
+    gui->coordlist = gtk_tree_view_new_with_model(model);
+
+    scwin = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scwin), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(scwin), gui->coordlist);
+    gtk_widget_set_no_show_all(scwin, !gwy_params_get_boolean(gui->args->params, PARAM_MULTISELECT));
+
+    str = g_string_new(NULL);
+    for (i = 0; i < NCOLUMNS; i++) {
+        column = gtk_tree_view_column_new();
+        gtk_tree_view_column_set_expand(column, TRUE);
+        gtk_tree_view_column_set_alignment(column, 0.5);
+        g_object_set_data(G_OBJECT(column), "id", GUINT_TO_POINTER(i));
+        renderer = gtk_cell_renderer_text_new();
+        g_object_set(renderer, "xalign", 1.0, NULL);
+        gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(column), renderer, TRUE);
+        gtk_cell_layout_set_cell_data_func(GTK_CELL_LAYOUT(column), renderer, render_coord_cell, gui, NULL);
+        label = gtk_label_new(NULL);
+        gtk_tree_view_column_set_widget(column, label);
+        gtk_widget_show(label);
+        gtk_tree_view_append_column(GTK_TREE_VIEW(gui->coordlist), column);
+
+        label = gtk_tree_view_column_get_widget(column);
+        g_string_assign(str, "<b>");
+        g_string_append(str, titles[i]);
+        g_string_append(str, "</b>");
+        gtk_label_set_markup(GTK_LABEL(label), str->str);
+    }
+    g_string_free(str, TRUE);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(gui->coordlist));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_BROWSE);
+    g_signal_connect(selection, "changed", G_CALLBACK(coordlist_selection_changed), gui);
+
+    return scwin;
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    gboolean multiselect = gwy_params_get_boolean(params, PARAM_MULTISELECT);
+    SliceOutputType output_type = gwy_params_get_enum(params, PARAM_OUTPUT_TYPE);
+    SlicePos pos;
+
+    fill_pos_from_params(args->params, &pos);
+    if (id < 0 || id == PARAM_BASE_PLANE || id == PARAM_OUTPUT_TYPE) {
+        /* In multiselection mode it ensures the non-multiple coordinates are compacted to single one. */
+        collapse_selection(gui);
+        update_position(gui, &pos, TRUE);
+    }
+    if (id == PARAM_XPOS || id == PARAM_YPOS || id == PARAM_ZPOS)
+        update_position(gui, &pos, TRUE);
+
+    if (id < 0 || id == PARAM_BASE_PLANE)
+        gwy_param_table_data_id_refilter(gui->table_options, PARAM_TARGET_GRAPH);
+    if (id < 0 || id == PARAM_OUTPUT_TYPE)
+        gwy_param_table_set_sensitive(gui->table_options, PARAM_TARGET_GRAPH, output_type == OUTPUT_GRAPHS);
+    if (id < 0 || id == PARAM_MULTISELECT) {
+        gtk_widget_set_no_show_all(gui->scwin, !multiselect);
+        if (multiselect)
+            gtk_widget_show_all(gui->scwin);
+        else
+            gtk_widget_hide(gui->scwin);
+    }
+    if (id < 0 || id == PARAM_MULTISELECT || id == PARAM_OUTPUT_TYPE) {
+        gwy_selection_set_max_objects(gui->iselection, (multiselect && output_type == OUTPUT_GRAPHS) ? MAXOBJECTS : 1);
+        gwy_selection_set_max_objects(gui->gselection, (multiselect && output_type == OUTPUT_IMAGES) ? MAXOBJECTS : 1);
+    }
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+dialog_response_after(G_GNUC_UNUSED GtkDialog *dialog, gint response, ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GwyBrick *brick = args->brick;
+
+    if (response == GWY_RESPONSE_RESET) {
+        gwy_params_set_int(args->params, PARAM_XPOS, gwy_brick_get_xres(brick)/2);
+        gwy_params_set_int(args->params, PARAM_YPOS, gwy_brick_get_yres(brick)/2);
+        gwy_params_set_int(args->params, PARAM_ZPOS, gwy_brick_get_zres(brick)/2);
+        collapse_selection(gui);
+    }
+}
+
+static void
+point_selection_changed(ModuleGUI *gui,
+                        gint id,
+                        GwySelection *selection)
+{
+    ModuleArgs *args = gui->args;
+    SliceBasePlane base_plane = gwy_params_get_enum(args->params, PARAM_BASE_PLANE);
+    SliceOutputType output_type = gwy_params_get_enum(args->params, PARAM_OUTPUT_TYPE);
+    GwyDataField *field = gui->image;
+    gint xres = gwy_data_field_get_xres(field), yres = gwy_data_field_get_yres(field);
+    gint i, j;
+    SlicePos pos;
+    gdouble xy[2];
+
+    gwy_debug("%d (%d)", gui->changing_selection, id);
+    if (gui->changing_selection)
+        return;
+
+    /* What should we do here?  Hope we always get another update with a specific id afterwards. */
+    if (id < 0 || !gwy_selection_get_object(selection, id, xy))
+        return;
+
+    if (output_type == OUTPUT_GRAPHS)
+        gui->current_object = id;
+
+    j = CLAMP(gwy_data_field_rtoj(field, xy[0]), 0, xres-1);
+    i = CLAMP(gwy_data_field_rtoi(field, xy[1]), 0, yres-1);
+
+    fill_pos_from_params(args->params, &pos);
+    if (base_plane == PLANE_XY || base_plane == PLANE_XZ)
+        pos.x = j;
+    if (base_plane == PLANE_YZ || base_plane == PLANE_YX)
+        pos.y = j;
+    if (base_plane == PLANE_ZX || base_plane == PLANE_ZY)
+        pos.z = j;
+
+    if (base_plane == PLANE_YX || base_plane == PLANE_ZX)
+        pos.x = i;
+    if (base_plane == PLANE_ZY || base_plane == PLANE_XY)
+        pos.y = i;
+    if (base_plane == PLANE_XZ || base_plane == PLANE_YZ)
+        pos.z = i;
+
+    update_position(gui, &pos, FALSE);
+}
+
+static void
+plane_selection_changed(ModuleGUI *gui,
+                        gint id,
+                        GwySelection *selection)
+{
+    ModuleArgs *args = gui->args;
+    SliceBasePlane base_plane = gwy_params_get_enum(args->params, PARAM_BASE_PLANE);
+    SliceOutputType output_type = gwy_params_get_enum(args->params, PARAM_OUTPUT_TYPE);
+    GwyBrick *brick = args->brick;
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick), zres = gwy_brick_get_zres(brick);
+    SlicePos pos;
+    gdouble r;
+
+    gwy_debug("%d (%d)", gui->changing_selection, id);
+    if (gui->changing_selection)
+        return;
+
+    /* What should we do here?  Hope we always get another update with a specific id afterwards. */
+    if (id < 0 || !gwy_selection_get_object(selection, id, &r))
+        return;
+
+    if (output_type == OUTPUT_IMAGES)
+        gui->current_object = id;
+
+    fill_pos_from_params(args->params, &pos);
+    if (base_plane == PLANE_YZ || base_plane == PLANE_ZY)
+        pos.x = CLAMP(gwy_brick_rtoi(brick, r - gwy_brick_get_xoffset(brick)), 0, xres-1);
+    else if (base_plane == PLANE_YX || base_plane == PLANE_XY)
+        pos.z = CLAMP(gwy_brick_rtok_cal(brick, r), 0, zres-1);
+    else if (base_plane == PLANE_XZ || base_plane == PLANE_ZX)
+        pos.y = CLAMP(gwy_brick_rtoj(brick, r - gwy_brick_get_yoffset(brick)), 0, yres-1);
+    else {
+        g_return_if_reached();
+    }
+
+    update_position(gui, &pos, FALSE);
+}
+
+static void
+coordlist_selection_changed(GtkTreeSelection *selection, ModuleGUI *gui)
+{
+    GtkTreeModel *model;
+    GtkTreePath *path;
+    GtkTreeIter iter;
+    SlicePos pos;
+    gint idx;
+
+    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+        return;
+
+    path = gtk_tree_model_get_path(model, &iter);
+    idx = gtk_tree_path_get_indices(path)[0];
+    gtk_tree_path_free(path);
+
+    g_return_if_fail(idx < gui->args->allpos->len);
+    pos = g_array_index(gui->args->allpos, SlicePos, idx);
+
+    gui->current_object = idx;
+    update_position(gui, &pos, FALSE);
+}
+
+static void
+collapse_selection(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    SlicePos pos;
+
+    g_assert(!gui->changing_selection);
+    gui->changing_selection = TRUE;
+    fill_pos_from_params(args->params, &pos);
+    gui->current_object = 0;
+    gwy_null_store_set_n_rows(gui->store, 1);
+    g_array_set_size(gui->args->allpos, 1);
+    gui->changing_selection = FALSE;
+    update_position(gui, &pos, TRUE);
+}
+
+static void
+update_position(ModuleGUI *gui, const SlicePos *pos, gboolean assume_changed)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    SliceBasePlane base_plane = gwy_params_get_enum(params, PARAM_BASE_PLANE);
+    SliceOutputType output_type = gwy_params_get_enum(params, PARAM_OUTPUT_TYPE);
+    GwyBrick *brick = args->brick;
+    gdouble xy[2], z;
+    gboolean plane_changed = FALSE, point_changed = FALSE;
+    SlicePos currpos;
+    gint id;
+
+    fill_pos_from_params(params, &currpos);
+    if (base_plane == PLANE_XY || base_plane == PLANE_YX) {
+        xy[0] = gwy_brick_itor(brick, pos->x);
+        xy[1] = gwy_brick_jtor(brick, pos->y);
+        if (base_plane != PLANE_XY)
+            GWY_SWAP(gdouble, xy[0], xy[1]);
+        z = gwy_brick_ktor_cal(brick, pos->z);
+        point_changed = (pos->x != currpos.x || pos->y != currpos.y);
+        plane_changed = (pos->z != currpos.z);
+    }
+    else if (base_plane == PLANE_XZ || base_plane == PLANE_ZX) {
+        xy[0] = gwy_brick_itor(brick, pos->x);
+        xy[1] = gwy_brick_ktor_cal(brick, pos->z);
+        if (base_plane != PLANE_XZ)
+            GWY_SWAP(gdouble, xy[0], xy[1]);
+        z = gwy_brick_jtor(brick, pos->y) + brick->yoff;
+        point_changed = (pos->x != currpos.x || pos->z != currpos.z);
+        plane_changed = (pos->y != currpos.y);
+    }
+    else if (base_plane == PLANE_YZ || base_plane == PLANE_ZY) {
+        xy[0] = gwy_brick_jtor(brick, pos->y);
+        xy[1] = gwy_brick_ktor_cal(brick, pos->z);
+        if (base_plane != PLANE_YZ)
+            GWY_SWAP(gdouble, xy[0], xy[1]);
+        z = gwy_brick_itor(brick, pos->x) + brick->xoff;
+        point_changed = (pos->y != currpos.y || pos->z != currpos.z);
+        plane_changed = (pos->x != currpos.x);
+    }
+    else {
+        g_return_if_reached();
+    }
+
+    gui->changing_selection = TRUE;
+    gwy_param_table_set_int(gui->table_coords, PARAM_XPOS, pos->x);
+    gwy_param_table_set_int(gui->table_coords, PARAM_YPOS, pos->y);
+    gwy_param_table_set_int(gui->table_coords, PARAM_ZPOS, pos->z);
+    update_multiselection(gui);
+    if (assume_changed || point_changed) {
+        id = (output_type == OUTPUT_GRAPHS ? gui->current_object : 0);
+        gwy_selection_set_object(gui->iselection, id, xy);
+    }
+    if (assume_changed || plane_changed) {
+        id = (output_type == OUTPUT_IMAGES ? gui->current_object : 0);
+        gwy_selection_set_object(gui->gselection, id, &z);
+    }
+    gui->changing_selection = FALSE;
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    ModuleArgs *args = gui->args;
+    SliceOutputType output_type = gwy_params_get_enum(args->params, PARAM_OUTPUT_TYPE);
+    GwyGraphCurveModel *gcmodel;
+    gint id;
+
+    id = (output_type == OUTPUT_GRAPHS ? gui->current_object : 0);
+    extract_gmodel(args, gui->gmodel);
+    gcmodel = gwy_graph_model_get_curve(gui->gmodel, 0);
+    extract_graph_curve(args, gcmodel, id);
+
+    id = (output_type == OUTPUT_IMAGES ? gui->current_object : 0);
+    extract_image_plane(args, gui->image, id);
+    gwy_data_field_data_changed(gui->image);
+    gwy_set_data_preview_size(GWY_DATA_VIEW(gui->dataview), PREVIEW_SIZE);
+}
+
+static void
+update_multiselection(ModuleGUI *gui)
+{
+    GtkTreeSelection *selection;
+    ModuleArgs *args = gui->args;
+    gint curr = gui->current_object;
+    gint len = args->allpos->len;
+    GtkTreeIter iter;
+    GtkTreePath *path;
+
+    gwy_debug("len: %d, curr: %d", len, curr);
+    if (len == curr) {
+        append_current_pos(args);
+        gwy_null_store_set_n_rows(gui->store, curr+1);
+    }
+    else if (len > gui->current_object) {
+        fill_pos_from_params(args->params, &g_array_index(args->allpos, SlicePos, curr));
+        gwy_null_store_row_changed(gui->store, curr);
+    }
+    else {
+        g_assert_not_reached();
+    }
+
+    if (!gwy_params_get_boolean(args->params, PARAM_MULTISELECT))
+        return;
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(gui->coordlist));
+    gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(gui->store), &iter, NULL, gui->current_object);
+    gtk_tree_selection_select_iter(selection, &iter);
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(gui->store), &iter);
+    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(gui->coordlist), path, NULL, FALSE, 0.0, 0.0);
+    gtk_tree_path_free(path);
+}
+
+static void
+execute(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    gboolean multiselect = gwy_params_get_boolean(args->params, PARAM_MULTISELECT);
+    SliceOutputType output_type = gwy_params_get_enum(args->params, PARAM_OUTPUT_TYPE);
+    GwyAppDataId target_graph_id;
+    GwyGraphModel *gmodel;
+    GwyGraphCurveModel *gcmodel;
+    guint idx;
+
+    if (!multiselect) {
+        g_array_set_size(args->allpos, 0);
+        append_current_pos(args);
+    }
+
+    if (output_type == OUTPUT_IMAGES) {
+        for (idx = 0; idx < args->allpos->len; idx++)
+            extract_one_image(args, data, id, idx);
+    }
+    else if (output_type == OUTPUT_GRAPHS) {
+        gmodel = gwy_graph_model_new();
+        extract_gmodel(args, gmodel);
+        for (idx = 0; idx < args->allpos->len; idx++) {
+            gcmodel = gwy_graph_curve_model_new();
+            extract_graph_curve(args, gcmodel, idx);
+            g_object_set(gcmodel, "color", gwy_graph_get_preset_color(idx), NULL);
+            gwy_graph_model_add_curve(gmodel, gcmodel);
+            g_object_unref(gcmodel);
+        }
+        target_graph_id = gwy_params_get_data_id(args->params, PARAM_TARGET_GRAPH);
+        gwy_app_add_graph_or_curves(gmodel, data, &target_graph_id, 1);
+        g_object_unref(gmodel);
+    }
+}
+
+static void
+extract_one_image(ModuleArgs *args, GwyContainer *data, gint id, gint idx)
+{
+    SliceBasePlane base_plane = gwy_params_get_enum(args->params, PARAM_BASE_PLANE);
+    SlicePos *pos = &g_array_index(args->allpos, SlicePos, idx);
+    GwyBrick *brick = args->brick;
+    GwyDataField *dfield;
+    GwySIValueFormat *vf;
+    gchar *title = NULL;
+    const guchar *gradient;
+    gdouble r;
+    gint i, newid;
+
+    dfield = gwy_data_field_new(1, 1, 1.0, 1.0, TRUE);
+    extract_image_plane(args, dfield, idx);
+    newid = gwy_app_data_browser_add_data_field(dfield, data, TRUE);
+    g_object_unref(dfield);
+    gwy_app_channel_log_add(data, -1, newid, "volume::volume_slice", NULL);
+
+    if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(data, gwy_app_get_data_palette_key_for_id(newid), gradient);
+
+    if (base_plane == PLANE_XY || base_plane == PLANE_YX) {
+        i = pos->z;
+        r = gwy_brick_ktor_cal(brick, i);
+        if (args->zcalibration)
+            vf = gwy_data_line_get_value_format_y(args->zcalibration, GWY_SI_UNIT_FORMAT_VFUNICODE, NULL);
+        else
+            vf = gwy_brick_get_value_format_z(brick, GWY_SI_UNIT_FORMAT_VFUNICODE, NULL);
+        title = g_strdup_printf(_("Z slice at %.*f%s%s (#%d)"),
+                                vf->precision, r/vf->magnitude, strlen(vf->units) ? " " : "", vf->units, i);
+    }
+    else if (base_plane == PLANE_XZ || base_plane == PLANE_ZX) {
+        i = pos->y;
+        r = gwy_brick_jtor(brick, i);
+        vf = gwy_brick_get_value_format_y(brick, GWY_SI_UNIT_FORMAT_VFUNICODE, NULL);
+        title = g_strdup_printf(_("Y slice at %.*f%s%s (#%d)"),
+                                vf->precision, r/vf->magnitude, strlen(vf->units) ? " " : "", vf->units, i);
+    }
+    else if (base_plane == PLANE_YZ || base_plane == PLANE_ZY) {
+        i = pos->x;
+        r = gwy_brick_itor(brick, i);
+        vf = gwy_brick_get_value_format_x(brick, GWY_SI_UNIT_FORMAT_VFUNICODE, NULL);
+        title = g_strdup_printf(_("X slice at %.*f%s%s (#%d)"),
+                                vf->precision, r/vf->magnitude, strlen(vf->units) ? " " : "", vf->units, i);
+    }
+    else {
+        g_return_if_reached();
+    }
+    gwy_si_unit_value_format_free(vf);
+    gwy_container_set_string(data, gwy_app_get_data_title_key_for_id(newid), title);
+}
+
+static void
+extract_image_plane(ModuleArgs *args, GwyDataField *dfield,
+                    guint idx)
+{
+    SliceBasePlane base_plane = gwy_params_get_enum(args->params, PARAM_BASE_PLANE);
+    GwyBrick *brick = args->brick;
+    gboolean do_flip = FALSE;
+    const SlicePos *pos = &g_array_index(args->allpos, SlicePos, idx);
+
+    if (base_plane == PLANE_XY || base_plane == PLANE_YX) {
+        do_flip = (base_plane == PLANE_YX);
+        gwy_brick_extract_plane(args->brick, dfield, 0, 0, pos->z, brick->xres, brick->yres, -1, FALSE);
+    }
+    else if (base_plane == PLANE_YZ || base_plane == PLANE_ZY) {
+        do_flip = (base_plane == PLANE_ZY);
+        gwy_brick_extract_plane(args->brick, dfield, pos->x, 0, 0, -1, brick->yres, brick->zres, FALSE);
+    }
+    else if (base_plane == PLANE_XZ || base_plane == PLANE_ZX) {
+        do_flip = (base_plane == PLANE_ZX);
+        gwy_brick_extract_plane(args->brick, dfield, 0, pos->y, 0, brick->xres, -1, brick->zres, FALSE);
+    }
+
+    if (do_flip) {
+        GwyDataField *tmp = gwy_data_field_duplicate(dfield);
+        gwy_data_field_flip_xy(tmp, dfield, FALSE);
+        g_object_unref(tmp);
+    }
+}
+
+static void
+extract_graph_curve(ModuleArgs *args,
+                    GwyGraphCurveModel *gcmodel,
+                    gint idx)
+{
+    SliceBasePlane base_plane = gwy_params_get_enum(args->params, PARAM_BASE_PLANE);
+    const SlicePos *pos = &g_array_index(args->allpos, SlicePos, idx);
+    GwyBrick *brick = args->brick;
+    GwyDataLine *line, *calibration = NULL;
+    gchar *desc;
+
+    gwy_debug("%d (%u)", idx, (guint)args->allpos->len);
+    gwy_debug("(%d, %d, %d)", pos->x, pos->y, pos->z);
+    line = gwy_data_line_new(1, 1.0, FALSE);
+    if (base_plane == PLANE_XY || base_plane == PLANE_YX) {
+        gwy_brick_extract_line(brick, line, pos->x, pos->y, 0, pos->x, pos->y, brick->zres, FALSE);
+        gwy_data_line_set_offset(line, brick->zoff);
+        calibration = args->zcalibration;
+        desc = g_strdup_printf(_("Z graph at x: %d y: %d"), pos->x, pos->y);
+    }
+    else if (base_plane == PLANE_YZ || base_plane == PLANE_ZY) {
+        gwy_brick_extract_line(brick, line, 0, pos->y, pos->z, brick->xres-1, pos->y, pos->z, FALSE);
+        gwy_data_line_set_offset(line, brick->xoff);
+        desc = g_strdup_printf(_("X graph at y: %d z: %d"), pos->y, pos->z);
+    }
+    else if (base_plane == PLANE_XZ || base_plane == PLANE_ZX) {
+        gwy_brick_extract_line(brick, line, pos->x, 0, pos->z, pos->x, brick->yres-1, pos->z, FALSE);
+        gwy_data_line_set_offset(line, brick->yoff);
+        desc = g_strdup_printf(_("Y graph at x: %d z: %d"), pos->x, pos->z);
+    }
+    else {
+        g_return_if_reached();
+    }
+
+    g_object_set(gcmodel,
+                 "description", desc,
+                 "mode", GWY_GRAPH_CURVE_LINE,
+                 NULL);
+
+    if (calibration) {
+        gwy_graph_curve_model_set_data(gcmodel,
+                                       gwy_data_line_get_data(calibration), gwy_data_line_get_data(line),
+                                       gwy_data_line_get_res(line));
+        gwy_graph_curve_model_enforce_order(gcmodel);
+    }
+    else
+        gwy_graph_curve_model_set_data_from_dataline(gcmodel, line, 0, 0);
+
+    g_object_unref(line);
+}
+
+static void
+extract_gmodel(ModuleArgs *args, GwyGraphModel *gmodel)
+{
+    SliceBasePlane base_plane = gwy_params_get_enum(args->params, PARAM_BASE_PLANE);
+    GwyBrick *brick = args->brick;
+    const gchar *xlabel, *ylabel, *gtitle;
+    GwySIUnit *xunit = NULL, *yunit;
+
+    if (base_plane == PLANE_XY || base_plane == PLANE_YX) {
+        gtitle = _("Volume Z graphs");
+        xlabel = "z";
+        ylabel = "w";
+    }
+    else if (base_plane == PLANE_YZ || base_plane == PLANE_ZY) {
+        gtitle = _("Volume X graphs");
+        xlabel = "x";
+        ylabel = "w";
+    }
+    else if (base_plane == PLANE_XZ || base_plane == PLANE_ZX) {
+        gtitle = _("Volume Y graphs");
+        xlabel = "y";
+        ylabel = "w";
+    }
+    else {
+        g_return_if_reached();
+    }
+
+    if (base_plane == PLANE_XY || base_plane == PLANE_YX) {
+        if (args->zcalibration)
+            xunit = gwy_data_line_get_si_unit_y(args->zcalibration);
+        else
+            xunit = gwy_brick_get_si_unit_z(brick);
+    }
+    else if (base_plane == PLANE_YZ || base_plane == PLANE_ZY)
+        xunit = gwy_brick_get_si_unit_x(brick);
+    else if (base_plane == PLANE_ZX || base_plane == PLANE_XZ)
+        xunit = gwy_brick_get_si_unit_y(brick);
+    yunit = gwy_brick_get_si_unit_w(brick);
+
+    g_object_set(gmodel,
+                 "title", gtitle,
+                 "si-unit-x", xunit,
+                 "si-unit-y", yunit,
+                 "axis-label-bottom", xlabel,
+                 "axis-label-left", ylabel,
+                 NULL);
+}
+
+static void
+append_current_pos(ModuleArgs *args)
+{
+    SlicePos pos;
+
+    fill_pos_from_params(args->params, &pos);
+    g_array_append_val(args->allpos, pos);
+}
+
+static void
+fill_pos_from_params(GwyParams *params, SlicePos *pos)
+{
+    pos->x = gwy_params_get_int(params, PARAM_XPOS);
+    pos->y = gwy_params_get_int(params, PARAM_YPOS);
+    pos->z = gwy_params_get_int(params, PARAM_ZPOS);
+}
+
+static inline void
+clamp_int_param(GwyParams *params, gint id, gint min, gint max, gint default_value)
+{
+    gint p = gwy_params_get_int(params, id);
+
+    if (p < min || p > max)
+        gwy_params_set_int(params, id, default_value);
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    gint xres = gwy_brick_get_xres(args->brick);
+    gint yres = gwy_brick_get_yres(args->brick);
+    gint zres = gwy_brick_get_zres(args->brick);
+
+    clamp_int_param(params, PARAM_XPOS, 0, xres-1, xres/2);
+    clamp_int_param(params, PARAM_YPOS, 0, yres-1, yres/2);
+    clamp_int_param(params, PARAM_ZPOS, 0, zres-1, zres/2);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

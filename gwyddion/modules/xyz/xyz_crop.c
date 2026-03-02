@@ -1,0 +1,312 @@
+/*
+ *  $Id: xyz_crop.c 26355 2024-05-21 08:23:55Z yeti-dn $
+ *  Copyright (C) 2016-2023 David Necas (Yeti).
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/surface.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-xyz.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+    MAXORDER = 10
+};
+
+enum {
+    PARAM_KEEPOFFSET
+};
+
+typedef enum {
+    METHOD_FULL      = 0,
+    METHOD_NEIGHBORS = 1,
+} ZDriftMethodType;
+
+typedef struct {
+    GwyParams *params;
+    GwySurface *surface;
+    GwyDataField *dfield;
+    gdouble xy[4];
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table_options;
+    GwyContainer *data;
+    GwyVectorLayer *vlayer;
+    GwySelection *selection;
+    GwyRectSelectionLabels *rlabels;
+    gdouble rsel[4];
+    gint isel[4];
+
+} ModuleGUI;
+
+
+
+static gboolean         module_register           (void);
+static GwyParamDef*     define_module_params      (void);
+static GwySurface*      execute                   (ModuleArgs *args);
+static GwyDialogOutcome run_gui                   (ModuleArgs *args,
+                                                   GwyContainer *data,
+                                                   gint id);
+
+static void             param_changed             (ModuleGUI *gui,
+                                                   gint id);
+static void             xyzcrop                   (GwyContainer *data,
+                                                   GwyRunType runtype);
+static void             selection_changed         (ModuleGUI *gui);
+static void             rect_updated              (ModuleGUI *gui);
+static void             update_selected_rectangle (ModuleGUI *gui);
+
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("XYZ data crop."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "Petr Klapetek",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, xyz_crop)
+
+static gboolean
+module_register(void)
+{
+    gwy_xyz_func_register("xyz_crop",
+                          (GwyXYZFunc)&xyzcrop,
+                          N_("/Crop..."),
+                          NULL,
+                          RUN_MODES,
+                          GWY_MENU_FLAG_XYZ,
+                          N_("Crop"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_xyz_func_current());
+    gwy_param_def_add_boolean(paramdef, PARAM_KEEPOFFSET, "keepoffsets", _("_Keep offsets"), FALSE);
+
+    return paramdef;
+}
+
+static void
+xyzcrop(GwyContainer *data, GwyRunType runtype)
+{
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    ModuleArgs args;
+    GwySurface *result = NULL;
+    gint id, newid;
+    const guchar *gradient;
+
+    g_return_if_fail(runtype & RUN_MODES);
+
+    gwy_app_data_browser_get_current(GWY_APP_SURFACE, &args.surface,
+                                     GWY_APP_SURFACE_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_SURFACE(args.surface));
+
+    args.params = gwy_params_new_from_settings(define_module_params());
+    args.dfield = gwy_data_field_new(10, 10, 10, 10, FALSE);
+
+    gwy_preview_surface_to_datafield(args.surface, args.dfield,
+                                     PREVIEW_SIZE, PREVIEW_SIZE,
+                                     GWY_PREVIEW_SURFACE_FILL);
+ 
+    if (runtype == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, id);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+    }
+
+    if (outcome == GWY_DIALOG_PROCEED)
+        result = execute(&args);
+
+    if (result) {
+        newid = gwy_app_data_browser_add_surface(result, data, TRUE);
+        gwy_app_set_surface_title(data, newid, _("Cropped"));
+        if (gwy_container_gis_string(data, gwy_app_get_surface_palette_key_for_id(id), &gradient))
+            gwy_container_set_const_string(data, gwy_app_get_surface_palette_key_for_id(newid), gradient);
+
+        g_object_unref(result);
+    }
+
+end:
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GwyDialog *dialog;
+    ModuleGUI gui;
+    GwyParamTable *table;
+    GtkWidget *vbox, *hbox, *dataview;
+    GwyDialogOutcome outcome;
+    const guchar *gradient;
+
+    gui.dialog = gwy_dialog_new(_("Crop"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    gui.args = args;
+    gui.data = gwy_container_new();
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), args->dfield);
+
+    dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    gui.selection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(dataview),
+                                                    0, "Rectangle", 1, TRUE);
+    g_object_ref(gui.selection);
+    gui.vlayer = gwy_data_view_get_top_layer(GWY_DATA_VIEW(dataview));
+    g_object_ref(gui.vlayer);
+    g_signal_connect_swapped(gui.selection, "changed",
+                             G_CALLBACK(selection_changed), &gui);
+
+    if (gwy_container_gis_string(data, gwy_app_get_surface_palette_key_for_id(id), &gradient))
+       gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+
+    hbox = gwy_create_dialog_preview_hbox(GTK_DIALOG(dialog), GWY_DATA_VIEW(dataview), FALSE);
+
+    vbox = gwy_vbox_new(0);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+
+    gui.rlabels = gwy_rect_selection_labels_new(TRUE, G_CALLBACK(rect_updated), &gui);
+    gtk_box_pack_start(GTK_BOX(vbox), gwy_rect_selection_labels_get_table(gui.rlabels), FALSE, FALSE, 0);
+
+    table = gui.table_options = gwy_param_table_new(args->params);
+    gwy_param_table_append_checkbox(table, PARAM_KEEPOFFSET);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(vbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
+
+    g_signal_connect_swapped(gui.table_options, "param-changed", G_CALLBACK(param_changed), &gui);
+
+    outcome = gwy_dialog_run(dialog);
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+selection_changed(ModuleGUI *gui)
+{
+    gint i;
+    gdouble xy[4];
+
+    if (!gwy_selection_get_data(gui->selection, NULL)) {
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, FALSE);
+    } else {
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, TRUE);
+        gwy_selection_get_object(gui->selection, 0, xy);
+        for (i = 0; i < 4; i++)
+            gui->args->xy[i] = xy[i];
+    }
+    update_selected_rectangle(gui);
+}
+
+static void
+rect_updated(ModuleGUI *gui)
+{
+    gwy_rect_selection_labels_select(gui->rlabels, gui->selection, gui->args->dfield);
+}
+
+static void
+update_selected_rectangle(ModuleGUI *gui)
+{
+    gwy_rect_selection_labels_fill(gui->rlabels, gui->selection, gui->args->dfield, gui->rsel, gui->isel);
+}
+
+
+static void
+param_changed(ModuleGUI *gui, G_GNUC_UNUSED gint id)
+{
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static GwySurface*
+execute(ModuleArgs *args)
+{
+    GwySurface *surface = args->surface;
+    GwySurface *result;
+    const GwyXYZ *xyz;
+    GwyXYZ *xyz_result;
+    guint i, n, npoints, newnpoints;
+    gdouble xfrom, xto, yfrom, yto, dfxoff, dfyoff, xoff = 0, yoff = 0;
+    gboolean keep = gwy_params_get_boolean(args->params, PARAM_KEEPOFFSET);
+
+    if ((args->xy[2] - args->xy[0]) == 0 || (args->xy[3] - args->xy[1]) == 0)
+        return NULL;
+
+    dfxoff = gwy_data_field_get_xoffset(args->dfield);
+    dfyoff = gwy_data_field_get_yoffset(args->dfield);
+
+    xfrom = args->xy[0] + dfxoff;
+    yfrom = args->xy[1] + dfyoff;
+    xto = args->xy[2] + dfxoff;
+    yto = args->xy[3] + dfyoff;
+
+    xyz = gwy_surface_get_data(surface);
+    npoints = gwy_surface_get_npoints(surface);
+    newnpoints = 0;
+    for (i = 0; i < npoints; i++) {
+        if (xyz[i].x >= xfrom && xyz[i].y >= yfrom && xyz[i].x <= xto && xyz[i].y <= yto)
+            newnpoints++;
+    }
+
+    printf("newn %d\n", newnpoints);
+
+    result = gwy_surface_new_sized(newnpoints);
+    xyz_result = gwy_surface_get_data(result);
+    gwy_surface_copy_units(surface, result);
+
+    if (!keep) {
+        xoff = xfrom;
+        yoff = yfrom;
+    }
+
+    n = 0;
+    for (i = 0; i < npoints; i++) {
+        if (xyz[i].x >= xfrom && xyz[i].y >= yfrom && xyz[i].x <= xto && xyz[i].y <= yto) {
+            xyz_result[n].x = xyz[i].x - xoff;
+            xyz_result[n].y = xyz[i].y - yoff;
+            xyz_result[n].z = xyz[i].z;
+            n++;
+        }
+    }
+    return result;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

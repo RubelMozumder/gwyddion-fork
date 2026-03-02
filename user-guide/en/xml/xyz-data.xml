@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: xyz-data.xml 18911 2016-09-04 12:57:04Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='xyz-data'>
+  <title>XYZ Data</title>
+  <indexterm><primary>XYZ data</primary></indexterm>
+  <para>
+    XYZ data are point clouds representing measurements in arbitrary sets of
+    points in the <xi:include href="eqi-xy.xml"/> plane.
+    In SPM context it is generally assumed the data define a function in the
+    plane, i.e. one point in the <xi:include href="eqi-xy.xml"/> plane
+    correspond to one <xi:include href="eqi-z.xml"/> value, at least
+    conceptually.  More general XYZ data can represent arbitrary
+    three-dimensional shapes.  However, this is unusual in SPM and
+    <application>Gwyddion</application> currently assumes the data correspond
+    to a single-valued surface.
+  </para>
+  <para id='xyz-data-compatibility'>
+    <indexterm>
+      <primary>XYZ data</primary>
+      <secondary>compatibility</secondary>
+    </indexterm>
+    One important consequence is that XYZ data sets that vary in
+    <xi:include href="eqi-z.xml"/> values but are defined on the same
+    points in the <xi:include href="eqi-xy.xml"/> plane are considered
+    <quote>compatible</quote> in Gwyddion.  Many operations can be performed
+    more directly with compatible data, or only make sense with compatible
+    data.
+  </para>
+  <para>
+    The <link linkend='xyz-data-processing'>XYZ data processing options</link>,
+    found in the <guimenu>XYZ Data</guimenu> menu, are at present limited.
+    XYZ data windows, as shown in the following figure, provide the basic
+    visualisation of XYZ data: a preview raster image.  The preview image
+    is calculated using a fast method that provides a result close to nearest
+    neighbour interpolation of the XYZ data.  Resizing the window only resizes
+    the preview image.  Use the <guibutton>Update Preview</guibutton> button
+    to recalculate the preview image for the current window size.
+  </para>
+  <informalfigure id='fig-xyz-data-window'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='xyz-data-window.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        An XYZ data window displaying the preview image of a spiral-path scan.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <para>
+    It is also possible to switch between preview of the data and display of
+    the XYZ point density using the <guibutton>Density Map</guibutton> toggle
+    button.  The behaviour with respect to window resizing is the same as for
+    the data.
+  </para>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,10 @@
+TODO for file formats:
+- Zeiss CZI - basic implementation of file format
+- NTMDT - fix bugs with new spectroscopy frames, load hybrid scans as curve maps.
+- Renishaw - read whitelight physical dimensions and untis from EXIF tag in image.
+- Zeiss LSM - clear the clutter and reimplement data loading basing on LSM TAG
+- NanoScanTech - reimplement spectroscopy as curve maps where it is appropriate.
+
+TODO for processing:
+- Dimensionality reduction module for volumes
+- ROI average for volumes.

@@ -1,0 +1,690 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='masks'>
+  <title>Masks</title>
+  <para>
+    The mask-related functions can be divided into three main groups:
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        Creation
+      </term>
+      <listitem>
+        <para>
+          Masks are created by various types of marking functions, namely
+          grain marking functions
+          (<link linkend='grain-threshold'>Mark by Threshold</link>,
+          <link linkend='grain-watershed'>Mark by Watershed</link>),
+          defect marking functions
+          (<link linkend='mask-of-outliers'>Mask of Outliers</link>,
+          <link linkend='mark-scars'>Mark Scars</link>)
+          and feature marking functions
+          (<link linkend='mask-by-correlation'>Mask by Correlation</link>,
+          <link linkend='facet-analysis'>Facet Analysis</link>,
+          <link linkend='tip-certainty-map'>Certainty Map</link>).
+          In addition, some general mask editing functions provide means to
+          create masks from scratch.
+        </para>
+        <para>
+          Masks are also used to mark invalid pixels in files imported from
+          formats that distinguish between valid and invalid pixels since
+          Gwyddion does not have a concept of invalid pixels.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Application
+      </term>
+      <listitem>
+        <para>
+          In general, the mask-covered area is considered to be the area of
+          interest, i.e. the area to operate on.  This applies namely to
+          statistical functions such as the
+          <link linkend='stat-quantities'>Statistical Quantities tool</link>.
+          Function
+          <link linkend='remove-data-under-mask'>Interpolate Data Under Mask</link>
+          replaces the data under mask, while the
+          <link linkend='remove-grains'>Remove Grains tool</link> can perform
+          such replacement for individual grains.  There are several functions
+          for the examination of grain properties, see section
+          <link linkend='grain-analysis-statistics'>Grain Statistics</link>.
+        </para>
+        <para>
+          Some functions ask whether to consider the area under mask included
+          or excluded (or ignore the mask), namely
+          <link linkend='leveling'>levelling functions</link>.  Such choice is
+          offered only if a mask is present on the data.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        Editing
+      </term>
+      <listitem>
+        <para>
+          A few basic mask operations, such as inversion or complete removal,
+          are available in
+          <menuchoice>
+            <guimenu>Data Process</guimenu>
+            <guisubmenu>Mask</guisubmenu>
+          </menuchoice>
+          menu.  More advanced functions include the grain-oriented
+          <link linkend='remove-grains'>Remove Grains tool</link> and
+          <link linkend='grain-filter'>Grain Filter</link>
+          that provide different means to remove parts of the mask, as well
+          as
+          <link linkend='mask-editor'>Mask Editor tool</link> and
+          <link linkend='mark-with'>Mark With</link>
+          focused on general mask editing.
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    This section describes general mask functions that are not tied to
+    specific applications.
+  </para>
+  <sect2 id='maskops'>
+    <title>Basic operations</title>
+    <sect3 id='mask-invert-remove'>
+      <title>
+        Inversion and Removal
+        <gwy:icon name='mask_invert'/>
+        <gwy:icon name='mask_remove'/>
+      </title>
+      <para>
+        Basic operations in the
+        <menuchoice>
+          <guimenu>Data Process</guimenu>
+          <guisubmenu>Mask</guisubmenu>
+        </menuchoice>
+        menu include <guimenuitem>Invert</guimenuitem> that inverts the mask,
+        making marked pixels unmarked and vice versa, and
+        <guimenuitem>Remove</guimenuitem> that removes the mask from the data.
+        There functions are also available in the
+        <link linkend='mask-editor'>Mask Editor</link> tool described below.
+        In addition, mask can be removed using the
+        <link linkend='data-window-context-menu'>data window context
+        menu</link>.
+      </para>
+    </sect3>
+    <sect3 id='mask-extract'>
+      <title>
+        Extract <gwy:icon name='mask_extract'/>
+      </title>
+      <para>
+        Function <guimenuitem>Extract</guimenuitem> creates a new image from
+        the mask of the current image.  The image will have values 1 in masked
+        pixels and 0 in unmasked pixels.
+      </para>
+    </sect3>
+    <sect3 id='mask-shift'>
+      <title>
+        Shift <gwy:icon name='mask_shift'/>
+      </title>
+      <para>
+        Mask can be shifted horizontally and/or vertically using
+        <menuchoice>
+          <guimenu>Data Process</guimenu>
+          <guisubmenu>Mask</guisubmenu>
+          <guimenuitem>Shift</guimenuitem>
+        </menuchoice>.
+        After shifting the mask, some its pixels correspond to outside of the
+        image.  The <guilabel>Exterior type</guilabel> controls how they are
+        filled.  The periodic, mirror and border-copying methods work the same
+        as in <link linkend='extend'>Extend</link>.  In addition all the
+        outside pixels can be set to masked (<guilabel>Filled</guilabel>) or
+        unmasked (<guilabel>Empty</guilabel>).
+      </para>
+    </sect3>
+    <sect3 id='mask-distribute'>
+      <title>
+        Distribute <gwy:icon name='mask_distribute'/>
+      </title>
+      <para>
+        Occasionally it is useful to copy a mask to many images.  This can be
+        done using the <guimenuitem>Distribute</guimenuitem> function.  It can
+        copy the mask either to all images within one file or all images in
+        all open files.  If the checkbox <guilabel>Preserve existing
+        masks</guilabel> is enabled the function avoids replacing existing
+        masks.  Note that the mask can be copied only to images with the same
+        pixel dimensions.  Hence images with different dimensions are
+        automatically excluded.
+      </para>
+    </sect3>
+  </sect2>
+  <sect2 id='mask-editor'>
+    <title>
+      Mask Editor Tool <gwy:icon name='mask_editor'/>
+    </title>
+    <para>
+      The <link linkend='tool-mask-editor'>Mask Editor tool</link>
+      is the <quote>Swiss Army knife</quote> for mask modification.
+      It provides two
+      groups of functions: editing of the mask by drawing directly in
+      the data window and global operations with the mask such as inversion
+      or growing and shrinking.
+    </para>
+    <para>
+      The direct mask modification is controlled by the buttons in the
+      <guilabel>Editor</guilabel> group. It can be done in two ways: by selecting
+      geometrical shapes that are subsequently filled or erased (using the
+      <guilabel>Shapes</guilabel> option), and by freehand drawing operations
+      using drawing tools (option <guilabel>Drawing Tools</guilabel>).
+    </para>
+    <para>
+      Buttons in the <guilabel>Mode</guilabel> row select how the geometrical
+      shape drawn in the data window will modify the mask:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Set <gwy:icon name='mask_set'/>
+        </term>
+        <listitem>
+          <para>
+            The mask is set to the drawn shape, discarding any mask already
+            present.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Add <gwy:icon name='mask_add'/>
+        </term>
+        <listitem>
+          <para>
+            The mask is extended by the drawn shape (if there is no mask yet
+            a mask is created).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Subtract <gwy:icon name='mask_subtract'/>
+        </term>
+        <listitem>
+          <para>
+            The drawn shape is cut out from the mask
+            This function has no effect if there is no mask.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Intersect <gwy:icon name='mask_intersect'/>
+        </term>
+        <listitem>
+          <para>
+            The mask is set to the intersection of the drawn shape and the
+            already present mask.
+            This function has no effect if there is no mask.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Buttons in the <guilabel>Shape</guilabel> row control which shape is
+      drawn on the mask.  The choices include rectangles, ellipses and thin
+      lines.
+    </para>
+    <para>
+      Freehand drawing tools are selected by buttons in the <guilabel>Tool</guilabel>
+      row:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Pencil <gwy:icon name='mask_paint_draw'/>
+        </term>
+        <listitem>
+          <para>
+            Freehand drawing with a pencil of radius specified by parameter
+            <guilabel>Radius</guilabel>.  Note this may be slow on slow computers
+            and/or large data fields.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Eraser <gwy:icon name='mask_paint_erase'/>
+        </term>
+        <listitem>
+          <para>
+            Freehand erasing with an eraser of radius specified by parameter
+            <guilabel>Radius</guilabel>.  Note this may be slow on slow computers
+            and/or large data fields.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Fill <gwy:icon name='mask_fill_draw'/>
+        </term>
+        <listitem>
+          <para>
+            Bucket-filling of a contiguous unmasked area.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Erase-fill <gwy:icon name='mask_fill_erase'/>
+        </term>
+        <listitem>
+          <para>
+            Bucket erase-filling of a contiguous masked area.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The basic global operation with masks, i.e. inversion, removal and
+      filling the entire data field area with a mask are available in the
+      <guilabel>Actions</guilabel> row.  Additional operations include:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guibutton>Grow</guibutton>
+           <gwy:icon name='mask_grow'/>
+        </term>
+        <listitem>
+          <para>
+            Extends the mask by <guilabel>Amount</guilabel> pixels on each
+            side.  More precisely, the mask is extended by one pixel on each
+            side and this is repeated <guilabel>Amount</guilabel> times.
+          </para>
+          <para>
+            Normally, growing does not distinguish between individual parts of
+            the mask.   Parts that grow so much that they touch therefore
+            merge.  This can be prevented by <guilabel>Prevent grain merging
+            by growing</guilabel> which makes individual parts of the mask
+            stop growing once there is only one-pixel space between them.
+          </para>
+          <para>
+            When the mask is extended by a large amount it can become important
+            how exactly we measure the distance from the mask edge because it
+            essentially determines the shape to which small grains will grow.
+            This is controlled by option <guilabel>Distance type</guilabel>.
+            The various distance types are described in paragraph
+            <link linkend='mask-edt'>Distance Transform</link>.  Usually, the
+            Euclidean distance is preferable.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guibutton>Shrink</guibutton>
+           <gwy:icon name='mask_shrink'/>
+        </term>
+        <listitem>
+          <para>
+            Reduces the mask by <guilabel>Amount</guilabel> pixels from each
+            side.  More precisely, the mask is reduced by one pixel from each
+            side and this is repeated <guilabel>Amount</guilabel> times.
+          </para>
+          <para>
+            The reduction may or may not occur from the data field borders.
+            This is controlled by the <guilabel>Shrink from border</guilabel>
+            check box.  Similar to growing, it is possible to specify the
+            distance type also for shrinking.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guibutton>Fill Voids</guibutton>
+        </term>
+        <listitem>
+          <para>
+            Makes the grains simply-connected, i.e. without any holes, by
+            filling the holes in grains.  The checkbox
+            <guilabel>Fill non-simple-connected</guilabel> controls if
+            only simple holes are filled, i.e. holes that are themselves
+            simply-connected, or all holes are filled, regardless of
+            topology.
+          </para>
+          <informalfigure id='fig-voids-connectivity'>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref='voids-connectivity.pdf' format='PDF'/>
+              </imageobject>
+              <imageobject>
+                <imagedata fileref='voids-connectivity.png' format='PNG'/>
+              </imageobject>
+              <caption>
+                Explanation of voids connectivity for
+                <guibutton>Fill Voids</guibutton>.  Without
+                <guilabel>Fill non-simple-connected</guilabel>
+                only voids in the middle mask would be filled.  With this
+                option enabled all voids would be filled.
+              </caption>
+            </mediaobject>
+          </informalfigure>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='mark-with'>
+    <title>
+      Mark With <gwy:icon name='mark_with'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Mask</guisubmenu>
+        <guimenuitem>Mark With</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Mark With can create or modify masks using another mask or data of the
+      same dimensions.  The operations that can be applied to the current mask
+      are the same as in the
+      <link linkend='mask-editor'>Mask Editor tool</link>: creation,
+      union, subtraction and intersection.  The source of the other mask can
+      be one of the following:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Mask
+        </term>
+        <listitem>
+          <para>
+            This is the simplest case, a mask can be combined with another mask
+            using the specified logical operations.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Data
+        </term>
+        <listitem>
+          <para>
+            In the Data mode, another height field is used as the other mask
+            source.  The mask consists of pixels within a range of heights,
+            specified as relative values within the total range.  To use pixels
+            outside a certain range for the masking, set the upper bound to a
+            smaller value than the lower bound.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Presentation
+        </term>
+        <listitem>
+          <para>
+            The Presentation mode differs from Data mode only in that a
+            presentation is used instead of the data.
+          </para>
+          <para>
+            This is an exception to the rule stating that presentations are
+            never used for further processing.  Sometimes it can be useful to
+            mark, for instance, edges found on the data even though the
+            corresponding presentation visualizes a quantity weird from the
+            physical point of view.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='maskmorph'>
+    <title>
+      Morphological Operation <gwy:icon name='mask_morph'/>
+    </title>
+    <para>
+      Classical morphological operations can be performed with masks using
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Mask</guisubmenu>
+        <guimenuitem>Morphological Operation</guimenuitem>
+      </menuchoice>.
+      All the operations take the mask as one operand and so-called structuring
+      element as the second operand that determines the precise effect.  The
+      structuring element can be chosen from a few predefined basic shapes
+      (disc, octagon, square, diamond) or it can be given as another mask.
+    </para>
+    <para>
+      The basic shapes are all symmetrical.  When another mask is used as
+      the structuring element it may be asymmetrical or have empty borders.
+      In this case the structuring element has the full dimensions of
+      the selected mask image, including any empty borders.  This full-size
+      image is considered centred.  If you want to remove empty borders from
+      the structuring elements mask, enable the option <guilabel>Trim empty
+      border</guilabel>.  The structuring element will be then again
+      centred but after the empty border removal.
+    </para>
+    <para>
+      The available operations include:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Erosion
+        </term>
+        <listitem id='maskops-erosion'>
+          <indexterm>
+            <primary>erosion</primary>
+            <secondary>mask</secondary>
+          </indexterm>
+          <para>
+            Erosion removes small features and reduces the size or larger
+            features – by amount and shape given by the structuring element.
+            More precisely, if the structuring element is placed to a pixel of
+            the mask and it is entirely contained in the mask then such pixel
+            is kept in the mask.  All other mask pixels are cleared.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Dilation
+        </term>
+        <listitem id='maskops-dilation'>
+          <indexterm>
+            <primary>dilation</primary>
+            <secondary>mask</secondary>
+          </indexterm>
+          <para>
+            Dilation fills small holes and increases the size of features – by
+            amount and shape given by the structuring element.  More precisely,
+            if the structuring element is rotated by 180 degrees and placed to
+            each pixel of the mask the result of dilation is the union of
+            all these shifted structuring elements.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Opening
+        </term>
+        <listitem id='maskops-opening'>
+          <indexterm>
+            <primary>opening</primary>
+            <secondary>mask</secondary>
+          </indexterm>
+          <para>
+            Opening is erosion followed by dilation.  The dilation corrects
+            the effect of the preceding erosion where the mask conforms to the
+            structuring elements.  The net effect is that small non-conforming
+            bumps and grains are removed but conforming parts are kept intact.
+            The mask shape is thus cleaned and simplified.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Closing
+        </term>
+        <listitem id='maskops-closing'>
+          <indexterm>
+            <primary>closing</primary>
+            <secondary>mask</secondary>
+          </indexterm>
+          <para>
+            Closing is dilation followed by erosion.  The erosion corrects
+            the effect of the preceding dilation where the mask conforms to the
+            structuring elements.  The net effect is that small non-conforming
+            holes and dents are removed but conforming parts are kept intact.
+            The mask shape is thus simplified.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          ASF Opening
+        </term>
+        <listitem id='maskops-asf-opening'>
+          <para>
+            A simple opening or closing filter may be too rough for correction
+            of shape flaws of varying sizes.  The alternating sequential filter
+            consists of a sequence of closing and opening operations with
+            progressively increasing structuring elements up to the given size
+            and preserves better the shape of features that should not be
+            removed by the opening.  The final operation of this filter is the
+            opening.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          ASF Closing
+        </term>
+        <listitem id='maskops-asf-closing'>
+          <para>
+            A simple opening or closing filter may be too rough for correction
+            of shape flaws of varying sizes.  The alternating sequential filter
+            consists of a sequence of opening and closing operations with
+            progressively increasing structuring elements up to the given size
+            and preserves better the shape of features that should not be
+            removed by the closing.  The final operation of this filter is the
+            closing.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='mask-edt'>
+    <title>
+      Distance Transform <gwy:icon name='distance_transform'/>
+    </title>
+    <indexterm><primary>distance transform</primary></indexterm>
+    <para>
+      The distance transform assigns to each pixel its distance to the mask
+      boundary.  It is available as
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Mask</guisubmenu>
+        <guimenuitem>Distance Transform</guimenuitem>
+      </menuchoice>.
+      This operation is, in a certain sense, complementary to the
+      <link linkend='grain-watershed'>watershed</link>.  The distance transform
+      can perform the transform using true Euclidean distance
+      <xi:include href="eq-distance-euclidean.xml"/>
+      as well as classical simple distances such as the city-block
+      (4-neighbourhood)
+      <xi:include href="eq-distance-cityblock.xml"/>
+      and chessboard (8-neighbourhood)
+      <xi:include href="eq-distance-chessboard.xml"/>
+      distances that are useful mainly for didactic purposes.  In addition,
+      octagonal distances are available that are calculated by taking the
+      city-block and chessboard distance steps alternatively, obtaining ‘48’
+      and ‘84’ variants depending on which step is taken first.  Finally, an
+      octagonal distance without any specifier is available that is the
+      average of the two variants.
+    </para>
+    <para>
+      If the transform is applied to grain interiors the distance is zero
+      outside grains and increases towards the grain ‘centres’.  Conversely, it
+      can be applied to the exteriors and it is then highest for pixels
+      farthest from any grain.  It is also possible to calculate signed
+      two-side transform which is the difference of the two transforms, i.e. it
+      is positive inside grains and negative outside.
+    </para>
+    <para>
+      Option <guilabel>Shrink from border</guilabel> controls the handling of
+      borders.  When it is enabled, image boundaries are considered to be
+      also grain (or non-grain) boundaries.  Pixels on the image edge thus
+      cannot receive large values.  When it is disabled, the grains (or
+      non-grains) are effectively infinitely large outside the image.
+      So pixels close to the boundary can receive large distance values.
+    </para>
+    <informalfigure id='fig-distance-transform'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='distance-transform.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Euclidean distance transform example: the source mask shown as white
+          on black, interior distance transform, exterior transform (with
+          inverted greyscale for comparison) and the signed transform.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='mask-thin'>
+    <title>
+      Thinning <gwy:icon name='mask_thin'/>
+    </title>
+    <para>
+      Thinning is another classical morphological operation, available as
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Mask</guisubmenu>
+        <guimenuitem>Thin</guimenuitem>
+      </menuchoice>.
+      It reduces the mask to a skeleton consisting only of thin lines
+      characterizing the overall shape.  If the mask boundary is jagged
+      thinning can result in a large number of extra strands.  Therefore it
+      is often useful to apply a simplifying operation beforehand (opening or
+      closing).
+    </para>
+    <para>
+      It should be noted that this function works only with the mask.  It does
+      not use any information from the underlying height field.  Therefore,
+      even though the thinned mask can often coincide with summits and ridges
+      of marked topographical features, this is generally just a coincidence.
+    </para>
+    <informalfigure id='fig-mask-thin'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mask-thin.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Mask thinning example: topographical image of buckling of a polymer
+          film (left); the same image with a mask covering the bump on the
+          surface (centre); and the same mask after thinning (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='mask-noisify'>
+    <title>Noisify</title>
+    <para>
+      Function
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Mask</guisubmenu>
+        <guimenuitem>Noisify</guimenuitem>
+      </menuchoice>
+      adds random salt and/or pepper noise to the mask, as selected by the
+      noise type (symmetrical, positive or negative).  This is useful mainly
+      for the evaluation and development of data processing methods.
+     </para>
+     <para>
+      Parameter <guilabel>Density</guilabel> determines the fraction of image
+      pixels touched.  If <guilabel>Alter only boundaries</guilabel> is enabled
+      a mask pixels is not changed unless it is currently at the boundary,
+      i.e. some of its 4-neighbours differs from the pixel.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: build-and-devel.xml 22370 2019-08-06 16:42:19Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<chapter id='build-and-devel'>
+  <title>Building from Source Code and Development</title>
+  <xi:include href='installation-dependencies.xml'/>
+  <xi:include href='installation-unix-source.xml'/>
+  <xi:include href='installation-osx.xml'/>
+  <xi:include href='installation-cross-mingw32.xml'/>
+  <xi:include href='installation-mingw32.xml'/>
+  <xi:include href='installation-compiling-msvc.xml'/>
+  <xi:include href='installation-devel.xml'/>
+  <xi:include href='develop.xml'/>
+</chapter>

@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: xyz-data-processing.xml 23026 2020-12-28 09:06:18Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='curve-maps-data-processing'>
+  <title>Curve Maps Data Processing</title>
+  <indexterm><primary>Curve Maps Data Processing</primary></indexterm>
+  <para>
+    Curve maps are formed by bundles of curves measured on a regular grid,
+    so the data processing tasks are either connected to extracting the
+    individual curve data, or to automatically processing the curves
+    in every point to create a map of some evaluated quantity. 
+  </para>
+  <para>
+    Basic curve map operations include simple tasks
+    available as a set of menu entries
+    <menuchoice>
+      <guimenu>Curve Maps</guimenu>
+      <guimenuitem>Basic operations</guimenuitem>
+    </menuchoice>.
+    This includes functions for cropping, flipping, rotating curve maps,
+    as well as for changing their physical scale, having the same meaning
+    as for the 2D data. Such functions are useful for any type of curve maps.
+    In contrast to this, many functions are suitable only for some particular
+    curve map types, namely for maps of force-distance curves that many
+    SPMs can produce.
+  </para>
+  <para>
+    Note that at present the curve map functions typically do not store undo data
+    as the size of a typical curve map is already very large.
+  </para>
+  <sect2 id='cmap-crop'>
+    <title>
+      Crop <gwy:icon name='crop'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guimenuitem>Basic operations</guimenuitem>
+        <guimenuitem>Crop</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The module cuts the curve map in lateral directions that can be
+      entered either in pixels or in physical dimensions.
+      With <guilabel>Keep lateral offsets</guilabel> option enabled, the top
+      left corner coordinates of the resulting image correspond to the
+      top left corner of the selection, otherwise the top left corner
+      coordinates are set to <xi:include href="eqi-coords-0-0.xml"/>.
+    </para>
+  </sect2>
+  <sect2 id='cmap-flip'>
+    <title>
+      Flip
+      <gwy:icon name='flip_horizontally'/>
+      <gwy:icon name='flip_vertically'/>
+      <gwy:icon name='rotate_180'/>
+    </title>
+    <indexterm>
+      <primary>flip</primary>
+      <secondary>horizontally</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>flip</primary>
+      <secondary>vertically</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>flip</primary>
+      <secondary>both</secondary>
+    </indexterm>
+    <para>
+      Flip the data horizontally (i.e. about the vertical axis),
+      vertically (i.e. about the horizontal axis) or in both axes
+      with
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guisubmenu>Basic Operations</guisubmenu>
+        <guimenuitem>Flip Horizontally</guimenuitem>
+      </menuchoice>,
+      <guimenuitem>Flip Vertically</guimenuitem>
+      or
+      <guimenuitem>Flip Both Axes</guimenuitem>,
+      respectively.
+    </para>
+  </sect2>
+
+  <sect2 id='cmap-rotate-90'>
+    <title>
+      Rotation by multiples of 90°
+      <gwy:icon name='rotate_90_cw'/>
+      <gwy:icon name='rotate_90_ccw'/>
+    </title>
+    <indexterm>
+      <primary>rotation</primary>
+      <secondary>by multiple of 90°</secondary>
+    </indexterm>
+    <para>
+      Rotation of data by 90 degrees is done using one of the
+      basic rotation functions:
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guisubmenu>Basic Operations</guisubmenu>
+        <guimenuitem>Rotate Clockwise</guimenuitem>
+      </menuchoice>,
+      <guimenuitem>Rotate Anticlockwise</guimenuitem>
+      .
+    </para>
+  </sect2>
+
+  <sect2 id='cmap-dimensions-and-units'>
+    <title>
+      Dimensions and Units <gwy:icon name='data_measure'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guimenuitem>Basic operations</guimenuitem>
+        <guimenuitem>Dimensions and Units</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The module changes physical dimensions of curve maps.
+      This is useful for the correction of raw data that have been imported
+      with wrong physical scales or as a simple manual recalibration of
+      dimensions and values. Apart of different methods for determining
+      the scaling factors (matching pixel size of another data set, setting the
+      scale directly or setting the physical dimensions), the module can
+      be also used to set the lateral offsets. Finally, it can be also used
+      to set the lateral scale units if this was not done while loading the file.
+    </para>
+  </sect2>
+
+  <sect2 id='cmap-remove-segments'>
+    <title>
+      Remove Segments
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guimenuitem>Basic operations</guimenuitem>
+        <guimenuitem>Remove Segments</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The module removes any curve map segmentation. Segments are formed by marks
+      on datasets in each pixel of the curve map and can be used e.g. for splitting
+      the force-distance curve into an approach and a retract part in the force-distance
+      data processing modules. Using this module all such marks are deleted.
+    </para>
+  </sect2>
+
+  <sect2 id='cmap-align'>
+    <title>Align</title>
+    <para>
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guimenuitem>Align...</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The module performs alignment of the curves in the 'z' direction, 
+      where 'z' can mean height, but also any other variable on which
+      the spectra are dependent, like voltage in a IV characteristics.
+      A typical use is aligning the Force-Distance curves measured on
+      a sample with large topography variations, obtaining the topography
+      and shifting all the curves to start at the same z level.
+    </para>
+  </sect2>
+
+  <sect2 id='cmap-extract-curves'>
+    <title>
+      Extract Curves
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guimenuitem>Extract Curves</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The module extracts individual curves as a graph, displayed
+      in the <link linkend='graph-windows'>graph window</link>.
+      As there is no hierarchy in the data forming the curve map,
+      it is necessary to select <guilabel>Abscissa</guilabel> (the independent variable)
+      and <guilabel>Ordinate</guilabel> (the dependent variable) to do so.
+      Typically, for a force-distance curve, the <guilabel>Abscissa</guilabel> will be
+      something related to height or probe-sample separation and 
+      <guilabel>Ordinate</guilabel> will be something related to force.
+      Multiple curves can be extracted by clicking on the <guilabel>Extract Multiple</guilabel> 
+      option.
+    </para>
+  </sect2>
+
+  <sect2 id='cmap-cut-to-segments'>
+    <title>
+      Cut to Segments
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Curve Maps</guimenu>
+        <guimenuitem>Cut to Segments</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The module can be used to either create segments on the curve map
+      or to extract these segments. Segments are the key prerequisite for some of the
+      curve map analysis functions. For example, they can represent the approach and retract part of
+      force-distance data. The module uses a <guilabel>Curve</guilabel> selected by the user 
+      and applies some method (selected by <guilabel>Mode</guilabel> parameter) to detect
+      how to split (or mark) the data. For the mentioned case of force-distance measurements
+      the most logical split would be based on the height, segmenting the curve to
+      an approach, hold and retract part as shown here.
+    </para>
+    <informalfigure id='fig-cut-to-segments'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='cmap_segments.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of Cut to Segments module, showing typical segmentation settings for 
+          force-distance data.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+    The <guilabel>Output type</guilabel> can be set to mark the segments only, 
+    which is the most typical application. Here, the curve map is not altered, only positions 
+    of segments for each individual pixel are added.
+    This is the mode which should be selected to prepare data for curve map processing modules 
+    that use segmented data. The second option is to extract some segments, including the selection 
+    of which curves should be kept. 
+    This can be also used to shrink the data size significantly, keeping only what is needed.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

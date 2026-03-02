@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-b_x-times-b_y.xml 19639 2017-04-20 11:55:12Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase><phrase role='mathvar'>b<subscript>x</subscript></phrase> × <phrase role='mathvar'>b<subscript>y</subscript></phrase></mathphrase>
+  <alt>b_x\times b_y</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

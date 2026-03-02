@@ -1,0 +1,1013 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2015-2023 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwythreads.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwynlfit.h>
+#include <libprocess/brick.h>
+#include <libprocess/stats.h>
+#include <libprocess/linestats.h>
+#include <libprocess/gwyprocess.h>
+#include <libprocess/gwyprocesstypes.h>
+#include <libprocess/correlation.h>
+#include <libgwydgets/gwydataview.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwydgetutils.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+#include "libgwyddion/gwyomp.h"
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+};
+
+enum {
+    RESPONSE_APPLY = 5,
+    RESPONSE_DRIFT = 6,
+};
+
+enum {
+    PARAM_OUTPUT_CROP,
+    PARAM_OUTPUT_DRIFT,
+    PARAM_DIR,
+    PARAM_XDO,
+    PARAM_YDO,
+    PARAM_ZDO,
+    PARAM_XRAW,
+    PARAM_YRAW,
+    PARAM_ZRAW,
+    PARAM_XORDER,
+    PARAM_YORDER,
+    PARAM_ZORDER,
+    PARAM_METHOD,
+    PARAM_ROTATE,
+    PARAM_ROTRANGE,
+    PARAM_NROT
+};
+
+typedef enum {
+    OUTPUT_DRIFT = 0,
+    OUTPUT_CROP  = 1,
+    NOUTPUTS
+} DriftOutput;
+
+typedef enum {
+    DIR_X   = 0,
+    DIR_Y   = 1,
+    DIR_Z   = 2,
+    DIR_ROT = 3,
+    NDIRS
+} DriftDir;
+
+typedef enum {
+    METHOD_INDIVIDUAL = 0,
+    METHOD_AVERAGE    = 1,
+    NMETHODS
+} DriftMethod;
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    GwyBrick *result;
+    gboolean xydata_done;
+    gboolean zdata_done;
+    gint xdrift_n;
+    gdouble *xdrift_z;
+    gdouble *xdrift_drift;
+    gdouble *xdrift_fit;
+    gint ydrift_n;
+    gdouble *ydrift_z;
+    gdouble *ydrift_drift;
+    gdouble *ydrift_fit;
+    gint zdrift_n;
+    gdouble *zdrift_z;
+    gdouble *zdrift_drift;
+    gdouble *zdrift_fit;
+    gint rdrift_n;
+    gdouble *rdrift_z;
+    gdouble *rdrift_drift;
+    gdouble *rdrift_fit;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table_quantity;
+    GwyParamTable *table_options;
+    GwyParamTable *table_x;
+    GwyParamTable *table_y;
+    GwyParamTable *table_z;
+    GwyContainer *data;
+    GwyGraphModel *gmodel;
+    GwySelection *graph_selection;
+} ModuleGUI;
+
+
+static gboolean                    module_register        (void);
+static GwyParamDef*                define_module_params   (void);
+static void                        drift                  (GwyContainer *data,
+                                                           GwyRunType runtype);
+static void                        execute                (ModuleArgs *args,
+                                                           GtkWindow *wait_window);
+static GwyDialogOutcome            run_gui                (ModuleArgs *args,
+                                                           GwyContainer *data,
+                                                           gint id);
+static void                        param_changed          (ModuleGUI *gui,
+                                                           gint id);
+static void                        dialog_response        (GwyDialog *dialog,
+                                                           gint response,
+                                                           ModuleGUI *gui);
+static void                        preview                (gpointer user_data);
+static void                        update_image           (ModuleGUI *gui,
+                                                           gint z);
+static void                        calculate_xydrift_data (ModuleArgs *args,
+                                                           GtkWindow *wait_window);
+static void                        calculate_zdrift_data  (ModuleArgs *args,
+                                                           GtkWindow *wait_window);
+static void                        graph_selection_changed(ModuleGUI *gui,
+                                                           gint id,
+                                                           GwySelection *selection);
+static void                        update_drift_curve     (ModuleGUI *gui);
+static void                        update_fit_curve       (ModuleGUI *gui);
+
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Estimates drift across stacked high-speed SPM frames."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "Petr Klapetek",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_drift)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_drift",
+                             (GwyVolumeFunc)&drift,
+                             N_("/_Correct Data/Estimate _Drift..."),
+                             NULL,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("Estimates drift"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum dirs[] = {
+        { N_("_X"),        DIR_X,    },
+        { N_("_Y"),        DIR_Y,    },
+        { N_("_Z"),        DIR_Z,    },
+        { N_("_Rotation"), DIR_ROT,  },
+    };
+    static const GwyEnum methods[] = {
+        { N_("_One by one"), METHOD_INDIVIDUAL, },
+        { N_("_Average"),    METHOD_AVERAGE,    },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_gwyenum(paramdef, PARAM_DIR, "dir", _("Show direction"),
+                              dirs, G_N_ELEMENTS(dirs), DIR_Z);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_METHOD, "method", _("XY search method"),
+                              methods, G_N_ELEMENTS(methods), METHOD_INDIVIDUAL);
+    gwy_param_def_add_boolean(paramdef, PARAM_OUTPUT_CROP, "output_crop", _("Crop data"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_OUTPUT_DRIFT, "output_drift", _("Plot graphs"), TRUE);
+    gwy_param_def_add_boolean(paramdef, PARAM_XDO, "xdo", _("Apply"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_YDO, "ydo", _("Apply"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_ZDO, "zdo", _("Apply"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_XRAW, "xraw", _("Use raw data"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_YRAW, "yraw", _("Use raw data"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_ZRAW, "zraw", _("Use raw data"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_ROTATE, "rotate", _("XY rotate"), FALSE);
+    gwy_param_def_add_int(paramdef, PARAM_XORDER, "xorder", _("Polynomial degree"), 0, 10, 1);
+    gwy_param_def_add_int(paramdef, PARAM_YORDER, "yorder", _("Polynomial degree"), 0, 10, 1);
+    gwy_param_def_add_int(paramdef, PARAM_ZORDER, "zorder", _("Polynomial degree"), 0, 10, 1);
+    gwy_param_def_add_int(paramdef, PARAM_NROT, "nrot", _("_Number of rotations"), 3, 100, 15);
+    gwy_param_def_add_double(paramdef, PARAM_ROTRANGE, "rotrange", _("_Rotation range"),
+                             0.1, 10, 5);
+
+    return paramdef;
+}
+
+static void
+drift(GwyContainer *data, GwyRunType runtype)
+{
+    ModuleArgs args;
+    GwyBrick *brick = NULL;
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    gboolean output_drift, output_crop;
+    gint oldid, newid, k, zres;
+
+    g_return_if_fail(runtype & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &brick,
+                                     GWY_APP_BRICK_ID, &oldid,
+                                     0);
+    g_return_if_fail(GWY_IS_BRICK(brick));
+    args.result = NULL;
+    args.brick = brick;
+    args.params = gwy_params_new_from_settings(define_module_params());
+
+    zres = gwy_brick_get_zres(brick);
+    args.xdrift_n = zres;
+    args.ydrift_n = zres;
+    args.rdrift_n = zres;
+    args.zdrift_n = zres;
+    args.xdrift_z = g_new(gdouble, zres);
+    args.ydrift_z = g_new(gdouble, zres);
+    args.rdrift_z = g_new(gdouble, zres);
+    args.zdrift_z = g_new(gdouble, zres);
+    args.xdrift_drift = g_new0(gdouble, zres);
+    args.ydrift_drift = g_new0(gdouble, zres);
+    args.rdrift_drift = g_new0(gdouble, zres);
+    args.zdrift_drift = g_new0(gdouble, zres);
+    args.xdrift_fit = g_new0(gdouble, zres);
+    args.ydrift_fit = g_new0(gdouble, zres);
+    args.rdrift_fit = g_new0(gdouble, zres);
+    args.zdrift_fit = g_new0(gdouble, zres);
+
+    for (k = 0; k < zres; k++) {
+        args.xdrift_z[k] = k;
+        args.ydrift_z[k] = k;
+        args.rdrift_z[k] = k;
+        args.zdrift_z[k] = k;
+    }
+
+    if (runtype == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, oldid);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+    }
+
+    if (outcome != GWY_DIALOG_HAVE_RESULT)
+        execute(&args, gwy_app_find_window_for_volume(data, oldid));
+
+    output_drift = gwy_params_get_boolean(args.params, PARAM_OUTPUT_DRIFT);
+    output_crop = gwy_params_get_boolean(args.params, PARAM_OUTPUT_CROP);
+
+    if (output_drift) {
+        GwyGraphModel *gmodel;
+        GwyGraphCurveModel *gcmodel;
+
+        if (!args.xydata_done)
+            calculate_xydrift_data(&args, gwy_app_find_window_for_volume(data, oldid));
+        if (!args.zdata_done)
+            calculate_zdrift_data(&args, gwy_app_find_window_for_volume(data, oldid));
+
+        gmodel = gwy_graph_model_new();
+        g_object_set(gmodel,
+                     "title", _("Lateral drift"),
+                     "axis-label-left", _("Lateral drift"),
+                     "axis-label-bottom", _("Slice level"),
+                     NULL);
+
+        gcmodel = gwy_graph_curve_model_new();
+        g_object_set(gcmodel, "description", _("x-axis drift"), NULL);
+        gwy_graph_curve_model_set_data(gcmodel, args.xdrift_z, args.xdrift_drift, args.xdrift_n);
+        gwy_graph_model_add_curve(gmodel, gcmodel);
+        g_object_unref(gcmodel);
+        gcmodel = gwy_graph_curve_model_new();
+        g_object_set(gcmodel, "description", _("y-axis drift"), NULL);
+        gwy_graph_curve_model_set_data(gcmodel, args.ydrift_z, args.ydrift_drift, args.ydrift_n);
+        gwy_graph_model_add_curve(gmodel, gcmodel);
+        g_object_unref(gcmodel);
+        gwy_app_data_browser_add_graph_model(gmodel, data, TRUE);
+        g_object_unref(gmodel);
+
+        gmodel = gwy_graph_model_new();
+        g_object_set(gmodel,
+                     "title", _("Z drift"),
+                     "axis-label-left", _("Z drift"),
+                     "axis-label-bottom", _("Slice level"),
+                     NULL);
+
+        gcmodel = gwy_graph_curve_model_new();
+        g_object_set(gcmodel, "description", _("Z-axis drift"), NULL);
+        gwy_graph_curve_model_set_data(gcmodel, args.zdrift_z, args.zdrift_drift, args.zdrift_n);
+        gwy_graph_model_add_curve(gmodel, gcmodel);
+        g_object_unref(gcmodel);
+        gwy_app_data_browser_add_graph_model(gmodel, data, TRUE);
+        g_object_unref(gmodel);
+    }
+    if (output_crop) {
+        newid = gwy_app_data_browser_add_brick(args.result, NULL, data, TRUE);
+
+        gwy_app_set_brick_title(data, newid, _("Drift corrected"));
+        gwy_app_sync_volume_items(data, data, oldid, newid, FALSE,
+                                  GWY_DATA_ITEM_GRADIENT,
+                                  0);
+
+        gwy_app_volume_log_add_volume(data, -1, newid);
+    }
+
+end:
+    g_object_unref(args.params);
+    g_object_unref(args.result);
+
+    g_free(args.xdrift_z);
+    g_free(args.ydrift_z);
+    g_free(args.zdrift_z);
+    g_free(args.rdrift_z);
+    g_free(args.xdrift_drift);
+    g_free(args.ydrift_drift);
+    g_free(args.zdrift_drift);
+    g_free(args.rdrift_drift);
+    g_free(args.xdrift_fit);
+    g_free(args.ydrift_fit);
+    g_free(args.zdrift_fit);
+    g_free(args.rdrift_fit);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GtkWidget *hbox, *graph, *area, *dataview;
+    GwyParamTable *table;
+    GwyDialog *dialog;
+    ModuleGUI gui;
+    GwyGraphCurveModel *gcmodel;
+    GwyDialogOutcome outcome;
+    GwyBrick *brick = args->brick;
+    GwyDataField *field = gwy_data_field_new(gwy_brick_get_xres(brick),
+                                             gwy_brick_get_yres(brick),
+                                             gwy_brick_get_xreal(brick),
+                                             gwy_brick_get_yreal(brick),
+                                             TRUE);
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.data = gwy_container_new();
+
+    args->xydata_done = FALSE;
+    args->zdata_done = FALSE;
+
+    args->result = gwy_brick_duplicate(brick);
+
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), field);
+    if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.dialog = gwy_dialog_new(_("Estimate Drift"));
+    dialog = GWY_DIALOG(gui.dialog);
+
+    gtk_dialog_add_button(GTK_DIALOG(dialog),
+                          _("_Calculate drift"), RESPONSE_DRIFT);
+    gtk_dialog_add_button(GTK_DIALOG(dialog),
+                          _("_Apply correction"), RESPONSE_APPLY);
+    gtk_dialog_add_button(GTK_DIALOG(dialog),
+                          _("_Reset"), GWY_RESPONSE_RESET);
+    gtk_dialog_add_button(GTK_DIALOG(dialog),
+                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+    gtk_dialog_add_button(GTK_DIALOG(dialog),
+                          GTK_STOCK_OK, GTK_RESPONSE_OK);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+    //gwy_dialog_add_buttons(dialog, GWY_RESPONSE_UPDATE, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    hbox = gwy_create_dialog_preview_hbox(GTK_DIALOG(dialog), GWY_DATA_VIEW(dataview), FALSE);
+
+    gui.gmodel = gwy_graph_model_new();
+    gcmodel = gwy_graph_curve_model_new();
+    g_object_set(gcmodel, "mode", GWY_GRAPH_CURVE_POINTS, "description", "drift", NULL);
+    gwy_graph_model_add_curve(gui.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+    gcmodel = gwy_graph_curve_model_new();
+    g_object_set(gcmodel, "mode", GWY_GRAPH_CURVE_LINE, "description", "fit", NULL);
+    gwy_graph_model_add_curve(gui.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+
+    graph = gwy_graph_new(gui.gmodel);
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gtk_widget_set_size_request(graph, PREVIEW_SIZE, PREVIEW_SIZE);
+    gtk_box_pack_start(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+
+    area = gwy_graph_get_area(GWY_GRAPH(graph));
+    gwy_graph_area_set_status(GWY_GRAPH_AREA(area), GWY_GRAPH_STATUS_XLINES);
+    gui.graph_selection = gwy_graph_area_get_selection(GWY_GRAPH_AREA(area), GWY_GRAPH_STATUS_XLINES);
+    gwy_selection_set_max_objects(gui.graph_selection, 1);
+
+    hbox = gwy_hbox_new(20);
+    gwy_dialog_add_content(dialog, hbox, TRUE, TRUE, 4);
+
+    table = gui.table_quantity = gwy_param_table_new(args->params);
+    gwy_param_table_append_combo(table, PARAM_DIR);
+    gwy_param_table_append_combo(table, PARAM_METHOD);
+    gwy_param_table_append_checkbox(table, PARAM_OUTPUT_CROP);
+    gwy_param_table_append_checkbox(table, PARAM_OUTPUT_DRIFT);
+
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_x = gwy_param_table_new(args->params);
+    gwy_param_table_append_header(table, -1, _("X Correction"));
+    gwy_param_table_append_checkbox(table, PARAM_XDO);
+    gwy_param_table_append_checkbox(table, PARAM_XRAW);
+    gwy_param_table_append_slider(table, PARAM_XORDER);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_y = gwy_param_table_new(args->params);
+    gwy_param_table_append_header(table, -1, _("Y Correction"));
+    gwy_param_table_append_checkbox(table, PARAM_YDO);
+    gwy_param_table_append_checkbox(table, PARAM_YRAW);
+    gwy_param_table_append_slider(table, PARAM_YORDER);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_z = gwy_param_table_new(args->params);
+    gwy_param_table_append_header(table, -1, _("Z Correction"));
+    gwy_param_table_append_checkbox(table, PARAM_ZDO);
+    gwy_param_table_append_checkbox(table, PARAM_ZRAW);
+    gwy_param_table_append_slider(table, PARAM_ZORDER);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    table = gui.table_options = gwy_param_table_new(args->params);
+    gwy_param_table_append_checkbox(table, PARAM_ROTATE);
+    gwy_param_table_append_slider(table, PARAM_ROTRANGE);
+    gwy_param_table_set_unitstr(table, PARAM_ROTRANGE, "deg");
+    gwy_param_table_append_slider(table, PARAM_NROT);
+
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    gwy_param_table_set_sensitive(table, PARAM_ROTRANGE,
+                                  gwy_params_get_boolean(args->params, PARAM_ROTATE));
+
+
+    g_signal_connect_swapped(gui.table_quantity, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_options, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_x, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_y, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_z, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.graph_selection, "changed", G_CALLBACK(graph_selection_changed), &gui);
+    g_signal_connect_after(dialog, "response", G_CALLBACK(dialog_response), &gui);
+    //gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_UPON_REQUEST, preview, &gui, NULL);
+
+    //update_graph_curve(&gui);
+    update_image(&gui, 0);
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.data);
+    g_object_unref(gui.gmodel);
+
+    return outcome;
+}
+
+static void
+clear_data(ModuleArgs *args)
+{
+    //gint k;
+    //gint zres = gwy_brick_get_zres(args->brick);
+    args->xydata_done = FALSE;
+    args->zdata_done = FALSE;
+ /*   for (k = 0; k < zres; k++) {
+        args->xdrift_drift[k] = 0;
+        args->ydrift_drift[k] = 0;
+        args->rdrift_drift[k] = 0;
+        args->zdrift_drift[k] = 0;
+        args->xdrift_fit[k] = 0;
+        args->ydrift_fit[k] = 0;
+        args->rdrift_fit[k] = 0;
+        args->zdrift_fit[k] = 0;
+    }
+    */
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    if (!(id == PARAM_OUTPUT_CROP || id == PARAM_OUTPUT_DRIFT))
+        gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+
+    if (id < 0 || id == PARAM_METHOD || id == PARAM_ROTATE || id == PARAM_ROTRANGE || id == PARAM_NROT) {
+        clear_data(gui->args);
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), RESPONSE_APPLY, FALSE);
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, FALSE);
+    }
+
+    if (id < 0 || id == PARAM_ROTATE) {
+        gwy_param_table_set_sensitive(gui->table_options, PARAM_ROTRANGE,
+                                      gwy_params_get_boolean(gui->args->params, PARAM_ROTATE));
+        gwy_param_table_set_sensitive(gui->table_options, PARAM_NROT,
+                                      gwy_params_get_boolean(gui->args->params, PARAM_ROTATE));
+     }
+
+     update_fit_curve(gui);
+}
+
+static void
+dialog_response(G_GNUC_UNUSED GwyDialog *dialog, gint response, ModuleGUI *gui)
+{
+    if (response == GWY_RESPONSE_RESET) {
+        gui->args->xydata_done = FALSE;
+        gui->args->zdata_done = FALSE;
+        gwy_brick_copy(gui->args->brick, gui->args->result, FALSE);
+        gwy_selection_clear(gui->graph_selection);
+    } else if (response == RESPONSE_DRIFT) {
+        update_drift_curve(gui);
+        update_fit_curve(gui);
+    } else if (response == RESPONSE_APPLY) {
+        preview(gui);
+        graph_selection_changed(gui, 0, gui->graph_selection);
+    }
+}
+
+static void
+calculate_zdrift_data(ModuleArgs *args, GtkWindow *wait_window)
+{
+    gint k;
+    GwyBrick *brick = args->brick;
+    gint xres = brick->xres;
+    gint yres = brick->yres;
+    gint zres = brick->zres;
+    GwyDataField *dfield;
+    gdouble zerodrift;
+    gdouble *zdrift;
+    gboolean cancelled = FALSE;
+
+    gwy_app_wait_start(wait_window, _("Updating z drift data..."));
+    dfield = gwy_data_field_new(xres, yres, brick->xreal, brick->yreal, FALSE);
+
+    args->zdata_done = TRUE;
+    zdrift = g_new(gdouble, zres);
+
+    for (k = 0; k < zres; k++) {
+        gwy_brick_extract_xy_plane(brick, dfield, k);
+        if (k == 0) {
+            zdrift[k] = 0;
+            zerodrift = gwy_data_field_get_avg(dfield);
+        }
+        else
+            zdrift[k] = gwy_data_field_get_avg(dfield) - zerodrift;
+
+        if (!gwy_app_wait_set_fraction((gdouble)k/zres)) {
+            clear_data(args);
+            cancelled = TRUE;
+            break;
+        }
+     }
+    gwy_app_wait_finish();
+
+    if (!cancelled) {
+        gwy_assign(args->zdrift_drift, zdrift, zres);
+        args->zdata_done = TRUE;
+    }
+
+    g_free(zdrift);
+    g_object_unref(dfield);
+}
+
+static gdouble
+polynom(gint degree, gdouble *coeffs, gdouble x)
+{
+    int i;
+    double sum, xpow;
+
+    sum = coeffs[0];
+    xpow = 1;
+    for (i = 1; i <= degree; i++) {
+        xpow *= x;
+        sum += coeffs[i]*xpow;
+    }
+    return sum;
+}
+
+static void
+calculate_xydrift_data(ModuleArgs *args, GtkWindow *wait_window)
+{
+    gint i, j, k, n, m, xborder, yborder, kstart, bestrotm;
+    gdouble xoffset, yoffset, xoff, yoff, maxscore, xsum, ysum, rsum, zvals[9];
+    gdouble xrot, *rotdata, *xdrift, *ydrift, *rdrift;
+    GwyBrick *brick = args->brick;
+    GwyParams *params = args->params;
+    gint method = gwy_params_get_enum(params, PARAM_METHOD);
+    gboolean rotate = gwy_params_get_boolean(params, PARAM_ROTATE);
+    gdouble rotrange = gwy_params_get_double(params, PARAM_ROTRANGE)*G_PI/180;
+    gint nrot = gwy_params_get_int(params, PARAM_NROT);
+    gint xres = brick->xres;
+    gint yres = brick->yres;
+    gint zres = brick->zres;
+    gdouble angle, rotscore, bestrotscore, bestrot = 0;
+    GwyDataField *dfield, *dfieldp, *score, *kernel, *rotdfield;
+    gboolean cancelled = FALSE;
+
+    gwy_app_wait_start(wait_window, _("Updating lateral drift data..."));
+
+    dfield = gwy_data_field_new(xres, yres, brick->xreal, brick->yreal, FALSE);
+    dfieldp = gwy_data_field_new(xres, yres, brick->xreal, brick->yreal, FALSE);
+    score = gwy_data_field_new_alike(dfieldp, FALSE);
+    xborder = xres/10;
+    yborder = yres/10;
+    kernel = gwy_data_field_area_extract(dfield, xborder, yborder, xres - 2*xborder, yres - 2*yborder);
+
+    xdrift = g_new(gdouble, zres);
+    ydrift = g_new(gdouble, zres);
+    rdrift = g_new(gdouble, zres);
+
+    if (method == METHOD_INDIVIDUAL) {
+        kstart = 1;
+        args->xdrift_z[0] = 0;
+        args->ydrift_z[0] = 0;
+        args->rdrift_z[0] = 0;
+        args->xdrift_drift[0] = 0;
+        args->ydrift_drift[0] = 0;
+        args->rdrift_drift[0] = 0;
+        xsum = 0;
+        ysum = 0;
+        rsum = 0;
+    } else {
+        kstart = 0;
+        gwy_brick_sum_xy_plane(brick, dfieldp);
+    }
+
+    for (k = kstart; k < zres; k++) {
+        if (method == METHOD_INDIVIDUAL)
+           gwy_brick_extract_xy_plane(brick, dfieldp, k-1);
+
+        gwy_brick_extract_xy_plane(brick, dfield, k);
+
+        if (rotate) {
+            //printf("################## rotate\n  ####################");
+            bestrot = 0;
+            bestrotm = 0;
+            bestrotscore = -G_MAXDOUBLE;
+            rotdata = g_new0(gdouble, nrot);
+
+            for (m = 0; m < nrot; m++) {
+                angle = -rotrange/2 + m*rotrange/nrot;
+
+                rotdfield = gwy_data_field_new_rotated(dfield, NULL, angle,
+                                                       GWY_INTERPOLATION_BILINEAR,
+                                                       GWY_ROTATE_RESIZE_SAME_SIZE);
+                gwy_data_field_area_copy(rotdfield, kernel, xborder, yborder, xres - 2*xborder, yres - 2*yborder, 0, 0);
+
+                gwy_data_field_correlation_search(dfieldp, kernel, NULL, score, GWY_CORRELATION_POC,
+                                                  0.1, GWY_EXTERIOR_MIRROR_EXTEND, 0);
+
+                rotscore = gwy_data_field_get_max(score);
+                rotdata[m] = rotscore;
+                //printf("%g %g\n", angle*180/G_PI, rotscore);
+                if (rotscore > bestrotscore) {
+                    bestrotscore = rotscore;
+                    bestrot = angle;
+                    bestrotm = m;
+                }
+
+                g_object_unref(rotdfield);
+            }
+            if (bestrotm > 0 && bestrotm < (nrot-1)) {
+                gwy_math_refine_maximum_1d(rotdata + bestrotm - 1, &xrot);
+                //printf("rot %g     %g -> %g\n", xrot, bestrot*180/G_PI,( bestrot+xrot*rotrange/nrot)*180/G_PI);
+                bestrot += xrot*rotrange/nrot;
+            }
+
+            g_free(rotdata);
+            //printf("rotrange %g  bestangle %g\n", rotrange, bestrot*180/G_PI);
+        }
+
+        if (rotate)
+            gwy_data_field_rotate(dfield, bestrot, GWY_INTERPOLATION_BILINEAR);
+
+        gwy_data_field_area_copy(dfield, kernel, xborder, yborder, xres - 2*xborder, yres - 2*yborder, 0, 0);
+
+        gwy_data_field_correlation_search(dfieldp, kernel, NULL, score, GWY_CORRELATION_POC,
+                                          0.1, GWY_EXTERIOR_MIRROR_EXTEND, 0);
+
+      //remove all the far values
+        //gwy_data_field_area_clear(score, 0, 0, xres/2 - xborder + 1, yres);
+        //gwy_data_field_area_clear(score, 0, 0, xres, yres/2 - yborder + 1);
+        //gwy_data_field_area_clear(score, xres/2 + xborder - 1, 0, xres/2 - xborder + 1, yres);
+        //gwy_data_field_area_clear(score, 0, yres/2 + yborder - 1, xres, yres/2 - yborder + 1);
+
+
+        if (gwy_data_field_get_local_maxima_list(score, &xoff, &yoff, &maxscore, 1, 0, 0.0, FALSE)) {
+            //printf("%g %g  %d %d  x %g  y %g score %g\n", xoff, yoff, xres/2, yres/2,
+                   //xoff-xres/2, yoff-yres/2, maxscore);
+            if (xoff > 0 && xoff < (xres - 1) && yoff > 0 && yoff < (yres - 1)) {
+                n = 0;
+                for (j = -1; j <= 1; j++) {
+                    for (i = -1; i <= 1; i++) {
+                        zvals[n++] = gwy_data_field_get_val(score, xoff+i, yoff+j);
+                    }
+                }
+                gwy_math_refine_maximum_2d(zvals, &xoffset, &yoffset);
+                xoffset += xoff - xres/2;
+                yoffset += yoff - yres/2;
+            } else {
+                xoffset = GWY_ROUND(xoff) - xres/2;
+                yoffset = GWY_ROUND(yoff) - yres/2;
+            }
+        }
+        else
+            xoffset = yoffset = 0;
+
+        if (method == METHOD_INDIVIDUAL) {
+            xsum += xoffset;
+            ysum += yoffset;
+            rsum += bestrot*180/G_PI;
+            xdrift[k] = xsum;
+            ydrift[k] = ysum;
+            rdrift[k] = rsum;
+        }
+        else {
+            xdrift[k] = xoffset;
+            ydrift[k] = yoffset;
+            rdrift[k] = bestrot*180/G_PI;
+        }
+
+        if (!gwy_app_wait_set_fraction((gdouble)k/zres)) {
+            clear_data(args);
+            cancelled = TRUE;
+            break;
+        }
+    }
+    gwy_app_wait_finish();
+
+    if (!cancelled) {
+        for (k = 0; k < zres; k++) {
+            args->xdrift_drift[k] = xdrift[k];
+            args->ydrift_drift[k] = ydrift[k];
+            args->rdrift_drift[k] = rdrift[k];
+        }
+        args->xydata_done = TRUE;
+    }
+
+
+    g_object_unref(dfield);
+    g_object_unref(dfieldp);
+    g_object_unref(score);
+    g_object_unref(kernel);
+
+    g_free(xdrift);
+    g_free(ydrift);
+    g_free(rdrift);
+}
+
+static void
+fit_polynom(gint degree, gboolean raw, gdouble *z, gdouble *drift, gdouble *fit, gint n)
+{
+    gint k;
+    gdouble *coeffs;
+
+    if (raw) {
+       for (k = 0;  k < n; k++)
+           fit[k] = drift[k];
+    }
+    else {
+       coeffs = gwy_math_fit_polynom(n, z, drift, degree, NULL);
+       for (k = 0; k < n; k++)
+           fit[k] = polynom(degree, coeffs, k);
+
+       g_free(coeffs);
+   }
+}
+
+static void
+update_drift_curve(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+
+    //if (!args->xydata_done)
+    calculate_xydrift_data(args, GTK_WINDOW(gui->dialog));
+
+    //if (!args->zdata_done)
+    calculate_zdrift_data(args, GTK_WINDOW(gui->dialog));
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), RESPONSE_APPLY, TRUE);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, TRUE);
+}
+
+static void
+update_fit_curve(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    gint dir = gwy_params_get_enum(params, PARAM_DIR);
+    GwyGraphCurveModel *gcmodel = gwy_graph_model_get_curve(gui->gmodel, 0);
+    GwyGraphCurveModel *fitmodel = gwy_graph_model_get_curve(gui->gmodel, 1);
+    gboolean xraw = gwy_params_get_boolean(args->params, PARAM_XRAW);
+    gboolean yraw = gwy_params_get_boolean(args->params, PARAM_YRAW);
+    gboolean zraw = gwy_params_get_boolean(args->params, PARAM_ZRAW);
+    gint xdegree = gwy_params_get_int(args->params, PARAM_XORDER);
+    gint ydegree = gwy_params_get_int(args->params, PARAM_YORDER);
+    gint zdegree = gwy_params_get_int(args->params, PARAM_ZORDER);
+    gint zres = gwy_brick_get_zres(args->brick);
+
+    if (dir == DIR_X || dir == DIR_Y || dir == DIR_ROT) {
+        if (args->xydata_done) {
+            fit_polynom(xdegree, xraw, args->xdrift_z, args->xdrift_drift, args->xdrift_fit, zres);
+            fit_polynom(ydegree, yraw, args->ydrift_z, args->ydrift_drift, args->ydrift_fit, zres);
+        }
+
+        if (dir == DIR_X) {
+            gwy_graph_curve_model_set_data(gcmodel, args->xdrift_z, args->xdrift_drift, args->xdrift_n);
+            gwy_graph_curve_model_set_data(fitmodel, args->xdrift_z, args->xdrift_fit, args->xdrift_n);
+        }
+        else if (dir == DIR_Y) {
+            gwy_graph_curve_model_set_data(gcmodel, args->ydrift_z, args->ydrift_drift, args->ydrift_n);
+            gwy_graph_curve_model_set_data(fitmodel, args->ydrift_z, args->ydrift_fit, args->ydrift_n);
+        } else {
+            gwy_graph_curve_model_set_data(gcmodel, args->rdrift_z, args->rdrift_drift, args->rdrift_n);
+            gwy_graph_curve_model_set_data(fitmodel, args->rdrift_z, args->rdrift_drift, args->rdrift_n);
+        }
+    }
+    else if (dir == DIR_Z) {
+        if (args->zdata_done)
+            fit_polynom(zdegree, zraw, args->zdrift_z, args->zdrift_drift, args->zdrift_fit, zres);
+
+        gwy_graph_curve_model_set_data(gcmodel, args->zdrift_z, args->zdrift_drift, args->zdrift_n);
+        gwy_graph_curve_model_set_data(fitmodel, args->zdrift_z, args->zdrift_fit, args->zdrift_n);
+    }
+
+    if (dir == DIR_X)
+        g_object_set(gui->gmodel,
+                     "axis-label-left", _("x drift [px]"),
+                     "axis-label-bottom", "slice level",
+                     NULL);
+    else if (dir == DIR_Y)
+        g_object_set(gui->gmodel,
+                     "axis-label-left", _("y drift [px]"),
+                     "axis-label-bottom", "slice level",
+                     NULL);
+    else if (dir == DIR_Z)
+        g_object_set(gui->gmodel,
+                     "axis-label-left", _("z drift"),
+                     "axis-label-bottom", "slice level",
+                     NULL);
+    else
+        g_object_set(gui->gmodel,
+                     "axis-label-left", _("rotation [deg]"),
+                     "axis-label-bottom", "slice level",
+                     NULL);
+}
+
+static void
+update_image(ModuleGUI *gui, gint z)
+{
+    GwyDataField *dfield;
+    GwyBrick *brick = gui->args->result;
+    dfield = gwy_container_get_object(gui->data, gwy_app_get_data_key_for_id(0));
+
+    gwy_brick_extract_xy_plane(brick, dfield, CLAMP(z, 0, brick->zres-1));
+
+    gwy_data_field_data_changed(dfield);
+}
+
+static void
+graph_selection_changed(ModuleGUI *gui, G_GNUC_UNUSED gint id, GwySelection *selection)
+{
+    gdouble z;
+
+    if (!gwy_selection_get_object(selection, 0, &z))
+        z = 0;
+    update_image(gui, z);
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+
+    if (!gui->args->xydata_done)
+        calculate_xydrift_data(gui->args, GTK_WINDOW(gui->dialog));
+    if (!gui->args->zdata_done)
+        calculate_zdrift_data(gui->args, GTK_WINDOW(gui->dialog));
+
+    execute(gui->args, GTK_WINDOW(gui->dialog));
+    gwy_dialog_have_result(GWY_DIALOG(gui->dialog));
+}
+
+static void
+subpixel_area_copy(GwyDataField *dfield, GwyDataField *cropfield,
+                   gint xres, gint yres,
+                   gdouble xs, gdouble ys)
+{
+    gint row, col, i;
+    GwyXY *coords = g_new(GwyXY, xres*yres);
+
+    for (row = i = 0; row < yres; row++) {
+        for (col = 0; col < xres; col++, i++) {
+            coords[i].x = col + 0.5 - xs;
+            coords[i].y = row + 0.5 - ys;
+        }
+    }
+
+    gwy_data_field_sample_distorted(dfield, cropfield,
+                                    coords, GWY_INTERPOLATION_SCHAUM,
+                                    GWY_EXTERIOR_FIXED_VALUE,
+                                    gwy_data_field_get_avg(dfield));
+
+    g_free(coords);
+}
+
+
+static void
+execute(ModuleArgs *args, GtkWindow *wait_window)
+{
+    GwyParams *params = args->params;
+    gint k;
+    gboolean xdo = gwy_params_get_boolean(params, PARAM_XDO);
+    gboolean ydo = gwy_params_get_boolean(params, PARAM_YDO);
+    gboolean zdo = gwy_params_get_boolean(params, PARAM_ZDO);
+    gboolean rotate = gwy_params_get_boolean(params, PARAM_ROTATE);
+    gint xc, yc;
+    gdouble xs, ys;
+    GwyBrick *original = args->brick;
+    GwyBrick *brick = args->result;
+    GwyDataField *dfield, *cropfield;
+    gint xres = gwy_brick_get_xres(original);
+    gint yres = gwy_brick_get_yres(original);
+    gint zres = gwy_brick_get_zres(original);
+    gint nxres = gwy_brick_get_xres(brick);
+    gint nyres = gwy_brick_get_yres(brick);
+
+    xc = args->xdrift_fit[zres/2];
+    yc = args->ydrift_fit[zres/2];
+
+    gwy_app_wait_start(wait_window, _("Cropping data..."));
+    dfield = gwy_data_field_new(xres, yres, gwy_brick_get_xreal(original), gwy_brick_get_yreal(original), FALSE);
+    cropfield = gwy_data_field_new(nxres, nyres, gwy_brick_get_xreal(brick), gwy_brick_get_yreal(brick), FALSE);
+
+    for (k = 0; k < zres; k++) {
+        if (xdo || ydo || zdo)
+            gwy_brick_extract_xy_plane(original, dfield, k);
+
+        if (xdo || ydo) {
+            gwy_data_field_fill(cropfield, gwy_data_field_get_avg(dfield));
+        }
+
+        if (xdo)
+            xs = args->xdrift_fit[k] - xc;
+        else
+            xs = 0;
+        if (ydo)
+            ys = args->ydrift_fit[k] - yc;
+        else
+            ys = 0;
+
+        if (xdo || ydo) {
+            subpixel_area_copy(dfield, cropfield, xres, yres, xs, ys);
+        }
+        else if (zdo)
+            gwy_data_field_area_copy(dfield, cropfield, 0, 0, xres, yres, xs, ys);
+
+        if (rotate)
+            gwy_data_field_rotate(cropfield, args->rdrift_drift[k]*G_PI/180, GWY_INTERPOLATION_BILINEAR);
+
+        if (zdo)
+            gwy_data_field_add(cropfield, -args->zdrift_fit[k]);
+
+        if (xdo || ydo || zdo)
+            gwy_brick_set_xy_plane(brick, cropfield, k);
+
+        if (!gwy_app_wait_set_fraction((gdouble)k/zres))
+            break;
+    }
+    gwy_app_wait_finish();
+
+    g_object_unref(dfield);
+    g_object_unref(cropfield);
+}
+
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

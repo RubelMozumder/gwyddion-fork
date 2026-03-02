@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: xyz-data.xml 18400 2016-03-08 11:02:08Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='xyz-data'>
+  <title>Données XYZ</title>
+  <indexterm><primary>Données XYZ</primary></indexterm>
+  <para>
+    Les données XYZ sont des nuages de points réprésentant des mesures 
+    arbitraires dans le plan <xi:include href="eqi-xy.xml"/>. Dans le contexte
+    des mesures SPM on considère généralement que les données définissent une 
+    fonction dans le plan, c'est-à-dire que chaque point dans le plan 
+    <xi:include href="eqi-xy.xml"/> correspond à une valeur 
+    <xi:include href="eqi-z.xml"/>. Des données XYZ plus générales peuvent 
+    représenter des formes tri-dimensionnelles arbitraires. Toutefois, ce cas 
+    est inhabituel pour les données SPM, et <application>Gwyddion</application> 
+    considère que les données correspondent à une surface n'ayant qu'une valeur
+    par coordonnée <xi:include href="eqi-xy.xml"/>.
+  </para>
+  <para id='xyz-data-compatibility'>
+    <indexterm>
+      <primary>Données XYZ</primary>
+      <secondary>compatibilité</secondary>
+    </indexterm>
+    Une conséquence importante est que les ensembles de données XYZ variant 
+    selon les valeurs en <xi:include href="eqi-z.xml"/> mais définies sur les
+    mêmes points dans le plan <xi:include href="eqi-xy.xml"/> sont considérées
+    comme <quote>compatible</quote> dans Gwyddion. De nombreuses opérations
+    peuvent être appliquées de manière plus directe sur des données 
+    compatibles, et certaines n'ont de sens que sur des données compatibles.
+  </para>
+  <para>
+    Les <link linkend='xyz-data-processing'>fonctions de traitement des données XYZ</link>,
+    données dans le menu <guimenu>données XYZ</guimenu> sont pour l'instant 
+    limitées. La fenêtre des données XYZ, affichée dans lea figure ci-dessous,
+    fournit une visualisation basique des données : un aperçu rastérisé en 
+    image. Celui-ci est calculé à l'aide d'un méthode rapide proche de 
+    l'interpolation arrondie des données XYZ. Le redimensionnement de la 
+    fenêtre ne fait que redimensionner l'aperçu. Utilisez le bouton 
+    <guibutton>rafraîchir l'aperçu</guibutton> pour recalculer l'aperçu pour la 
+    taille de fenêtre en cours.
+  </para>
+  <informalfigure id='fig-xyz-data-window'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='xyz-data-window.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Fenêtre de données XYZ affichant l'aperçu d'un scan le long d'une spirale.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <para>
+    Il est aussi possible de basculer entre l'aperçu et l'affichage de la 
+    densité des points XYZ à l'aide du bouton 
+    <guibutton>carte de densité</guibutton>. Le comportement face au 
+    redimensionnement de la fenêtre est identique à celui de l'aperçu.
+  </para>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

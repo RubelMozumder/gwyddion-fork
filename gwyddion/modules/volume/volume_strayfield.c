@@ -1,0 +1,642 @@
+/*
+ *  $Id: volume_strayfield.c 25581 2023-07-31 11:59:40Z yeti-dn $
+ *  Copyright (C) 2015-2023 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/brick.h>
+#include <libprocess/stats.h>
+#include <libprocess/gwyprocesstypes.h>
+#include <libprocess/mfm.h>
+#include <libprocess/filters.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+};
+
+enum {
+    PARAM_QUANTITY,
+    PARAM_SHOW_TYPE,
+    PARAM_XPOS,
+    PARAM_YPOS,
+    PARAM_ZFROM,
+    PARAM_ZTO,
+};
+
+enum {
+    CURVE_EXTRACTED  = 0,
+    CURVE_CALCULATED = 1,
+    NCURVES
+};
+
+typedef enum {
+    GWY_STRAYFIELD_SINGLE    = 0,
+    GWY_STRAYFIELD_PLANEDIFF = 1,
+    /* Not implemented. */
+    GWY_STRAYFIELD_ZSHIFT    = 2,
+} StrayfieldQuantity;
+
+typedef enum {
+    SHOW_DATA  = 0,
+    SHOW_RESULT = 1,
+} StrayfieldShow;
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    GwyBrick *strayfield;
+    GwyDataLine *rmsdiff;
+    /* Cached input data properties. */
+    GwyDataLine *calibration;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GwyParams *params;
+    GwyContainer *data;
+    GwyDataField *xyplane;
+    GtkWidget *dialog;
+    GwyParamTable *table_z;
+    GwyParamTable *table_display;
+    GtkWidget *dataview;
+    GtkWidget *graph;
+    GwyGraphModel *gmodel;
+    GwySelection *graph_selection;
+    GwySelection *image_selection;
+    gint calculated_zfrom;
+} ModuleGUI;
+
+static gboolean         module_register         (void);
+static void             strayfield              (GwyContainer *data,
+                                                 GwyRunType run);
+static GwyDialogOutcome run_gui                 (ModuleArgs *args,
+                                                 GwyContainer *data,
+                                                 gint id);
+static void             param_changed           (ModuleGUI *gui,
+                                                 gint id);
+static gboolean         execute                 (ModuleArgs *args,
+                                                 GtkWindow *wait_window);
+static void             preview                 (gpointer user_data);
+static void             point_selection_changed (ModuleGUI *gui,
+                                                 gint id,
+                                                 GwySelection *selection);
+static void             graph_selection_changed (ModuleGUI *gui,
+                                                 gint id,
+                                                 GwySelection *selection);
+static void             extract_xyplane         (ModuleGUI *gui);
+static void             update_graph_curves     (ModuleGUI *gui);
+static void             setup_gmodel            (ModuleArgs *args,
+                                                 GwyGraphModel *gmodel);
+static void             dialog_response_after   (GtkDialog *dialog,
+                                                 gint response,
+                                                 ModuleGUI *gui);
+static void             sanitise_params         (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Checks the stray field dependence consistency."),
+    "Petr Klapetek <pklapetek@gwyddion.net>",
+    "2.0",
+    "Petr Klapetek, Robb Puttock & David Nečas (Yeti)",
+    "2018",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_strayfield)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_strayfield",
+                             (GwyVolumeFunc)&strayfield,
+                             N_("/SPM M_odes/_Stray Field Consistency..."),
+                             NULL,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("MSM stray field consistency"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum displays[] = {
+        { N_("_Data"),   SHOW_DATA,  },
+        { N_("_Result"), SHOW_RESULT, },
+    };
+    static const GwyEnum quantities[] =  {
+        { N_("Single value evolution"),     GWY_STRAYFIELD_SINGLE,     },
+        { N_("Plane variance"),             GWY_STRAYFIELD_PLANEDIFF,  },
+#if 0
+        { N_("Z shift difference"),         GWY_STRAYFIELD_ZSHIFT,     },
+#endif
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_gwyenum(paramdef, PARAM_QUANTITY, "quantity", gwy_sgettext("_Quantity"),
+                              quantities, G_N_ELEMENTS(quantities), GWY_STRAYFIELD_SINGLE);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_SHOW_TYPE, "show_type", gwy_sgettext("verb|_Display"),
+                              displays, G_N_ELEMENTS(displays), SHOW_DATA);
+    gwy_param_def_add_int(paramdef, PARAM_XPOS, "xpos", _("_X"), -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_YPOS, "ypos", _("_Y"), -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_ZFROM, "zfrom", _("_Z base"), 0, G_MAXINT, 0);
+    /* XXX: There used to be also analogous "zto". But is an upper limit is actually useful? We can always calculate
+     * in the entire range.
+     * There also used to be an instant updates option, but we instantly update everything which can be updated
+     * sanely – and instant strayfield recalculation just does not work. */
+    return paramdef;
+}
+
+static void
+strayfield(GwyContainer *data, GwyRunType run)
+{
+    ModuleArgs args;
+    GwyDialogOutcome outcome;
+    gint id, zres;
+
+    g_return_if_fail(run & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_clear(&args, 1);
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &args.brick,
+                                     GWY_APP_BRICK_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_BRICK(args.brick));
+
+    args.calibration = gwy_brick_get_zcalibration(args.brick);
+    zres = gwy_brick_get_zres(args.brick);
+    if (args.calibration && zres != gwy_data_line_get_res(args.calibration))
+        args.calibration = NULL;
+    args.strayfield = gwy_brick_new_alike(args.brick, TRUE);
+    args.rmsdiff = gwy_data_line_new(zres, zres, TRUE);
+    args.params = gwy_params_new_from_settings(define_module_params());
+    sanitise_params(&args);
+
+    outcome = run_gui(&args, data, id);
+    gwy_params_save_to_settings(args.params);
+    if (outcome == GWY_DIALOG_CANCEL)
+        goto end;
+
+    /* FIXME: Currently the module is just for a visual check and does not output anything. */
+
+end:
+    g_object_unref(args.strayfield);
+    g_object_unref(args.rmsdiff);
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GwyBrick *brick = args->brick;
+    gint zres = gwy_brick_get_zres(brick);
+    GtkWidget *hbox, *align;
+    GwyGraphArea *area;
+    GwyGraph *graph;
+    GwyParamTable *table;
+    GwyDialog *dialog;
+    ModuleGUI gui;
+    GwyDialogOutcome outcome;
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+
+    gui.data = gwy_container_new();
+    gui.xyplane = gwy_data_field_new(1, 1, 1.0, 1.0, FALSE);
+    extract_xyplane(&gui);
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), gui.xyplane);
+
+    if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.gmodel = gwy_graph_model_new();
+    setup_gmodel(args, gui.gmodel);
+
+    gui.dialog = gwy_dialog_new(_("Stray Field Consistency Check"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_UPDATE, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, 0);
+
+    hbox = gwy_hbox_new(0);
+    gwy_dialog_add_content(dialog, hbox, FALSE, FALSE, 4);
+
+    align = gtk_alignment_new(0.0, 0.0, 0.0, 0.0);
+    gtk_box_pack_start(GTK_BOX(hbox), align, FALSE, FALSE, 0);
+
+    gui.dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    gtk_container_add(GTK_CONTAINER(align), gui.dataview);
+    gui.image_selection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(gui.dataview), 0, "Point", 1, TRUE);
+
+    gui.graph = gwy_graph_new(gui.gmodel);
+    graph = GWY_GRAPH(gui.graph);
+    gwy_graph_enable_user_input(graph, FALSE);
+    gtk_widget_set_size_request(gui.graph, PREVIEW_SIZE, PREVIEW_SIZE);
+    gtk_box_pack_start(GTK_BOX(hbox), gui.graph, TRUE, TRUE, 0);
+
+    area = GWY_GRAPH_AREA(gwy_graph_get_area(graph));
+    gwy_graph_area_set_status(area, GWY_GRAPH_STATUS_XLINES);
+    gui.graph_selection = gwy_graph_area_get_selection(area, GWY_GRAPH_STATUS_XLINES);
+    gwy_selection_set_max_objects(gui.graph_selection, 1);
+
+    hbox = gwy_hbox_new(24);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), hbox, TRUE, TRUE, 4);
+
+    gui.table_z = table = gwy_param_table_new(args->params);
+    gwy_param_table_append_combo(table, PARAM_QUANTITY);
+    gwy_param_table_append_slider(table, PARAM_ZFROM);
+    gwy_param_table_slider_restrict_range(table, PARAM_ZFROM, 0, zres-1);
+    gwy_param_table_slider_add_alt(table, PARAM_ZFROM);
+    if (args->calibration)
+        gwy_param_table_alt_set_calibration(table, PARAM_ZFROM, args->calibration);
+    else
+        gwy_param_table_alt_set_brick_pixel_z(table, PARAM_ZFROM, brick);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+    gwy_dialog_add_param_table(dialog, table);
+
+    gui.table_display = table = gwy_param_table_new(args->params);
+    gwy_param_table_append_radio(table, PARAM_SHOW_TYPE);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+    gwy_dialog_add_param_table(dialog, table);
+
+    /* Start with a calculated stray field. */
+    preview(&gui);
+
+    g_signal_connect_swapped(gui.table_z, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.table_display, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.image_selection, "changed", G_CALLBACK(point_selection_changed), &gui);
+    g_signal_connect_swapped(gui.graph_selection, "changed", G_CALLBACK(graph_selection_changed), &gui);
+    g_signal_connect_after(dialog, "response", G_CALLBACK(dialog_response_after), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_UPON_REQUEST, preview, &gui, NULL);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.gmodel);
+    g_object_unref(gui.xyplane);
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+setup_gmodel(ModuleArgs *args, GwyGraphModel *gmodel)
+{
+    static const gchar *descriptions[NCURVES] = { N_("Extracted"), N_("Calculated"), };
+    GwyBrick *brick = args->brick;
+    GwyDataLine *calibration = args->calibration;
+    GwySIUnit *xunit = (calibration ? gwy_data_line_get_si_unit_y(calibration) : gwy_brick_get_si_unit_z(brick));
+    GwyGraphCurveModel *gcmodel;
+    guint i;
+
+    g_object_set(gmodel,
+                 "si-unit-x", xunit,
+                 "si-unit-y", gwy_brick_get_si_unit_w(brick),
+                 "axis-label-bottom", "z",
+                 "axis-label-left", "w",
+                 NULL);
+    /* There are always two curves. */
+    for (i = 0; i < NCURVES; i++) {
+        gcmodel = gwy_graph_curve_model_new();
+        g_object_set(gcmodel,
+                     "mode", GWY_GRAPH_CURVE_LINE,
+                     "color", gwy_graph_get_preset_color(i),
+                     "description", descriptions[i],
+                     NULL);
+        gwy_graph_model_add_curve(gmodel, gcmodel);
+        g_object_unref(gcmodel);
+    }
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    gdouble z;
+
+    if (id < 0 || id == PARAM_ZFROM) {
+        z = gwy_brick_ktor_cal(args->brick, gwy_params_get_int(params, PARAM_ZFROM));
+        gwy_selection_set_object(gui->graph_selection, 0, &z);
+    }
+    if (id < 0 || id == PARAM_ZFROM || id == PARAM_SHOW_TYPE) {
+        extract_xyplane(gui);
+        gwy_data_field_data_changed(gui->xyplane);
+    }
+    if (id < 0 || id == PARAM_XPOS || id == PARAM_YPOS || id == PARAM_QUANTITY)
+        update_graph_curves(gui);
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+extract_xyplane(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    gint lev = gwy_params_get_int(args->params, PARAM_ZFROM);
+    StrayfieldShow show_type = gwy_params_get_enum(args->params, PARAM_SHOW_TYPE);
+
+    gwy_brick_extract_xy_plane(show_type == SHOW_DATA ? args->brick : args->strayfield, gui->xyplane, lev);
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+
+    gui->calculated_zfrom = -1;
+    if (execute(gui->args, GTK_WINDOW(gui->dialog)))
+        gui->calculated_zfrom = gwy_params_get_int(gui->args->params, PARAM_ZFROM);
+    update_graph_curves(gui);
+    extract_xyplane(gui);
+    gwy_data_field_data_changed(gui->xyplane);
+}
+
+static void
+point_selection_changed(ModuleGUI *gui,
+                        G_GNUC_UNUSED gint id,
+                        GwySelection *selection)
+{
+    ModuleArgs *args = gui->args;
+    GwyBrick *brick = args->brick;
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick);
+    gdouble xy[2];
+
+    if (!gwy_selection_get_object(selection, 0, xy))
+        return;
+
+    gwy_params_set_int(args->params, PARAM_XPOS, CLAMP(gwy_brick_rtoi(brick, xy[0]), 0, xres-1));
+    gwy_params_set_int(args->params, PARAM_YPOS, CLAMP(gwy_brick_rtoj(brick, xy[1]), 0, yres-1));
+    gwy_param_table_param_changed(gui->table_z, PARAM_XPOS);
+}
+
+static void
+graph_selection_changed(ModuleGUI *gui,
+                        G_GNUC_UNUSED gint id,
+                        GwySelection *selection)
+{
+    ModuleArgs *args = gui->args;
+    GwyBrick *brick = args->brick;
+    gint lev, zres = gwy_brick_get_zres(brick);
+    gdouble z;
+
+    /* XXX: When clicking on a new position graph emits two updates, one with old selected line removed and another
+     * with the new selection. It is silly. Just ignore updates with no selected line. */
+    if (!gwy_selection_get_object(selection, 0, &z))
+        return;
+
+    /* FIXME FIXME FIXME: This used to be much more complicated. Was anything lost? */
+    lev = GWY_ROUND(gwy_brick_rtok_cal(brick, z));
+    lev = CLAMP(lev, 0, zres-1);
+    gwy_param_table_set_int(gui->table_z, PARAM_ZFROM, lev);
+}
+
+static gdouble
+get_brick_self_plane_rms(GwyBrick *brick, gint from, gint level)
+{
+    gint k, xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick);
+    const gdouble *p, *plane0, *plane;
+    gdouble d, sum = 0;
+
+    p = gwy_brick_get_data(brick);
+    plane0 = p + xres*yres*from;
+    plane = p + xres*yres*level;
+
+    for (k = 0; k < xres*yres; k++) {
+        d = plane[k] - plane0[k];
+        sum += d*d;
+    }
+
+    /* XXX: This used to be sqrt(sum)/(xres*yres), but that does not make sense. */
+    return sqrt(sum/(xres*yres));
+}
+
+static gboolean
+compute_strayfield_brick(GwyBrick *brick, GwyBrick *result,
+                         gint zfrom, gint zto,
+                         GtkWindow *wait_window)
+{
+    GwyDataField *shiftedfield;
+    GwyDataField *basefield;
+    gboolean cancelled = FALSE;
+    gdouble z0, z;
+    gint level;
+
+    if (zfrom >= zto)
+        return FALSE;
+
+    if (wait_window)
+        gwy_app_wait_start(wait_window, _("Building stray field dependence..."));
+
+    basefield = gwy_data_field_new(1, 1, 1.0, 1.0, FALSE);
+    gwy_brick_extract_xy_plane(brick, basefield, zfrom);
+    shiftedfield = gwy_data_field_new_alike(basefield, FALSE);
+    gwy_brick_clear(result);
+
+    z0 = gwy_brick_ktor_cal(brick, zfrom);
+    for (level = zfrom; level < zto; level++) {
+        z = gwy_brick_ktor_cal(brick, level);
+        gwy_data_field_mfm_shift_z(basefield, shiftedfield, z - z0);
+        gwy_brick_set_xy_plane(result, shiftedfield, level);
+        if (wait_window && !gwy_app_wait_set_fraction(((gdouble)(level-zfrom))/(zto-zfrom))) {
+            cancelled = TRUE;
+            break;
+        }
+    }
+    if (wait_window)
+        gwy_app_wait_finish();
+
+    g_object_unref(basefield);
+    g_object_unref(shiftedfield);
+
+    if (cancelled)
+        gwy_brick_clear(result);
+
+    return !cancelled;
+}
+
+static GwyDataLine*
+make_xdata(GwyBrick *brick, gint from, gint to)
+{
+    GwyDataLine *xdataline, *calibration;
+    gint i, res = to - from;
+    gdouble *d;
+    gdouble dz, zoff;
+
+    calibration = gwy_brick_get_zcalibration(brick);
+    if (calibration && (gwy_brick_get_zres(brick) != gwy_data_line_get_res(calibration)))
+        calibration = NULL;
+
+    if (calibration) {
+        xdataline = gwy_data_line_duplicate(calibration);
+        gwy_data_line_resize(xdataline, from, to);
+    }
+    else {
+        xdataline = gwy_data_line_new(to - from, to - from, FALSE);
+        d = gwy_data_line_get_data(xdataline);
+        dz = gwy_brick_get_dz(brick);
+        zoff = gwy_brick_get_zoffset(brick);
+        for (i = 0; i < res; i++)
+            d[i] = zoff + (from + i)*dz;
+    }
+
+    return xdataline;
+}
+
+static gboolean
+execute(ModuleArgs *args, GtkWindow *wait_window)
+{
+    GwyBrick *brick = args->brick, *strayfield = args->strayfield;
+    gint zfrom = gwy_params_get_int(args->params, PARAM_ZFROM);
+    gint zto = gwy_brick_get_zres(brick);
+    gdouble *d;
+    gint k, ndata;
+
+    ndata = zto - zfrom;
+    if (!ndata || !compute_strayfield_brick(brick, strayfield, zfrom, zto, wait_window))
+        return FALSE;
+
+    gwy_data_line_resample(args->rmsdiff, ndata, GWY_INTERPOLATION_NONE);
+    d = gwy_data_line_get_data(args->rmsdiff);
+    d[0] = 0;
+    for (k = 0; k < ndata; k++)
+        d[k] = get_brick_self_plane_rms(strayfield, zfrom, zfrom+k);
+
+    return TRUE;
+}
+
+static void
+extract_one_graph_curve(GwyBrick *brick,
+                        gint col, gint row,
+                        gint zfrom, gint zto,
+                        GwyGraphCurveModel *gcmodel)
+{
+    GwyDataLine *xdataline, *ydataline;
+    gint ndata = zto - zfrom;
+
+    xdataline = make_xdata(brick, zfrom, zto);
+    ydataline = gwy_data_line_new(ndata, ndata, FALSE);
+    gwy_brick_extract_line(brick, ydataline, col, row, zfrom, col, row, zto, FALSE);
+    gwy_graph_curve_model_set_data(gcmodel,
+                                   gwy_data_line_get_data(xdataline), gwy_data_line_get_data(ydataline), ndata);
+    g_object_unref(xdataline);
+    g_object_unref(ydataline);
+}
+
+static void
+extract_data_curve(ModuleArgs *args, GwyGraphCurveModel *gcmodel)
+{
+    gint col = gwy_params_get_int(args->params, PARAM_XPOS);
+    gint row = gwy_params_get_int(args->params, PARAM_YPOS);
+    gint zres = gwy_brick_get_zres(args->brick);
+
+    extract_one_graph_curve(args->brick, col, row, 0, zres, gcmodel);
+}
+
+static void
+extract_strayfield_curve(ModuleArgs *args, gint zfrom, GwyGraphCurveModel *gcmodel)
+{
+    gint col = gwy_params_get_int(args->params, PARAM_XPOS);
+    gint row = gwy_params_get_int(args->params, PARAM_YPOS);
+    gint zres = gwy_brick_get_zres(args->brick);
+
+    extract_one_graph_curve(args->strayfield, col, row, zfrom, zres, gcmodel);
+}
+
+static void
+plot_rmsdiff_curve(ModuleArgs *args, gint zfrom, GwyGraphCurveModel *gcmodel)
+{
+    gint zto = gwy_brick_get_zres(args->brick);
+    GwyDataLine *xdataline, *rmsdiff = args->rmsdiff;
+    gint ndata = zto - zfrom;
+
+    xdataline = make_xdata(args->brick, zfrom, zto);
+    gwy_graph_curve_model_set_data(gcmodel,
+                                   gwy_data_line_get_data(xdataline), gwy_data_line_get_data(rmsdiff), ndata);
+    g_object_unref(xdataline);
+}
+
+static void
+update_graph_curves(ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    StrayfieldQuantity quantity = gwy_params_get_enum(args->params, PARAM_QUANTITY);
+    GwyGraphCurveModel *gcmodel;
+
+    /* We can always plot the input data. */
+    gcmodel = gwy_graph_model_get_curve(gui->gmodel, CURVE_EXTRACTED);
+    extract_data_curve(args, gcmodel);
+
+    /* We may or may not be able to plot the calculated data because they may not exist. */
+    gcmodel = gwy_graph_model_get_curve(gui->gmodel, CURVE_CALCULATED);
+    if (gui->calculated_zfrom >= 0) {
+        g_object_set(gcmodel, "mode", GWY_GRAPH_CURVE_LINE, NULL);
+        if (quantity == GWY_STRAYFIELD_SINGLE)
+            extract_strayfield_curve(args, gui->calculated_zfrom, gcmodel);
+        else
+            plot_rmsdiff_curve(args, gui->calculated_zfrom, gcmodel);
+    }
+    else {
+        g_object_set(gcmodel, "mode", GWY_GRAPH_CURVE_HIDDEN, NULL);
+    }
+}
+
+static void
+dialog_response_after(G_GNUC_UNUSED GtkDialog *dialog, gint response, ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GwyBrick *brick = args->brick;
+
+    if (response == GWY_RESPONSE_RESET) {
+        gwy_params_set_int(args->params, PARAM_XPOS, gwy_brick_get_xres(brick)/2);
+        gwy_params_set_int(args->params, PARAM_YPOS, gwy_brick_get_yres(brick)/2);
+    }
+}
+
+static inline void
+clamp_int_param(GwyParams *params, gint id, gint min, gint max, gint default_value)
+{
+    gint p = gwy_params_get_int(params, id);
+
+    if (p < min || p > max)
+        gwy_params_set_int(params, id, default_value);
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    GwyBrick *brick = args->brick;
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick), zres = gwy_brick_get_zres(brick);
+
+    clamp_int_param(params, PARAM_XPOS, 0, xres-1, xres/2);
+    clamp_int_param(params, PARAM_YPOS, 0, yres-1, yres/2);
+    clamp_int_param(params, PARAM_ZFROM, 0, zres-1, zres/2);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

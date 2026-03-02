@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-Omega_m.xml 20209 2017-08-09 08:27:53Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase>Ω<subscript><phrase role='mathvar'>m</phrase></subscript></mathphrase>
+  <alt>\Omega_m</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

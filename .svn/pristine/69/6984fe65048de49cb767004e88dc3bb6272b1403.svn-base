@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: fitting-functions.xml 17165 2015-05-14 08:47:20Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='fitting-functions'>
+  <title>Fonctions d'ajustement</title>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-acf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-acf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-acf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-acf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-hhcf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-hhcf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-hhcf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-hhcf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-psdf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-psdf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-psdf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-psdf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-rpsdf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian-rpsdf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-rpsdf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential-rpsdf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-two-gaussians-psdf.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-two-gaussians-psdf.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-gaussian.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-lorentzian.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-lorentzian.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-sinc.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-sinc.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-exponential.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-power.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-power.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-square-wave.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-square-wave.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-parabolic-step.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-parabolic-step.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-smooth-bent-step.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-smooth-bent-step.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-boltzmann-bent-step.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-boltzmann-bent-step.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-smooth-slanted-step.pdf' format='PDF'/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref='fitfunc-smooth-slanted-step.png' format='PNG'/>
+      </imageobject>
+    </inlinemediaobject>
+  </para>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,334 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2023-05-21 23:34+0400\n"
+"PO-Revision-Date: 2023-05-21 23:38+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.3.1\n"
+
+#: selections.xml:6(title)
+msgid "Selections"
+msgstr "Выбранные объекты"
+
+#: selections.xml:7(para)
+msgid ""
+"All interactive <link linkend=\"tools\">tools</link> and some other "
+"processing methods allow to select geometrical shapes on data with mouse: "
+"points, lines, rectangles, circles/ellipses. Existing selections can be "
+"similarly modified by dragging corners, endpoints, or complete selections. "
+"When mouse cursor is moved near to an editable point of a selection, is "
+"changes its shape to indicate the possibility to edit this point."
+msgstr ""
+"Все интерактивные <link linkend=\"tools\">инструменты</link> и некоторые из "
+"других методов обработки позволяют выбирать на данных мышью геометрические "
+"фигуры: точки, линии, прямоугольники, круги/эллипсы. Существующие выбранные "
+"объекты могут изменяться подобным образом путём перетаскивания за углы, "
+"конечные точки или весь выбранный объект. Когда курсор мыши приближается к "
+"редактируемой точке выбранного объекта, он меняет свою форму чтобы "
+"показывает возможность изменить эту точку."
+
+#: selections.xml:16(para)
+msgid ""
+"Each tool typically uses only one type of selection and when it is activated "
+"on a data window, it sets the selection mode to this type. Selections of "
+"other types than currently displayed are remembered and they are recalled "
+"when a tool which uses them is activated again. E.g. when you select several "
+"lines with Profile extraction tool, then switch to Statistical quantities "
+"(the lines disappear) and select a rectangular area to calculate its "
+"statistical characteristics, and then switch back to Profile extraction, the "
+"rectangle disappears and the lines appear again."
+msgstr ""
+"Каждый из инструментов обычно использует только один вид выбранного объекта, "
+"и, когда он задействован в окне данных, устанавливает режим выбора на этот "
+"вид. Выбранные объекты видов, отличных от текущего показанного, запоминаются "
+"и вызываются вновь, когда инструмент, который их использует, будет "
+"задействован вновь. Т.е., когда вы выбираете несколько линий с помощью "
+"инструмента извлечения профиля, затем переключаетесь на статистические "
+"величины (линии пропадают) и выбираете прямоугольную область в которой будут "
+"рассчитываться статистические величины, и затем переключаетесь назад на "
+"извлечение профилей, прямоугольная область исчезнет, а линии появятся вновь."
+
+#: selections.xml:26(para)
+msgid ""
+"Tools that use the same type of selection – e.g. both Statistical functions "
+"and Statistical quantities use rectangular selection – share it. To "
+"calculate height distribution of the same rectangle you have selected for "
+"statistical quantities, it is sufficient to switch the tool."
+msgstr ""
+"Инструменты, которые используют одинаковый режим выбора, например, как "
+"статистические функции, так и статистические величины используют "
+"прямоугольный режим выделения, делят его между собой. Чтобы посчитать "
+"распределение высот того же самого прямоугольника, что вы выбрали для "
+"расчёта статистических величин, достаточно поменять инструмент."
+
+#: selections.xml:37(caption)
+msgid "Data window with three selected lines, two horizontal and one vertical."
+msgstr ""
+"Окно данных с тремя выбранными линиями, двумя горизонтальными и одной "
+"вертикальной."
+
+#: selections.xml:42(para)
+msgid ""
+"If you save data in Gwyddion native file format (<filename>.gwy</filename>), "
+"all selections are saved together with data and recalled the next time the "
+"file is opened and appropriate tool chosen."
+msgstr ""
+"Если вы сохраняете данные в родной для Gwyddion формат файла (<filename>."
+"gwy</filename>), все выбранные объекты будут сохранены вместе с данными и "
+"вызваны в следующий раз, когда файл будет открыт и подходящий инструмент "
+"выбран."
+
+#: selections.xml:53(listitem)
+msgid "rectangular selections to perfect squares,"
+msgstr "прямоугольные выбранные области до правильных квадратов,"
+
+#: selections.xml:56(listitem)
+msgid "elliptical selections to perfect circles, and"
+msgstr "эллиптические выбранные области до правильных кругов, и"
+
+#: selections.xml:59(listitem)
+msgid "directions of line selections to multiples of 15°."
+msgstr "направления выбранных линий до кратных 15°."
+
+#: selections.xml:48(para)
+msgid ""
+"Pressing <keycap>Shift</keycap> during selection restricts the degrees of "
+"freedom of the shape, making it easier to draw shapes from a specific "
+"subset. Specifically, pressing <keycap>Shift</keycap> restricts "
+"<placeholder-1/>"
+msgstr ""
+"Нажатие <keycap>Shift</keycap> при выделении ограничивает степени свободы "
+"фигуры, делая проще рисование фигур из определённого подмножества. Точнее, "
+"нажатие <keycap>Shift</keycap> ограничивает <placeholder-1/>"
+
+#: selections.xml:68(keycap)
+msgid "Left"
+msgstr "Влево"
+
+#: selections.xml:68(keycap)
+msgid "Right"
+msgstr "Вправо"
+
+#: selections.xml:69(keycap)
+msgid "Up"
+msgstr "Вверх"
+
+#: selections.xml:69(keycap)
+msgid "Down"
+msgstr "Вниз"
+
+#: selections.xml:67(listitem)
+msgid ""
+"arrow keys <placeholder-1/>, <placeholder-2/>, <placeholder-3/> and "
+"<placeholder-4/> move the point – for lines or rectangles this means the "
+"first point,"
+msgstr ""
+"клавиши со стрелками <placeholder-1/>, <placeholder-2/>, <placeholder-3/> и "
+"<placeholder-4/> перемещают точку, для линий и прямоугольников это означает "
+"первую точку,"
+
+#: selections.xml:73(keycap)
+msgid "Shift"
+msgstr "Shift"
+
+#: selections.xml:72(listitem)
+msgid ""
+"holding <placeholder-1/> moves the other point instead for lines or "
+"rectangles, and"
+msgstr ""
+"удержание <placeholder-1/> перемещает вместо этого другую точку для линий "
+"или прямоугольников, и"
+
+#: selections.xml:77(keycap)
+msgid "Alt"
+msgstr "Alt"
+
+#: selections.xml:78(keycap)
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#: selections.xml:76(listitem)
+msgid ""
+"holding another modifier key such as <placeholder-1/> or <placeholder-2/> "
+"moves the point by larger steps."
+msgstr ""
+"удержание другого модификатора, например, <placeholder-1/> или "
+"<placeholder-2/> перемещает точки с большим шагом."
+
+#: selections.xml:64(para)
+msgid ""
+"The last modified shape can also be adjusted using the keyboard: "
+"<placeholder-1/>"
+msgstr ""
+"Последняя измененная фигура также может быть подправлена с использованием "
+"клавиатуры: <placeholder-1/>"
+
+#: selections.xml:82(para)
+msgid ""
+"Several <link linkend=\"tools\">tools</link> can hold the selection while "
+"switching between images. Meaning the selection is copied from the current "
+"image any image you switch to. It is enabled by checking <guilabel>Hold "
+"selection</guilabel> in the tool. Depending on the additional options, the "
+"current selection can be copied only to images which do not have any yet or "
+"replace existing selections."
+msgstr ""
+"Несколько <link linkend=\"tools\">инструментов</link> могут сохранять "
+"выделенные объекты при переключении между изображениями. Это означает, что "
+"выделение копируется между текущим изображением и тем изображением, на "
+"которое переключается пользователь. Такое поведение можно включить путём "
+"выбора опции <guilabel>Сохранить выделение</guilabel> в окне инструмента. В "
+"зависимости от дополнительных настроек, текущее выделение может быть "
+"скопировано только для изображений, на которых ничего не выделено или "
+"заменять существующие выделения."
+
+#: selections.xml:92(title)
+msgid "Selection Manager <gwy:icon name=\"selections\"/>"
+msgstr "Менеджер выбранного <gwy:icon name=\"selections\"/>"
+
+#: selections.xml:95(para)
+msgid ""
+"The <link linkend=\"tool-selection-manager\">selection manager tool</link> "
+"is a special tool that displays the list of all selections in an image and "
+"enables to copy them to other images."
+msgstr ""
+"<link linkend=\"tool-selection-manager\">Менеджер выбранного</link> — "
+"специальный инструмент, который показывает список всех выбранных элементов "
+"для изображения и позволяет скопировать их на другие изображения."
+
+#: selections.xml:100(para)
+msgid ""
+"For each selection, the tool shows the name, which is how the selection is "
+"identified in the <filename>.gwy</filename> file; the selection type and the "
+"number of objects (points, lines, rectangles, …) selected. Usually, there is "
+"at most one selection of any type because they are shared among the tools as "
+"<link linkend=\"selection-sharing\">described above</link>. Nevertheless, "
+"sometimes there are special or private selections present as shown on the "
+"following figure displaying two point-wise selections."
+msgstr ""
+"Для каждого выбранного объекта показывается имя, под которым он "
+"идентифицируется в файле <filename>.gwy</filename>, тип выбранного объекта и "
+"количество выбранных объектов (точек, линий, прямоугольников, …). Обычно "
+"существует по крайней мере один выбранный объект любого типа поскольку они "
+"являются общими для инструментов, как <link linkend=\"selection-sharing"
+"\">описано выше</link>. Тем не менее, иногда присутствуют специальные или "
+"индивидуальные выбранные объекты, как показано на следующем рисунке, "
+"демонстрирующем два выбранных набора точек."
+
+#: selections.xml:115(caption)
+msgid "Selection Manager showing several selections present in the data."
+msgstr "Менеджер выбранного показывает несколько выбранных объектов на данных."
+
+#: selections.xml:120(para)
+msgid "Selection chosen in the list is displayed in the data window."
+msgstr "Выбранный в списке объект показывается в окне данных."
+
+#: selections.xml:123(para)
+msgid ""
+"It is possible to delete individual selections by choosing them in the list "
+"and pressing the <keycap>Delete</keycap> key or <guibutton>Delete</"
+"guibutton> button – this is equivalent to clearing the selection in the "
+"corresponding tool. The <guibutton>Clear</guibutton> button removes all "
+"selections."
+msgstr ""
+"Можно удалить отдельные выбранные объекты выбрав их в списке и нажав клавишу "
+"<keycap>Delete</keycap> или кнопку <guibutton>Delete</guibutton>– это "
+"эквивалентно очистке выбранного в соответствующем инструменте. Кнопка "
+"<guibutton>Очистить</guibutton> удаляет все выбранные объекты."
+
+#: selections.xml:130(para)
+msgid ""
+"However, the most interesting function of Selection Manager is selection "
+"copying. There are two ways to copy a selection to another image:"
+msgstr ""
+"Однако, наиболее интересным инструментом в менеджере выбранного является "
+"копирование выбранных объектов. Есть два варианта как скопировать выбранный "
+"объект на другое изображение:"
+
+#: selections.xml:135(listitem)
+msgid ""
+"Dragging a row from the selection list onto a data window copies the "
+"selection to this data window."
+msgstr ""
+"Перетаскиванием строки из списка выбранных объектов на окно данных копирует "
+"объект в это окно."
+
+#: selections.xml:140(guibutton)
+msgid "Distribute"
+msgstr "Распространить"
+
+#: selections.xml:142(guilabel)
+msgid "to all files"
+msgstr "на все файлы"
+
+#: selections.xml:139(listitem)
+msgid ""
+"Clicking the <placeholder-1/> button copies the selection to all other "
+"images in the file. Or, if <placeholder-2/> is enabled, to all images in all "
+"open files."
+msgstr ""
+"Нажатие на кнопку <placeholder-1/> копирует выбранный объект на все "
+"изображения файла. Или, если <placeholder-2/> включено, на все изображения "
+"всех открытых файлов."
+
+#: selections.xml:146(para)
+msgid ""
+"Selections are copied only to images with compatible lateral units. This "
+"means that a selection in a normal image with meters as the lateral units "
+"will not be distributed to a two-dimensional PSDF image or a two-dimensional "
+"slope distribution."
+msgstr ""
+"Выбранные объекты копируются только на изображения с совместимыми "
+"пространственными единицами измерения. Это означает, что выбранный объект на "
+"обычном изображении с метрами в качестве пространственных единиц измерения "
+"не будет распространяться на изображение с двумерной функцией спектральной "
+"плотности мощности или двумерным распределением наклонов."
+
+#: selections.xml:152(para)
+msgid ""
+"If the physical dimensions of the target data are not sufficient to contain "
+"all the objects of the copied selection then only those objects that fit are "
+"copied (this can also mean nothing is copied)."
+msgstr ""
+"Если пространственного разрешения данных приёмника не хватает, чтобы "
+"поместить все объекты скопированной выделенной области, тогда копируются "
+"только те объекты, что поместились (может так получиться, что ничего не "
+"скопируется)."
+
+#: selections.xml:157(para)
+msgid ""
+"The coordinates defining the chosen selection can be exported to the "
+"clipboard or a text file using <guibutton>Copy</guibutton> and "
+"<guibutton>Export</guibutton> buttons. Each specific selection type is "
+"defined by its coordinates as described in the <ulink url=\"http://gwyddion."
+"net/documentation/libgwydgets/standard-vector-layers.php\">developer "
+"documentation</ulink>: for instance points have two coordinates <xi:include "
+"href=\"eqi-x.xml\"/> and <xi:include href=\"eqi-y.xml\"/>, while rectangles "
+"have four that correspond to <xi:include href=\"eqi-x.xml\"/> and <xi:"
+"include href=\"eqi-y.xml\"/> of its two corners. The coordinates are always "
+"relative to top left image corner, even if the origin is not in the top left "
+"corner."
+msgstr ""
+"Координаты, определяющие выбранную выбранный объект, можно экспортировать в "
+"буфер обмена или текстовый файл используя кнопки <guibutton>Копировать</"
+"guibutton> и <guibutton>Экспорт</guibutton>. Каждый особый тип выбранного "
+"объекта задаётся своими координатами как описано в <ulink url=\"http://"
+"gwyddion.net/documentation/libgwydgets/standard-vector-layers.php"
+"\">документации для разработчиков</ulink>: например, у точек будет пара "
+"координат <xi:include href=\"eqi-x.xml\"/> и <xi:include href=\"eqi-y.xml\"/"
+">, в то время, как у прямоугольников будет четыре, которые будут "
+"соответствовать координатам <xi:include href=\"eqi-x.xml\"/> и <xi:include "
+"href=\"eqi-y.xml\"/> его двух углов. Координаты всегда отсчитываются "
+"относительно верхнего левого угла изображения, даже если начало координат с "
+"ним не совпадает."
+
+#~ msgid "Selection Manager"
+#~ msgstr "Менеджер выделенных областей"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

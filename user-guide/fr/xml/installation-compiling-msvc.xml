@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: installation-compiling-msvc.xml 16770 2014-11-06 21:22:39Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-compiling-msvc'>
+  <title>Compilation sous MS Windows avec Microsoft Visual Studio</title>
+  <sect2 id='installation-compiling-msvc-installation'>
+    <title>Installation du paquet</title>
+    <para>
+    Le paquet pour la compilation avec Visual Studio est disponible ici :
+    <ulink url='http://sourceforge.net/projects/gwyddion/files/gwyddion/2.43/Gwyddion-2.43-msvc.zip/download'>here</ulink>.
+    </para>
+    <sect3 id='installation-compiling-msvc-installation-solution'>
+      <title>Solution</title>
+      <para>
+      Copiez le dossier <literal>msvc2015</literal> dans le dossier du code 
+      source de <command>gwyddion</command> (il s'agit du dossier 
+      <literal>/trunk/gwyddion</literal> dans <literal>svn</literal>, que l'on
+      appellera par la suite <literal>gwyddion</literal>).
+      </para>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-generated_files'>
+      <title>Fichiers générés</title>
+      <para>
+      Copiez le contenu du dossier <literal>generated-files</literal> dans le
+      dossier <literal>gwyddion</literal>.
+      </para>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-python'>
+      <title>Python 2.7</title>
+      <para>
+      Installez Python 2.7. La version 2.7.11 ne fonctionne pas. La dernière 
+      version stable est la 2.7.9. Les paquets d'installation sont dans le 
+      dossier <literal>libs-install</literal>. Installez-les dans les dossier
+      <literal>C:\libs\Python\Win32</literal> et
+      <literal>C:\libs\Python\x64</literal>. Il est impossible de lier la
+      librairie de debogage Python car il manque le fichier
+      <literal>python27_d.lib</literal>. Il est inutile de définir 
+      <literal>MS_NO_COREDLL</literal>, <literal>Py_NO_ENABLE_SHARED</literal> 
+      et <literal>SWIG_PYTHON_INTERPRETER_NO_DEBUG</literal>.
+      </para>
+      <sect4 id='installation-compiling-msvc-installation-python-resolution'>
+        <title>Résolution</title>
+          <itemizedlist>
+            <listitem>copiez <literal>python27.lib</literal> en <literal>python27_d.lib</literal></listitem>
+            <listitem>dans <literal>pyconfig.h</literal> commentez <literal>define Py_DEBUG</literal></listitem>
+          </itemizedlist>
+          <para>
+          <literal>python27_d.lib</literal> et <literal>pyconfig.h</literal> 
+          sont dans le dossier <literal>libs\Python27</literal>, vous pouvez 
+          donc simplement les copier dans le dossier 
+          <literal>C:\libs\Python27</literal>.
+          </para>
+      </sect4>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-libraries'>
+      <title>Librairies</title>
+      <para>
+      <command>Gwyddion</command> dépend de librairies externes. Définissez les
+      chemins vers celles-ci grâce aux 
+      <command>variables d'environnement</command>. Les chemins doivent se
+      terminer par le caractère \. Les versions stable des librairies sont dans
+      le dossier <literal>libs</literal>. Voici un exemple de réglage des 
+      variables d'environnement :
+      </para>
+      <programlisting><![CDATA[
+CFITSIO_DIR = C:\libs\cfitsio\
+GTK_DIR = C:\libs\Gtk\
+GTKGLEXT_DIR = C:\libs\GetGLExt\
+LIBICONV_DIR = C:\libs\libiconv\
+LIBXML_DIR = C:\libs\libxml\
+PYTHON_DIR = C:\libs\Python27\
+ZLIB_DIR = C:\libs\zlib\
+]]></programlisting>
+    </sect3>
+    <sect3 id='installation-compiling-msvc-installation-build_events'>
+      <title>Événements de construction</title>
+      <para>
+      Une partie de la construction du projet consiste à copier tous les 
+      fichiers nécessaires pour faire tourner Gwyddion. Les fichiers spécifiques
+      sont copiés du dossier <literal>gwyddion</literal> vers le dossier 
+      <literal>$(OutDir)</literal> (ou un sous-dosssier approprié). Les fichiers
+      dll sont copiés à partir des chemins des librairies externes définis dans 
+      les variables d'environnement, vers le dossier 
+      <literal>$(OutDir)</literal>. Les commandes sont dans l'élément 
+      <literal>Project/Properties/Build Events/Post-Build Event</literal>.
+      </para>
+    </sect3>
+  </sect2>
+  <sect2 id='installation-compiling-msvc-generating'>
+    <title>Génération de la solution</title>
+    <para>
+    <command>Gwyddion</command> est compilé nativement sous Linux à l'aide
+    d'<command>autotools</command>. La conversion des conditions de compilation
+    entre différentes plateformes n'est pas une chose triviale (conditions, 
+    dépendances, expansion de variables, fichiers de configuration différents
+    entre Linux et Windows dus à une disponibilité différente des librairies). 
+    Tous ces facteurs aboutissent à l'impossibilité d'une conversion complète 
+    et automatique.
+    </para>
+    <para>
+    <literal>gen-gwyddion-msvc-sln.py</literal> est un script générant la
+    <command>solution</command> Visual Studio et les <command>projets</command>. 
+    Le script doit être lancé dans le dossier <literal>gwyddion</literal> (voir
+    plus haut). <command>Gwyddion</command>  doit être compilé sous Linux avant
+    de lancer le script. La compilation sous Linux génère des fichier .d et .h
+    spécifiques et permet au script de générer les fichiers des fonctions
+    exportées (.def). Tous ces fichiers sont nécessaires pour la compilation 
+    sous Windows. Ils sont tous triés dans le dossier 
+    <literal>generated-files</literal> et doivent être copiés dans le dossier
+    <literal>gwyddion</literal> sous Windows. Le script aboutit à la 
+    <literal>solution</literal> Visual Studion et aux <literal>projets</literal>
+    qui sont générés dans le dossier <literal>msvc2015</literal>. Tous les
+    dossiers générés par le script sont créés dans le dossier
+    <literal>gwyddion</literal>.       
+    </para>
+    <para>
+    Les fichiers de configuration <literal>config.h</literal> et 
+    <literal>gwyconfig.h</literal> sont générés nativement sous Linux par
+    <command>autotools</command>. Ces fichiers correspondent à la configuration
+    Linux et doivent être modifiés pour permettre la compilation dans Visual 
+    Studio. La préparation de fichiers de configuration adaptés à Windows fait 
+    partie du script. Ces fichiers sont copiés dans le dossier
+    <literal>generated-files</literal> durant le processus de génération 
+    réalisé par le script.  
+    </para>
+    <sect3 id='installation-compiling-msvc-generating-procedure'>
+      <title>Procédure</title>
+      <sect4 id='installation-compiling-msvc-generating-procedure-compile'>
+        <title>Compilation sous Linux</title>
+        <para>
+        Sous Linux. Lancez <literal>./autogen.sh</literal> et <literal>make</literal> 
+        dans le dossier du code source (en général il s'agit du dossier 
+        <literal>gwyddion</literal>). 
+        Voir aussi la <link linkend='installation-unix-source'>compilation sous Linux/Unix</link>.
+        </para>
+      </sect4>
+      <sect4 id='installation-compiling-msvc-generating-procedure-script'>
+        <title>Lancez le script pour générer la <literal>solution</literal> et
+        copier les fichiers générés</title>
+        <para>
+        Sous Linux. Lancez <literal>gen-gwyddion-msvc-sln.py</literal> dans le
+        dossier <literal>gwyddion</literal>.
+        </para>
+        <para>
+        <informaltable id='table-generated_folders'>
+          <tgroup cols='2'>
+            <?dblatex ll?>
+            <thead>
+              <row>
+                <entry><literal>Dossier généré</literal></entry>
+                <entry>Contenu</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry><literal>msvc2015</literal></entry>
+                <entry>Solution Gwyddion</entry>
+              </row>
+              <row>
+                <entry><literal>msvc2015/generated-files</literal></entry>
+                <entry>fichiers .def, .c, .h</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        </para>
+        <para>
+        Copiez tous les fichiers et dossiers présents dans le dossier
+        <literal>./msvc2015/generated-files</literal> de la machine sous Linux 
+        vers le dossier <literal>./gwyddion</literal> de la machine sous Windows.
+        </para>
+      </sect4>
+      <sect4 id='installation-compiling-msvc-generating-procedure-installation'>
+        <title>Installation</title>
+        <para>
+        Sous Windows. Voir la section 
+        <link linkend='installation-compiling-msvc-installation'>installation du paquet</link>.         
+        </para>
+      </sect4>
+    </sect3>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

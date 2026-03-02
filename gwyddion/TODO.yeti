@@ -1,0 +1,12 @@
+- Spectro tool somehow loses the selection upon data switch.  Maybe data
+  browser is to blame.
+- Surf file: units and scales are botched
+- Fix copied channel naming (identical)
+- Fix enum documentation after rename, write missing
+  libprocess: GwyWatershedStateType, Gwy2DCWTWaveletType, GwyDWTDenoiseType,
+              GwyTipType
+  libgwydgets: GwyGraphStatusType, GwyGraphPointType, GwyGraphLabelPosition
+- Check whether we always emit notification when object properties change
+- Display whether data are unchanged/modified/new somewhere
+- Swap undo levels to disk
+- Add some guessing to Rawfile

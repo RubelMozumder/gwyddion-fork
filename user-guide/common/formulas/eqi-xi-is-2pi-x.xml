@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-xi-is-2pi-x.xml 10447 2009-11-15 12:41:03Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase><phrase role='mathvar'>ξ</phrase> = 2π<phrase role='mathvar'>x</phrase></mathphrase>
+  <alt>\xi=2\pi x</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

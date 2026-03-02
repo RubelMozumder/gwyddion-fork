@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: fractal.xml 26281 2024-04-17 12:27:31Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 xmlns:xi="http://www.w3.org/2001/XInclude" id="fractal-analysis">
+  <title>Фрактальный анализ <gwy:icon name="fractal_measure"/></title>
+  <para>В практике встречаются объекты, которые демонстрируют случайные свойства. Часто предполагается, что в определённом диапазоне масштабов эти объекты демонстрируют свойства аффинного самоподобия. Аффинное самоподобие является обобщением самоподобия, которое является основным свойством большинства детерминированных фракталов. Часть аффинно-самоподобного объекта подобна целому объекту после анизотропного масштабирования. Многие случайно шероховатые поверхности считаются принадлежащими к классу случайных объектов, которые проявляют свойства аффинного самоподобия и они рассматриваются как аффинно-самоподобные статистические фракталы. Разумеется, эти поверхности можно исследовать используя атомно-силовую микроскопию (АСМ). Результаты фрактального анализа аффинно-самоподобных случайных поверхностей с использованием АСМ нередко используются для классификации подобных поверхностей, полученных в результате различных технологических процессов [<link linkend="fractal-analysis-ref-1">1</link>,<link linkend="fractal-analysis-ref-2">2</link>,<link linkend="fractal-analysis-ref-3">3</link>,<link linkend="fractal-analysis-ref-4">4</link>].</para>
+  <para id="fractal-dimension"><indexterm><primary>фрактальная размерность</primary></indexterm> В Gwyddion доступны различные виды фрактального анализа в меню <menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Статистика</guisubmenu><guimenuitem>Фрактальная размерность</guimenuitem></menuchoice>.</para>
+  <variablelist>
+    <varlistentry>
+      <term>Метод подсчёта кубов [<link linkend="fractal-analysis-ref-1">1</link>,<link linkend="fractal-analysis-ref-2">2</link>]</term>
+      <listitem>выводится напрямую из определения фрактальной размерности, основанного на подсчёте блоков. В основе алгоритма лежат следующие шаги: кубическая решетка с постоянной решетки <xi:include href="eqi-l.xml"/> накладывается на расширенную по <xi:include href="eqi-z.xml"/> поверхность. Изначально <xi:include href="eqi-l.xml"/> задаётся равной <xi:include href="eqi-X-over-2.xml"/> (где <xi:include href="eqi-X.xml"/> это длина края поверхности), в результате получается решетка из <xi:include href="eqi-2x2x2-is-8.xml"/> кубов. Тогда <xi:include href="eqi-N-of-l.xml"/> это число всех кубов, содержащих хотя бы один пиксель изображения. Постоянная решетки <xi:include href="eqi-l.xml"/> на каждом шаге уменьшается в два раза и процесс повторяется до тех пор, пока <xi:include href="eqi-l.xml"/> не станет равной расстоянию между двумя соседними пикселями. Наклон графика <xi:include href="eqi-log-N-of-l.xml"/> от <xi:include href="eqi-log-1-over-l.xml"/> напрямую даёт фрактальную размерность <xi:include href="eqi-D_f.xml"/>.</listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Метод триангуляции [<link linkend="fractal-analysis-ref-1">1</link>]</term>
+      <listitem>весьма похож на алгоритм подсчёта кубов и тоже напрямую основан на определении фрактальной размерности, основанном на подсчёте блоков. Метод работает следующим образом: сетка с размером ячейки в одну единицу измерения <xi:include href="eqi-l.xml"/> помещается на поверхность. Это определяет положения вершин набора треугольников. Когда, например,  <xi:include href="eqi-l-is-X-over-4.xml"/>, поверхность покрыта 32 треугольниками различной площади наклонёнными под разными углами  по отношению к плоскости <xi:include href="eqi-xy.xml"/>. Площади всех треугольников рассчитываются и суммируются чтобы получить приближенную площадь поверхности  <xi:include href="eqi-S-of-l.xml"/>, соответствующую <xi:include href="eqi-l.xml"/>. Размер сетки затем уменьшается последовательно в два раза на каждом шаге, как и раньше, процесс продолжается до тех пор, пока  не станет равным расстоянию между двумя соседними точками. Наклон графика <xi:include href="eqi-log-S-of-l.xml"/> от <xi:include href="eqi-log-1-over-l.xml"/> при этом соответствует <xi:include href="eqi-D_f-minus-2.xml"/>.</listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Вариационный метод (метод разделения) [<link linkend="fractal-analysis-ref-3">3</link>,<link linkend="fractal-analysis-ref-4">4</link>]</term>
+      <listitem>основан на зависимости от масштаба дробного броуновского движения. На практике, в вариационном методе делят полную поверхность на равносторонние квадратные блоки, и вариация (степень среднеквадратичного значения высоты) рассчитывается для заданного размера блоков. Фрактальная размерность рассчитывается из наклона <xi:include href="eqi-beta.xml"/> аппроксимированной методом наименьших квадратов линии на графике в двойном логарифмическом масштабе вариации как <xi:include href="eqi-D_f-is-3-minus-beta-over-2.xml"/>.</listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Метод спектра мощности [<link linkend="fractal-analysis-ref-3">3</link>,<link linkend="fractal-analysis-ref-4">4</link>,<link linkend="fractal-analysis-ref-5">5</link>]</term>
+      <listitem>основан на зависимости спектра мощности дробного броуновского движения. В методе спектра мощности каждый линейный профиль высоты, из которых состоит изображение, преобразуется с помощью преобразования Фурье, рассчитывается спектр мощности и затем все эти спектры усредняются. Фрактальная размерность определяется из наклона <xi:include href="eqi-beta.xml"/> аппроксимирующей линии, проведённой по методу наименьших квадратов на построенном в двойном логарифмическом масштабе графике спектра мощности, как <xi:include href="eqi-D_f-is-7-over-2-plus-beta-over-2.xml"/>.</listitem>
+    </varlistentry>
+  </variablelist>
+  <para>Оси на графиках фрактальной размерности уже приведены к логарифмическому масштабу, следовательно линейные зависимости, упомянутые выше, там соответствуют прямым. Единицы измерения осей следует считать произвольными.</para>
+  <para>Следует отметить, что результаты различных методов различаются. Это явление вызвано систематическими ошибками различных методов фрактального анализа.</para>
+  <informalfigure id="fig-fractal-dimension-screenshot">
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fractal.png" format="PNG"/>
+      </imageobject>
+      <caption>Диалоговое окно расчёта фрактальной размерности.</caption>
+    </mediaobject>
+  </informalfigure>
+  <para>Более того, на результат фрактального анализа может сильно влиять свёртка с зондом. Мы рекомендуем поэтому проверять карту достоверности до начала фрактального анализа. В случае, если поверхность сильно искажена изображением зонда, результаты фрактального анализа могут быть весьма недостоверными.</para>
+  <para>Следует отметить, что алгоритмы, используемые во фрактальном анализе также используются в модуле фрактальной коррекции и опции инструмента удаления пятен <quote>фрактальная коррекция</quote>.</para>
+  <sect2 id="fractal-analysis-ref">
+    <title>Источники</title>
+    <para id="fractal-analysis-ref-1">[1] C. Douketis, Z. Wang, T. L. Haslett, M. Moskovits: Fractal character of cold-deposited silver films determined by low-temperature scanning tunneling microscopy. Physical Review B 51 (1995) 11022, <ulink url="http://dx.doi.org/10.1103/PhysRevB.51.11022">doi:10.1103/PhysRevB.51.11022</ulink></para>
+    <para id="fractal-analysis-ref-2">[2] W. Zahn, A. Zösch: The dependence of fractal dimension on measuring conditions of scanning probe microscopy. Fresenius J Analen Chem 365 (1999) 168-172, <ulink url="http://dx.doi.org/10.1007/s002160051466">doi:10.1007/s002160051466</ulink></para>
+    <para id="fractal-analysis-ref-3">[3] A. Van Put, A. Vertes, D. Wegrzynek, B. Treiger, R. Van Grieken: Quantitative characterization of individual particle surfaces by fractal analysis of scanning electron microscope images. Fresenius J Analen Chem 350 (1994) 440-447, <ulink url="http://dx.doi.org/10.1007/BF00321787">doi:10.1007/BF00321787</ulink></para>
+    <para id="fractal-analysis-ref-4">[4] A. Mannelquist, N. Almquist, S. Fredriksson: Influence of tip geometry on fractal analysis of atomic force microscopy images. Appl. Phys. A 66 (1998) 891-895, <ulink url="http://dx.doi.org/10.1007/s003390051262">doi:10.1007/s003390051262</ulink></para>
+    <para id="fractal-analysis-ref-5">[5] W. Zahn, A. Zösch: Characterization of thin film surfaces by fractal geometry. Fresenius J Anal Chem 358 (1997) 119-121, <ulink url="http://dx.doi.org/10.1007/s002160050360">doi:10.1007/s002160050360</ulink></para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

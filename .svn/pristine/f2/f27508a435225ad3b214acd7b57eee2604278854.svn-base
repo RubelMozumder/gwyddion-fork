@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: installation-unix.xml 11696 2010-12-20 10:55:40Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-unix'>
+  <title>Paquets Linux/Unix</title>
+    <para>
+      Certains systèmes GNU/Linux et Unix fournissent les paquets pré-compilés
+      de Gwyddion.
+      La page de <ulink url='http://gwyddion.net/download.php'>téléchargement</ulink>
+      du projet suit aussi les initiatives de paquetage connues. Par exemple,
+      Debian, Ubuntu, Gentoo, openSuSE ou FreeBSD proposent des paquets
+      Gwyddion. Une application Flatpak app utilisable pour de multiples
+      distributions existe aussi. Gwyddion est aussi disponible depuis
+      plusieurs dépôt pour Mac OS X, tels que MacPorts, Homebrew et Fink.
+      Si votre système d'exploitation est suffisamment récent et qu'il
+      propose un tel paquet, il suffit de l'installer avec les moyens habituels
+      du système utilisé. Dans le cas contraire vous pouvez vous lancer dans la 
+      <link linkend='installation-unix-source'>compilation à partir du code source</link>.
+    </para>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

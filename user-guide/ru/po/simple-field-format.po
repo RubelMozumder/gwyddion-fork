@@ -1,0 +1,280 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-user-guide-ru\n"
+"POT-Creation-Date: 2021-01-03 11:23+0400\n"
+"PO-Revision-Date: 2021-01-03 11:41+0400\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Last-Translator: \n"
+"Language-Team: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-SourceCharset: utf8\n"
+
+#: simple-field-format.xml:6(title)
+msgid "Simple Field Files"
+msgstr "Файлы с простым полем (GSF)"
+
+#: simple-field-format.xml:7(para)
+msgid "The Gwyddion <link linkend=\"gwyfile-format\">native file format</link> captures all the information and state Gwyddion needs to save and consequently it is quite complex. Often it is not practical to save files in <filename>.gwy</filename> format in custom programs and scripts creating input for Gwyddion."
+msgstr "<link linkend=\"gwyfile-format\">Встроенный формат файлов</link> Gwyddion сохраняет всю информацию и состояние, которые нужно хранить программе, и, следовательно, устроен достаточно сложно. Часто не является разумным сохранять файлы в формате .gwy в других программах и скриптах, создающих входные файлы для программы Gwyddion."
+
+#: simple-field-format.xml:14(para)
+msgid "The Gwyddion Simple Field file format (<filename>.gsf</filename>) can be used in these situations instead. It is a single-channel format for 2D data that was designed to be easy and efficient to read and write, with human-readable header, reasonably expressive, and avoiding instrument or application specific fields (though it can optionally bear them)."
+msgstr "Вместо этого можно использовать формат файла с простым полем Gwyddion (.gsf) для этих целей. Это формат с одним каналом для двумерных данных, который разработан чтобы его можно было просто и эффективно читать и писать, с человекочитаемым заголовком, достаточно выразительный и избегающий специфичных для прибора или приложения полей (хотя опционально формат может их содержать)."
+
+#: simple-field-format.xml:21(para)
+msgid "GSF can be read and written by Gwyddion version 2.20 or later."
+msgstr "GSF может быть прочитан и записан Gwyddion версии 2.20 и выше."
+
+#: simple-field-format.xml:25(title)
+msgid "Overall structure"
+msgstr "Общая структура"
+
+#: simple-field-format.xml:26(para)
+msgid "A GSF file consists of four parts, in the following order:"
+msgstr "Файл GSF состоит из четырёх частей в следующем порядке:"
+
+#: simple-field-format.xml:32(link)
+msgid "magic line"
+msgstr "магическая строка"
+
+#: simple-field-format.xml:35(para)
+msgid "Files begin with a <quote>magic line</quote> identifying the file type."
+msgstr "Файлы начинаются с <quote>магической строки</quote>, определяющей тип файла."
+
+#: simple-field-format.xml:43(link)
+msgid "text header"
+msgstr "текстовый заголовок"
+
+#: simple-field-format.xml:46(para)
+msgid "The header consists of lines of the form <informalexample><programlisting><replaceable>name</replaceable> = <replaceable>value</replaceable></programlisting></informalexample> defining individual parameters."
+msgstr "Заголовок состоит из строк в формате <informalexample><programlisting><replaceable>имя</replaceable> = <replaceable>значение</replaceable></programlisting></informalexample> определяющих отдельные параметры."
+
+#: simple-field-format.xml:57(link) simple-field-format.xml:237(title)
+msgid "NUL padding"
+msgstr "выравнивание с помощью NUL"
+
+#: simple-field-format.xml:60(para)
+msgid "The header is terminated by one to four NUL bytes, aligning the data start to a multiple of 4."
+msgstr "Заголовок заканчивается от одного до четырёх байтов NUL, выравнивая начало блока данных кратно 4."
+
+#: simple-field-format.xml:68(link)
+msgid "binary data"
+msgstr "двоичные данные"
+
+#: simple-field-format.xml:71(para)
+msgid "Binary data is in 32bit floating-point format."
+msgstr "Двоичные данные хранятся в 32-битном формате с плавающей точкой."
+
+#: simple-field-format.xml:79(title)
+msgid "Magic line"
+msgstr "Магическая строка"
+
+#: simple-field-format.xml:80(para)
+msgid "GSF files start with the line <informalexample><programlisting>Gwyddion Simple Field 1.0</programlisting></informalexample> terminated by a linefeed character (<literal>\\n</literal>, ASCII 0x0a)."
+msgstr "Файлы GSF начинаются со строки <informalexample><programlisting>Gwyddion Simple Field 1.0</programlisting></informalexample> завершенной символом перевода строки (<literal>\\n</literal>, ASCII 0x0a)."
+
+#: simple-field-format.xml:89(title)
+msgid "Text header"
+msgstr "Текстовый заголовок"
+
+#: simple-field-format.xml:90(para)
+msgid "Each header line has the form <programlisting><replaceable>name</replaceable> = <replaceable>value</replaceable></programlisting> where any whitespace before the name, around the equal sign and at the end of value is ignored. Field names are case-sensitive and follow the usual rules for identifiers in programming languages."
+msgstr "Каждая строка заголовка имеет формат <programlisting><replaceable>имя</replaceable> = <replaceable>значение</replaceable></programlisting> где любой пробельный символ перед именем, вокруг знака равенства и в конце значения игнорируется. Имена полей чувствительны к регистру и следуют обычным правилам для идентификаторов в языках программирования."
+
+#: simple-field-format.xml:97(para)
+msgid "Similarly to the magic line, the lines in the text header are terminated by a linefeed character as is usual on Unix. This means the header must be read and written in binary mode to ensure preservation of end-of-line characters on other systems (and not changing the header size e.g. by LF → CRLF transformation)."
+msgstr "Подобно магической строке, строки в текстовом заголовке заканчиваются символом перевода строки, как принято в Unix. Это означает, что заголовок должен читаться и писаться в двоичном режиме для сохранения символов перевода строки на других системах (и неизменности размера заголовка, например при преобразовании LF → CRLF)."
+
+#: simple-field-format.xml:104(para)
+msgid "Any non-ASCII characters, that can occur for example in the channel title, are represented in UTF-8 encoding. The NUL character may not occur in the header."
+msgstr "Любые символы не из алфавита ASCII, которые могут попасться, например, в имени канала, представлены в кодировке UTF-8. Символ NUL не может встречаться в заголовке."
+
+#: simple-field-format.xml:109(para)
+msgid "Header fields:"
+msgstr "Поля заголовка:"
+
+#: simple-field-format.xml:117(entry)
+msgid "Name"
+msgstr "Имя"
+
+#: simple-field-format.xml:118(entry)
+msgid "Type"
+msgstr "Тип"
+
+#: simple-field-format.xml:119(entry)
+msgid "Value"
+msgstr "Значение"
+
+#: simple-field-format.xml:124(literal)
+msgid "XRes"
+msgstr "XRes"
+
+#: simple-field-format.xml:125(entry) simple-field-format.xml:132(entry)
+msgid "Mandatory"
+msgstr "Обязательно"
+
+#: simple-field-format.xml:126(entry)
+msgid "The horizontal size in pixels, a positive integer."
+msgstr "Горизонтальный размер в пикселях, положительное целое."
+
+#: simple-field-format.xml:131(literal)
+msgid "YRes"
+msgstr "YRes"
+
+#: simple-field-format.xml:133(entry)
+msgid "The vertical size in pixels, a positive integer."
+msgstr "Вертикальный размер в пикселях, положительное целое."
+
+#: simple-field-format.xml:138(literal)
+msgid "XReal"
+msgstr "XReal"
+
+#: simple-field-format.xml:139(entry) simple-field-format.xml:148(entry)
+#: simple-field-format.xml:157(entry) simple-field-format.xml:166(entry)
+#: simple-field-format.xml:175(entry) simple-field-format.xml:183(entry)
+#: simple-field-format.xml:197(entry)
+msgid "Optional"
+msgstr "Опционально"
+
+#: simple-field-format.xml:142(literal) simple-field-format.xml:151(literal)
+#: simple-field-format.xml:160(literal) simple-field-format.xml:169(literal)
+#: simple-field-format.xml:182(literal) simple-field-format.xml:190(literal)
+#: simple-field-format.xml:200(literal)
+msgid "XYUnits"
+msgstr "XYUnits"
+
+#: simple-field-format.xml:140(entry)
+msgid "Horizontal size in physical units (given by <placeholder-1/>), a positive floating point number. It defaults to 1.0 if not given."
+msgstr "Горизонтальный размер в физических единицах (заданных <placeholder-1/>), положительное число с плавающей точкой. По умолчанию равно 1.0 если не задано."
+
+#: simple-field-format.xml:147(literal)
+msgid "YReal"
+msgstr "YReal"
+
+#: simple-field-format.xml:149(entry)
+msgid "Vertical size in physical units (given by <placeholder-1/>), a positive floating point number. It defaults to 1.0 if not given."
+msgstr "Вертикальный размер в физических единицах (заданных <placeholder-1/>), положительное число с плавающей точкой. По умолчанию равно 1.0 если не задано."
+
+#: simple-field-format.xml:156(literal)
+msgid "XOffset"
+msgstr "XOffset"
+
+#: simple-field-format.xml:158(entry)
+msgid "Horizontal offset in physical units (given by <placeholder-1/>), a floating point number. It defaults to 0.0 if not given."
+msgstr "Горизонтальное смещение в физических единицах (заданных <placeholder-1/>), положительное число с плавающей точкой. По умолчанию равно 0.0 если не задано."
+
+#: simple-field-format.xml:165(literal)
+msgid "YOffset"
+msgstr "YOffset"
+
+#: simple-field-format.xml:167(entry)
+msgid "Vertical offset in physical units (given by <placeholder-1/>), a floating point number. It defaults to 0.0 if not given."
+msgstr "Вертикальное смещение в физических единицах (заданных <placeholder-1/>), положительное число с плавающей точкой. По умолчанию равно 0.0 если не задано."
+
+#: simple-field-format.xml:174(literal)
+msgid "Title"
+msgstr "Title"
+
+#: simple-field-format.xml:176(entry)
+msgid "Data/channel title. It has no default, applications might display ‘Unknown’ or something similar if not given."
+msgstr "Заголовок данных/канала. Не имеет значения по умолчанию, приложения могут отображать ‘Unknown’ или нечто подобное если не задан."
+
+#: simple-field-format.xml:186(literal) simple-field-format.xml:191(literal)
+msgid "m"
+msgstr "m"
+
+#: simple-field-format.xml:187(literal)
+msgid "A"
+msgstr "A"
+
+#: simple-field-format.xml:184(entry)
+msgid "Lateral units, i.e. units of physical sizes and offsets. They must be given as base units, that is <placeholder-1/> or <placeholder-2/> with no power-of-10 prefix (Gwyddion could deal with it but it might present a problem for other software). The default is no units. This means in SPM data, you normally wish to specify <placeholder-3/> as <placeholder-4/> because the lateral dimensions are in metres."
+msgstr "Пространственные единицы, т.е. единицы физических размеров и смещений. Они должны быть заданы как базовые единицы, которыми являются <placeholder-1/> или <placeholder-2/> без префикса, обозначающего степень 10 (Gwyddion с этим справится, но это может создавать проблемы другим программам). По умолчанию величины безразмерные. Это означает, что для данных СЗМ вы обычно захотите задать <placeholder-3/> как <placeholder-4/> поскольку пространственные размеры измеряются в метрах."
+
+#: simple-field-format.xml:196(literal)
+msgid "ZUnits"
+msgstr "ZUnits"
+
+#: simple-field-format.xml:198(entry)
+msgid "Value units, i.e. units of data values. See <placeholder-1/> above for details."
+msgstr "Единицы значения, т.е. единицы значений данных. См. <placeholder-1/> выше для дополнительной информации."
+
+#: simple-field-format.xml:206(para)
+msgid "Floating point numbers can be in the scientific format, e.g. <literal>1.23e-4</literal>. They are represented in the standard C/POSIX locale, i.e. decimal dot is used (not comma or other separators)."
+msgstr "Числа с плавающей точкой могут быть в научном формате, т.е. <literal>1.23e-4</literal>. Они представлены в стандартной локали C/POSIX, десятичным разделителем является точка (не запятая и не другие разделители)."
+
+#: simple-field-format.xml:211(para)
+msgid "The header may contain other fields beside those listed above. Gwyddion will load them into <link linkend=\"metadata\">metadata</link>. Common informational fields can include <literal>Comment</literal>, <literal>Date</literal> or <literal>Direction</literal>."
+msgstr "Заголовок может содержать другие поля помимо описанных выше. Gwyddion загрузит их в <link linkend=\"metadata\">метаданные</link>. Общие информационные поля могут включать <literal>Комментарий</literal>, <literal>Дату</literal> или <literal>Направление</literal>."
+
+#: simple-field-format.xml:217(para)
+msgid "Fields may occur in any order, nevertheless, it is recommended to start with mandatory fields, continue with optional fields and put custom fields last."
+msgstr "Поля могут идти в любом порядке, тем не менее, рекомендуется начинать с обязательных полей, затем привести опциональные и закончить нестандартными."
+
+#: simple-field-format.xml:222(para)
+msgid "A simple header example (also including the magic line):"
+msgstr "Пример простого заголовка (также включает магическую строку):"
+
+#: simple-field-format.xml:226(programlisting)
+msgid "Gwyddion Simple Field 1.0 XRes = 400 YRes = 400 XReal = 5e-05 YReal = 5e-05 XYUnits = m ZUnits = V Title = ADC2"
+msgstr "Gwyddion Simple Field 1.0 XRes = 400 YRes = 400 XReal = 5e-05 YReal = 5e-05 XYUnits = m ZUnits = V Title = ADC2"
+
+#: simple-field-format.xml:238(para)
+msgid "The text header is followed by one to four NUL (<literal>\\0</literal>, ASCII 0x00) bytes that (a) terminate it and (b) align the data start to an offset from the begining of file that is a multiple of 4. More precisely, denoting <xi:include href=\"eqi-N.xml\"/> the total length of the magic line and the text header, the data starts at the nearest multiple of 4 larger than <xi:include href=\"eqi-N.xml\"/>."
+msgstr "За текстовым заголовком идёт от одного до четырёх байтов NUL (<literal>\\0</literal>, ASCII 0x00), которые (a) завершают его и (b) выравнивают начало двоичных данных от начала файла на величину, кратную 4. Точнее, обозначив <xi:include href=\"eqi-N.xml\"/> общую длину магической строки и текстового заголовка, данные начинаются в ближайшем числе, кратном 4 и большем, чем <xi:include href=\"eqi-N.xml\"/>."
+
+#: simple-field-format.xml:246(para)
+msgid "This padding to a multiple of 4 ensures aligned memory access when mapping the file directly to memory. The number of NUL bytes is uniquely determined by the remainder of the length modulo four (<xi:include href=\"eqi-N-mod-4.xml\"/>):"
+msgstr "Это кратное 4 выравнивание гарантирует выровненный доступ к памяти при отображении файла непосредственно в память. Количество байтов NUL однозначно определяется остатком от деления длины на 4 (<xi:include href=\"eqi-N-mod-4.xml\"/>):"
+
+#: simple-field-format.xml:256(entry)
+msgid "Remainder"
+msgstr "Остаток"
+
+#: simple-field-format.xml:257(entry)
+msgid "Number of padding NULs"
+msgstr "Число выравнивающих символов NUL"
+
+#: simple-field-format.xml:261(entry)
+msgid "0"
+msgstr "0"
+
+#: simple-field-format.xml:261(entry)
+msgid "4"
+msgstr "4"
+
+#: simple-field-format.xml:262(entry) simple-field-format.xml:264(entry)
+msgid "1"
+msgstr "1"
+
+#: simple-field-format.xml:262(entry) simple-field-format.xml:264(entry)
+msgid "3"
+msgstr "3"
+
+#: simple-field-format.xml:263(entry)
+msgid "2"
+msgstr "2"
+
+#: simple-field-format.xml:270(title)
+msgid "Binary data"
+msgstr "Двоичные данные"
+
+#: simple-field-format.xml:271(para)
+msgid "Data values are stored as IEEE 32bit single-precision floating point numbers, in little-endian (LSB, or Intel) byte order. Values are stored by row, from top to bottom, and in each row from left to right."
+msgstr "Значения данных хранятся как 32-битные числа с плавающей точкой IEEE одинарной точности, в формате следования байтов начиная с младшего (LSB, or Intel). Данные сохраняются по строкам, сверху вниз и в каждой строке слева направо."
+
+#: simple-field-format.xml:276(para)
+msgid "Similarly to GWY files, the data should not contain infinities and NaNs (not-a-numbers). Gwyddion replaces and masks such values upon import since version 2.57, but behaviour in older versions is undefined."
+msgstr "Подобно файлам GWY, данные не должны содержать бесконечных значений и значений NaN (не число). Gwyddion заменяет и показывает в виде маски такие данные при импорте начиная с версии 2.57, но поведение в более ранних версиях не определено."
+
+#: simple-field-format.xml:281(para)
+msgid "The physical units of these values are <literal>ZUnits</literal>."
+msgstr "Физические величины этих значений - <literal>ZUnits</literal>."
+
+#: simple-field-format.xml:284(para)
+msgid "The size of the image data is exactly <literal>4*XRes*YRes</literal> bytes and there is no data after it in the file."
+msgstr "Размер данных изображения точно 4*XRes*YRes и после них в файле больше не должно быть данных."

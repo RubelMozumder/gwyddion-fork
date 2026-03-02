@@ -1,0 +1,908 @@
+/*
+ *  $Id: asdfile.c 26253 2024-03-13 15:45:59Z yeti-dn $
+ *  Copyright (C) 2024 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * ASD high-speed AFM files
+ * .asd
+ * Read
+ * [1] The import module is unfinished due to the lack of documentation, testing files and/or people willing to help
+ * with the testing.  If you can help please contact us.
+ **/
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-asd-spm">
+ *   <comment>ASD high-speed AFM data file</comment>
+ *   <glob pattern="*.asd"/>
+ *   <glob pattern="*.ASD"/>
+ * </mime-type>
+ **/
+
+#include "config.h"
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwyutils.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/stats.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils-file.h>
+
+#include "get.h"
+#include "err.h"
+
+#define EXTENSION ".asd"
+
+enum {
+    HEADER_MIN_SIZE_V0    = 117,
+    HEADER_MIN_SIZE_V1    = 165,
+    HEADER_MIN_SIZE_V2    = 201,
+    HEADER_V2_EXTRA_SIZE  = 36,
+    FRAME_HEADER_MIN_SIZE = 11,
+    SIZE_MARGIN           = 2048,
+};
+
+typedef enum {
+    ASD_MISSING    = 0,
+    ASD_TOPOGRAPHY = 0x5054, /* TP */
+    ASD_ERROR      = 0x5245, /* ER */
+    ASD_PHASE      = 0x4850, /* PH */
+} ASDDataType;
+
+typedef enum {
+    ASD_UNIPOLAR_1_0V = 0x00000001, /* +0.0 to +1.0 V */
+    ASD_UNIPOLAR_2_5V = 0x00000002, /* +0.0 to +2.5 V */
+    ASD_UNIPOLAR_5_0V = 0x00000004, /* +0.0 to +5.0 V */
+    ASD_BIPOLAR_1_0V  = 0x00010000, /* -1.0 to +1.0 V */
+    ASD_BIPOLAR_2_5V  = 0x00020000, /* -2.5 to +2.5 V */
+    ASD_BIPOLAR_5_0V  = 0x00040000, /* -5.0 to +5.0 V */
+} ASDConverterCode;
+
+typedef struct {
+    guint version;             /* File version */
+    guint header_size;         /* Size of the file header */
+    guint frame_header_size;   /* Size of the frame header */
+    guint text_encoding;       /* Numeric identifier of text encoding */
+    guint operator_name_len;   /* Operator name string length */
+    guint comment_len;         /* Comment string length */
+    guint comment_offset;      /* Offset of comment in file (v0). */
+    ASDDataType data_type_ch1; /* Data type of the 1st channel */
+    ASDDataType data_type_ch2; /* Data type of the 2nd channel */
+    guint nframes_recorded;    /* Number of frames when the file was originally recorded */
+    guint nframes_current;     /* Number of frames contained in the current file */
+    guint scan_direction;      /* Scanning direction (FIXME some enum) */
+    guint file_id;
+    guint xres;
+    guint yres;
+    gdouble xreal;
+    gdouble yreal;
+    gboolean averaging;        /* Averaging flag */
+    guint avg_window;          /* Number of data for averaging */
+    guint year;
+    guint month;
+    guint day;
+    guint hour;
+    guint minute;
+    guint second;
+    guint x_round_deg;         /* Degree of rounding of x-scanning signal [percent] */
+    guint y_round_deg;         /* Degree of rounding of y-scanning signal [percent] */
+    gdouble frame_acq_time;    /* Frame acquisition time [ms] */
+    gdouble zsensor_sens;      /* Z sensor sensitivity [nm/V] */
+    gdouble phase_sens;        /* Phase sensitivity [deg/V] */
+    gint offset;               /* Offset [nm?] */
+    guint machine_num;         /* Number of imaging machine */
+    ASDConverterCode ad_range; /* Enumerated AD range code. */
+    guint ad_nbits;            /* AD resolution (number of bits) */
+    gdouble x_maxreal;         /* Maximum scanning range in X [nm] */
+    gdouble y_maxreal;         /* Maximum scanning range in Y [nm] */
+    gdouble x_piezo_ext;       /* X piezo extention coefficient [nm/V] */
+    gdouble y_piezo_ext;       /* Y piezo extention coefficient [nm/V] */
+    gdouble z_piezo_ext;       /* Z piezo extention coefficient [nm/V] */
+    gdouble z_piezo_gain;      /* Z piezo drive gain */
+    gchar *operator_name;      /* Operator name */
+    gchar *comment;            /* Comment */
+
+    /* Version 2 only. Most are pretty mysterious. */
+    guint nframes_again;
+    guint feed_forward1;
+    gdouble feed_forward2;
+    guint colour_map_max;
+    guint colour_map_min;
+    guint nred_points;
+    guint ngreen_points;
+    guint nblue_points;
+    gint *xy_red;
+    gint *xy_green;
+    gint *xy_blue;
+
+    /* Unknown. */
+    guchar reserved[12];
+    guint unknown1;
+} ASDHeader;
+
+typedef struct {
+    guint frameno;             /* Frame number */
+    gint raw_max;              /* Maximum raw data value */
+    gint raw_min;              /* Minimum raw data value */
+    gint xoffset;              /* X offset [nm] */
+    gint yoffset;              /* Y offset [nm] */
+    gdouble xtilt;             /* Tilt in X */
+    gdouble ytilt;             /* Tilt in Y */
+    gboolean laser_ir;         /* Laser radiation flag. */
+    /* There can be more stuff afterwards… */
+} ASDFrame;
+
+static gboolean      module_register     (void);
+static gint          asd_detect          (const GwyFileDetectInfo *fileinfo,
+                                          gboolean only_name);
+static GwyContainer* asd_load            (const gchar *filename,
+                                          GwyRunType mode,
+                                          GError **error);
+static GwyContainer* get_meta            (ASDHeader *header);
+static void          create_graphs       (GwyContainer *container,
+                                          GArray *frames,
+                                          gint id);
+static gboolean      read_header         (ASDHeader *header,
+                                          const guchar **p,
+                                          gsize size,
+                                          GError **error);
+static void          read_frame_header   (ASDFrame *frame,
+                                          const guchar *p);
+static gdouble       value_scaling_factor(const ASDHeader *header,
+                                          ASDDataType datatype);
+static void          converter_parameters(const ASDHeader *header,
+                                          gdouble *q,
+                                          gdouble *z0);
+static guint         header_minsize      (guint version);
+static void          asd_header_free     (ASDHeader *header);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports ASD high-speed AFM data files."),
+    "Yeti <yeti@gwyddion.net>",
+    "0.1",
+    "David Nečas (Yeti)",
+    "2024",
+};
+
+GWY_MODULE_QUERY2(module_info, asdfile)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("asdfile",
+                           N_("ASD high-speed AFM files (.asd)"),
+                           (GwyFileDetectFunc)&asd_detect,
+                           (GwyFileLoadFunc)&asd_load,
+                           NULL,
+                           NULL);
+    gwy_file_func_set_is_unfinished("asdfile", TRUE);
+
+    return TRUE;
+}
+
+static gint
+asd_detect(const GwyFileDetectInfo *fileinfo,
+           gboolean only_name)
+{
+    gsize minsize, header_size, fh_size, oplen = 0, commoff = 0, commlen = 0;
+    guint version, ch1, ch2;
+    const guchar *p = fileinfo->head;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 20 : 0;
+
+    if (fileinfo->buffer_len < sizeof(guint32))
+        return 0;
+
+    version = gwy_get_guint32_le(&p);
+    if (!(minsize = header_minsize(version)))
+        return 0;
+    if (fileinfo->buffer_len <= minsize)
+        return 0;
+
+    if (version == 0) {
+        ch1 = gwy_get_guint16_le(&p);
+        ch2 = gwy_get_guint16_le(&p);
+        header_size = gwy_get_guint32_le(&p);
+        fh_size = gwy_get_guint32_le(&p);
+        oplen = gwy_get_guint32_le(&p);
+        commoff = gwy_get_guint32_le(&p);
+        commlen = gwy_get_guint32_le(&p);
+        gwy_debug("v=%u h=%zu f=%zu u=%zu coff=%zu c=%zu", version, header_size, fh_size, oplen, commoff, commlen);
+        /* In version 0 the comment is not counted in the header size (or something like that). But the operator seems
+         * to be included, so we can check it. Also, the comment offset should be sane. */
+        if (header_size - minsize != oplen)
+            return 0;
+        if (commoff > SIZE_MARGIN || commoff + commlen + header_size > fileinfo->file_size)
+            return 0;
+    }
+    else if (version == 1 || version == 2) {
+        header_size = gwy_get_guint32_le(&p);
+        fh_size = gwy_get_guint32_le(&p);
+        p += sizeof(guint32);
+        oplen = gwy_get_guint32_le(&p);
+        commlen = gwy_get_guint32_le(&p);
+        ch1 = gwy_get_guint32_le(&p);
+        ch2 = gwy_get_guint32_le(&p);
+        gwy_debug("v=%u h=%zu f=%zu u=%zu c=%zu", version, header_size, fh_size, oplen, commlen);
+        if (version == 1) {
+            if (header_size - minsize != oplen + commlen)
+                return 0;
+        }
+        else {
+            /* The version 2 header contains more variable-length items. */
+            if (header_size - minsize < oplen + commlen)
+                return 0;
+        }
+    }
+    else
+        return 0;
+
+    if (oplen > SIZE_MARGIN || commlen > SIZE_MARGIN)
+        return 0;
+    if (header_size < minsize || header_size > minsize + SIZE_MARGIN)
+        return 0;
+    if (fh_size < FRAME_HEADER_MIN_SIZE || fh_size > FRAME_HEADER_MIN_SIZE + SIZE_MARGIN)
+        return 0;
+
+    if ((ch1 == ASD_TOPOGRAPHY || ch1 == ASD_PHASE || ch1 == ASD_ERROR)
+        && (ch2 == ASD_TOPOGRAPHY || ch2 == ASD_PHASE || ch2 == ASD_ERROR))
+        return 100;
+
+    return 60;
+}
+
+static GwyContainer*
+asd_load(const gchar *filename,
+         G_GNUC_UNUSED GwyRunType mode,
+         GError **error)
+{
+    GwyContainer *container = NULL;
+    guchar *buffer = NULL;
+    const guchar *p;
+    const gchar *title;
+    gsize size = 0, header_size, fh_size, expected_size, image_size;
+    guint id, i, xres, yres, nframes, nchannels;
+    GError *err = NULL;
+    ASDHeader header;
+    gdouble qsens, qconv, z0conv;
+    GArray *frames;
+    GwyBrick *brick;
+    gdouble *d;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+    gwy_clear(&header, 1);
+
+    if (size <= sizeof(guint32)) {
+        err_TOO_SHORT(error);
+        goto fail;
+    }
+
+    p = buffer;
+    if (!read_header(&header, &p, size, error))
+        goto fail;
+
+    nframes = header.nframes_current;
+    nchannels = (header.data_type_ch1 != ASD_MISSING) + (header.data_type_ch2 != ASD_MISSING);
+    if (!nchannels || !nframes) {
+        err_NO_DATA(error);
+        goto fail;
+    }
+    xres = header.xres;
+    yres = header.yres;
+
+    /* This is correct for all versions, whereas header.header_size does not work for version 0. */
+    header_size = p - buffer;
+    fh_size = header.frame_header_size;
+    image_size = xres*yres*sizeof(gint16);
+    expected_size = header_size + (gsize)nframes * nchannels*(image_size + fh_size);
+    if (err_SIZE_MISMATCH(error, expected_size, size, FALSE))
+        goto fail;
+
+    /* A bit silly, but the files have exactly two channels. */
+    container = gwy_container_new();
+    for (id = 0; id < 2; id++) {
+        ASDDataType datatype = (id == 0 ? header.data_type_ch1 : header.data_type_ch2);
+
+        if (datatype == ASD_MISSING)
+            continue;
+
+        qsens = value_scaling_factor(&header, datatype);
+        converter_parameters(&header, &qconv, &z0conv);
+        brick = gwy_brick_new(xres, yres, nframes, header.xreal, header.yreal, 1.0, FALSE);
+        gwy_si_unit_set_from_string(gwy_brick_get_si_unit_x(brick), "m");
+        gwy_si_unit_set_from_string(gwy_brick_get_si_unit_y(brick), "m");
+        d = gwy_brick_get_data(brick);
+        frames = g_array_new(FALSE, FALSE, sizeof(ASDFrame));
+        for (i = 0; i < nframes; i++) {
+            ASDFrame frame;
+
+            /* FIXME: We actually don't know what to do with the frame info. Maybe add some accompanying 1D data? */
+            read_frame_header(&frame, p);
+            g_array_append_val(frames, frame);
+
+            p += fh_size;
+            gwy_convert_raw_data(p, xres*yres, 1, GWY_RAW_DATA_SINT16, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                                 d + i*xres*yres, qsens*qconv, qsens*z0conv);
+            p += image_size;
+        }
+
+        /* It seems not acquired channels as simply zero-filled. Skip those. */
+        if (gwy_brick_get_max(brick) == 0.0 && gwy_brick_get_min(brick) == 0.0) {
+            g_object_unref(brick);
+            g_array_free(frames, TRUE);
+            continue;
+        }
+
+        gwy_container_pass_object(container, gwy_app_get_brick_key_for_id(id), brick);
+        gwy_container_pass_object(container, gwy_app_get_brick_meta_key_for_id(id), get_meta(&header));
+
+        title = gwy_enuml_to_string(datatype,
+                                    "Topography", ASD_TOPOGRAPHY,
+                                    "Phase", ASD_PHASE,
+                                    "Error", ASD_ERROR,
+                                    NULL);
+        if (*title)
+            gwy_container_set_const_string(container, gwy_app_get_brick_title_key_for_id(id), title);
+
+        create_graphs(container, frames, id);
+        g_array_free(frames, TRUE);
+
+        gwy_file_volume_import_log_add(container, id, NULL, filename);
+    }
+
+fail:
+    gwy_file_abandon_contents(buffer, size, NULL);
+    asd_header_free(&header);
+
+    return container;
+}
+
+static GwyContainer*
+get_meta(ASDHeader *header)
+{
+    GwyContainer *meta = gwy_container_new();
+
+    gwy_container_set_string_by_name(meta, "Date and time",
+                                     g_strdup_printf("%04u-%02u-%02u %02u:%02u:%02u",
+                                                     header->year, header->month, header->day,
+                                                     header->hour, header->minute, header->second));
+    gwy_container_set_const_string_by_name(meta, "Averaging", header->averaging ? "Yes" : "No");
+    gwy_container_set_string_by_name(meta, "Averaging num", g_strdup_printf("%u", header->avg_window));
+    gwy_container_set_string_by_name(meta, "Frame acquisition time", g_strdup_printf("%g ms", header->frame_acq_time));
+    gwy_container_set_string_by_name(meta, "Z sensor sensitivity", g_strdup_printf("%g nm/V", header->zsensor_sens));
+    gwy_container_set_string_by_name(meta, "Phase sensitivity", g_strdup_printf("%g deg/V", header->phase_sens));
+    gwy_container_set_string_by_name(meta, "X maximum scanning range", g_strdup_printf("%g nm", header->x_maxreal));
+    gwy_container_set_string_by_name(meta, "Y maximum scanning range", g_strdup_printf("%g nm", header->y_maxreal));
+    gwy_container_set_string_by_name(meta, "X piezo extension coefficient",
+                                     g_strdup_printf("%g nm/V", header->x_piezo_ext));
+    gwy_container_set_string_by_name(meta, "Y piezo extension coefficient",
+                                     g_strdup_printf("%g nm/V", header->y_piezo_ext));
+    gwy_container_set_string_by_name(meta, "Z piezo extension coefficient",
+                                     g_strdup_printf("%g nm/V", header->z_piezo_ext));
+    gwy_container_set_string_by_name(meta, "Z drive gain", g_strdup_printf("%g", header->z_piezo_gain));
+    /* FIXME: UTF-8? It should be, but who knows. */
+    if (*header->operator_name)
+        gwy_container_set_const_string_by_name(meta, "Operator name", header->operator_name);
+    if (*header->comment)
+        gwy_container_set_const_string_by_name(meta, "Comment", header->comment);
+
+    return meta;
+}
+
+static void
+create_graphs(GwyContainer *container, GArray *frames, gint id)
+{
+    GwyGraphModel *gmodel;
+    GwyGraphCurveModel *gcmodel;
+    ASDFrame *frame;
+    guint i, n = frames->len;
+    gdouble *storage = g_new(gdouble, 3*n), *idata = storage, *xdata = storage + n, *ydata = storage + 2*n;
+    GwySIUnit *yunit = gwy_si_unit_new("m");
+
+    for (i = 0; i < frames->len; i++) {
+        idata[i] = i;
+        frame = &g_array_index(frames, ASDFrame, i);
+        xdata[i] = 1e-9*frame->xoffset;
+        ydata[i] = 1e-9*frame->yoffset;
+    }
+
+    gmodel = gwy_graph_model_new();
+    g_object_set(gmodel,
+                 "title", "Offsets",
+                 "axis-label-left", "Offset",
+                 "axis-label-bottom", "Frame number",
+                 "si-unit-y", yunit,
+                 NULL);
+
+    gcmodel = gwy_graph_curve_model_new();
+    g_object_set(gcmodel,
+                 "mode", GWY_GRAPH_CURVE_LINE,
+                 "description", "X offset",
+                 "color", gwy_graph_get_preset_color(1),
+                 NULL);
+    gwy_graph_curve_model_set_data(gcmodel, idata, xdata, n);
+    gwy_graph_model_add_curve(gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+    gcmodel = gwy_graph_curve_model_new();
+    g_object_set(gcmodel,
+                 "mode", GWY_GRAPH_CURVE_LINE,
+                 "description", "Y offset",
+                 "color", gwy_graph_get_preset_color(2),
+                 NULL);
+    gwy_graph_curve_model_set_data(gcmodel, idata, ydata, n);
+    gwy_graph_model_add_curve(gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+    gwy_container_pass_object(container, gwy_app_get_graph_key_for_id(id+1), gmodel);
+    g_object_unref(yunit);
+    g_free(storage);
+}
+
+static gboolean
+read_header_block_sizes(ASDHeader *header, const guchar **p, gsize size,
+                        GError **error)
+{
+    gsize minsize;
+
+    if (header->version == 0)
+        minsize = HEADER_MIN_SIZE_V0;
+    else if (header->version == 1)
+        minsize = HEADER_MIN_SIZE_V1;
+    else {
+        g_return_val_if_reached(FALSE);
+    }
+
+    header->header_size = gwy_get_guint32_le(p);
+    if (header->header_size < minsize || header->header_size > minsize + SIZE_MARGIN) {
+        err_FILE_TYPE(error, "ASD");
+        return FALSE;
+    }
+    header->frame_header_size = gwy_get_guint32_le(p);
+    gwy_debug("header size %u, frame header size %u", header->header_size, header->frame_header_size);
+    if (header->frame_header_size < FRAME_HEADER_MIN_SIZE
+        || header->frame_header_size > FRAME_HEADER_MIN_SIZE + SIZE_MARGIN) {
+        err_INVALID(error, "Frame header size");
+        return FALSE;
+    }
+    if (header->header_size >= size) {
+        err_TRUNCATED_HEADER(error);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+static void
+read_header_block_channels12(ASDHeader *header, const guchar **p)
+{
+    if (header->version == 0) {
+        header->data_type_ch1 = gwy_get_guint16_le(p);
+        header->data_type_ch2 = gwy_get_guint16_le(p);
+    }
+    else {
+        header->data_type_ch1 = gwy_get_guint32_le(p);
+        header->data_type_ch2 = gwy_get_guint32_le(p);
+    }
+    gwy_debug("data types %u, %u", header->data_type_ch1, header->data_type_ch2);
+}
+
+static gboolean
+read_header_block_res_real(ASDHeader *header, const guchar **p, GError **error)
+{
+    if (header->version == 0) {
+        header->xres = gwy_get_guint16_le(p);
+        header->yres = gwy_get_guint16_le(p);
+    }
+    else {
+        header->xres = gwy_get_guint32_le(p);
+        header->yres = gwy_get_guint32_le(p);
+    }
+    if (err_DIMENSION(error, header->xres) || err_DIMENSION(error, header->yres))
+        return FALSE;
+    gwy_debug("xres %u, yres %u", header->xres, header->yres);
+    if (header->version == 0) {
+        header->xreal = gwy_get_guint16_le(p);
+        header->yreal = gwy_get_guint16_le(p);
+    }
+    else {
+        header->xreal = gwy_get_guint32_le(p);
+        header->yreal = gwy_get_guint32_le(p);
+    }
+    header->xreal *= 1e-9;
+    header->yreal *= 1e-9;
+    sanitise_real_size(&header->xreal, "x size");
+    sanitise_real_size(&header->yreal, "y size");
+    gwy_debug("xreal %g, yreal %g", header->xreal, header->yreal);
+    return TRUE;
+}
+
+static void
+read_header_block_datetime(ASDHeader *header, const guchar **p)
+{
+    if (header->version == 0) {
+        header->year = gwy_get_guint16_le(p);
+        header->month = **p;
+        (*p)++;
+        header->day = **p;
+        (*p)++;
+        header->hour = **p;
+        (*p)++;
+        header->minute = **p;
+        (*p)++;
+        header->second = **p;
+        (*p)++;
+    }
+    else {
+        header->year = gwy_get_guint32_le(p);
+        header->month = gwy_get_guint32_le(p);
+        header->day = gwy_get_guint32_le(p);
+        header->hour = gwy_get_guint32_le(p);
+        header->minute = gwy_get_guint32_le(p);
+        header->second = gwy_get_guint32_le(p);
+    }
+    gwy_debug("datetime %04u-%02u-%02u %02u:%02u:%02u",
+              header->year, header->month, header->day, header->hour, header->minute, header->second);
+}
+
+static void
+read_header_block_averaging(ASDHeader *header, const guchar **p)
+{
+    header->averaging = !!(**p);
+    (*p)++;
+    header->avg_window = gwy_get_guint32_le(p);
+    gwy_debug("averaging %u (%d)", header->avg_window, header->averaging);
+}
+
+static void
+read_header_block_ad(ASDHeader *header, const guchar **p)
+{
+    header->ad_range = gwy_get_guint32_le(p);
+    header->ad_nbits = gwy_get_guint32_le(p);
+    gwy_debug("AD range %u, AD nbits %u", header->ad_range, header->ad_nbits);
+}
+
+static void
+read_header_block_maxrange(ASDHeader *header, const guchar **p)
+{
+    header->x_maxreal = gwy_get_gfloat_le(p);
+    header->y_maxreal = gwy_get_gfloat_le(p);
+    gwy_debug("max %g nm x %g nm", header->x_maxreal, header->y_maxreal);
+}
+
+static void
+read_header_block_nframes(ASDHeader *header, const guchar **p)
+{
+    header->nframes_recorded = gwy_get_guint32_le(p);
+    header->nframes_current = gwy_get_guint32_le(p);
+    gwy_debug("nframes rec %u, nframes curr %u", header->nframes_recorded, header->nframes_current);
+}
+
+static gchar*
+read_header_string(const guchar **p, gsize size, G_GNUC_UNUSED const gchar *what)
+{
+    gchar *s = g_new0(gchar, size + 1);
+
+    memcpy(s, *p, size);
+    *p += size;
+    g_strdelimit(s, "\r\n\t\v", ' ');
+    gwy_debug("%s %s", what, s);
+    return s;
+}
+
+static gboolean
+read_header_v0(ASDHeader *header,
+               const guchar **p,
+               gsize size,
+               GError **error)
+{
+    header->version = gwy_get_guint32_le(p);
+    g_return_val_if_fail(header->version == 0, FALSE);
+
+    read_header_block_channels12(header, p);
+    if (!read_header_block_sizes(header, p, size, error))
+        return FALSE;
+
+    header->operator_name_len = gwy_get_guint32_le(p);
+    header->comment_offset = gwy_get_guint32_le(p);
+    header->comment_len = gwy_get_guint32_le(p);
+    if (header->operator_name_len > header->header_size
+        || header->header_size - HEADER_MIN_SIZE_V0 != header->operator_name_len) {
+        err_TRUNCATED_HEADER(error);
+        return FALSE;
+    }
+
+    if (!read_header_block_res_real(header, p, error))
+        return FALSE;
+    header->frame_acq_time = gwy_get_gfloat_le(p);
+    header->z_piezo_ext = gwy_get_gfloat_le(p);
+    header->z_piezo_gain = gwy_get_gfloat_le(p);
+    read_header_block_ad(header, p);
+    read_header_block_averaging(header, p);
+    header->unknown1 = gwy_get_guint16_le(p);
+    read_header_block_datetime(header, p);
+    header->y_round_deg = header->x_round_deg = *((*p)++);
+    read_header_block_maxrange(header, p);
+    get_CHARARRAY(header->reserved, p);
+    read_header_block_nframes(header, p);
+    header->machine_num = gwy_get_guint32_le(p);
+    header->file_id = gwy_get_guint16_le(p);
+    /* We already checked the sizes above. The strings are not terminated. */
+    header->operator_name = read_header_string(p, header->operator_name_len, "operator");
+    header->zsensor_sens = gwy_get_gfloat_le(p);
+    header->phase_sens = gwy_get_gfloat_le(p);
+    header->scan_direction = gwy_get_guint32_le(p);
+
+    if (size - header->header_size < header->comment_offset + header->comment_len) {
+        err_TRUNCATED_PART(error, "comment");
+        return FALSE;
+    }
+    *p += header->comment_offset;
+    header->comment = read_header_string(p, header->comment_len, "comment");
+
+    return TRUE;
+}
+
+static gboolean
+read_header_v1(ASDHeader *header,
+               const guchar **p,
+               gsize size,
+               GError **error)
+{
+    header->version = gwy_get_guint32_le(p);
+    g_return_val_if_fail(header->version == 1 || header->version == 2, FALSE);
+
+    if (!read_header_block_sizes(header, p, size, error))
+        return FALSE;
+
+    header->text_encoding = gwy_get_guint32_le(p);
+    gwy_debug("enc number %u", header->text_encoding);
+
+    header->operator_name_len = gwy_get_guint32_le(p);
+    header->comment_len = gwy_get_guint32_le(p);
+    if (header->operator_name_len > header->header_size || header->comment_len > header->header_size) {
+        err_TRUNCATED_HEADER(error);
+        return FALSE;
+    }
+
+    /* If version is 1 check the exact size. For other (later) versions only check if it fits. */
+    if (header->version == 1
+        && header->header_size - HEADER_MIN_SIZE_V1 != header->operator_name_len + header->comment_len) {
+        err_TRUNCATED_HEADER(error);
+        return FALSE;
+    }
+    else if (header->header_size - HEADER_MIN_SIZE_V1 < header->operator_name_len + header->comment_len) {
+        err_TRUNCATED_HEADER(error);
+        return FALSE;
+    }
+
+    gwy_debug("operator len %u, comment len %u", header->operator_name_len, header->comment_len);
+    read_header_block_channels12(header, p);
+    read_header_block_nframes(header, p);
+    header->scan_direction = gwy_get_guint32_le(p);
+    header->file_id = gwy_get_guint32_le(p);
+    gwy_debug("scan dir %u, file_id %u", header->scan_direction, header->file_id);
+    if (!read_header_block_res_real(header, p, error))
+        return FALSE;
+    read_header_block_averaging(header, p);
+    read_header_block_datetime(header, p);
+    header->x_round_deg = gwy_get_guint32_le(p);
+    header->y_round_deg = gwy_get_guint32_le(p);
+    header->frame_acq_time = gwy_get_gfloat_le(p);
+    header->zsensor_sens = gwy_get_gfloat_le(p);
+    header->phase_sens = gwy_get_gfloat_le(p);
+    header->offset = gwy_get_gint32_le(p);
+    get_CHARARRAY(header->reserved, p);
+    header->machine_num = gwy_get_guint32_le(p);
+    read_header_block_ad(header, p);
+    read_header_block_maxrange(header, p);
+    header->x_piezo_ext = gwy_get_gfloat_le(p);
+    header->y_piezo_ext = gwy_get_gfloat_le(p);
+    header->z_piezo_ext = gwy_get_gfloat_le(p);
+    header->z_piezo_gain = gwy_get_gfloat_le(p);
+
+    /* We already checked the sizes above. The strings are not terminated. */
+    header->operator_name = read_header_string(p, header->operator_name_len, "operator");
+    header->comment = read_header_string(p, header->comment_len, "comment");
+
+    return TRUE;
+}
+
+static gboolean
+read_header_v2(ASDHeader *header,
+               const guchar **p,
+               gsize size,
+               GError **error)
+{
+    const guchar *start = *p;
+    gsize coords_size;
+    guint i;
+
+    /* Version 2 is, fortunately, not completely reshuffled again. It is like 1, just with extra stuff at the end. */
+    if (!read_header_v1(header, p, size, error))
+        return FALSE;
+
+    if (size - (*p - start) < HEADER_V2_EXTRA_SIZE) {
+        err_TRUNCATED_HEADER(error);
+        return FALSE;
+    }
+
+    header->nframes_again = gwy_get_guint32_le(p);
+    gwy_debug("nframes_again %u", header->nframes_again);
+    header->feed_forward1 = gwy_get_guint32_le(p);
+    header->feed_forward2 = gwy_get_gdouble_le(p);
+    header->colour_map_max = gwy_get_guint32_le(p);
+    header->colour_map_min = gwy_get_guint32_le(p);
+    header->nred_points = gwy_get_guint32_le(p);
+    header->ngreen_points = gwy_get_guint32_le(p);
+    header->nblue_points = gwy_get_guint32_le(p);
+    gwy_debug("nred %u, ngreen %u, nblue %u", header->nred_points, header->ngreen_points, header->nblue_points);
+    /* Sanity check; also prevents buffer overflow below. */
+    if (header->nred_points > 65536) {
+        err_INVALID(error, "NRed");
+        return FALSE;
+    }
+    if (header->ngreen_points > 65536) {
+        err_INVALID(error, "NGreen");
+        return FALSE;
+    }
+    if (header->nblue_points > 65536) {
+        err_INVALID(error, "NBlue");
+        return FALSE;
+    }
+
+    coords_size = 2*sizeof(gint32)*(header->nred_points + header->ngreen_points + header->nblue_points);
+    if (size - (*p - start) < coords_size) {
+        err_TRUNCATED_HEADER(error);
+        return FALSE;
+    }
+
+    header->xy_red = g_new(gint, 2*header->nred_points);
+    for (i = 0; i < 2*header->nred_points; i++)
+        header->xy_red[i] = gwy_get_gint32_le(p);
+
+    header->xy_green = g_new(gint, 2*header->ngreen_points);
+    for (i = 0; i < 2*header->ngreen_points; i++)
+        header->xy_green[i] = gwy_get_gint32_le(p);
+
+    header->xy_blue = g_new(gint, 2*header->nblue_points);
+    for (i = 0; i < 2*header->nblue_points; i++)
+        header->xy_blue[i] = gwy_get_gint32_le(p);
+
+    return TRUE;
+}
+
+static gboolean
+read_header(ASDHeader *header,
+            const guchar **p,
+            gsize size,
+            GError **error)
+{
+    const guchar *start = *p;
+    gsize minsize;
+    gboolean ok;
+
+    header->version = gwy_get_guint32_le(p);
+    gwy_debug("version %u", header->version);
+    if (!(minsize = header_minsize(header->version))) {
+        err_FILE_TYPE(error, "ASD");
+        return FALSE;
+    }
+    if (size <= minsize) {
+        err_TOO_SHORT(error);
+        return FALSE;
+    }
+
+    *p = start;
+    if (header->version == 0)
+        ok = read_header_v0(header, p, size, error);
+    else if (header->version == 1)
+        ok = read_header_v1(header, p, size, error);
+    else if (header->version == 2)
+        ok = read_header_v2(header, p, size, error);
+    else {
+        g_return_val_if_reached(FALSE);
+    }
+    if (!ok)
+        return FALSE;
+
+    gwy_debug("total header length %ld", (glong)(*p - start));
+    return TRUE;
+}
+
+static void
+read_frame_header(ASDFrame *frame,
+                  const guchar *p)
+{
+    frame->frameno = gwy_get_guint32_le(&p);
+    frame->raw_max = gwy_get_gint16_le(&p);
+    frame->raw_min = gwy_get_gint16_le(&p);
+    frame->xoffset = gwy_get_gint16_le(&p);
+    frame->yoffset = gwy_get_gint16_le(&p);
+    frame->xtilt = gwy_get_gfloat_le(&p);
+    frame->ytilt = gwy_get_gfloat_le(&p);
+    frame->laser_ir = !!*(p++);
+    gwy_debug("[%u] xoffset %d, yoffset %d, xtilt %g, ytilt %g, laser_ir %d",
+              frame->frameno, frame->xoffset, frame->yoffset, frame->xtilt, frame->ytilt, frame->laser_ir);
+}
+
+static gdouble
+value_scaling_factor(const ASDHeader *header, ASDDataType datatype)
+{
+    if (datatype == ASD_TOPOGRAPHY)
+        return header->z_piezo_gain * header->z_piezo_ext;
+    if (datatype == ASD_PHASE)
+        return header->phase_sens;
+    if (datatype == ASD_ERROR)
+        return header->zsensor_sens;
+
+    g_warning("Unknown data type 0x%04x; cannot determine scaling factor.", datatype);
+    return 1.0;
+}
+
+static void
+converter_parameters(const ASDHeader *header, gdouble *q, gdouble *z0)
+{
+    ASDConverterCode conv = header->ad_range;
+    gdouble res = (1u << header->ad_nbits);
+
+    /* The converters have voltage ranges and things, but we do not know how to use them. If found these in some
+     * random Python module on the intergits. They produce bonkers numbers. */
+    if (conv == ASD_UNIPOLAR_1_0V || conv == ASD_UNIPOLAR_2_5V || conv == ASD_UNIPOLAR_5_0V) {
+        *q = conv/res;
+        *z0 = 0.0;
+    }
+    else if (conv == ASD_BIPOLAR_1_0V || conv == ASD_BIPOLAR_2_5V || conv == ASD_BIPOLAR_5_0V) {
+        *q = -2.0*conv/res;
+        *z0 = conv;
+    }
+    else {
+        g_warning("Unknown converter code 0x%04x.", conv);
+        *q = 1.0;
+        *z0 = 0.0;
+    }
+}
+
+static guint
+header_minsize(guint version)
+{
+    if (version == 0)
+        return HEADER_MIN_SIZE_V0;
+    if (version == 1)
+        return HEADER_MIN_SIZE_V1;
+    if (version == 2)
+        return HEADER_MIN_SIZE_V2;
+
+    return 0;
+}
+
+static void
+asd_header_free(ASDHeader *header)
+{
+    g_free(header->operator_name);
+    g_free(header->comment);
+    g_free(header->xy_red);
+    g_free(header->xy_green);
+    g_free(header->xy_blue);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

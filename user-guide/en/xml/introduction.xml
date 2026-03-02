@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: introduction.xml 22939 2020-09-04 14:21:54Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<chapter id='introduction'>
+  <title>Introduction</title>
+  <para>
+    This is a user guide and reference for the scanning probe microscopy
+    data processing software
+    <ulink url='http://gwyddion.net/'><application>Gwyddion</application></ulink>.
+  </para>
+  <para>
+    The latest version of this document is available on-line at
+    <ulink url='http://gwyddion.net/documentation/user-guide-en/'>http://gwyddion.net/documentation/user-guide-en/</ulink>.
+    It is available in several languages, namely English, French and Russian.
+    All language versions are listed on-line at
+    <ulink url='http://gwyddion.net/documentation/'>http://gwyddion.net/documentation/</ulink>.
+  </para>
+  <para>
+    If you wish to refer to <application>Gwyddion</application> in a scientific
+    paper please cite
+    <ulink url='http://www.springerlink.com/content/21716522802h0404/'>David Nečas, Petr Klapetek, Gwyddion: An open-source software for SPM data analysis, Cent. Eur. J. Phys. 10(1) (2012) 181-188</ulink>
+    (instead or alongside this guide).
+  </para>
+  <sect1 id='motivation'>
+    <title>Motivation</title>
+    <para>
+      <ulink url='http://gwyddion.net/'><application>Gwyddion</application></ulink>
+      is a modular program for SPM data analysis. Primarily it is
+      supposed to be used for analysis of height fields obtained by means of
+      scanning probe microscopy techniques (AFM, MFM, STM, NSOM).
+      However, it can be also used for any other height field and or
+      (greyscale) image processing, for instance for the analysis of
+      profilometry data or thickness maps from imaging spectrophotometry.
+      Gwyddion is Free Software (and Open Source Software), covered by
+      <ulink url='http://www.gnu.org/licenses/gpl.html'>GNU General Public License</ulink>
+      (GNU GPL).
+    </para>
+    <para>
+      The main idea behind Gwyddion development is to provide modular
+      program for 2D data analysis that could be easily extended by modules
+      and plug-ins with no need of core recompilation. Moreover, the status of
+      free software enables to provide source codes to developers and users,
+      which makes the further program improvement easier.
+    </para>
+    <para>
+      Gwyddion can be currently used with Linux/Unix (including Mac OS X) and
+      Microsoft Windows operating systems. Both families of systems can be
+      used also for development. For graphical interface,
+      <ulink url='http://www.gtk.org/'>Gtk+</ulink> widget toolkit is used,
+      therefore it can be basically ported on any system
+      that is supported by Gtk+.
+    </para>
+    <para>
+      Gwyddion core development is currently funded by
+      <ulink url='http://www.cmi.cz/?lang=2'>Czech Metrology Institute</ulink>.
+      The project started as a part of the Nanomet initiative (covered by
+      Euromet) in August, 2004. It is supposed that more persons and
+      institutions will participate on development. Project is open for
+      anyone. Welcome…
+    </para>
+  </sect1>
+  <sect1 id='licensing'>
+    <title>Licensing</title>
+    <para>
+      Gwyddion is covered by
+      <link linkend='gpl'>GNU General Public License</link>
+      (GNU GPL).  The full license text is also included as file
+      <filename>COPYING</filename> in the source distribution (MS Windows
+      installers contain it as file <filename>COPYING.wri</filename>).
+      In brief, this license means that:
+      <itemizedlist>
+        <listitem>
+          <para>
+            You can freely use the program.  You can freely make copies,
+            modify and distribute them.  You can download the program and its
+            source code from Gwyddion web pages and modify it as you want.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            If you decide to distribute it, the modified code is still covered
+            by the same license.  In particular, you have to offer the source
+            code too.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            The same holds for extensions, e.g. if you write an import module
+            for a new file type or a new data analysis function it has to be
+            licensed under GNU GPL (when it is distributed – if you use it
+            privately, do whatever you wish with it).
+          </para>
+          <para>
+            However, it is also possible to execute third-party programs from
+            Gwyddion and these do not necessarily have to be distributed under
+            the same license – if they are not derived works of Gwyddion
+            (which, admittedly, is not always easy to determine).
+          </para>
+        </listitem>
+      </itemizedlist>
+      The main reasons why the program is covered by this kind of license
+      are here: first of all, this licensing policy enables us to make
+      modular program that can be easily developed by many people from
+      different institutions. Second, this license protects the rights of
+      developers that their code, here given to the public, cannot be copied
+      and used for closed proprietary products.
+    </para>
+  </sect1>
+</chapter>
+<!-- vim: set ts=2 sw=2 et : -->

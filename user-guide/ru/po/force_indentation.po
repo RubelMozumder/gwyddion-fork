@@ -1,0 +1,136 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2021-01-03 20:24+0400\n"
+"PO-Revision-Date: 2021-01-03 20:25+0400\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: force_indentation.xml:6(title) force_indentation.xml:16(guisubmenu)
+msgid "Force and Indentation"
+msgstr "Силы и индентирование"
+
+#: force_indentation.xml:8(title)
+msgid "Analyze Imprint <gwy:icon name=\"tip_indent_analyze\"/>"
+msgstr "Анализ отпечатка <gwy:icon name=\"tip_indent_analyze\"/>"
+
+#: force_indentation.xml:14(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: force_indentation.xml:15(guisubmenu)
+msgid "SPM Modes"
+msgstr "Режимы СЗМ"
+
+#: force_indentation.xml:17(guisubmenu)
+msgid "Analyze Imprint..."
+msgstr "Анализ отпечатка..."
+
+#: force_indentation.xml:25(term)
+msgid "Impression"
+msgstr "Отпечаток"
+
+#: force_indentation.xml:27(para)
+msgid ""
+"Is defined as the region around the local minimum with the same normal "
+"vector (up to symmetry). This corresponds to the usual definition of the "
+"contact area."
+msgstr ""
+"Определяется как область вокруг локального минимума с одинаковым вектором "
+"нормали (с точностью до симметричного отображения). Это соответствует "
+"обычному определению области контакта."
+
+#: force_indentation.xml:33(term)
+msgid "Inner pile-up"
+msgstr "Внутреннее выдавливание"
+
+#: force_indentation.xml:35(para)
+msgid "Part of the impression lying above the reference plane."
+msgstr "Часть отпечатка, лежащая выше базовой плоскости."
+
+#: force_indentation.xml:41(term)
+msgid "Outer pile-up"
+msgstr "Внешнее выдавливание"
+
+#: force_indentation.xml:43(para)
+msgid ""
+"Part of the image above the reference plane but with a different normal "
+"vector than the impression."
+msgstr ""
+"Часть отпечатка, лежащего выше базовой плоскости, но вектор нормали к "
+"которой отличается от отпечатка."
+
+#: force_indentation.xml:49(term)
+msgid "Special points"
+msgstr "Особые точки"
+
+#: force_indentation.xml:51(para)
+msgid "Include the maximum, minimum and points along steepest slope profiles."
+msgstr ""
+"Включают максимум, минимум и точки вдоль направления наискорейшего спуска."
+
+#: force_indentation.xml:57(term)
+msgid "Expected projected and developed areas"
+msgstr "Ожидаемые площади поверхности и проекции"
+
+#: force_indentation.xml:59(para)
+msgid ""
+"Refer to the values obtained by evaluating the theoretical area function of "
+"the chosen indentor type at the depth of the imprint."
+msgstr ""
+"Приводятся значения, полученные расчётом теоретической функции площади для "
+"выбранного типа индентора на глубине отпечатка."
+
+#: force_indentation.xml:65(term)
+msgid "Volume above-below"
+msgstr "Объём выше-ниже"
+
+#: force_indentation.xml:67(para)
+msgid ""
+"Volume above-below is the difference between the volume above the reference "
+"plane and the volume below."
+msgstr ""
+"Объем выше-ниже это разность между объёмом над базовой плоскостью и объёмом "
+"под ней."
+
+#: force_indentation.xml:21(para)
+msgid ""
+"The module identifies different characteristic parts of an indent and "
+"calculates the corresponding projected and developed areas (<include href="
+"\"eqi-A_p.xml\"/> and <include href=\"eqi-A_d.xml\"/>) and volumes. "
+"<placeholder-1/>"
+msgstr ""
+"Одуль определяет различные характеристические области отпечатка и "
+"рассчитывает соответствующие площади поверхности и проекции (<xi:include "
+"href=\"eqi-A_p.xml\"/> и <xi:include href=\"eqi-A_d.xml\"/>), а также "
+"объёмы. <placeholder-1/>"
+
+#: force_indentation.xml:74(para)
+msgid ""
+"Note, that the module levels the data by fitting planes along the borders of "
+"the image. This may lead to mismatch between some of the values returned by "
+"this model and analoguous ones returned by the <link linkend=\"tool-stats"
+"\">Statistical Quantities tool</link>. The data should be leveled manually "
+"in order to reduce this effect."
+msgstr ""
+"Следует отметить, что в этом модуле данные выравниваются аппроксимацией "
+"плоскостей вдоль границ изображения. Это может приводить к несоответствиям "
+"между значениям, возвращаемым этой моделью и аналогичными, получаемыми с "
+"помощью <link linkend=\"tool-stats\">инструмента Статистических величин</"
+"link>. Данные необходимо выравнивать вручную чтобы уменьшить этот эффект."
+
+#: force_indentation.xml:82(caption)
+msgid ""
+"Scheme of different regions of an indentation: above, below, plane, "
+"impression, inner pile-up and outer pile-up."
+msgstr ""
+"Схема различных областей на отпечатке: над плоскостью, под ней, плоскость, "
+"отпечаток, внутреннее выдавливание и внешнее выдавливание."

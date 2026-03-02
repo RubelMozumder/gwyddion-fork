@@ -1,0 +1,1166 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2023-2024 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwythreads.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwynlfit.h>
+#include <libprocess/brick.h>
+#include <libprocess/stats.h>
+#include <libprocess/linestats.h>
+#include <libprocess/gwyprocess.h>
+#include <libprocess/gwyprocesstypes.h>
+#include <libprocess/correlation.h>
+#include <libgwydgets/gwydataview.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwydgetutils.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+#include "libgwyddion/gwyomp.h"
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_X_SIZE = 400,
+    PREVIEW_Y_SIZE = 700,
+    RESPONSE_RECALC = 101,
+};
+
+enum {
+    PARAM_XOFFSETS,
+    PARAM_YOFFSETS,
+    PARAM_XOFFSETS_CURVE,
+    PARAM_YOFFSETS_CURVE,
+    PARAM_XOFFSETS_FLIP,
+    PARAM_YOFFSETS_FLIP,
+    PARAM_XSHIFT,
+    PARAM_YSHIFT,
+    PARAM_ZSHIFT,
+    PARAM_XORDER,
+    PARAM_YORDER,
+    PARAM_GRAPHS,
+    PARAM_BACKGROUND
+};
+
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    GwySurface *result;
+    gdouble *xshift;
+    gdouble *yshift;
+    gdouble *zshift;
+    GwyDataField *background;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GtkWidget *result;
+    GwyParamTable *table_options;
+    GwyContainer *data;
+    GtkWidget *message;
+    GtkWidget *dataview;
+} ModuleGUI;
+
+
+static gboolean              module_register          (void);
+static GwyParamDef*          define_module_params     (void);
+static void                  xystitch                 (GwyContainer *data,
+                                                       GwyRunType runtype);
+static gboolean              execute                  (ModuleArgs *args,
+                                                       GtkWindow *wait_window);
+static GwyDialogOutcome      run_gui                  (ModuleArgs *args,
+                                                       GwyContainer *data,
+                                                       gint id);
+static void                  param_changed            (ModuleGUI *gui,
+                                                       gint id);
+static void                  dialog_response          (GwyDialog *dialog,
+                                                       gint response,
+                                                       ModuleGUI *gui);
+static void                  recalc                   (gpointer user_data);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Merges all XY planes into XYZ data"),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "Petr Klapetek & David Nečas (Yeti)",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_xystitch)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_xystitch",
+                             (GwyVolumeFunc)&xystitch,
+                             N_("/SPM M_odes/_XY Stitch..."),
+                             NULL,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME | GWY_MENU_FLAG_GRAPH_CURVE,
+                             N_("Merge all the XY planes to XYZ data"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_graph_id(paramdef, PARAM_XOFFSETS, "xoffsets", _("X _offsets graph"));
+    gwy_param_def_add_graph_curve(paramdef, PARAM_XOFFSETS_CURVE, "xcurve", _("X o_ffsets curve"));
+    gwy_param_def_add_graph_id(paramdef, PARAM_YOFFSETS, "yoffsets", _("Y off_sets graph"));
+    gwy_param_def_add_graph_curve(paramdef, PARAM_YOFFSETS_CURVE, "ycurve", _("Y offs_ets curve"));
+    gwy_param_def_add_boolean(paramdef, PARAM_XOFFSETS_FLIP, "xflip", _("_Flip X axis"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_YOFFSETS_FLIP, "yflip", _("F_lip Y axis"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_XSHIFT, "xshift", _("Adjust _X shifts"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_YSHIFT, "yshift", _("Adjust _Y shifts"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_ZSHIFT, "zshift", _("Adjust _Z shifts"), FALSE);
+    gwy_param_def_add_int(paramdef, PARAM_XORDER, "xorder", _("X polynomial degree"), 1, 7, 1);
+    gwy_param_def_add_int(paramdef, PARAM_YORDER, "yorder", _("Y polynomial degree"), 1, 4, 1);
+    gwy_param_def_add_boolean(paramdef, PARAM_GRAPHS, "graphs", _("Plot graphs"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_BACKGROUND, "background", _("E_xtract background"), FALSE);
+//    gwy_param_def_add_boolean(paramdef, PARAM_ROTATE, "rotate", _("A_djust rotation"), FALSE);
+//    gwy_param_def_add_double(paramdef, PARAM_MAXSHIFT, "max_shift", _("_Shift range"), 0.0, 50, 20);
+//    gwy_param_def_add_double(paramdef, PARAM_MAXROTATE, "max_rotate", _("_Rotation range"), 0.0, 10, 1);
+
+    return paramdef;
+}
+
+static void
+xystitch(GwyContainer *data, GwyRunType runtype)
+{
+    ModuleArgs args;
+    GwyBrick *brick = NULL;
+    GwyDialogOutcome outcome = GWY_DIALOG_PROCEED;
+    gint oldid, newid;
+    GwyAppDataId graph_id;
+    GwyGraphModel *gmodel;
+    GwyGraphCurveModel *gcmodel;
+    gdouble *ishift;
+    gint i, nshift;
+    const guchar *gradient;
+
+    g_return_if_fail(runtype & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+    gwy_clear(&args, 1);
+
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &brick,
+                                     GWY_APP_BRICK_ID, &oldid,
+                                     GWY_APP_CONTAINER_ID, &graph_id.datano,
+                                     GWY_APP_GRAPH_MODEL_ID, &graph_id.id,
+                                     0);
+    g_return_if_fail(GWY_IS_BRICK(brick));
+
+    ishift = NULL;
+    args.params = gwy_params_new_from_settings(define_module_params());
+    args.brick = brick;
+    gwy_params_set_graph_id(args.params, PARAM_XOFFSETS, graph_id);
+    gwy_params_set_graph_id(args.params, PARAM_YOFFSETS, graph_id);
+
+    if (runtype == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args, data, oldid);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto end;
+    }
+    if (outcome != GWY_DIALOG_HAVE_RESULT) {
+        if (!execute(&args, gwy_app_find_window_for_channel(data, oldid)))
+            goto end;
+    }
+
+    if (args.result) {
+        newid = gwy_app_data_browser_add_surface(args.result, data, TRUE);
+        if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(oldid), &gradient))
+           gwy_container_set_const_string(data, gwy_app_get_surface_palette_key_for_id(newid), gradient);
+        gwy_app_set_surface_title(data, newid, _("Stitched"));
+
+        if (gwy_params_get_boolean(args.params, PARAM_BACKGROUND)) {
+            newid = gwy_app_data_browser_add_data_field(args.background, data, TRUE);
+            gwy_app_sync_data_items(data, data, oldid, newid, FALSE,
+                                    GWY_DATA_ITEM_GRADIENT,
+                                    GWY_DATA_ITEM_MASK_COLOR,
+                                    GWY_DATA_ITEM_REAL_SQUARE,
+                                    0);
+            if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(oldid), &gradient))
+                 gwy_container_set_const_string(data, gwy_app_get_data_palette_key_for_id(newid), gradient);
+
+            gwy_app_set_data_field_title(data, newid, _("Background"));
+        }
+
+        if (gwy_params_get_boolean(args.params, PARAM_GRAPHS)) {
+            nshift = gwy_brick_get_zres(args.brick);
+            ishift = g_new(gdouble, nshift);
+
+            for (i = 0; i < nshift; i++)
+                ishift[i] = i;
+
+            if (gwy_params_get_boolean(args.params, PARAM_XSHIFT)) {
+               gmodel = gwy_graph_model_new();
+               g_object_set(gmodel,
+                            "title", _("X shift"),
+                            "axis-label-left", _("X shift"),
+                            "axis-label-bottom", _("Frame number"),
+                            "si-unit-y", gwy_brick_get_si_unit_x(brick),
+                            NULL);
+
+               gcmodel = gwy_graph_curve_model_new();
+               gwy_graph_curve_model_set_data(gcmodel, ishift, args.xshift, nshift);
+
+               g_object_set(gcmodel, "description", _("x-axis shift"), NULL);
+               gwy_graph_model_add_curve(gmodel, gcmodel);
+               gwy_object_unref(gcmodel);
+               gwy_app_data_browser_add_graph_model(gmodel, data, TRUE);
+               gwy_object_unref(gmodel);
+            }
+
+            if (gwy_params_get_boolean(args.params, PARAM_YSHIFT)) {
+               gmodel = gwy_graph_model_new();
+               g_object_set(gmodel,
+                            "title", _("Y shift"),
+                            "axis-label-left", _("y shift"),
+                            "axis-label-bottom", "frame number",
+                            "si-unit-y", gwy_brick_get_si_unit_y(brick),
+                            NULL);
+
+               gcmodel = gwy_graph_curve_model_new();
+               gwy_graph_curve_model_set_data(gcmodel, ishift, args.yshift, nshift);
+
+               g_object_set(gcmodel, "description", _("y-axis shift"), NULL);
+               gwy_graph_model_add_curve(gmodel, gcmodel);
+               gwy_object_unref(gcmodel);
+               gwy_app_data_browser_add_graph_model(gmodel, data, TRUE);
+               gwy_object_unref(gmodel);
+            }
+
+
+            if (gwy_params_get_boolean(args.params, PARAM_ZSHIFT)) {
+               gmodel = gwy_graph_model_new();
+               g_object_set(gmodel,
+                            "title", _("Z shift"),
+                            "axis-label-left", _("z shift"),
+                            "axis-label-bottom", "frame number",
+                            "si-unit-y", gwy_brick_get_si_unit_w(brick),
+                            NULL);
+
+               gcmodel = gwy_graph_curve_model_new();
+               gwy_graph_curve_model_set_data(gcmodel, ishift, args.zshift, nshift);
+
+               g_object_set(gcmodel, "description", _("z-axis shift"), NULL);
+               gwy_graph_model_add_curve(gmodel, gcmodel);
+               gwy_object_unref(gcmodel);
+               gwy_app_data_browser_add_graph_model(gmodel, data, TRUE);
+               gwy_object_unref(gmodel);
+            }
+
+
+            g_free(ishift);
+        }
+    }
+
+end:
+    g_object_unref(args.params);
+    GWY_OBJECT_UNREF(args.result);
+    GWY_OBJECT_UNREF(args.background);
+    g_free(args.xshift);
+    g_free(args.yshift);
+    g_free(args.zshift);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GtkWidget *hbox, *vbox, *label;
+    GwyParamTable *table;
+    GwyDialog *dialog;
+    ModuleGUI gui;
+    GwyDialogOutcome outcome;
+    GwyBrick *brick = args->brick;
+    GwyDataField *field = gwy_data_field_new(gwy_brick_get_xres(brick), gwy_brick_get_yres(brick),
+                                             gwy_brick_get_xreal(brick), gwy_brick_get_yreal(brick),
+                                             TRUE);
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.data = gwy_container_new();
+
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), field);
+    if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.dialog = gwy_dialog_new(_("XY Stitch"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gtk_dialog_add_button(GTK_DIALOG(dialog), gwy_sgettext("verb|_Stitch"), RESPONSE_RECALC);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    gui.dataview = gwy_create_preview(gui.data, 0, PREVIEW_X_SIZE, FALSE);
+    hbox = gwy_create_dialog_preview_hbox(GTK_DIALOG(dialog), GWY_DATA_VIEW(gui.dataview), FALSE);
+    vbox = gwy_vbox_new(0);
+
+    table = gui.table_options = gwy_param_table_new(args->params);
+    gwy_param_table_append_graph_id(table, PARAM_XOFFSETS);
+    gwy_param_table_append_graph_curve(table, PARAM_XOFFSETS_CURVE, gwy_params_get_graph(args->params, PARAM_XOFFSETS));
+    gwy_param_table_append_checkbox(table, PARAM_XOFFSETS_FLIP);
+
+    gwy_param_table_append_graph_id(table, PARAM_YOFFSETS);
+    gwy_param_table_append_graph_curve(table, PARAM_YOFFSETS_CURVE, gwy_params_get_graph(args->params, PARAM_YOFFSETS));
+    gwy_param_table_append_checkbox(table, PARAM_YOFFSETS_FLIP);
+
+    gwy_param_table_append_checkbox(table, PARAM_XSHIFT);
+    gwy_param_table_append_checkbox(table, PARAM_YSHIFT);
+    gwy_param_table_append_checkbox(table, PARAM_ZSHIFT);
+    gwy_param_table_append_slider(table, PARAM_XORDER);
+    gwy_param_table_append_slider(table, PARAM_YORDER);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_checkbox(table, PARAM_GRAPHS);
+    gwy_param_table_append_checkbox(table, PARAM_BACKGROUND);
+    //gwy_param_table_append_checkbox(table, PARAM_ROTATE);
+    //gwy_param_table_append_slider(table, PARAM_MAXROTATE);
+    //gwy_param_table_set_unitstr(table, PARAM_MAXROTATE, "deg");
+
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(vbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    gui.result = label = gtk_label_new(NULL);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+
+    g_signal_connect_swapped(gui.table_options, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_after(dialog, "response", G_CALLBACK(dialog_response), &gui);
+    param_changed(&gui, PARAM_XOFFSETS);
+    param_changed(&gui, PARAM_ZSHIFT);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+update_poly_sensitivity(ModuleGUI *gui)
+{
+    GwyParams *params = gui->args->params;
+    gboolean doz = gwy_params_get_boolean(params, PARAM_ZSHIFT);
+    gint xdegree = gwy_params_get_int(params, PARAM_XORDER);
+    gint ydegree = gwy_params_get_int(params, PARAM_YORDER);
+
+    gwy_param_table_set_sensitive(gui->table_options, PARAM_XORDER, doz);
+    gwy_param_table_set_sensitive(gui->table_options, PARAM_YORDER, doz);
+    gwy_param_table_set_sensitive(gui->table_options, PARAM_BACKGROUND, doz && (xdegree > 1 || ydegree > 1));
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    GwyGraphCurveModel *gcmx, *gcmy;
+
+    if (id == PARAM_XOFFSETS || id == PARAM_YOFFSETS) {
+        gwy_param_table_graph_curve_set_model(gui->table_options, PARAM_XOFFSETS_CURVE,
+                                              gwy_params_get_graph(gui->args->params, PARAM_XOFFSETS));
+        gwy_param_table_graph_curve_set_model(gui->table_options, PARAM_YOFFSETS_CURVE,
+                                              gwy_params_get_graph(gui->args->params, PARAM_YOFFSETS));
+
+        gcmx = gwy_graph_model_get_curve(gwy_params_get_graph(gui->args->params, PARAM_XOFFSETS),
+                                         gwy_params_get_int(gui->args->params, PARAM_XOFFSETS_CURVE));
+
+        gcmy = gwy_graph_model_get_curve(gwy_params_get_graph(gui->args->params, PARAM_XOFFSETS),
+                                         gwy_params_get_int(gui->args->params, PARAM_XOFFSETS_CURVE));
+
+        /* FIXME: translatable strings */
+        if (gwy_graph_curve_model_get_ndata(gcmx) < gwy_brick_get_zres(gui->args->brick)) {
+            gtk_label_set_text(GTK_LABEL(gui->result), "Error: not enough X graph points");
+            gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), RESPONSE_RECALC, FALSE);
+        }
+        else if (gwy_graph_curve_model_get_ndata(gcmy) < gwy_brick_get_zres(gui->args->brick)) {
+            gtk_label_set_text(GTK_LABEL(gui->result), "Error: not enough Y graph points");
+            gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), RESPONSE_RECALC, FALSE);
+        }
+        else {
+            gtk_label_set_text(GTK_LABEL(gui->result), NULL);
+            gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), RESPONSE_RECALC, TRUE);
+        }
+    }
+
+    if (id == PARAM_ZSHIFT || id == PARAM_XORDER || id == PARAM_YORDER)
+        update_poly_sensitivity(gui);
+
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+dialog_response(G_GNUC_UNUSED GwyDialog *dialog, gint response, ModuleGUI *gui)
+{
+    if (response == RESPONSE_RECALC) {
+        recalc(gui);
+    }
+}
+
+static void
+recalc(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    GwyDataField *dfield = gwy_container_get_object(gui->data, gwy_app_get_data_key_for_id(0));
+    gdouble xmin, xmax, ymin, ymax, xrange, yrange;
+    gint newxres, newyres;
+
+    if (!execute(gui->args, GTK_WINDOW(gui->dialog))) {
+        /* FIXME: What should happen on failure? */
+        return;
+    }
+
+    gwy_surface_get_xrange(gui->args->result, &xmin, &xmax);
+    gwy_surface_get_yrange(gui->args->result, &ymin, &ymax);
+    xrange = xmax - xmin;
+    yrange = ymax - ymin;
+
+    if (xrange >= yrange) {
+       newxres = PREVIEW_X_SIZE;
+       newyres = yrange*newxres/xrange;
+    }
+    else {
+       newyres = PREVIEW_Y_SIZE;
+       newxres = xrange*newyres/yrange;
+    }
+    if (newxres == 0 || newyres == 0) {
+        /* FIXME: translatable strings */
+        if (newxres == 0)
+            gtk_label_set_text(GTK_LABEL(gui->result), "Error: zero preview resolution in X");
+        else
+            gtk_label_set_text(GTK_LABEL(gui->result), "Error: zero preview resolution in Y");
+        return;
+    }
+
+    //printf("newres %d %d   rng %g %g\n", newxres, newyres, xrange, yrange);
+
+    gwy_data_field_resample(dfield, newxres, newyres, GWY_INTERPOLATION_NONE);
+    gwy_data_field_set_xoffset(dfield, xmin);
+    gwy_data_field_set_yoffset(dfield, ymin);
+    gwy_data_field_set_xreal(dfield, xrange);
+    gwy_data_field_set_yreal(dfield, yrange);
+
+    gwy_data_field_average_xyz(dfield, NULL,
+                               gwy_surface_get_data_const(gui->args->result),
+                               gwy_surface_get_npoints(gui->args->result));
+    gwy_data_field_data_changed(dfield);
+
+    gwy_set_data_preview_size(GWY_DATA_VIEW(gui->dataview), newxres);
+    gwy_dialog_have_result(GWY_DIALOG(gui->dialog));
+}
+
+static gdouble
+get_curve_value_at(GwyGraphCurveModel *gc, gint level)
+{
+    const gdouble *ys = gwy_graph_curve_model_get_ydata(gc);
+    gint n = gwy_graph_curve_model_get_ndata(gc);
+
+    if (level < 0 || level > (n-1))
+        return 0;
+    else
+        return ys[level];
+}
+
+//moff: mth image offset in the particular direction
+//noff: nth image offset in the particular directions
+//res: image resolution in the particular directions
+//result: start N: position of overlap on image N, size of overlap in this direction
+static void
+get_overlap(double moff, double noff, gint res, gint *start1, gint *start2, gint *size)
+{
+    int imoff = (int)moff;
+    int inoff = (int)noff;
+
+    if (inoff == imoff) {
+        *start1 = 0;
+        *start2 = 0;
+        *size = res;
+    }
+    else if (inoff > imoff && (inoff-imoff) < res) {
+        *start1 = inoff - imoff;
+        *start2 = 0;
+        *size = res - (inoff-imoff);
+    }
+    else if (inoff < imoff && (imoff-inoff) < res) {
+        *start1 = 0;
+        *start2 = imoff - inoff;
+        *size = res - (imoff-inoff);
+    }
+    else
+        *size = 0;
+}
+
+// matrix: matrix of sum of height shifts
+// rzs: matrix of overlap sizes
+// res: number of images - 1 + 5
+// matrix, rzs have size res + 1
+static void
+solve_polyshifts(gdouble *matrix, gdouble *rhs, gdouble *shift, gdouble *poly, gint res, gint npoly)
+{
+    gdouble *result;
+    gint k;
+
+    //printf("solve\n");
+
+    result = g_new(gdouble, res);
+    gwy_math_lin_solve_rewrite(res, matrix, rhs, result);
+
+
+    if (result) {
+        //sum all the previous z shifts to get individual images shift instead of differences
+        shift[0] = 0;
+        for (k = 0; k < (res-npoly); k++) {
+            shift[k+1] = -result[k] + shift[k];
+        }
+        //copy polynomial parameters directly, zres = res+1, three more polynom parameters
+        for (k = (res-npoly); k < res; k++) {
+            poly[k-(res-npoly)] = result[k];
+            //printf("%d %g\n", k, result[k]);
+        }
+
+        g_free(result);
+    }
+    else {
+        //printf("No polyshift result!\n");
+        gwy_clear(shift, res-npoly);
+        gwy_clear(poly, npoly);
+    }
+}
+
+// zs: matrix of sum of height shifts
+// rzs: matrix of overlap sizes
+static gboolean
+optimize_shifts(gdouble **zs, gint **rzs, gdouble *shift, gint zres)
+{
+    gdouble *result, *matrix, *rhs;
+    gint col, row, k, l, p, pleft, pright;
+    gint res = 2;
+    gboolean ok = FALSE;
+
+    if (zres >= 2)
+        res = zres - 1;
+
+    result = g_new(gdouble, res);
+    // allocate and null the matrix and rand hand side
+    rhs = g_new0(gdouble, res);
+    matrix = g_new0(gdouble, res*res);
+
+    //matice:
+    //diagonala p,p : suma prekryvu  (0 ... p) s (p+1 ...  zres),
+    //                nebo (0 ... p) s (p ...  zres) ?
+    //                priklad: 3, 3: 1-3:4-10
+    //nediagonala p,r>p:  suma prekryvu (0 ... p) (r+1 ... zres)
+    //                priklad: 3, 7: 1-3:8-10
+    //nediagonala p,r<p:  suma prekryvu (0 ... r) (p+1 ... zres)
+    //                priklad: 7, 3: 1-3:8-10
+    //
+    //prava strana:
+    // stejne jako diagonala, suma rozdilu (0...p) s (p+1 ... zres))
+
+    if (!gwy_app_wait_set_fraction(0.0) || !gwy_app_wait_set_message(_("Filling matrix...")))
+        goto end;
+
+    for (row = 0; row < res; row++) { //row
+        for (col = 0; col < res; col++) {  //col
+             if (col == row) {
+                 p = col;
+                 for (k = 0; k <= p; k++) {
+                     for (l = (p+1); l < zres; l++) {  //p+1 so far best
+                         matrix[col + res*row] += rzs[k][l];
+                         rhs[row] += zs[k][l];
+                     }
+                 }
+             }
+             else {
+                 pleft = MIN(col, row);
+                 pright = MAX(col, row) + 1;
+                 for (k = 0; k <= pleft; k++) {
+                     for (l = pright; l < zres; l++)
+                         matrix[col + res*row] += rzs[k][l];
+                 }
+             }
+        }
+        if (!gwy_app_wait_set_fraction((double)row/res))
+            goto end;
+    }
+
+    if (!gwy_app_wait_set_fraction(0.0) || !gwy_app_wait_set_message(_("Solving matrix...")))
+        goto end;
+
+    /*printf("-------------- conventional matrix ----------------                     right hand side vector\n");
+    for (row = 0; row < res; row++) {
+         for (col = 0; col < res; col++) {
+             printf("%g ", matrix[col + res*row]);
+         }
+         printf("                                 %g\n", rhs[row]);
+    }
+    */
+    result = gwy_math_lin_solve_rewrite(res, matrix, rhs, result);
+
+    if (result) {
+        //sum all the previous z shifts to get individual images shift instead of differences
+        shift[0] = 0;
+        for (k = 0; k < res; k++) {
+            shift[k+1] = result[k] + shift[k];
+        }
+        g_free(result);
+    }
+    else {
+        for (k = 0; k < zres; k++)
+            shift[k] = 0;
+    }
+
+    ok = TRUE;
+
+end:
+    g_free(matrix);
+    g_free(rhs);
+
+    return ok;
+}
+
+
+static gboolean
+get_xy_shift(GwyDataField *mdetail, GwyDataField *ndetail, gdouble *xshift, gdouble *yshift)
+{
+    gint i, j, n;
+    gdouble xsh, ysh, xoff, yoff, maxscore, zvals[9];
+    GwyDataField *score = gwy_data_field_new_alike(mdetail, TRUE);
+    gint xres = gwy_data_field_get_xres(mdetail);
+    gint yres = gwy_data_field_get_yres(mdetail);
+
+    gwy_data_field_correlation_search(mdetail, ndetail, NULL, score,
+                                      GWY_CORR_SEARCH_PHASE_ONLY_SCORE,
+                                      0.1, GWY_EXTERIOR_MIRROR_EXTEND, 0);
+
+    if (gwy_data_field_get_local_maxima_list(score, &xoff, &yoff, &maxscore, 1, 0, 0.0, FALSE)) {
+        if (xoff > 0 && xoff < (xres - 1) && yoff > 0 && yoff < (yres - 1)) {
+            n = 0;
+            for (j = -1; j <= 1; j++) {
+                for (i = -1; i <= 1; i++) {
+                    zvals[n++] = gwy_data_field_get_val(score, xoff+i, yoff+j);
+                }
+            }
+            gwy_math_refine_maximum_2d(zvals, &xsh, &ysh);
+            xsh += xoff - xres/2;
+            ysh += yoff - yres/2;
+        }
+        else {
+            xsh = GWY_ROUND(xoff) - xres/2;
+            ysh = GWY_ROUND(yoff) - yres/2;
+        }
+    }
+    else
+        xsh = ysh = 0;
+
+    *xshift = gwy_data_field_itor(mdetail, xsh);
+    *yshift = gwy_data_field_jtor(mdetail, ysh);
+
+    g_object_unref(score);
+    return TRUE;
+}
+
+static gboolean
+get_shifts(GwyBrick *brick, gdouble *xoff, gdouble *yoff, gdouble *xshift, gdouble *yshift, gdouble *zshift,
+           gdouble *poly, gboolean dox, gboolean doy, gboolean doz, gint xorder, gint yorder)
+{
+    gint k, m, n, col1, row1, col2, row2, width, height;
+    const gint xres = gwy_brick_get_xres(brick);
+    const gint yres = gwy_brick_get_yres(brick);
+    const gint zres = gwy_brick_get_zres(brick);
+    GwyDataField *mfield, *nfield, *mdetail, *ndetail;
+    gdouble **xs, **ys, **zs, mh, nh, xsh, ysh;
+    gdouble polyterm[15], mdx, mdy;
+    gint **rs;
+    gint npoly = 15;
+    gboolean dopoly = ((xorder > 1) || (yorder > 1));
+    gboolean ok = FALSE;
+
+    //poly stuff
+    gint res = 0 /* silence GCC, only used if (dopoly) */, pcol, prow, sp, sc, scol, srow;
+    gdouble mx, my, shiftx, shifty;
+    gdouble *matrix = NULL, *rhs = NULL, heightdiff, *mdata, *ndata;
+
+    /* XXX: For some reason, if we put this after if (dopoly) GCC 13.2.1 goes bonkers, telling us that zres is now
+     * a huge number (or perhaps 100% negative) and we are trying to allocate huge amounts of memory.
+     *
+     * argument 1 range [18446744071562067968, 18446744073709551615] exceeds maximum object size 9223372036854775807
+     *
+     * Even though it is happy with xs and ys and starts complaining about rs, nothing changes the value of zres and
+     * I even declared it const and it does not seem to think we are trying to change it. */
+    xs = g_new(gdouble*, zres);
+    ys = g_new(gdouble*, zres);
+    zs = g_new(gdouble*, zres);
+    for (k = 0; k < zres; k++) {
+        xs[k] = g_new(gdouble, zres);
+        ys[k] = g_new(gdouble, zres);
+        zs[k] = g_new(gdouble, zres);
+
+        if (dox)
+            xshift[k] = 0;
+        if (doy)
+            yshift[k] = 0;
+        if (doz)
+            zshift[k] = 0;
+    }
+
+    rs = g_new(gint*, zres);
+    for (k = 0; k < zres; k++)
+        rs[k] = g_new(gint, zres);
+
+    for (m = 0; m < zres; m++) {
+        gwy_clear(rs[m], zres);
+        gwy_clear(xs[m], zres);
+        gwy_clear(ys[m], zres);
+        gwy_clear(zs[m], zres);
+    }
+
+    if (dopoly) {
+       res = zres - 1 + npoly; //-1+3+4
+
+       rhs = g_new(gdouble, res);
+       matrix = g_new(gdouble, res*res);
+
+       for (prow = 0; prow < res; prow++) {
+           for (pcol = 0; pcol < res; pcol++) {
+               matrix[prow*res + pcol] = 0;
+           }
+           rhs[prow] = 0;
+       }
+    }
+    /* XXX: Otherwise res is uninitialised. It seems OK (in the uncommented code – the debugging code can definitely
+     * use it uninitialised), but GCC complains about it. */
+
+    mfield = gwy_data_field_new(xres, yres, gwy_brick_get_xreal(brick), gwy_brick_get_yreal(brick), FALSE);
+    nfield = gwy_data_field_new(xres, yres, gwy_brick_get_xreal(brick), gwy_brick_get_yreal(brick), FALSE);
+
+    //find z shift between mth and nth plane
+    for (m = 0; m < zres; m++) {
+       gwy_brick_extract_xy_plane(brick, mfield, m);
+       for (n = 0; n < zres; n++) {
+          if (m == n) {
+              rs[m][n] = xres*yres; //should this be zero or no?  zero so far best, does not matter if we count
+                                    //diagonal from p+1
+              xs[m][n] = ys[m][n] = zs[m][n] = 0;
+              continue;
+          }
+          gwy_brick_extract_xy_plane(brick, nfield, n);
+
+          get_overlap(gwy_brick_rtoi(brick, xoff[m] + xshift[m]), gwy_brick_rtoi(brick, xoff[n] + xshift[n]),
+                      xres, &col1, &col2, &width);
+          get_overlap(gwy_brick_rtoj(brick, yoff[m] + yshift[m]), gwy_brick_rtoj(brick, yoff[n] + yshift[n]),
+                      yres, &row1, &row2, &height);
+
+          if (width > 0 && height > 0) {
+             rs[m][n] = rs[n][m] = width*height;
+
+             if (dopoly) {
+                 if (m >= n)
+                     continue;
+
+                 mdata = gwy_data_field_get_data(mfield);
+                 ndata = gwy_data_field_get_data(nfield);
+
+             //  m x n overlap,
+             // overlap posistion in image m: col1, row1, width, height
+             // overlap position in image n: col2, row2, width, height
+             //   rhs = g_new(gdouble, res);
+             //   matrix = g_new(gdouble, res*res);
+
+                shiftx = (col2 - col1);//*xreal/xres;
+                shifty = (row2 - row1);//*yreal/yres;
+
+                for (prow = 0; prow < height; prow++) {
+                    for (pcol = 0; pcol < width; pcol++) {
+                         mx = (pcol - xres/2 + col1);//*xreal/xres;  //position relative to frame m center
+                         my = (prow - yres/2 + row1);//*yreal/yres;
+
+                         mdx = mx + shiftx;
+                         mdy = my + shifty;
+
+                         polyterm[0] = 2*mx*shiftx + shiftx*shiftx;
+                         polyterm[1] = 2*my*shifty + shifty*shifty;
+                         polyterm[2] = mx*shifty + my*shiftx + shiftx*shifty;
+                         polyterm[3] = 3*mx*mx*shiftx + 3*mx*shiftx*shiftx + shiftx*shiftx*shiftx;
+                         polyterm[4] = mx*mx*shifty + 2*mx*my*shiftx + 2*mx*shiftx*shifty
+                                     + my*shiftx*shiftx + shiftx*shiftx*shifty;
+                         polyterm[5] = my*my*shiftx + 2*my*mx*shifty + 2*my*shifty*shiftx
+                                     + mx*shifty*shifty + shifty*shifty*shiftx;
+                         polyterm[6] = 3*my*my*shifty + 3*my*shifty*shifty + shifty*shifty*shifty;
+                         polyterm[7] = mdx*mdx*mdx*mdx - mx*mx*mx*mx;
+                         polyterm[8] = mdx*mdx*mdx*mdy - mx*mx*mx*my;
+                         polyterm[9] = mdx*mdx*mdy*mdy - mx*mx*my*my;
+                         polyterm[10] = mdx*mdy*mdy*mdy - mx*my*my*my;
+                         polyterm[11] = mdy*mdy*mdy*mdy - my*my*my*my;
+                         polyterm[12] = mdx*mdx*mdx*mdx*mdx - mx*mx*mx*mx*mx;
+                         polyterm[13] = mdx*mdx*mdx*mdx*mdx*mdx - mx*mx*mx*mx*mx*mx;
+                         polyterm[14] = mdx*mdx*mdx*mdx*mdx*mdx*mdx - mx*mx*mx*mx*mx*mx*mx;
+
+
+                         heightdiff = -(ndata[(prow + row2)*xres + pcol + col2]
+                                        - mdata[(prow + row1)*xres + pcol + col1]);
+
+                         //fill terms related to z shifts
+                         for (srow = m; srow < n; srow++) {     //rows and columns in range m...n,
+                             for (scol = m; scol < n; scol++) {
+                                 matrix[srow*res + scol] += 1;
+                             }
+                             //polynomial terms in the normal part of matrix
+                             for (sp = 0; sp < npoly; sp++)
+                                 matrix[srow*res + res - npoly + sp] -= polyterm[sp];
+
+                             rhs[srow] -= heightdiff;
+                         }
+                         //polynomial bottom part of the matrix
+                         for (sp = 0; sp < npoly; sp++) {
+                             for (scol = m; scol < n; scol++) //bottom without right edge
+                                 matrix[(sp+res-npoly)*res + scol] -= polyterm[sp];
+
+                             for (sc = 0; sc < npoly; sc++) //bottom right edge
+                                 matrix[(sp+res-npoly)*res + sc + res - npoly] += polyterm[sp]*polyterm[sc];
+
+                             rhs[sp + res - npoly] += polyterm[sp]*heightdiff;
+                         }
+                    }
+                }
+             }
+             if (doz) {
+                mh = gwy_data_field_area_get_sum_mask(mfield, NULL, GWY_MASK_IGNORE, col1, row1, width, height);
+                nh = gwy_data_field_area_get_sum_mask(nfield, NULL, GWY_MASK_IGNORE, col2, row2, width, height);
+                zs[m][n] = mh - nh;
+                zs[n][m] = nh - mh;
+              }
+
+             if (dox || doy) {
+                mdetail = gwy_data_field_area_extract(mfield, col1, row1, width, height);
+                ndetail = gwy_data_field_area_extract(nfield, col2, row2, width, height);
+
+                if (get_xy_shift(mdetail, ndetail, &xsh, &ysh)) {
+                    xs[m][n] = xsh*width*height;
+                    xs[n][m] = -xsh*width*height;
+                    ys[m][n] = ysh*width*height;
+                    ys[n][m] = -ysh*width*height;
+                }
+                else {
+                    xs[m][n] = 0;
+                    xs[n][m] = 0;
+                    ys[m][n] = 0;
+                    ys[n][m] = 0;
+                }
+             }
+          }
+          else {
+             xs[m][n] = 0;
+             ys[m][n] = 0;
+             zs[m][n] = 0;
+             rs[m][n] = 0;
+          }
+       }
+       if (!gwy_app_wait_set_fraction((double)m/zres))
+           goto end;
+    }
+
+    if (!gwy_app_wait_set_fraction(0.0) || !gwy_app_wait_set_message(_("Optimizing shifts...")))
+        goto end;
+
+    if (dopoly) {
+        //null the terms that should not be used
+        if (xorder < 7) {
+            if (xorder < 6) {
+                if (xorder < 5) {
+                    if (xorder < 4) {
+                        if (xorder < 3) {
+                            if (xorder < 2) { //xorder 1
+                                gwy_clear(matrix + (res-15)*res, res);
+                                rhs[res-15] = 0;
+                                gwy_clear(matrix + (res-13)*res, res);
+                                rhs[res-13] = 0;
+                            } //xorder 2 or 3
+                            gwy_clear(matrix + (res-12)*res, res);
+                            rhs[res-12] = 0;
+                            gwy_clear(matrix + (res-11)*res, res);
+                            rhs[res-11] = 0;
+                            gwy_clear(matrix + (res-10)*res, res);
+                            rhs[res-10] = 0;
+                        } //xorder 3
+                        gwy_clear(matrix + (res-8)*res, res);
+                        rhs[res-8] = 0;
+                        gwy_clear(matrix + (res-7)*res, res);
+                        rhs[res-7] = 0;
+                        gwy_clear(matrix + (res-6)*res, res);
+                        rhs[res-6] = 0;
+                        gwy_clear(matrix + (res-5)*res, res);
+                        rhs[res-5] = 0;
+                    }
+                    gwy_clear(matrix + (res-3)*res, res);
+                    rhs[res-3] = 0;
+                }
+                gwy_clear(matrix + (res-2)*res, res);
+                rhs[res-2] = 0;
+            }
+            gwy_clear(matrix + (res-1)*res, res);
+            rhs[res-1] = 0;
+        }
+        if (yorder < 4) {
+            if (yorder < 3) {
+                if (yorder < 2) { //yorder 1
+                    gwy_clear(matrix + (res-14)*res, res);
+                    rhs[res-14] = 0;
+                    gwy_clear(matrix + (res-13)*res, res);
+                    rhs[res-13] = 0;
+                } //yorder 2 or 3
+                gwy_clear(matrix + (res-11)*res, res);
+                rhs[res-11] = 0;
+                gwy_clear(matrix + (res-10)*res, res);
+                rhs[res-10] = 0;
+                gwy_clear(matrix + (res-9)*res, res);
+                rhs[res-9] = 0;
+            } //yorder 3
+            gwy_clear(matrix + (res-7)*res, res);
+            rhs[res-7] = 0;
+            gwy_clear(matrix + (res-6)*res, res);
+            rhs[res-6] = 0;
+            gwy_clear(matrix + (res-5)*res, res);
+            rhs[res-5] = 0;
+            gwy_clear(matrix + (res-4)*res, res);
+            rhs[res-4] = 0;
+        }
+
+
+        //regularisation
+        for (k = res-npoly; k < res; k++)
+            matrix[k*res + k] += 1;
+    }
+
+   /*
+    printf("-------------- hipster matrix ----------------                     right hand side vector\n");
+    for (row = 0; row < res; row++) {
+            for (col = 0; col < res; col++) {
+                printf("%g ", matrix[col + res*row]);
+            }
+            printf("                                 %g\n", rhs[row]);
+    }
+    */
+
+    if (dox) {
+        if (!optimize_shifts(xs, rs, xshift, zres))
+            goto end;
+    }
+    if (doy) {
+        if (!optimize_shifts(ys, rs, yshift, zres))
+            goto end;
+    }
+    if (doz) {
+        if (!optimize_shifts(zs, rs, zshift, zres))
+            goto end;
+    }
+
+    if (dopoly) {
+        solve_polyshifts(matrix, rhs, zshift, poly, res, npoly);
+    }
+
+    ok = TRUE;
+
+end:
+    for (k = 0; k < zres; k++) {
+        /*
+        if (k < 10)
+            printf("x %g  y %g  z %g\n", xshift[k], yshift[k], zshift[k]);
+            */
+
+        g_free(xs[k]);
+        g_free(ys[k]);
+        g_free(zs[k]);
+        g_free(rs[k]);
+    }
+    g_free(xs);
+    g_free(ys);
+    g_free(zs);
+    g_free(rs);
+    g_object_unref(mfield);
+    g_object_unref(nfield);
+
+    return ok;
+}
+
+static gboolean
+execute(ModuleArgs *args, GtkWindow *wait_window)
+{
+    GwyParams *params = args->params;
+    gint k, m, n, col, row;
+    GwyBrick *brick = args->brick;
+    GwySurface *frame;
+    GwyXYZ *xyz, *sxyz;
+    GwyDataField *dfield;
+    gdouble *xoffset, *yoffset, *xshift, *yshift, *zshift, poly[15], mx, my, *bdata = NULL;
+    gboolean xflip = gwy_params_get_boolean(params, PARAM_XOFFSETS_FLIP);
+    gboolean yflip = gwy_params_get_boolean(params, PARAM_YOFFSETS_FLIP);
+    gboolean dox = gwy_params_get_boolean(params, PARAM_XSHIFT);
+    gboolean doy = gwy_params_get_boolean(params, PARAM_YSHIFT);
+    gboolean doz = gwy_params_get_boolean(params, PARAM_ZSHIFT);
+    gint xorder = gwy_params_get_int(args->params, PARAM_XORDER);
+    gint yorder = gwy_params_get_int(args->params, PARAM_YORDER);
+    gboolean dobackground = gwy_params_get_boolean(params, PARAM_BACKGROUND);
+    GwyGraphCurveModel* gcmx = gwy_graph_model_get_curve(gwy_params_get_graph(params, PARAM_XOFFSETS),
+                                                         gwy_params_get_int(params, PARAM_XOFFSETS_CURVE));
+    GwyGraphCurveModel* gcmy = gwy_graph_model_get_curve(gwy_params_get_graph(params, PARAM_YOFFSETS),
+                                                         gwy_params_get_int(params, PARAM_YOFFSETS_CURVE));
+    gboolean ok = FALSE;
+
+    gint xres = gwy_brick_get_xres(brick);
+    gint yres = gwy_brick_get_yres(brick);
+    gint zres = gwy_brick_get_zres(brick);
+
+    gwy_app_wait_start(wait_window, _("Estimating shifts..."));
+
+    xoffset = g_new(gdouble, zres);
+    yoffset = g_new(gdouble, zres);
+    xshift = args->xshift = g_new(gdouble, zres);
+    yshift = args->yshift = g_new(gdouble, zres);
+    zshift = args->zshift = g_new(gdouble, zres);
+
+    if (args->result)
+        g_object_unref(args->result);
+
+    args->result = gwy_surface_new_sized(xres*yres*zres);
+    gwy_surface_set_si_unit_xy(args->result, gwy_brick_get_si_unit_x(brick));
+    gwy_surface_set_si_unit_z(args->result, gwy_brick_get_si_unit_w(brick));
+    xyz = gwy_surface_get_data(args->result);
+
+    dfield = gwy_data_field_new(xres, yres, gwy_brick_get_xreal(brick), gwy_brick_get_yreal(brick), FALSE);
+
+    for (k = 0; k < zres; k++) {
+        xshift[k] = 0;
+        yshift[k] = 0;
+        zshift[k] = 0;
+
+        xoffset[k] = get_curve_value_at(gcmx, k) - get_curve_value_at(gcmx, 0);
+        yoffset[k] = get_curve_value_at(gcmy, k) - get_curve_value_at(gcmy, 0);
+
+        if (xflip)
+            xoffset[k] = -xoffset[k];
+        if (yflip)
+            yoffset[k] = -yoffset[k];
+
+        //printf("%g %g\n", xoffset[k], yoffset[k]);
+    }
+
+    /*first get shifts in lateral direction and then in z, using already known xy offsets*/
+    for (k = 0; k < 15; k++)
+        poly[k] = 0;
+
+    if (dox || doy) {
+        if (!get_shifts(brick, xoffset, yoffset, xshift, yshift, zshift, poly, dox, doy, FALSE, 0, 0))
+            goto end;
+    }
+    if (doz && (xorder > 1 || yorder > 1)) {
+        if (!get_shifts(brick, xoffset, yoffset, xshift, yshift, zshift, poly, FALSE, FALSE, FALSE, xorder, yorder))
+            goto end;
+    }
+    else if (doz) {
+        if (!get_shifts(brick, xoffset, yoffset, xshift, yshift, zshift, poly, FALSE, FALSE, TRUE, 0, 0))
+            goto end;
+    }
+
+    //printf("poly: %g %g %g\n", poly[0], poly[1], poly[2]);
+
+    if (dobackground) {
+        if (!args->background) {
+            args->background = gwy_data_field_new(xres, yres,
+                                                  gwy_brick_get_xreal(brick), gwy_brick_get_yreal(brick), FALSE);
+            gwy_data_field_set_si_unit_xy(args->background, gwy_brick_get_si_unit_x(brick));
+            gwy_data_field_set_si_unit_z(args->background, gwy_brick_get_si_unit_w(brick));
+        }
+        bdata = gwy_data_field_get_data(args->background);
+    }
+
+    if (!gwy_app_wait_set_message("Merging data..."))
+        goto end;
+
+    n = 0;
+    for (k = 0; k < zres; k++) {
+        gwy_brick_extract_xy_plane(brick, dfield, k);
+
+        //xshift[k] += xoffset[k];
+        //yshift[k] += yoffset[k];
+
+        frame = gwy_surface_new();
+        gwy_surface_set_from_data_field(frame, dfield);
+        sxyz = gwy_surface_get_data(frame);
+        m = 0;
+
+        for (row = 0; row < yres; row++) {
+            for (col = 0; col < xres; col++) {
+                mx = col - xres/2;
+                my = row - yres/2;
+                xyz[n].x = sxyz[m].x + xshift[k] + xoffset[k];
+                xyz[n].y = sxyz[m].y + yshift[k] + yoffset[k];
+                xyz[n].z = (sxyz[m].z + zshift[k]
+                            + poly[0]*mx*mx + poly[1]*my*my + poly[2]*mx*my
+                            + poly[3]*mx*mx*mx + poly[4]*mx*mx*my + poly[5]*mx*my*my + poly[6]*my*my*my
+                            + poly[7]*mx*mx*mx*mx + poly[8]*mx*mx*mx*my + poly[9]*mx*mx*my*my
+                            + poly[10]*mx*my*my*my + poly[11]*my*my*my*my
+                            + poly[12]*mx*mx*mx*mx*mx + poly[13]*mx*mx*mx*mx*mx*mx
+                            + poly[14]*mx*mx*mx*mx*mx*mx*mx);
+                if (dobackground) {
+                    bdata[col + xres*row] = -(poly[0]*mx*mx + poly[1]*my*my + poly[2]*mx*my
+                                              + poly[3]*mx*mx*mx + poly[4]*mx*mx*my + poly[5]*mx*my*my
+                                              + poly[6]*my*my*my
+                                              + poly[7]*mx*mx*mx*mx + poly[8]*mx*mx*mx*my
+                                              + poly[9]*mx*mx*my*my + poly[10]*mx*my*my*my
+                                              + poly[11]*my*my*my*my
+                                              + poly[12]*mx*mx*mx*mx*mx + poly[13]*mx*mx*mx*mx*mx*mx
+                                              + poly[14]*mx*mx*mx*mx*mx*mx*mx);
+                }
+                n++;
+                m++;
+            }
+        }
+        g_object_unref(frame);
+
+        if (!gwy_app_wait_set_fraction((gdouble)k/zres))
+            goto end;
+    }
+
+    ok = TRUE;
+
+end:
+    gwy_app_wait_finish();
+
+    g_object_unref(dfield);
+    g_free(xoffset);
+    g_free(yoffset);
+
+    return ok;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

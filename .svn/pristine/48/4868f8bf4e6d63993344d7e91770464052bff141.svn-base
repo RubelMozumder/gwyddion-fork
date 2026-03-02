@@ -1,0 +1,185 @@
+#!/bin/bash
+# $Id$
+pkgname=gwyddion
+projectdir=$PWD
+logdir=$projectdir/../buildlog
+tmplog=tmplog
+
+source $HOME/.bashrc
+cd $logdir
+
+cat >autostuff.ignore <<'EOF'
+^configure\.ac[:0-9]* installing ['`]\./missing'
+^configure\.ac[:0-9]* installing ['`]\./install-sh'
+^configure\.ac[:0-9]* installing ['`]\./config.guess'
+^configure\.ac[:0-9]* installing ['`]\./config.sub'
+^configure\.ac[:0-9]* installing ['`]\./compile'
+^app/Makefile\.am[:0-9]* installing [`']\./depcomp'
+^python/Makefile\.am[:0-9]* installing ['`]\./py-compile'
+EOF
+
+# Error Unable to init server... reported to RedHat as Bug 1453161
+# Inkscape, unfortunately, is chatty and likes to print lots of nonsense to
+# stderr.
+cat >build_project.ignore <<'EOF'
+^TRANSLATION [a-z]
+[0-9]+ translated messages
+^\.* done\.$
+^/usr/bin/ld: warning: link\.res contains output sections; did you forget -T\?$
+^[ ^]*$
+^Warning: versions are different between png\.h and png\.c$
+^ *png\.h version: 1\.[6-9]\.[0-9]+$
+^ *png\.c version: 1\.[6-9]\.[0-9]+$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.: ]*Unimplemented style property SP_PROP_STOP_(OPACITY|COLOR): value: .*$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.: ]*Ignoring unrecognized CSS property: [-a-zA-Z0-9_]+$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.: ]*Fonts dir '/home/gwyddion/\.config/inkscape/fonts' does not exist and will be ignored\.$
+^\*\* \(inkscape:[0-9]+\): WARNING \*\*: [0-9.: ]*Failed to wrap object of type 'GtkRecentManager'\. Hint: this error is commonly caused by failing to call a library init\(\) function\.$
+^Unable to init server: Could not connect: Connection refused$
+^ConcreteInkscapeApplication<T>::create_window: Should not be called!$
+^Background RRGGBBAA: ffffff00$
+^Area [-+0-9.e]+:[-+0-9.e]+:[-+0-9.e]+:[-+0-9.e]+ exported to [0-9]+ x [0-9]+ pixels \([0-9]+ dpi\)$
+^INFO: Reading \./gwydgetmarshals\.list\.\.\.$
+EOF
+
+cat >build_documentation.ignore <<'EOF'
+^Writing .* for [^ ]+\(.*\)
+^lib.*-scan\.c: In function
+^lib.*-scan\.c:[0-9]*: warning: unused parameter
+^lib.*-scan\.c:[0-9]*:[0-9]*: warning: unused parameter 'arg[vc]'
+^Computing chunks\.\.\.
+^ *main *\(int argc, char \*argv\[\]\)$
+^[ ^]*$
+EOF
+
+# The /sbin/ldconfig is strange (we have the file) but consistent.  Probably
+# a chroot-like problem during rpmbuild.
+cat >make_dists.ignore <<'EOF'
+^\+
+^libtool:( install:)? warning: relinking [`'].*\.la'
+^libtool:( install:)? warning: [`'].*\.la' has not been installed in [`']/usr/lib(64)?
+^libtool:( install:)? warning: remember to run [`']libtool --finish /usr/lib(64)?
+^\.* done\.$
+^/sbin/ldconfig: Warning: ignoring configuration file that cannot be opened: /etc/ld\.so\.conf: No such file or directory$
+^[0-9]+ blocks
+^[0-9]+ translated message
+EOF
+
+cat >install_to_tmp.ignore <<'EOF'
+^libtool:( install:)? warning: relinking [`'].*\.la'
+^libtool:( install:)? warning: remember to run [`']libtool --finish /usr/lib(64)?
+EOF
+
+# Put things that are properly guarded by #ifdefs to this ignore list.
+cat >check_deps_versions.ignore <<'EOF'
+^libgwyddion/gwyutils\.c:[0-9]+: glib-2\.16 required for g_win32_get_package_installation_directory_of_module$
+^modules/file/renishaw\.c:348: glib-2\.16 required for g_strcmp0$
+^app/help\.c:[0-9]+: gtk2-2\.14 required for gtk_show_uri$
+libgwydgets/gwy3dview\.c:[0-9]+: cairo-1\.6 required for cairo_format_stride_for_width$
+^modules/file/imgexport\.c:[0-9]+: cairo-1\.6 required for cairo_ps_surface_set_eps$
+^gwyddion/toolbox-editor\.c:[0-9]+: glib-2\.30 required for g_unichar_fully_decompose$
+^WARNING: Malformed symbol name: "The Poke\(\) method" \(type=method\) in gio\.$
+EOF
+
+cat >check_symbols.ignore <<'EOF'
+^Exported undeclared symbol \(libgwyapp\): gwy_app_main_window_set$
+^Evil symbol \(pygwy\): \w+_pygwy$
+^Evil symbol \(pygwy\): pygwy_create_environment$
+^Evil symbol \(pygwy\): pygwy_initialize$
+^Evil symbol \(pygwy\): pygwy_register_console$
+EOF
+
+function printerr() {
+  f=$1
+  shift
+
+  test -s $f.err || return
+  cat --squeeze-blank $f.err \
+  | {
+    if test -s $f.ignore; then
+      grep -E -v -f $f.ignore
+    else
+      cat
+    fi
+  } | {
+    if test -n "$1"; then
+      $@
+    else
+      cat
+    fi
+  } >$tmplog
+  test -s $tmplog || return
+  echo "=====[ $f ]====="
+  cat $tmplog
+}
+
+function extract_build_documentation() {
+  logfile=build_documentation.log
+  h=
+  if test -s $tmplog; then
+    h=1
+  fi
+  python2 -c \
+"import re, sys
+x = re.findall(r'(?m)^(?:WARNING|ERROR)\\b.*(?:\\n\s+.*)*', sys.stdin.read())
+if x: print '\\n'.join(x)" \
+    <$logfile | grep -v -f build_documentation.ignore >$tmplog
+  if test -s $tmplog -a -z "$h"; then
+    echo "=====[ build_documentation ]====="
+  fi
+  cat $tmplog
+}
+
+function extract_documentation_stats() {
+   logfile=documentation_stats.log
+   htmlfile=documentation_stats.html
+   $projectdir/utils/documentation-stats.py <$logfile >$htmlfile
+
+   for x in $projectdir/devel-docs/libgwy*/libgwy*-undocumented.txt; do
+     b=$(basename "$x")
+     echo "=====[ $b ]====="
+     sed '1,/^$/d' "$x"
+     echo
+   done | cat -s >documentation-undocumented.log
+}
+
+function extract_translation_stats() {
+   logfile=build_project.err
+   htmlfile=translation_stats.html
+   $projectdir/utils/translation-stats.py <$logfile >$htmlfile
+}
+
+function coding_style_report() {
+  n=20
+  base=coding-style-byfile
+  cut -d: -f1 coding-style.log  | uniq -c | sort -nr >$base.log
+  head -n $n $base.log >$base-top$n.log
+  printf '% 7d total' $(wc -l <coding-style.log) >>$base-top$n.log
+
+  base=coding-style-bytype
+  cut -d: -f3- coding-style.log \
+    | sed -e 's/: .*//' -e 's/ (col [0-9]*)//' | sort | uniq -c | sort -nr \
+    >$base.log
+  head -n $n $base.log >$base-top$n.log
+  printf '% 7d  total' $(wc -l <coding-style.log) >>$base-top$n.log
+}
+
+printerr update_version
+printerr autostuff
+printerr build_project
+printerr build_pygwy >pygwy.log
+cat build_project.err build_pygwy.err >build-seen.err
+extract_translation_stats
+printerr build_documentation
+printerr build_msvc_sln
+extract_build_documentation
+extract_documentation_stats
+coding_style_report
+printerr install_to_tmp grep -vFf build-seen.err
+printerr check_headers
+printerr check_symbols
+printerr check_deps_versions
+printerr check_desktop
+printerr check_coding_style
+printerr make_dists grep -vFf build-seen.err
+
+rm *.ignore $tmplog

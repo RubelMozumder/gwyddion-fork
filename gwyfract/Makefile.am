@@ -1,0 +1,6 @@
+# @(#) $Id: Makefile.am 8586 2007-09-26 14:56:16Z yeti-dn $
+bin_PROGRAMS = gwyfract
+gwyfract_SOURCES = gwyfract.c ncpus.c
+AM_CFLAGS = @GWYDDION_CFLAGS@ @GTHREAD_CFLAGS@ @EXTRA_CFLAGS@
+AM_LDFLAGS = @GWYDDION_LIBS@ @GTHREAD_LIBS@ @EXTRA_LIBS@
+EXTRA_DIST = m4/pkg.m4

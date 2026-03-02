@@ -1,0 +1,4241 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion user guide\n"
+"POT-Creation-Date: 2024-01-05 10:09+0400\n"
+"PO-Revision-Date: 2024-01-05 11:19+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: synthetic.xml:6(title)
+msgid "Synthetic Surfaces"
+msgstr "Синтетические поверхности"
+
+#: synthetic.xml:7(para)
+msgid ""
+"Beside functions for analysis of measured data, Gwyddion provides several "
+"generators of artificial surfaces and measurement artefacts that can be used "
+"for testing or simulations also outside Gwyddion [<link linkend=\"synthetic-"
+"ref-1\">1</link>]."
+msgstr ""
+"Помимо функций для анализа измеренных данных Gwyddion предлагает несколько "
+"генераторов искусственных поверхностей которые можно также использовать для "
+"тестирования или моделирования вне Gwyddion [<link linkend=\"synthetic-"
+"ref-1\">1</link>]."
+
+#: synthetic.xml:13(para)
+msgid ""
+"All the surface generators share a certain set of parameters, determining "
+"the dimensions and scales of the created surface and the random number "
+"generator controls. These parameters are described below, the parameters "
+"specific to each generator are described in the corresponding subsections."
+msgstr ""
+"Все генераторы поверхностей имеют некоторый общий набор параметров, "
+"определяющих размеры и масштабы созданной поверхности и элементов управления "
+"генератором случайных чисел. Эти параметры описаны ниже, параметры, "
+"специфичные для каждого генератора описаны в соответствующих подразделах."
+
+#: synthetic.xml:19(para)
+msgid "Image parameters:"
+msgstr "Параметры изображения:"
+
+#: synthetic.xml:25(guilabel)
+msgid "Horizontal, Vertical size"
+msgstr "Горизонтальный, вертикальный размер"
+
+#: synthetic.xml:28(para)
+msgid ""
+"The horizontal and vertical resolution of the generated surface in pixels."
+msgstr ""
+"Горизонтальное и вертикальное разрешение создаваемой поверхности в пикселях."
+
+#: synthetic.xml:36(guilabel)
+msgid "Square image"
+msgstr "Квадратное изображение"
+
+#: synthetic.xml:39(para)
+msgid ""
+"This option, when enabled, forces the horizontal and vertical resolution to "
+"be identical."
+msgstr ""
+"Включение этой опции делает горизонтальное и вертикальное разрешения "
+"одинаковыми."
+
+#: synthetic.xml:47(guilabel)
+msgid "Width, Height"
+msgstr "Ширина, высота"
+
+#: synthetic.xml:50(para)
+msgid ""
+"The horizontal and vertical physical dimensions of the generated surface in "
+"selected units. Note square pixels are assumed so, changing one causes the "
+"other to be recalculated."
+msgstr ""
+"Горизонтальные и вертикальные физические размеры создаваемой поверхности в "
+"выбранных единицах. Следует отметить, что квадратные пиксели считаются "
+"таковыми, изменение одного параметра ведёт к изменению другого."
+
+#: synthetic.xml:59(guilabel)
+msgid "Dimension, Value units"
+msgstr "Единицы измерения пространства и значений"
+
+#: synthetic.xml:62(para)
+msgid ""
+"Units of the lateral dimensions (<guilabel>Width</guilabel>, "
+"<guilabel>Height</guilabel>) and of the values (heights). The units chosen "
+"here also determine the units of non-dimensionless parameters of the "
+"individual generators."
+msgstr ""
+"Единицы измерения пространственных размеров (<guilabel>Ширина</guilabel>, "
+"<guilabel>Высота</guilabel>) и значений (высот). Выбранные здесь единицы "
+"измерения также определяют единицы измерения не безразмерных параметров "
+"отдельных генераторов."
+
+#: synthetic.xml:72(guilabel)
+msgid "Take Dimensions from Current Image"
+msgstr "Взять размеры текущего изображения"
+
+#: synthetic.xml:75(para)
+msgid ""
+"Clicking this button fills all the above parameters according to the current "
+"image."
+msgstr ""
+"Нажатие этой кнопки приводит к заполнению всех вышеперечисленных параметров "
+"в соответствии с текущим изображением."
+
+#: synthetic.xml:79(para)
+msgid ""
+"Note that while the units of values are updated, the value scale is defined "
+"by generator-specific parameters that might not be directly derivable from "
+"the statistical properties of the current image. Hence these parameters are "
+"not recalculated."
+msgstr ""
+"Следует отметить, что хотя единицы измерения значений обновляются, масштаб "
+"значений определяется зависящими от генератора параметрами, которые могут не "
+"выводиться напрямую из статистических свойств текущего изображения. "
+"Следовательно, эти параметры не пересчитываются."
+
+#: synthetic.xml:89(guilabel)
+msgid "Replace the current image"
+msgstr "Заменить текущее изображение"
+
+#: synthetic.xml:92(para)
+msgid ""
+"This option has two effects. First, it causes the dimensions and scales to "
+"be automatically set to those of the current image. Second, it makes the "
+"generated surface replace the current image instead of creating a new image."
+msgstr ""
+"Эта опция имеет двойной эффект. Во первых, она заставляет размеры и масштабы "
+"автоматически устанавливаться равными текущему изображению. Во вторых, при "
+"этом генерируемая поверхность заменяет текущее изображение вместо создания "
+"нового."
+
+#: synthetic.xml:102(guilabel)
+msgid "Start from the current image"
+msgstr "Начать с текущего изображения"
+
+#: synthetic.xml:105(para)
+msgid ""
+"This option has two effects. First, it causes the dimensions and scales to "
+"be automatically set to those of the current image. Second, it makes the "
+"generator to start from the surface contained in the current image and "
+"modify it instead of starting from a flat surface. Note this does not affect "
+"whether the result actually goes to the current image or a new image is "
+"created."
+msgstr ""
+"Эта опция имеет двойной эффект. Во первых, она заставляет размеры и масштабы "
+"автоматически устанавливаться равными текущему активному изображению. Во "
+"вторых, она заставляет генератор начать с поверхности, содержащейся в "
+"текущем изображении и модифицировать её вместо плоской поверхности. Следует "
+"отметить, что это не влияет на то, будет ли результат записан в текущее "
+"изображение или будет создано новое."
+
+#: synthetic.xml:116(para)
+msgid "Random generator controls:"
+msgstr "Элементы управления генератором случайных чисел:"
+
+#: synthetic.xml:122(guilabel)
+msgid "Random seed"
+msgstr "Случайное зерно"
+
+#: synthetic.xml:125(para)
+msgid ""
+"The random number generator seed. Choosing the same parameters and "
+"resolutions and the same random seed leads to the same surface, even on "
+"different computers. Different seeds lead to different surfaces with the "
+"same overall characteristics given by the generator parameters."
+msgstr ""
+"Начальное число генератора случайных чисел. При выборе тех же параметров и "
+"разрешений и того же начального числа генерируется та же самая поверхность, "
+"даже на разных компьютерах. Различные начальные числа приводят к генерации "
+"разных поверхностей с теми же общими характеристиками, заданными параметрами "
+"генератора."
+
+#: synthetic.xml:136(guilabel)
+msgid "New"
+msgstr "Новый"
+
+#: synthetic.xml:139(para)
+msgid "Replaces the seed with a random number."
+msgstr "Заменяет начальное число случайным."
+
+#: synthetic.xml:146(guilabel)
+msgid "Randomize"
+msgstr "Сделать случайным"
+
+#: synthetic.xml:149(para)
+msgid ""
+"Enabling this option makes the seed to be chosen randomly every time the "
+"generator is run. This permits to conveniently re-run the generator with a "
+"new seed simply by pressing <keycap>Ctrl-F</keycap> (see <link linkend="
+"\"keyboard-shortcuts\">keyboard shortcuts</link>)."
+msgstr ""
+"Включение этой опции приводит к тому, что начальное число выбирается "
+"случайно при каждом запуске генератора. Это позволяет удобно перезапускать "
+"генератор просто нажимая <keycap>Ctrl-F</keycap> (см. раздел <link linkend="
+"\"keyboard-shortcuts\">клавиатурные сокращения</link>)."
+
+#: synthetic.xml:158(para)
+msgid "Update/preview controls:"
+msgstr "Обновить/просмотреть элементы управления:"
+
+#: synthetic.xml:164(guilabel)
+msgid "Instant updates"
+msgstr "Обновлять сразу"
+
+#: synthetic.xml:167(para)
+msgid ""
+"If the checkbox is enabled the surface is recalculated whenever an input "
+"parameter changes. This option is available in generators which are "
+"relatively fast."
+msgstr ""
+"Если этот флаг включен, поверхность рассчитывается заново после каждого "
+"изменения входных параметров. Эта опция доступна для генераторов которые "
+"работают относительно быстро."
+
+#: synthetic.xml:176(guilabel)
+msgid "Progressive preview"
+msgstr "Прогрессивное обновление"
+
+#: synthetic.xml:179(para)
+msgid ""
+"If the checkbox is enabled the preview shows the evolution of the surface "
+"during the simulation. This option is available in slow generators involving "
+"iterative physical simulations. Enabling the progressive generally makes the "
+"simulation slightly slower as snapshots need to be taken and displayed."
+msgstr ""
+"Если этот флаг включен, изображение предпросмотра показывает развитие "
+"морфологии поверхности в процессе симуляции. Эта опция доступна для "
+"медленных генераторов, которые задействуют итерационные физические модели. "
+"Включение прогрессивного обновления в общем случае слегка замедляет "
+"симуляцию, поскольку снимки требуют некоторого времени для своего получения "
+"и отображения."
+
+#: synthetic.xml:190(title)
+msgid "Spectral <gwy:icon name=\"synthetic_spectral\"/>"
+msgstr "Спектральный <gwy:icon name=\"synthetic_spectral\"/>"
+
+#: synthetic.xml:193(para)
+msgid ""
+"The spectral synthesis module creates randomly rough surfaces by "
+"constructing the Fourier transform of the surface according to specified "
+"parameters and then performing the inverse Fourier transform to obtain the "
+"real surface. The generated surfaces are periodic (i.e. perfectly tilable)."
+msgstr ""
+"Модуль спектрального синтеза создаёт случайно шероховатые поверхности путём "
+"синтеза преобразования Фурье поверхности в соответствии с заданными "
+"параметрами и затем применением обратного преобразования Фурье для получения "
+"реальной поверхности. Генерируемые поверхности являются периодическими (т.е. "
+"идеально гладко сшиваются на границах)."
+
+#: synthetic.xml:200(para)
+msgid ""
+"The Fourier image parameters define the shape of the PSDF, i.e. the Fourier "
+"coefficient modulus, the phases are chosen randomly. At present, all "
+"generated surfaces are isotropic, i.e. the PSDF is radially symmetric."
+msgstr ""
+"Параметры Фурье-образа определяют форму функции спектральной плотности "
+"мощности, т.е. модулей коэффициентов Фурье, фазы задаются случайно. В "
+"настоящий момент все создаваемые поверхности изотропны, т.е. функция "
+"спектральной плотности мощности радиально симметрична."
+
+#: synthetic.xml:209(guilabel) synthetic.xml:980(guilabel)
+#: synthetic.xml:3436(guilabel)
+msgid "RMS"
+msgstr "Ср. квадр."
+
+#: synthetic.xml:212(para)
+msgid ""
+"The root mean square value of the heights (or of the differences from the "
+"mean plane which, however, always is the <include href=\"eqi-z-is-0.xml\"/> "
+"plane). Button <guilabel>Like Current Image</guilabel> sets the RMS value to "
+"that of the current image."
+msgstr ""
+"Среднеквадратичное значение высот (или отличий от средней плоскости, "
+"которая, однако, всегда является плоскостью <include href=\"eqi-z-is-0.xml\"/"
+">). Кнопка <guilabel>как у текущего изображения</guilabel> устанавливает "
+"значение среднеквадратичного отклонения равным таковому для текущего "
+"изображения."
+
+#: synthetic.xml:223(guilabel)
+msgid "Minimum, maximum frequency"
+msgstr "Минимальная, максимальная частота"
+
+#: synthetic.xml:226(para)
+msgid ""
+"The minimum and maximum spatial frequency. Increasing the minimum frequency "
+"leads to <quote>flattening</quote> of the image, i.e. to removal of large "
+"features. Decreasing the maximum frequency limits the sharpness of the "
+"features."
+msgstr ""
+"Минимальная и максимальная пространственные частоты. Увеличение минимальной "
+"частоты ведёт к <quote>уплощению</quote> изображения, т.е. удалению крупных "
+"выделяющихся частей. Уменьшение максимальной частоты ограничивает остроту "
+"выступающих частей."
+
+#: synthetic.xml:236(guilabel)
+msgid "Enable Gaussian multiplier"
+msgstr "Разрешить гауссов множитель"
+
+#: synthetic.xml:239(para)
+msgid ""
+"Enables the multiplication of the Fourier coefficients by a Gaussian "
+"function that in the real space corresponds to the convolution with a "
+"Gaussian."
+msgstr ""
+"Включает умножение коэффициентов Фурье на гауссову функцию, что в реальном "
+"пространстве соответствует свёртке с гауссианой."
+
+#: synthetic.xml:248(guilabel)
+msgid "Enable Lorentzian multiplier"
+msgstr "Разрешить лоренцев множитель"
+
+#: synthetic.xml:251(para)
+msgid ""
+"Enables the multiplication of the Fourier coefficients by a function "
+"proportional to <include href=\"eqi-1-over-1-plus-K2T2-to-3t4.xml\"/>, where "
+"<include href=\"eqi-T.xml\"/> is the autocorrelation length. So, the factor "
+"itself is not actually Lorentzian but it corresponds to Lorentzian one-"
+"dimensional power spectrum density which in turn corresponds to exponential "
+"autocorrelation function (see section <link linkend=\"autocorrelation-1d"
+"\">Statistical Analysis</link> for the discussion of autocorrelation "
+"functions). This factor decreases relatively slowly so the finite resolution "
+"plays usually a larger role than in the case of Gaussian."
+msgstr ""
+"Включает умножение коэффициентов в разложении Фурье на функцию, "
+"пропорциональную <include href=\"eqi-1-over-1-plus-K2T2-to-3t4.xml\"/>, где "
+"<include href=\"eqi-T.xml\"/> — длина автокорреляции. Таким образом, сам "
+"множитель фактически не является лоренцевым, но он соответствует лоренцевой "
+"одномерной плотности спектра мощности, которая в свою очередь соответствует "
+"экспоненциальной функции автокорреляции (подробное обсуждение функций "
+"автокорреляции приведено в разделе <link linkend=\"autocorrelation-1d"
+"\">Статистический анализ</link>). Этот множитель убывает сравнительно "
+"медленно, таким образом, ограниченное разрешение играет обычно большую роль, "
+"чем в случае с гауссовым."
+
+#: synthetic.xml:269(guilabel)
+msgid "Autocorrelation length"
+msgstr "Длина автокорреляции"
+
+#: synthetic.xml:272(para)
+msgid ""
+"The autocorrelation length of the Gaussian or Lorentzian factors (see "
+"section <link linkend=\"autocorrelation-1d\">Statistical Analysis</link> for "
+"the discussion of autocorrelation functions)."
+msgstr ""
+"Длина автокорреляции гауссова или лоренцева множителя (подробное обсуждение "
+"функций автокорреляции приведено в разделе <link linkend=\"autocorrelation-1d"
+"\">Статистический анализ</link>)."
+
+#: synthetic.xml:282(guilabel)
+msgid "Enable power multiplier"
+msgstr "Разрешить степенной множитель"
+
+#: synthetic.xml:285(para)
+msgid ""
+"Enables multiplication of Fourier coefficients by factor proportional to "
+"<include href=\"eqi-1-over-k-to-p.xml\"/>, where <include href=\"eqi-k.xml\"/"
+"> is the spatial frequency and <include href=\"eqi-p.xml\"/> is the power. "
+"This permits to generate various fractal surfaces."
+msgstr ""
+"Включает умножение коэффициентов в разложении Фурье на множитель, "
+"пропорциональный <include href=\"eqi-1-over-k-to-p.xml\"/>, где <include "
+"href=\"eqi-k.xml\"/> - пространственная частота и <include href=\"eqi-p.xml"
+"\"/> - степень. Это позволяет создавать различные фрактальные поверхности."
+
+#: synthetic.xml:297(guilabel) synthetic.xml:3424(guilabel)
+msgid "Power"
+msgstr "Степень"
+
+#: synthetic.xml:300(para)
+msgid "The power <include href=\"eqi-p.xml\"/>."
+msgstr "Степень <include href=\"eqi-p.xml\"/>."
+
+#: synthetic.xml:311(caption)
+msgid ""
+"Artificial surfaces generated by spectral synthesis: a narrow range of "
+"spatial frequencies (left), Gaussian random surface (centre) and a fractal "
+"surface generated with power multiplier and <include href=\"eqi-p.xml\"/> "
+"equal to 1.5 (right)."
+msgstr ""
+"Искусственные поверхности созданные спектральным синтезом: узкий диапазон "
+"пространственных частот (слева), гауссова случайная поверхность (по центру) "
+"и фрактальная поверхность, созданная со степенным множителем и <include href="
+"\"eqi-p.xml\"/> равными 1,5 (справа)."
+
+#: synthetic.xml:321(title)
+msgid "Objects <gwy:icon name=\"synthetic_objects\"/>"
+msgstr "Объекты <gwy:icon name=\"synthetic_objects\"/>"
+
+#: synthetic.xml:324(para)
+msgid ""
+"The object placement method permits to create random surfaces composed of "
+"features of a specific shape. The algorithm is simple: the given number of "
+"objects is placed on random positions at the surface. For each object "
+"placed, the new heights are changed to <include href=\"eqi-max-z-z_0-plus-h."
+"xml\"/>, where <include href=\"eqi-z.xml\"/> is the current height at a "
+"specific pixel, <include href=\"eqi-h.xml\"/> is the height of the object at "
+"this pixel (assuming a zero basis) and <include href=\"eqi-z_0.xml\"/> is "
+"the current minimum height over the basis of the object being placed. The "
+"algorithm considers the horizontal plane to be filled with identical copies "
+"of the surface, hence, the generated surfaces are also periodic (i.e. "
+"perfectly tilable)."
+msgstr ""
+"Метод размещения объектов позволяет создавать случайные поверхности, "
+"состоящие из выступающих частей определённой формы. Алгоритм прост: заданное "
+"число объектов помещается в случайные места поверхности. Для каждого из "
+"размещаемых объектов, новые высоты меняются на <include href=\"eqi-max-z-z_0-"
+"plus-h.xml\"/>, где <include href=\"eqi-z.xml\"/> – текущая высота отдельной "
+"точки, <include href=\"eqi-h.xml\"/> – высота объекта в этой точке "
+"(подразумевая нулевой базис) и <include href=\"eqi-z_0.xml\"/> – текущая "
+"минимальная высота над базисом помещаемого объекта. Алгоритм рассматривает "
+"горизонтальную плоскость как заполненную идентичными копиями поверхности, "
+"следовательно, и сама поверхность будет периодически повторяющейся (т.е. "
+"будет идеально совмещаться сама с собой на границах при использовании в "
+"качестве текстуры)."
+
+#: synthetic.xml:373(entry)
+msgid "Pyramid"
+msgstr "Пирамида"
+
+#: synthetic.xml:374(entry)
+msgid "Diamond"
+msgstr "Бриллиант"
+
+#: synthetic.xml:375(entry)
+msgid "Tetrahedron"
+msgstr "Тетраэдр"
+
+#: synthetic.xml:376(entry)
+msgid "Hexagonal pyramid"
+msgstr "Гексагональная пирамида"
+
+#: synthetic.xml:409(entry)
+msgid "Cone"
+msgstr "Конус"
+
+#: synthetic.xml:410(entry)
+msgid "Half-sphere"
+msgstr "Полусфера"
+
+#: synthetic.xml:411(entry)
+msgid "Half-nugget"
+msgstr "Половина сварной точки"
+
+#: synthetic.xml:412(entry)
+msgid "Parabolic bump"
+msgstr "Параболический выступ"
+
+#: synthetic.xml:445(entry)
+msgid "Gaussian"
+msgstr "Гауссиана"
+
+#: synthetic.xml:446(entry)
+msgid "Exponential spike"
+msgstr "Экспоненциальный выброс"
+
+#: synthetic.xml:447(entry)
+msgid "Full sphere"
+msgstr "Полная сфера"
+
+#: synthetic.xml:448(entry)
+msgid "Full nugget"
+msgstr "Сварная точка"
+
+#: synthetic.xml:481(entry)
+msgid "Box"
+msgstr "Параллелепипед"
+
+#: synthetic.xml:482(entry)
+msgid "Thatch"
+msgstr "Камыш"
+
+#: synthetic.xml:483(entry)
+msgid "Semi-pyramid"
+msgstr "Полупирамида"
+
+#: synthetic.xml:484(entry)
+msgid "Tent"
+msgstr "Палатка"
+
+#: synthetic.xml:499(entry)
+msgid "Doughnut"
+msgstr "Бублик"
+
+#: synthetic.xml:507(para)
+msgid ""
+"Parameters and options in the <guilabel>Shape</guilabel> tab control the "
+"shape of individual features:"
+msgstr ""
+"Параметры и настройки на вкладке <guilabel>Форма</guilabel> управляют формой "
+"отдельных особенностей:"
+
+#: synthetic.xml:514(guilabel) synthetic.xml:793(guilabel)
+#: synthetic.xml:1938(guilabel) synthetic.xml:2973(guilabel)
+msgid "Shape"
+msgstr "Форма"
+
+#: synthetic.xml:517(para)
+msgid ""
+"The shape (type) of placed objects. At present the possibilities include "
+"half-spheres, boxes, various pyramids, bumps, spikes and a few more weird "
+"shapes. The difference between half-sphere and full sphere is in the height. "
+"The full sphere includes also the height of the lower half. The same applies "
+"to nuggets."
+msgstr ""
+"Форма (тип) размещаемых объектов. В настоящее время возможные варианты "
+"включают: полусферы, прямоугольные параллелепипеды, различные пирамиды, "
+"бугры, иглы и некоторое количество более странных форм. Разница между "
+"полусферой и полной сферой состоит в высоте. Полная сфера включает также "
+"высоту нижней половины. То же самое относится и к сварным точкам."
+
+#: synthetic.xml:528(guilabel) synthetic.xml:1975(guilabel)
+#: synthetic.xml:2690(guilabel) synthetic.xml:3161(guilabel)
+#: synthetic.xml:3486(guilabel) synthetic.xml:3625(guilabel)
+msgid "Size"
+msgstr "Размер"
+
+#: synthetic.xml:531(para)
+msgid "The lateral object size, usually the side of a containing square."
+msgstr "Пространственный размер объекта, обычно сторона описанного квадрата."
+
+#: synthetic.xml:538(guilabel)
+msgid "Aspect Ratio"
+msgstr "Пропорции"
+
+#: synthetic.xml:541(para)
+msgid ""
+"The ratio between the <include href=\"eqi-x.xml\"/> and <include href=\"eqi-"
+"y.xml\"/> dimensions of an object – with respect to some default proportions."
+msgstr ""
+"Соотношение между размерами по <include href=\"eqi-x.xml\"/> и <include href="
+"\"eqi-y.xml\"/> объекта по отношению к некоторым пропорциям по умолчанию."
+
+#: synthetic.xml:546(para)
+msgid ""
+"Changing the aspect ratio does not always imply mere geometrical scaling, e."
+"g. objects called nuggets change between half-spheres and rods when the "
+"ratio is changed."
+msgstr ""
+"Изменение соотношения сторон не всегда подразумевает простое геометрическое "
+"масштабирование, например, объекты, называемые частицами меняют форму от "
+"полусфер до стержней при изменении соотношения сторон."
+
+#: synthetic.xml:555(guilabel) synthetic.xml:2072(guilabel)
+#: synthetic.xml:2175(guilabel) synthetic.xml:2459(guilabel)
+#: synthetic.xml:2563(guilabel) synthetic.xml:2881(guilabel)
+#: synthetic.xml:3024(guilabel) synthetic.xml:3511(guilabel)
+#: synthetic.xml:3635(guilabel)
+msgid "Height"
+msgstr "Высота"
+
+#: synthetic.xml:558(para)
+msgid ""
+"A quantity proportional to the height of the object, normally the height of "
+"the highest point."
+msgstr ""
+"Величина, пропорциональная высоте объекта, обычно высота самой высокой точки."
+
+#: synthetic.xml:562(para)
+msgid ""
+"Enabling <guilabel>Scales with size</guilabel> makes unperturbed heights to "
+"scale proportionally to the sizes of individual objects. Otherwise the "
+"height is independent on size. Proportional scaling is useful with non-zero "
+"size variance to keep the shape of all objects identical (as opposed to "
+"elongating and flattening them vertically). If all objects have the same "
+"size the option has no effect."
+msgstr ""
+"Включение опции <guilabel>Масштабируется с размером</guilabel> заставляет "
+"невозмущенные высоты масштабироваться пропорционально размерам отдельных "
+"объектов. В противном случае высота не зависит от размера. Пропорциональное "
+"масштабирование полезно при использовании ненулевого разброса размеров чтобы "
+"сохранить форму всех объектов одинаковой (в противоположность их "
+"вертикальному удлинению и уплощению). Если все объекты имеют одинаковый "
+"размер, опция никак не влияет на результат."
+
+#: synthetic.xml:571(para) synthetic.xml:3038(para)
+msgid ""
+"Button <guilabel>Like Current Image</guilabel> sets the height value to a "
+"value based on the RMS of the current image."
+msgstr ""
+"Кнопка <guilabel>как у текущего изображения</guilabel> устанавливает "
+"значение высоты равным значению, основанном на среднеквадратичном отклонении "
+"текущего изображения."
+
+#: synthetic.xml:579(guilabel) synthetic.xml:3046(guilabel)
+msgid "Truncate"
+msgstr "Усечение"
+
+#: synthetic.xml:582(para)
+msgid ""
+"The shapes can be truncated at a certain height, enabling creation of "
+"truncated cones, pyramids, etc. The truncation height is given as a "
+"proportion to the total object height. Unity means the shape is not "
+"truncated, zero would mean complete removal of the object."
+msgstr ""
+"Фигуры могут быть усечены на определённой высоте для создания усечённых "
+"конусов, пирамид, и т.п. Высота усечения задаётся в долях от общей высоты "
+"объекта. Единица означает неусечённую фигуру, ноль – полное удаление объекта."
+
+#: synthetic.xml:591(para)
+msgid ""
+"Each parameter can be randomized for individual objects, this is controlled "
+"by <guilabel>Variance</guilabel>. For multiplicative quantities (all except "
+"orientation and truncation), the distribution is log-normal with the RMS "
+"value of the logarithmed quantity given by <guilabel>Variance</guilabel>."
+msgstr ""
+"Каждый параметр может быть задан случайно для отдельных объектов, это "
+"задаётся опцией <guilabel>Разброс</guilabel>. Для мультипликативных величин "
+"(все, кроме ориентации и усечения), распределение логарифмически нормальное "
+"со значением среднеквадратичного отклонения логарифма величины заданным "
+"параметром <guilabel>Разброс</guilabel>."
+
+#: synthetic.xml:598(para)
+msgid ""
+"Parameters and options in the <guilabel>Placement</guilabel> tab control "
+"where and how the surface is modified using the generated shapes:"
+msgstr ""
+"Параметры и настройки на вкладке <guilabel>Размещение</guilabel> управляют "
+"где и как поверхность будет меняться с помощью сгенерированных фигур:"
+
+#: synthetic.xml:605(guilabel) synthetic.xml:727(guilabel)
+#: synthetic.xml:1121(guilabel) synthetic.xml:2061(guilabel)
+#: synthetic.xml:2164(guilabel) synthetic.xml:2855(guilabel)
+#: synthetic.xml:2992(guilabel) synthetic.xml:3674(guilabel)
+#: synthetic.xml:3888(guilabel)
+msgid "Coverage"
+msgstr "Покрытие"
+
+#: synthetic.xml:608(para)
+msgid ""
+"The average number of times an object covers a pixel on the image. Coverage "
+"value of 1 means the surface would be exactly once covered by the objects "
+"assuming that they covered it uniformly and did not overlap. Values larger "
+"than 1 mean more layers of objects – and slower image generation."
+msgstr ""
+"Среднее количество раз, которое объект перекрывает пиксель изображения. "
+"Значение покрытия 1 означает что поверхность будет ровно один раз покрыта "
+"объектами, при этом они будут покрывать её равномерно. Большие значения "
+"означают больше слоёв объектов и более медленную генерацию изображения."
+
+#: synthetic.xml:619(guilabel)
+msgid "Feature sign"
+msgstr "Направление особенности"
+
+#: synthetic.xml:622(para)
+msgid ""
+"The direction in which the surface is changed by adding objects. Positive "
+"and negative modifications correspond forming hills and pits adding objects, "
+"respectively. Zero value of the parameter means hills and pits are chosen "
+"randomly. Positive values mean hills are more likely, while the maximum "
+"value 1 means only hills. The same holds for pits and negative values."
+msgstr ""
+"Направление изменения поверхности при добавлении объектов. Положительные и "
+"отрицательные изменения соответствуют образованию высот и впадин при "
+"добавлении объектов соответственно. Нулевое значение параметра означает что "
+"выступы и впадины выбираются случайно. Положительное значение делает выступы "
+"более вероятными, максимальное значение, равное 1 соответствует формированию "
+"только выступов. То же самое справедливо для отрицательных значений и впадин."
+
+#: synthetic.xml:634(guilabel) synthetic.xml:893(guilabel)
+msgid "Columnarity"
+msgstr "Рост плёнки колоннами"
+
+#: synthetic.xml:637(para)
+msgid ""
+"For columnarity of zero the local surface modification works as described in "
+"the introduction. For columnarity of one (the maximum), the objects are "
+"considered to have also a lower part, which is a perfect mirror of the "
+"(visible) upper part. Once the lower object part touches any point on the "
+"surface, it sticks to it. This determines the final height. The range of "
+"heights grows quckly in this case and the volume is rather porous (not "
+"representable with a height field, of course). Values between 0 and 1 mean "
+"the object height is interpolated between the two extremes."
+msgstr ""
+"Для столбчатости равной нулю локальная модификация поверхности работает как "
+"описано во введении. Для столбчатости равной одному (максимальной) объекты "
+"считаются имеющими также нижнюю часть, которая является идеальным зеркальным "
+"отражением (видимой) верхней части. Как только нижняя часть касается любой "
+"точки поверхности, она прилипает к ней. Это задаёт итоговую высоту. Диапазон "
+"высот растёт быстро в данном случае и объём будет достаточно пористым (что "
+"не представлено полем высот, разумеется). Значения между 0 и 1 означают что "
+"высота объекта интерполируется между двумя экстремумами."
+
+#: synthetic.xml:652(guilabel)
+msgid "Avoid stacking"
+msgstr "Избегать наложения"
+
+#: synthetic.xml:655(para)
+msgid ""
+"When this option is enabled, at most one object may be placed on any pixel "
+"of the surface. Hence, they never overlap. The <guilabel>Coverage</guilabel> "
+"option then does not determine how many objects are actually placed, but "
+"only how many the generator tries. Once there is no free space remaning "
+"where an object of given size could be added, increasing the coverage has no "
+"effect (beside slowing down the generation)."
+msgstr ""
+"Если эта опция включена, на любой пиксель поверхности может быть помещено не "
+"более одного объекта. Следовательно, они никогда не будут пересекаться. "
+"Опция <guilabel>Покрытие</guilabel> в данном случае не задаёт сколько "
+"объектов будет реально помещено на поверхность, а только количество попыток "
+"генератора разместить объект. Как только не остаётся свободного места, куда "
+"можно поместить объект заданного размера, увеличение покрытия не будет "
+"влиять на результат (только замедлять генерацию)."
+
+#: synthetic.xml:668(guilabel) synthetic.xml:1399(guilabel)
+#: synthetic.xml:2003(guilabel) synthetic.xml:3066(guilabel)
+#: synthetic.xml:3201(guilabel)
+msgid "Orientation"
+msgstr "Ориентация"
+
+#: synthetic.xml:671(para)
+msgid ""
+"The rotation of objects with respect to some base orientation, measured "
+"anticlockwise. The orientation can be also randomised using the "
+"corresponding <guilabel>Variance</guilabel>."
+msgstr ""
+"Поворот решетки по отношению к определённому исходному направлению, "
+"измеренный против часовой стрелки. Ориентация также может быть сделана "
+"случайной используя соответствующую настройку <guilabel>Разброса</guilabel>."
+
+#: synthetic.xml:684(caption)
+msgid ""
+"Artificial surfaces generated by object placement: spheres of varied size "
+"(left), narrow thatches of varied direction (centre), negative non-"
+"overlapping hexagonal pyramids of varying size (right)."
+msgstr ""
+"Искусственные поверхности, созданные размещением объектов: сфер различного "
+"размера (слева), узких камышовых листьев различного направления (по центру), "
+"отрицательных непересекающихся гексагональных пирамид разного размера "
+"(справа)."
+
+#: synthetic.xml:693(title)
+msgid "Particles <gwy:icon name=\"synthetic_particles\"/>"
+msgstr "Чвстицы <gwy:icon name=\"synthetic_particles\"/>"
+
+#: synthetic.xml:696(para)
+msgid ""
+"Particle depositions performs a dynamical simulation of interacting "
+"spherical particles falling onto a solid surface. The particles do not fall "
+"all at once. Instead, they are dropped sequentially among the particles "
+"already lying on the surface and left to relax."
+msgstr ""
+"Осаждение частиц проводит динамическое моделирование падения "
+"взаимодействующих сферических частиц на твёрдую поверхность. Частицы не "
+"падают все одновременно. Вместо этого, они падают последовательно между "
+"частицами уже лежащими на поверхности и им даётся время для релаксации."
+
+#: synthetic.xml:705(guilabel)
+msgid "Particle radius"
+msgstr "Радиус частицы"
+
+#: synthetic.xml:708(para)
+msgid ""
+"Radius of the spherical particles in real units. The height and lateral "
+"dimensions must be the same physical quantity so there is only one "
+"dimensional parameter."
+msgstr ""
+"Радиус сферических частиц в физических единицах. Высота и пространственные "
+"размеры должны быть одной и той же физической величиной, следовательно, тут "
+"будет только один параметр размерности."
+
+#: synthetic.xml:717(guilabel)
+msgid "Distribution width"
+msgstr "Ширина распределения"
+
+#: synthetic.xml:720(para)
+msgid "Standard deviation of radius distribution (Gaussian)."
+msgstr "Стандартное отклонение распределения радиуса (гауссова)."
+
+#: synthetic.xml:730(para)
+msgid ""
+"How much of the surface would be covered if it was covered uniformly by the "
+"deposited particles. If the simulation is unable to place as many particles "
+"as requested, usually due to too short time, an error message is displayed."
+msgstr ""
+"Какая часть поверхности должна быть покрыта, если она равномерно покрывается "
+"осаждаемыми частицами. если модель не может разместить требуемого числа "
+"частиц, обычно вследствие слишком малого времени симуляции, выводится "
+"сообщение об ошибке."
+
+#: synthetic.xml:740(guilabel)
+msgid "Relaxation steps"
+msgstr "Шагов релаксации"
+
+#: synthetic.xml:743(para)
+msgid "Simulation length, measured in the number of iterations."
+msgstr "Длина моделирования, измеренная в количестве шагов."
+
+#: synthetic.xml:749(para)
+msgid ""
+"The rod deposition method is based on the same dynamic simulation, but for "
+"elongated particles. The particles are in fact formed by sphere triplets, "
+"nevertheless this still allows a reasonable range of particle aspect ratios. "
+"The simulation also has several more interaction parameters."
+msgstr ""
+"Метод осаждения стержней основан на том же динамическом моделировании, но "
+"для продолговатых частиц. Частицы в действительности формируются триплетами "
+"сфер, тем не менее, это позволяет получить достаточно вменяемый диапазон "
+"соотношений размеров частиц. Модель также имеет несколько дополнительных "
+"параметров взаимодействия."
+
+#: synthetic.xml:759(title)
+msgid "Pile Up <gwy:icon name=\"synthetic_pileup\"/>"
+msgstr "Нагромождение <gwy:icon name=\"synthetic_noise\"/>"
+
+#: synthetic.xml:762(para)
+msgid ""
+"The <link linkend=\"object-synthesis\">Objects</link> artificial surface "
+"generator is rather fast but at the expense of avoiding any kind of 3D "
+"geometry and just moulding the surface using a few simple rules. <link "
+"linkend=\"particle-synthesis\">Particle and rod depositions</link> lie near "
+"the other end of the speed-realism spectrum and perform actual dynamical "
+"simulation of interacting particles falling onto the surface. This module "
+"represents a middle ground, as it forms the surface from real 3D solids, but "
+"still using only simple rules for what happens to them when they hit the "
+"surface, retaining a good surface generation speed."
+msgstr ""
+"Генератор искусственных поверхностей <link linkend=\"object-synthesis"
+"\">Объекты</link> достаточно быстр, но это достигается избеганием любых "
+"видов трёхмерной геометрии и только тем, что поверхность изменяется по "
+"простым правилам. Модули <link linkend=\"particle-synthesis\">осаждения "
+"частиц и стержней</link> лежат около другого конца спектра скорость-реализм "
+"и действительно выполняют динамическое моделирование падения на поверхность "
+"взаимодействующих частиц. Этот модуль лежит посередине, поскольку он "
+"формирует поверхность из реальных трёхмерных твёрдых объектов, но по "
+"прежнему использует только простые правила для того, что происходит с ними "
+"когда они касаются поверхности, сохраняя хорошую скорость генерации "
+"поверхности."
+
+#: synthetic.xml:775(para)
+msgid ""
+"The solids start falling in the horizontal position. When they hit the "
+"surface, a local mean plane around in the contact area is found. The shape "
+"is then rotated to lie flat on this local plane. Its final height is "
+"determined as detailed in the description of <guilabel>Columnarity</"
+"guilabel> below and then it just sticks in this position. There is no "
+"further sliding, toppling or other dynamic settling process."
+msgstr ""
+"Объекты начинают падать из горизонтального положения. Когда они касаются "
+"поверхности, находится положение локальной средней плоскости вокруг области "
+"контакта. Фигура после этого поворачивается так, чтобы лежать прямо на этой "
+"локальной плоскости, её финальная высота определяется как подробнее описано "
+"в описании <guilabel>Столбчатости</guilabel> ниже, и затем она просто "
+"прилипает в этом положении. Дальнейшее соскальзывание, кувыркание, обрушение "
+"и прочие динамические усадочные процессы не моделируются."
+
+#: synthetic.xml:784(para)
+msgid ""
+"Several generator parameters have exactly the same meaning as in <link "
+"linkend=\"object-synthesis\">Objects</link>. This includes "
+"<guilabel>Coverage</guilabel>, <guilabel>Avoid stacking</guilabel> and "
+"<guilabel>Orientation</guilabel>. The others are explained below:"
+msgstr ""
+"Некоторые параметры генератора имеют точно такое же значение, что и для "
+"синтеза <link linkend=\"object-synthesis\">Объектов</link>. Это включает в "
+"себя <guilabel>Покрытие</guilabel>, <guilabel>Избегать наложения</guilabel> "
+"и <guilabel>Ориентация</guilabel>. Остальные описаны ниже:"
+
+#: synthetic.xml:796(para)
+msgid ""
+"The shape (type) of placed objects. At present the possibilities include "
+"various elongated shapes."
+msgstr ""
+"Форма (вид) помещаемых объектов. В настоящее время возможные варианты "
+"включают в себя различные удлинённые формы."
+
+#: synthetic.xml:828(entry)
+msgid "Ellipsoid"
+msgstr "Эллипсоид"
+
+#: synthetic.xml:829(entry)
+msgid "Bar"
+msgstr "Брус"
+
+#: synthetic.xml:830(entry)
+msgid "Cylinder"
+msgstr "Цилиндр"
+
+#: synthetic.xml:851(entry)
+msgid "Nugget"
+msgstr "Частица"
+
+#: synthetic.xml:852(entry)
+msgid "Hexagonal rod"
+msgstr "Гексагональный стержень"
+
+#: synthetic.xml:862(guilabel) synthetic.xml:1200(guilabel)
+#: synthetic.xml:3007(guilabel)
+msgid "Width"
+msgstr "Ширина"
+
+#: synthetic.xml:865(para)
+msgid ""
+"The shapes can be elongated along the <include href=\"eqi-x.xml\"/> axis (as "
+"controlled by <guilabel>Aspect ratio</guilabel>). Their dimension in the "
+"orthogonal direction is given by width. The cross section is symmetrical. "
+"Therefore, the width determines both the horizontal width and height."
+msgstr ""
+"Формы могут быть вытянуты вдоль оси <include href=\"eqi-x.xml\"/> (что "
+"контролируется опцией <guilabel>Соотношение сторон</guilabel>). Их размер в "
+"перпендикулярном направлении задаётся шириной. Поперечное сечение будет "
+"симметричным. Следовательно, ширина задаёт сразу и горизонтальную ширину, и "
+"высоту."
+
+#: synthetic.xml:877(guilabel)
+msgid "Aspect ratio"
+msgstr "Соотношение сторон"
+
+#: synthetic.xml:880(para)
+msgid ""
+"The ratio between the <include href=\"eqi-x.xml\"/> and <include href=\"eqi-"
+"y.xml\"/> dimensions, in other words, the elongation. It is always at least "
+"unity; the shapes are never squashed along the <include href=\"eqi-x.xml\"/> "
+"axis. The aspect ratio distribution can be thus noticeably asymmetrical when "
+"the nominal aspect ratio is around unity and the variation is large."
+msgstr ""
+"Отношение между размерами вдоль направлений <include href=\"eqi-x.xml\"/> и "
+"<include href=\"eqi-y.xml\"/>. Другими словами, вытянутость. Оно всегда не "
+"меньше единицы, формы никогда не сжимаются вдоль оси <include href=\"eqi-x."
+"xml\"/>. Следовательно, распределение соотношения размеров может быть сильно "
+"асимметричным, если номинальное значение близко к единице и разброс велик."
+
+#: synthetic.xml:896(para)
+msgid ""
+"In general, this parameter influences how much the shapes tend to form "
+"columnar structures (porous, if topographical images could represent it). "
+"The default value of zero can be imagined as the lower part of the shape "
+"melting upon impact and filling the depression it has fallen into. Note that "
+"the volume balance is somewhat approximate and the height at which the "
+"object settles may be such that sharp spikes on the surface pierce through "
+"it."
+msgstr ""
+"В общем случае, этот параметр влияет на то, насколько фигуры склонны "
+"образовывать колоннообразные структуры (пористые, если топографические "
+"данные могут это представить). Значение по умолчанию, равное нулю, можно "
+"представить как если бы нижняя часть фигуры плавилась при взаимодействии и "
+"заполняла впадину, куда она упала. Следует отметить, что объёмное равновесие "
+"является в какой-то мере приблизительным и высота, на которой застревает "
+"объект может быть такой, что острые выступы на поверхности пробивают его "
+"насквозь."
+
+#: synthetic.xml:906(para)
+msgid ""
+"The maximum columnarity (1) means that once any part of the shape touches "
+"the surface, it sticks to it. For smaller positive values the final height "
+"is interpolated between the two heights gien by the two approaches."
+msgstr ""
+"Максимальная столбчатость (1) означает, что как только любая часть формы "
+"касается поверхности, она прилипает к ней. Для меньших положительных "
+"значений финальная высота интерполируется парой высот, заданной двумя "
+"подходами."
+
+#: synthetic.xml:912(para)
+msgid ""
+"If columnarity is negative, the shape is rammed into the surface. For the "
+"minimum value (−1) it settles at the lowest height for which at least one "
+"point of its entire lower boundary would not be below the original surface. "
+"Again, for other negative values the final height is interpolated."
+msgstr ""
+"Если столбчатость отрицательна, форма вбита в поверхность. Для минимального "
+"значения (-1) оно опускается на наименьшую высоту, для которой по крайней "
+"мере одна точка всей её нижней границы не будет ниже оригинальной "
+"поверхности. Снова, для других отрицательных значений финальная высота будет "
+"интерполирована."
+
+#: synthetic.xml:927(caption)
+msgid ""
+"Artificial surfaces generated by piling up geometrical shapes: oriented "
+"hexagonal rods on a central ridge (left), jumble of ellipsoid needles "
+"(centre), heap of cubes piled up on a central pillar (right)."
+msgstr ""
+"Искусственные поверхности, создаваемые нагромождением геометрических форм: "
+"направленных гексагональных брусьев на центральном гребне (слева), "
+"беспорядочная куча элипсоидальных игл (по центру), куча кубов наваленных на "
+"центральную колонну (справа)."
+
+#: synthetic.xml:937(title)
+msgid "Noise <gwy:icon name=\"synthetic_noise\"/>"
+msgstr "Шум <gwy:icon name=\"synthetic_noise\"/>"
+
+#: synthetic.xml:940(para)
+msgid ""
+"Random uncorrelated point noise is generated independently in each pixel. "
+"Several distributions are available."
+msgstr ""
+"Случайный некоррелированный точечный шум генерируется независимо в каждой "
+"точке. Доступно несколько распределений."
+
+#: synthetic.xml:947(guilabel) synthetic.xml:3410(guilabel)
+msgid "Distribution"
+msgstr "Распределение"
+
+#: synthetic.xml:950(para)
+msgid ""
+"The distribution of the noise value. The possibilities include Gaussian, "
+"exponential, uniform, triangular and salt and pepper distributions."
+msgstr ""
+"Распределение значения шума. Варианты включают в себя гауссово, "
+"экспоненциальное, равномерное и треугольное распределения, распределение "
+"вида соль и перец."
+
+#: synthetic.xml:955(para)
+msgid ""
+"The salt and pepper distribution works somewhat differently than is usual in "
+"computer graphics since the range of values is unbounded. It is a bimodal "
+"distribution consiting of two <include href=\"eqi-delta.xml\"/>-functions. "
+"In other words, a constant (given by RMS) is added and/or subtracted from "
+"the pixel values."
+msgstr ""
+"Распределение вида соль и перец работает несколько отлично от того, которое "
+"является привычным для работающих с компьютерной графикой, поскольку "
+"диапазон значений неограничен. Это бимодальное распределение состоящее из "
+"двух <include href=\"eqi-delta.xml\"/>-функций. Другими словами, константа "
+"(задаваемая с помощью RMS) добавляется и/или вычитается из каждого значения "
+"пикселя."
+
+#: synthetic.xml:966(guilabel) synthetic.xml:2102(guilabel)
+msgid "Direction"
+msgstr "Направление"
+
+#: synthetic.xml:969(para)
+msgid ""
+"The noise can be generated as symmetrical or one-sided. The mean value of "
+"the distribution of a symmetrical noise is zero, i.e. the mean value of data "
+"does not change when a symmetrical noise is added. One-sided noise only "
+"increases (if positive) or decreases (if negative) the data values."
+msgstr ""
+"Шум можно генерировать как симметричный, так и односторонний. Среднее "
+"значение распределения симметричного шума равно нулю, т.е. среднее значение "
+"данных не меняется при добавлении симметричного шума. Односторонний шум "
+"только увеличивает (положительный) или уменьшает (отрицательный) значения "
+"данных."
+
+#: synthetic.xml:983(para)
+msgid ""
+"Root mean square value of the noise distribution. More precisely, it is the "
+"RMS of the corresponding symmetrical distribution in the case the "
+"distribution is one-sided."
+msgstr ""
+"Среднеквадратичное значение распределения шума. Точнее, среднеквадратичное "
+"соответствующего симметричного распределения в случае одностороннего шума."
+
+#: synthetic.xml:992(guilabel) synthetic.xml:1063(guilabel)
+#: synthetic.xml:1159(guilabel) synthetic.xml:3077(guilabel)
+msgid "Density"
+msgstr "Плотность"
+
+#: synthetic.xml:995(para)
+msgid ""
+"Density is the fraction of values modified. If it is 1 all pixels are "
+"modified. When it is smaller some are left intact."
+msgstr ""
+"Плотность показывает долю значений, которые будут изменяться. Если она равна "
+"1, то изменятся все пиксели изображения. Если она меньше, некоторые "
+"останутся неизменными."
+
+#: synthetic.xml:1007(caption)
+msgid ""
+"Different artificial noise applied to the same surface: symmetrical Gaussian "
+"noise (left); positive exponential noise (centre); negative exponential "
+"noise (right). All images have the same false colour scale and all noises "
+"have the same RMS."
+msgstr ""
+"Различные виды искусственного шума, добавленные к одной и той же "
+"поверхности: симметричный гауссов шум (слева), положительный "
+"экспоненциальный шум (по центру), отрицательный экспоненциальный шум "
+"(справа). Все изображения показаны с одинаковой шкалой псевдоцвета и все "
+"виды шума имеют одинаковое среднеквадратичное отклонение."
+
+#: synthetic.xml:1019(title)
+msgid "Line Noise <gwy:icon name=\"synthetic_line_noise\"/>"
+msgstr "Линейный шум <gwy:icon name=\"synthetic_line_noise\"/>"
+
+#: synthetic.xml:1022(para)
+msgid ""
+"Line noise represents noise with non-negligible duration that leads to "
+"typical steps or scars (also called strokes) in the direction of the fast "
+"scanning axis – or misaligned scan lines. Parameters <guilabel>Distribution</"
+"guilabel>, <guilabel>Direction</guilabel> and <guilabel>RMS</guilabel> have "
+"the same meaning as in <link linkend=\"noise-synthesis\">Point noise</link>. "
+"Other parameters control the lateral characteristics of the noise."
+msgstr ""
+"Линейный шум представляет собой шум с длительностью больше пренебрежимо "
+"малой, который приводит к типичным ступеням или царапинам (они же называются "
+"штрихами) в направлении быстрой оси сканирования или смещенным линиям "
+"сканирования. Параметры <guilabel>Распределение</guilabel>, "
+"<guilabel>Направление</guilabel> и <guilabel>Среднеквадратичное отклонение</"
+"guilabel> имеют те же значения, что и для <link linkend=\"noise-synthesis"
+"\">точечного шума</link>. Другие параметры управляют пространственными "
+"характеристиками шума."
+
+#: synthetic.xml:1035(guilabel)
+msgid "Steps"
+msgstr "Ступеньки"
+
+#: synthetic.xml:1034(listitem)
+msgid ""
+"<placeholder-1/> represent abrupt changes in the value that continue to the "
+"end of the scan (or until another step occurs)."
+msgstr ""
+"<placeholder-1/> представляет собой резкое изменение значений которое "
+"продолжается до конца скана (или до возникновения следующей ступени)."
+
+#: synthetic.xml:1039(guilabel)
+msgid "Scars"
+msgstr "Царапины"
+
+#: synthetic.xml:1038(listitem)
+msgid ""
+"<placeholder-1/> are local changes of the value with a finite duration, i.e. "
+"the values return to the original level within the same scan line."
+msgstr ""
+"<placeholder-1/> это локальные изменения значения с конечной длиной, т.е. "
+"значения возвращаются к оригинальному уровню в пределах той же линии скана."
+
+#: synthetic.xml:1044(guilabel)
+msgid "Ridges"
+msgstr "Борозды"
+
+#: synthetic.xml:1043(listitem)
+msgid ""
+"<placeholder-1/> are similar to scars but on a larger scale: they can span "
+"several scan lines."
+msgstr ""
+"<placeholder-1/> подобны царапинам, но на большем масштабе: они могут "
+"продолжаться на несколько линий сканирования."
+
+#: synthetic.xml:1048(guilabel)
+msgid "Tilt"
+msgstr "Наклон"
+
+#: synthetic.xml:1047(listitem)
+msgid ""
+"<placeholder-1/> perturbs the slope of individual scan lines, as opposed to "
+"directly shifting heights."
+msgstr ""
+"<placeholder-1/> создает разброс наклонов отдельных линий сканирования, в "
+"противоположность тому, чтобы напрямую сдвигать их высоту."
+
+#: synthetic.xml:1052(guilabel)
+msgid "Hum"
+msgstr "Автогенерация (жужжание)"
+
+#: synthetic.xml:1051(listitem)
+msgid ""
+"<placeholder-1/> adds a quasi-periodic disturbance, simulating a type of "
+"noise originating from electronic interference."
+msgstr ""
+"<placeholder-1/> добавляет квазипериодическое возмущение, моделирующее тип "
+"шума возникающий из электронных помех."
+
+#: synthetic.xml:1031(para)
+msgid "The following line defect types are available: <placeholder-1/>"
+msgstr "Доступны следующие основные типы линейных дефектов: <placeholder-1/>"
+
+#: synthetic.xml:1057(para)
+msgid "Steps have the following parameters:"
+msgstr "Ступеньки имеют следующие параметры:"
+
+#: synthetic.xml:1066(para) synthetic.xml:1162(para)
+msgid ""
+"Average number of defects per scan line, including any dead time (as "
+"determined by parameter <guilabel>Within line</guilabel>)."
+msgstr ""
+"Среднее число дефектов на линию скана, включая любое время простоя (которое "
+"определяется параметром <guilabel>Рабочий ход</guilabel>)."
+
+#: synthetic.xml:1074(guilabel) synthetic.xml:1170(guilabel)
+msgid "Within line"
+msgstr "В пределах линии"
+
+#: synthetic.xml:1077(para)
+msgid ""
+"Fraction of the time to scan one line that corresponds to actual data "
+"acquisition. The rest of time is a dead time. Value 1 means there is no dead "
+"time, i.e. all steps occur within the image. Value 0 means the data "
+"acquisition time is negligible to the total line scan time, consequently, "
+"steps only occur between lines."
+msgstr ""
+"Доля времени сканирования линии, которая тратится непосредственно на снятие "
+"данных. Остальное время относится к холостому ходу. Значение 1 соответствует "
+"случаю нулевого времени холостого хода, т.е. все ступени появляются в "
+"пределах изображения. Значение 0 означает, что время снятия данных "
+"пренебрежимо мало к общему времени сканирования линии, следовательно, "
+"ступени могут встречаться только между линиями."
+
+#: synthetic.xml:1088(guilabel) synthetic.xml:1184(guilabel)
+msgid "Scanning direction"
+msgstr "Направление сканирования"
+
+#: synthetic.xml:1091(para) synthetic.xml:1187(para)
+msgid ""
+"If steps can occur inside a scan line it determines the horizontal scanning "
+"direction (assuming the slow axis scan is from top to bottom). For left to "
+"right scanning the left part of the scan line is contiguous with the data "
+"above and the right part with data below. For right to left scanning it is "
+"the opposite. The two directions are illustrated in the descriptions of "
+"<link linkend=\"fig-scan-step-artefacts\">Block line correction</link> which "
+"corrects similar artefacts."
+msgstr ""
+"Если ступени могут возникать внутри линии сканирования это задаёт "
+"горизонтальное направление сканирования (предполагается что медленная ось "
+"сканирования направлена сверху вниз). Для сканирования слева направо левая "
+"часть линии сканирования будет непрерывна с данными выше и нижняя с данными "
+"ниже. Для сканирования справа налево наоборот. Два направления "
+"проиллюстрированы в описании <link linkend=\"fig-scan-step-artefacts"
+"\">Блочной коррекции ступеней</link>, которая исправляет подобные артефакты."
+
+#: synthetic.xml:1104(guilabel)
+msgid "Cumulative"
+msgstr "Кумулятивные"
+
+#: synthetic.xml:1107(para)
+msgid ""
+"For cumulative steps the random step value is always added to the current "
+"value offset; for non-cumulative steps the new value offset is directly "
+"equal to the random step value."
+msgstr ""
+"Для кумулятивных ступеней случайное значение всегда добавляется к текущему "
+"значению данных; для одиночных ступеней новое смещение данных напрямую равно "
+"случайному значению смещения."
+
+#: synthetic.xml:1115(para)
+msgid "Scars have the following parameters:"
+msgstr "Для царапин доступны следующие параметры:"
+
+#: synthetic.xml:1124(para)
+msgid ""
+"The fraction of the the image covered by defect if they did not overlap. "
+"Since the defect may overlap, coverage value of 1 does not mean the image is "
+"covered completely."
+msgstr ""
+"Доля изображения покрытая дефектами, если они не пересекаются. Поскольку "
+"дефекты могут пересекаться, значение покрытия 1.0 не означает, что "
+"изображение полностью закрыто объектами."
+
+#: synthetic.xml:1133(guilabel)
+msgid "Length"
+msgstr "Длина"
+
+#: synthetic.xml:1136(para)
+msgid "Scar length in pixels."
+msgstr "Длина царапины в пикселях."
+
+#: synthetic.xml:1143(guilabel)
+msgid "Variance"
+msgstr "Разброс"
+
+#: synthetic.xml:1146(para)
+msgid ""
+"Variance of the scar length, see <link linkend=\"object-synthesis\">Objects</"
+"link> for description of variances."
+msgstr ""
+"Разброс длины царапины, описание в разделе <link linkend=\"object-synthesis"
+"\">объекты</link>."
+
+#: synthetic.xml:1153(para)
+msgid "Ridges have the following parameters:"
+msgstr "Гребни имеют следующие параметры:"
+
+#: synthetic.xml:1173(para)
+msgid ""
+"Fraction of the time to scan one line that corresponds to actual data "
+"acquisition. The rest of time is a dead time. Value 1 means there is no dead "
+"time, i.e. all value changes occur within the image. Value 0 means the data "
+"acquisition time is negligible to the total line scan time, consequently, "
+"value changes only occur between lines."
+msgstr ""
+"Доля времени сканирования линии, которая тратится непосредственно на снятие "
+"данных. Остальное время относится к холостому ходу. Значение 1 соответствует "
+"случаю нулевого времени холостого хода, т.е. все ступени появляются в "
+"пределах изображения. Значение 0 означает, что время снятия данных "
+"пренебрежимо мало к общему времени сканирования линии, следовательно, "
+"ступени могут встречаться только между линиями."
+
+#: synthetic.xml:1203(para)
+msgid ""
+"Mean duration of the defect, measured in image size. Value 1 means the mean "
+"duration will be the entire image scanning time. Small values mean the "
+"defects will mostly occupy just one scan line."
+msgstr ""
+"Средняя длина дефекта, измеренная в единицах размера изображения. Значение 1 "
+"означает что средней длиной будет всё время сканирования изображения. Малые "
+"значения означают что дефекты в основном будут занимать только одну линию "
+"сканирования."
+
+#: synthetic.xml:1211(para)
+msgid "Tilt has the following parameters:"
+msgstr "Наклон имеет следующие параметры:"
+
+#: synthetic.xml:1217(guilabel)
+msgid "Offset dispersion"
+msgstr "Разброс смещений"
+
+#: synthetic.xml:1220(para)
+msgid ""
+"With zero offsets all scan lines are tilted around the middle. In other "
+"words, the central image column remains unperturbed. Increasing the "
+"dispersion of the offsets moves the pivot points randomly more and more to "
+"left or right."
+msgstr ""
+"С нулевым смещением все линии сканирования наклонены относительно середины. "
+"Другими словами, центральный столбец изображения не искажается. Увеличение "
+"разброса смещений случайно сдвигает точки поворота больше и больше влево и "
+"вправо от центра."
+
+#: synthetic.xml:1228(para)
+msgid "Hum has the following parameters:"
+msgstr "Гудение имеет следующие параметры:"
+
+#: synthetic.xml:1234(guilabel)
+msgid "Wavelength"
+msgstr "Длина волны"
+
+#: synthetic.xml:1237(para)
+msgid "Characteristic wavelength of the hum, measured in the image."
+msgstr ""
+"Характеристическая частота жужжания, измеренная в размерах изображения."
+
+#: synthetic.xml:1244(guilabel)
+msgid "Spread"
+msgstr "Разброс"
+
+#: synthetic.xml:1247(para)
+msgid ""
+"Small spread means the noise is very narrow-band and looks more or less like "
+"as a pure sine wave. Large values produce a wider spectrum with beats and "
+"more distorted profile."
+msgstr ""
+"Малый разброс означает что шум будет очень узкополосным и будет выглядеть "
+"более-менее похоже на чистую синусоидальную волну. Большие значения "
+"порождают более широкий спектр с биениями и более искаженным профилем."
+
+#: synthetic.xml:1256(guilabel)
+msgid "Components"
+msgstr "Компоненты"
+
+#: synthetic.xml:1259(para)
+msgid ""
+"The number of random sine wave components that are used to construct the hum "
+"in each scan line."
+msgstr ""
+"Число случайных синусоидальных компонент, которые будут использованы чтобы "
+"сконструировать шум в каждой линии сканирования."
+
+#: synthetic.xml:1271(caption)
+msgid ""
+"Different types of line noise added to an artificial pyramidal surface. Top "
+"row: unmodified surface (left); relatively sparse cumulative steps (centre); "
+"relatively sparse ridges (right). Bottom row: scars of mean length of 16 px "
+"and high coverage (left); tilt with small offset dispersion (centre); hum "
+"with default settings (right)."
+msgstr ""
+"Различные виды линейного шума добавленные к искусственной пирамидальной "
+"поверхности: Верхний ряд: исходная поверхность (слева); относительно редкие "
+"кумулятивные ступени (по центру); относительно редкие борозды (справа). "
+"Нижний ряд: царапины со средней длиной 16 пикселей и высокой степенью "
+"покрытия (слева); наклон с малым разбросом смещений (по центру); "
+"автогенерация с настройками по умолчанию (справа)."
+
+#: synthetic.xml:1286(title)
+msgid "Pattern <gwy:icon name=\"synthetic_pattern\"/>"
+msgstr "Структура <gwy:icon name=\"synthetic_pattern\"/>"
+
+#: synthetic.xml:1289(para)
+msgid ""
+"Regular geometrical patterns represent surfaces often encountered in "
+"microscopy as standards or testing samples. Currently it can generate the "
+"following types of pattern:"
+msgstr ""
+"Правильные геометрические текстуры, представляют поверхности, часто "
+"встречающиеся в микроскопии в качестве стандартов или тестовых образцов. В "
+"настоящее время может генерировать следующие типы текстур:"
+
+#: synthetic.xml:1297(guilabel) synthetic.xml:1478(title)
+msgid "Staircase"
+msgstr "Лестница"
+
+#: synthetic.xml:1300(para)
+msgid ""
+"One-dimensional staircase pattern, formed by steps of constant width and "
+"height."
+msgstr ""
+"Одномерную лестничную текстуру, сформированную ступенями постоянной ширины и "
+"высоты."
+
+#: synthetic.xml:1308(guilabel) synthetic.xml:1540(title)
+msgid "Grating"
+msgstr "Решетка"
+
+#: synthetic.xml:1311(para)
+msgid ""
+"One-dimensional pattern, formed by double-sided steps (ridges) constant "
+"width and height."
+msgstr ""
+"Одномерная текстура, сформированная двусторонними ступенями (гребнями) "
+"постоянной ширины и высоты."
+
+#: synthetic.xml:1319(guilabel) synthetic.xml:1619(title)
+msgid "Amphitheatre"
+msgstr "Амфитеатр"
+
+#: synthetic.xml:1322(para)
+msgid ""
+"Superellipse-shaped pattern formed by concentric steps of constant width and "
+"height."
+msgstr ""
+"Текстура в виде суперэллипса, сформированная ступенями постоянной ширины и "
+"высоты."
+
+#: synthetic.xml:1330(guilabel) synthetic.xml:1695(title)
+msgid "Concentric rings"
+msgstr "Концентрические круги"
+
+#: synthetic.xml:1333(para)
+msgid ""
+"Superellipse-shaped pattern formed by concentric double-sided steps (ridges) "
+"of constant width and height."
+msgstr ""
+"Текстура в виде суперэллипса, сформированная двусторонними ступенями "
+"(гребнями) постоянной ширины и высоты."
+
+#: synthetic.xml:1341(guilabel) synthetic.xml:1806(title)
+msgid "Siemens star"
+msgstr "Звезда Сименса"
+
+#: synthetic.xml:1344(para)
+msgid "Radial pattern formed by alternating high and low wedges."
+msgstr ""
+"Круговая текстура, сформированная сменяющими друг друга высокой и низкой "
+"кромками."
+
+#: synthetic.xml:1351(guilabel) synthetic.xml:1850(title)
+msgid "Holes (rectangular)"
+msgstr "Отверстия (прямоугольные)"
+
+#: synthetic.xml:1354(para)
+msgid ""
+"Two-dimensional regular arrangement of rectangular holes, possibly round."
+msgstr ""
+"Двумерная регулярная структура из прямоугольных отверстий, возможно "
+"квадратных."
+
+#: synthetic.xml:1362(guilabel) synthetic.xml:1931(title)
+msgid "Pillars"
+msgstr "Колонны"
+
+#: synthetic.xml:1365(para)
+msgid ""
+"Two-dimensional regular arrangement of symmetrical pillars of several "
+"possible shapes (circular, square or hexagonal)."
+msgstr ""
+"Двумерная правильная упорядоченная структура симметричных колонн нескольких "
+"возможных видов (круглых, квадратных или шестигранных)."
+
+#: synthetic.xml:1373(guilabel) synthetic.xml:2018(title)
+msgid "Double staircase"
+msgstr "Двойная лестница"
+
+#: synthetic.xml:1376(para)
+msgid "Two-dimensional regular arrangement of steps of fixed width and height."
+msgstr ""
+"Двумерная регулярная структура из ступеней фиксированной ширины и высоты."
+
+#: synthetic.xml:1383(para)
+msgid ""
+"Each type of pattern has its own set of geometrical parameters determining "
+"the shape and dimensions of various part of the pattern. They are described "
+"in the following sections. Most geometrical parametrs have an associated "
+"variance control, similar to <link linkend=\"object-synthesis\">Object "
+"synthesis</link>, which permits making some aspects of the pattern irregular."
+msgstr ""
+"Каждый тип текстуры имеет свой набор геометрических параметров, задающих "
+"форму и размер различных частей текстуры. Они описаны в следующих разделах. "
+"Большая часть геометрических параметров имеет также связанное с ними "
+"управление разбросом, подобное используемому в <link linkend=\"object-"
+"synthesis\">синтезе объектов</link>, что позволяет сделать некоторые аспекты "
+"текстуры менее упорядоченными."
+
+#: synthetic.xml:1391(para)
+msgid ""
+"The placement of the pattern in the horizontal plane is controlled by "
+"parameters in tab <guilabel>Placement</guilabel>, common to all pattern "
+"types:"
+msgstr ""
+"Расположение структуры на горизонтальной поверхности управляется параметрами "
+"на вкладке <guilabel>Положение</guilabel>, общей для всех видов шаблонов:"
+
+#: synthetic.xml:1402(para)
+msgid ""
+"The rotation of the pattern with respect to some base orientation, measured "
+"anticlockwise."
+msgstr ""
+"Поворот текстуры по отношению к определённому исходному направлению, "
+"измеренный против часовой стрелки."
+
+#: synthetic.xml:1409(para)
+msgid ""
+"This tab also contains the deformation parameters. While enabling the "
+"variation of geometrical parameters makes the generated surface somewhat "
+"irregular the shape of its features is maintained. <guilabel>Deformation</"
+"guilabel> is a complementary method to introduce irregularity, specifically "
+"by distorting the pattern in the <include href=\"eqi-xy.xml\"/> plane. It "
+"has two parameters:"
+msgstr ""
+"Эта вкладка также содержит параметры деформации. Включение разброса "
+"параметров делает поверхность в какой-то степени неправильной, однако, форма "
+"характерных особенностей поддерживается неизменной. Это дополняется другим "
+"методом изменения, называемым <guilabel>Деформация</guilabel> который "
+"разрешает искажение шаблона в плоскости <include href=\"eqi-xy.xml\"/>. У "
+"деформации есть два параметра:"
+
+#: synthetic.xml:1420(guilabel) synthetic.xml:2264(guilabel)
+msgid "Amplitude"
+msgstr "Амплитуда"
+
+#: synthetic.xml:1423(para)
+msgid ""
+"The magnitude of the lateral deformation. It is a relative numerical "
+"quantity essentially determining how far the deformation can reach."
+msgstr ""
+"Величина пространственной деформации. Относительная численная величина в "
+"основном определяющая как далеко может зайти деформация."
+
+#: synthetic.xml:1432(guilabel)
+msgid "Lateral scale"
+msgstr "Пространственный масштаб"
+
+#: synthetic.xml:1435(para)
+msgid ""
+"The characteristic size of the deformations. It describes not how far the "
+"features are moved but how sharply or slowly the deformation itself changes "
+"within the horizontal plane."
+msgstr ""
+"Характерный размер деформаций. Он описывает не как далеко смещаются "
+"характерные части изображения, а как резко или медленно сама деформация "
+"меняется вдоль горизонтальной плоскости."
+
+#: synthetic.xml:1443(para)
+msgid ""
+"The deformation is analogous to the two-dimensional Gaussian deformation "
+"applied by <link linkend=\"displacement-field\">Displacement field</link>. "
+"However, it is applied to coordinates before rendering the pattern, whereas "
+"<link linkend=\"displacement-field\">Displacement field</link> distorts "
+"already sampled images."
+msgstr ""
+"Деформация работает аналогично двумерной гауссовой деформации, применяемой с "
+"помощью <link linkend=\"displacement-field\">поля смещения</link>. Однако, в "
+"данном случае она применяется к координатной системе перед тем, как "
+"отрисовывать текстуру, в то время, как <link linkend=\"displacement-field"
+"\">поле смещения</link> искажает уже дискретизированные изображения."
+
+#: synthetic.xml:1450(para)
+msgid ""
+"All patterns also have a <guilabel>Height</guilabel> parameter, giving the "
+"height of features in physical units. For staircase-like patterns that grow "
+"continuously it is the height of a single step. For patterns consisting of "
+"bumps of holes in a flat base plane it is the height of each individual "
+"feature (unless modified by variance)."
+msgstr ""
+"Все текстуры также имеют параметр <guilabel>Высота</guilabel>, задающий "
+"высоту элементов текстуры в физических единицах измерения. Для текстур по "
+"типу лестницы, которые растут непрерывно этот параметр задаёт высоту одной "
+"ступени. Для текстур, состоящих из выступов или впадин относительно ровной "
+"базовой плоскости этот параметр задаёт высоту одного отдельного элемента "
+"(если она не модифицирована Разбросом)."
+
+#: synthetic.xml:1462(caption)
+msgid ""
+"Artificial pattern surfaces. Top row: sharp steps with long-wavelength "
+"deformation, scaled grating with large width variance and wide asymmetrical "
+"slopes, a slightly deformed amphitheatre with negative parabolicity, and "
+"concentric rings with positive parabolicity and varying height. Bottom row: "
+"Siemens star with enlarged upper surface, long rectangular holes with "
+"varying vertical dimension and position, rows of slightly deformed circular "
+"pillars, and double staircase with irregular step width."
+msgstr ""
+"Поверхности на основе искусственных текстур. Верхний ряд: острые ступени, "
+"деформированные с большой длиной волны, масштабированная решетка с большим "
+"разбросом ширины и широкими асимметричными уклонами, слегка деформированный "
+"амфитеатр с отрицательной параболичностью, и концентрические круги с "
+"положительной параболичностью и меняющейся высотой. Нижний ряд: звезда "
+"Сименса с увеличенной верхней гранью, длинные прямоугольные отверстия с "
+"меняющимся вертикальным размером и положением, ряды слегка деформированных "
+"круглых колонн и двойная лестница с меняющейся шириной ступени."
+
+#: synthetic.xml:1479(para)
+msgid "Staircase has the following specific parameters:"
+msgstr "Лестница имеет следующие особые параметры:"
+
+#: synthetic.xml:1485(guilabel) synthetic.xml:1640(guilabel)
+msgid "Terrace width"
+msgstr "Ширина террасы"
+
+#: synthetic.xml:1488(para) synthetic.xml:1643(para)
+msgid ""
+"The width of one step, given in pixels but also displayed in physical units. "
+"All other lateral dimensions are given as fractions of this base width."
+msgstr ""
+"Ширина одной ступени, заданная в пикселях, но также отображаемая в "
+"физических единицах. Все остальные размеры в горизонтальной плоскости "
+"задаются как доля этой базовой ширины."
+
+#: synthetic.xml:1493(para) synthetic.xml:1648(para)
+msgid ""
+"The width includes the slope width and can be seen as a <quote>period</"
+"quote> of the pattern."
+msgstr ""
+"Ширина включает в себя ширину наклонной части и может рассматриваться как "
+"<quote>период</quote> текстуры."
+
+#: synthetic.xml:1501(guilabel) synthetic.xml:1559(guilabel)
+#: synthetic.xml:1656(guilabel) synthetic.xml:1732(guilabel)
+#: synthetic.xml:1872(guilabel) synthetic.xml:1964(guilabel)
+msgid "Position variance"
+msgstr "Разброс положения"
+
+#: synthetic.xml:1504(para) synthetic.xml:1659(para)
+msgid ""
+"Randomisation of the position of step edge. The edges never cross. Even for "
+"the maximum randomness, they can at most move to touch the next edge."
+msgstr ""
+"Случайное положение кромки ступени. Кромки никогда не пересекаются. Даже для "
+"максимального уровня случайности, они могут максимум коснуться края "
+"следующей ступени."
+
+#: synthetic.xml:1513(guilabel) synthetic.xml:1592(guilabel)
+#: synthetic.xml:1682(guilabel) synthetic.xml:1779(guilabel)
+#: synthetic.xml:1903(guilabel) synthetic.xml:1987(guilabel)
+msgid "Slope width"
+msgstr "Ширина уклона"
+
+#: synthetic.xml:1516(para)
+msgid ""
+"Fraction of width taken by the sloping edge. Zero means sharp edges, one "
+"means the pattern will be a flat ramp (without randomness or other modifying "
+"parameters)."
+msgstr ""
+"Доля ширины, занятая наклонной кромкой. нуль означает острые ступени, "
+"единица означает, что текстура будет ровным уклоном (без рандомизации или "
+"влияния других модифицирующих параметров)."
+
+#: synthetic.xml:1525(guilabel)
+msgid "Scales with width"
+msgstr "Масштабируется с длиной"
+
+#: synthetic.xml:1528(para)
+msgid ""
+"If enabled for the step height, the heights will be adjusted to be "
+"proportional to the widths of surrounding terraces, while keeping the "
+"average step height as given. This more closely preserves the mean plane of "
+"the surface even for randomised terrace width."
+msgstr ""
+"Если включено для высоты ступени, высота будет настраиваться чтобы быть "
+"пропорциональной ширине окружающих террас, при этом сохраняя среднюю высоту "
+"ступеней заданной. Этот подход наиболее близко сохраняет среднюю плоскость "
+"поверхности даже для случайной ширины ступеней."
+
+#: synthetic.xml:1541(para)
+msgid "Grating has the following specific parameters:"
+msgstr "Решетка имеет следующие особые параметры:"
+
+#: synthetic.xml:1547(guilabel) synthetic.xml:1716(guilabel)
+msgid "Period"
+msgstr "Период"
+
+#: synthetic.xml:1550(para) synthetic.xml:1719(para)
+msgid ""
+"The period of the pattern, given in pixels but also displayed in physical "
+"units. All other lateral dimensions are given as fractions of this base "
+"width."
+msgstr ""
+"Период текстуры, заданный в пикселях, но также отображаемый в физических "
+"единицах. Все остальные размеры в горизонтальной плоскости задаются как доля "
+"этой базовой ширины."
+
+#: synthetic.xml:1562(para) synthetic.xml:1735(para)
+msgid "Randomisation of the widths of individual ridge-trough pairs."
+msgstr "Рандомизация ширины отдельных пар гребень-желоб."
+
+#: synthetic.xml:1569(guilabel) synthetic.xml:1756(guilabel)
+msgid "Scale features with width"
+msgstr "Масштабировать особенности с шириной"
+
+#: synthetic.xml:1572(para) synthetic.xml:1759(para)
+msgid ""
+"If enabled then all lateral dimensions scale with the width of each "
+"individual ridge-trough pair for randomised patterns. Otherwise "
+"<guilabel>Top fraction</guilabel> or <guilabel>Slope width</guilabel> refer "
+"to the unperturbed base period."
+msgstr ""
+"Если включено, то все горизонтальные размеры масштабируются пропорционально "
+"ширине каждой отдельной пары гребень-впадина для рандомизированных текстур. "
+"В противном случае <guilabel>Верхняя доля</guilabel> или <guilabel>Ibhbyf "
+"yfrkjyf</guilabel> относятся к невозмущенному базовому периоду текстуры."
+
+#: synthetic.xml:1582(guilabel) synthetic.xml:1769(guilabel)
+#: synthetic.xml:1825(guilabel)
+msgid "Top fraction"
+msgstr "Верхняя фракция"
+
+#: synthetic.xml:1585(para) synthetic.xml:1772(para)
+msgid "Fraction of width taken by the upper surface."
+msgstr "Доля ширины, приходящаяся на верхнюю поверхность."
+
+#: synthetic.xml:1595(para) synthetic.xml:1782(para)
+msgid ""
+"Fraction of width taken by the sloping edges. Slopes are added to the top "
+"surface; they do not replace it. Therefore, zero <guilabel>Top fraction</"
+"guilabel> and non-zero slope results in a triangular profile."
+msgstr ""
+"Доля ширины, приходящаяся на наклонные грани. Грани добавляются к верхней "
+"поверхности, но не заменяют её. Следовательно нулевая <guilabel>Доля верхней "
+"фракции</guilabel> и ненулевой наклон будет приводить к треугольным профилям."
+
+#: synthetic.xml:1605(guilabel) synthetic.xml:1792(guilabel)
+msgid "Asymmetry"
+msgstr "Асимметрия"
+
+#: synthetic.xml:1608(para)
+msgid ""
+"Distribution of slope width to left and right edges. Minus one means left "
+"edges are sloped and right edges are sharp. Plus one means left edges are "
+"sharp and right edges are sloped. Zero means symmetrical slopes."
+msgstr ""
+"Распределение ширины уклона для левых и правых кромок. Минус один означает "
+"что левые кромки будут наклонными и правые острыми. Плюс один означает что "
+"левые будут острыми и правые наклонными. Ноль обозначает симметричные уклоны."
+
+#: synthetic.xml:1620(para)
+msgid "Amphitheatre has the following specific parameters:"
+msgstr "Амфитеатр имеет следующие особые параметры:"
+
+#: synthetic.xml:1626(guilabel) synthetic.xml:1702(guilabel)
+msgid "Superellipse parameter"
+msgstr "Параметр суперэллипса"
+
+#: synthetic.xml:1629(para)
+msgid ""
+"Step contours are superellipses described by <include href=\"eq-superellipse-"
+"pattern-amphitheatre.xml\"/> where <include href=\"eqi-p.xml\"/> is the "
+"parameter. Zero corresponds to squares, the maximum value two corresponds to "
+"diamonds, and the default value one corresponds to circles."
+msgstr ""
+"Контуры ступени это суперэллипсы, описываемые уравнением <include href=\"eq-"
+"superellipse-pattern-amphitheatre.xml\"/> где <include href=\"eqi-p.xml\"/>. "
+"Нулевое значение соответствует квадратам, максимальное значение, равное "
+"двум, соответствует ромбам, значение по умолчанию, равное единице, "
+"соответствует кругам."
+
+#: synthetic.xml:1668(guilabel) synthetic.xml:1742(guilabel)
+msgid "Parabolicity"
+msgstr "Параболичность"
+
+#: synthetic.xml:1671(para) synthetic.xml:1745(para)
+msgid ""
+"Positive values means that the terrace become narrower with increasing "
+"distance from centre and the overall profile becomes close to parabolical. "
+"Negative values have the opposite effect, with the overall shape becoming a "
+"parabola lying on its side."
+msgstr ""
+"Положительные значения означают, что терраса становится уже с увеличением "
+"расстояния от центра и весь профиль становится ближе к параболическому. "
+"Отрицательные значения приводят к обратному эффекту, общая форма становится "
+"параболой, лежащей на боку."
+
+#: synthetic.xml:1685(para)
+msgid ""
+"Fraction of width taken by the sloping edge. Zero means sharp edges, one "
+"means the pattern will be become a cone (without randomness or other "
+"modifying parameters)."
+msgstr ""
+"Доля ширины, занятая наклонной кромкой. нуль означает острые ступени, "
+"единица означает, что текстура будет конусом (без рандомизации или влияния "
+"других модифицирующих параметров)."
+
+#: synthetic.xml:1696(para)
+msgid "Concentric rings have the following specific parameters:"
+msgstr "Концентрические окружности имеют следующие особые параметры:"
+
+#: synthetic.xml:1705(para)
+msgid ""
+"Ring contours are superellipses described by <include href=\"eq-superellipse-"
+"pattern-rings.xml\"/> where <include href=\"eqi-p.xml\"/> is the parameter. "
+"Zero corresponds to squares, the maximum value two corresponds to diamonds, "
+"and the default value one corresponds to circles."
+msgstr ""
+"Контуры колец это суперэллипсы, описываемые уравнением <include href=\"eq-"
+"superellipse-pattern-rings.xml\"/> где <include href=\"eqi-p.xml\"/>. "
+"Нулевое значение соответствует квадратам, максимальное значение, равное "
+"двум, соответствует ромбам, значение по умолчанию, равное единице, "
+"соответствует кругам."
+
+#: synthetic.xml:1724(para)
+msgid ""
+"Since the patern is radial, the period must be understood as observed when "
+"travelling from the centre outwards."
+msgstr ""
+"Поскольку эта текстура является радиальной, период надо рассматривать как "
+"отсчитываемый при движении по радиусу от центра наружу."
+
+#: synthetic.xml:1795(para)
+msgid ""
+"Distribution of slope width to left and right edges. Minus one means inner "
+"edges are sloped and outer edges are sharp. Plus one means inner edges are "
+"sharp and outer edges are sloped. Zero means symmetrical slopes."
+msgstr ""
+"Распределение ширины наклонов между левой и правой кромкой. Минус один "
+"означает, что внутренние кромки будут наклонными и внешние острыми. Плюс "
+"один делает внутренние острыми и внешние наклонными. Нулевое значение задаёт "
+"одинаковые наклоны в обе стороны."
+
+#: synthetic.xml:1807(para)
+msgid "Siemens star has the following specific parameters:"
+msgstr "Звезда Сименса имеет следующие особые параметры:"
+
+#: synthetic.xml:1813(guilabel)
+msgid "Number of sectors"
+msgstr "Количество секторов"
+
+#: synthetic.xml:1816(para)
+msgid ""
+"The number of circular sectors the plane is divided to. Each sector contain "
+"an upper and a lower surface, so the number of edges is twice the number of "
+"sectors."
+msgstr ""
+"Число круговых секторов, на которые делится плоскость. Каждый сектор "
+"содержит верхнюю и нижнюю поверхность, так что количество кромок будет "
+"удвоенным числом секторов."
+
+#: synthetic.xml:1828(para)
+msgid "Fraction of angles taken by the upper surface."
+msgstr "Доля углов, приходящаяся на верхнюю поверхность."
+
+#: synthetic.xml:1835(guilabel)
+msgid "Edge shift"
+msgstr "Сдвиг края"
+
+#: synthetic.xml:1838(para)
+msgid ""
+"Shift of edges with respect to spokes meeting in the middle. Positive values "
+"mean the upper surface is enlarged by the shift, negative values mean the "
+"lower surface is enlarged. The shift does not change the asymptotic top "
+"fraction (for radius going to infinity), but it modifies the centre of the "
+"pattern."
+msgstr ""
+"Сдвиг кромки по отношению к радиальным ступицам, собирающимся вместе в "
+"центре. Положительные значения означают что верхняя поверхность "
+"увеличивается при сдвиге, отрицательные увеличивают нижнюю поверхность. "
+"Сдвиг не меняет асимптотическую долю верхней поверхности (для радиуса, "
+"стремящегося к бесконечности), но он меняет центр текстуры."
+
+#: synthetic.xml:1851(para)
+msgid "Rectangular holes have the following specific parameters:"
+msgstr "Прямоугольные отверстия имеют следующие особые параметры:"
+
+#: synthetic.xml:1856(term) synthetic.xml:1948(term)
+msgid "<guilabel>X period</guilabel> and <guilabel>Y period</guilabel>"
+msgstr "<guilabel>Период по X</guilabel> и <guilabel>период по Y</guilabel>"
+
+#: synthetic.xml:1862(para) synthetic.xml:1954(para)
+msgid ""
+"The horizontal and vertical period of the pattern, given in pixels but also "
+"displayed in physical units. All other lateral dimensions are given as "
+"fractions of the smaller of these two sizes."
+msgstr ""
+"Горизонтальный и вертикальный периоды текстуры, задаваемые в пикселях, но "
+"также отображаемые в физических единицах измерения. Все остальные "
+"пространственные размеры задаются как доля от меньшего из этих двух размеров."
+
+#: synthetic.xml:1875(para)
+msgid ""
+"Randomisation of the positions of the hole with respect to the rectangle "
+"centre."
+msgstr ""
+"Случайный выбор положения отверстий по отношению к центру прямоугольника."
+
+#: synthetic.xml:1882(term)
+msgid ""
+"<guilabel>X top fraction</guilabel> and <guilabel>Y top fraction</guilabel>"
+msgstr ""
+"<guilabel>Верхняя фракция по X</guilabel> и <guilabel>Верхняя фракция по Y</"
+"guilabel>"
+
+#: synthetic.xml:1888(para)
+msgid ""
+"Fraction of width taken by the upper surface in horizontal and vertical "
+"profiles going through the hole centre. Since the dimensions are given as "
+"two fractions, the aspect ratio of the hole scales with the corresponding "
+"two periods."
+msgstr ""
+"Доля ширины занятой верхней поверхностью на горизонтальных и вертикальных "
+"профилях, проходящих через центр отверстия. Поскольку размеры задаются как "
+"две доли, соотношение сторон отверстия масштабируется пропорционально двум "
+"соответствующим периодам."
+
+#: synthetic.xml:1894(para)
+msgid ""
+"The top surface has generally larger area because some profiles do not cross "
+"any holes – and it can be further increased by round corners."
+msgstr ""
+"Верхняя грань обычно имеет большую площадь поскольку некоторые профили не "
+"пересекают отверстий – и может ещё больше увеличиваться за счёт скругления "
+"углов."
+
+#: synthetic.xml:1906(para) synthetic.xml:1990(para)
+msgid ""
+"Fraction of size (smaller side of the base rectangle) taken by the sloping "
+"edges. The slope is the same in both directions."
+msgstr ""
+"Доля размера (меньшей стороны базового прямоугольника) занимаемая наклонными "
+"гранями. Наклон будет одинаковым в обоих направлениях."
+
+#: synthetic.xml:1910(para) synthetic.xml:1994(para)
+msgid ""
+"Slopes are added to the top surface; they do not replace it. Therefore, zero "
+"top fraction and non-zero slope can result in triangular profiles."
+msgstr ""
+"Наклоны добавлены к верхней поверхности, они её не заменяют. Следовательно, "
+"нулевая верхняя поверхность и ненулевой наклон приводят к треугольным "
+"профилям."
+
+#: synthetic.xml:1919(guilabel)
+msgid "Roundness"
+msgstr "Округлость"
+
+#: synthetic.xml:1922(para)
+msgid ""
+"Radius of rounded corners, given as a fraction of size (smaller side of the "
+"base rectangle)."
+msgstr ""
+"Радиус закругления углов, задаваемый как доля размера (меньшей стороны "
+"базового прямоугольника)."
+
+#: synthetic.xml:1932(para)
+msgid "Pillars have the following specific parameters:"
+msgstr "Колонны имеют следующие особые параметры:"
+
+#: synthetic.xml:1941(para)
+msgid ""
+"The shape of the pillar base, which can be circular, square or hexagonal."
+msgstr ""
+"Форма основания колонны, которая может быть круглой, квадратной или "
+"гексагональной."
+
+#: synthetic.xml:1967(para)
+msgid ""
+"Randomisation of the positions of the pillar with respect to the rectangle "
+"centre."
+msgstr "Случайный выбор положения колонн по отношению к центру прямоугольника."
+
+#: synthetic.xml:1978(para)
+msgid ""
+"Pillar width, given as fraction the size (smaller side of the base "
+"rectangle). Pillars are symmetrical and their aspect ratio does not scale "
+"with the rectangle."
+msgstr ""
+"Ширина колонны, заданная как доля размера (меньшей стороны базового "
+"прямоугольника). Колонны симметричны и их соотношение сторон не "
+"масштабируется вместе с прямоугольником."
+
+#: synthetic.xml:2006(para)
+msgid ""
+"Rotation of individual pillars with respect to the rectangular base lattice. "
+"For instance square pillars in the base orientation will look similar to the "
+"holes pattern (just inverted), whereas rotated by 45 degrees they can form a "
+"checkerboard pattern."
+msgstr ""
+"Поворот отдельных колонн по отношению к прямоугольной базовой решетке. "
+"Например, квадратные колонны в базовой ориентации будут выглядеть похоже на "
+"текстуру отверстий (только инвертированную), в то время как они же, но "
+"повернутые на 45 градусов образуют шахматную текстуру."
+
+#: synthetic.xml:2019(para)
+msgid "Double staircase has the following specific parameters:"
+msgstr "Двойная лестница имеет следующие особые параметры:"
+
+#: synthetic.xml:2024(term)
+msgid ""
+"<guilabel>Terrace X width</guilabel> and <guilabel>Terrace Y width</guilabel>"
+msgstr ""
+"<guilabel>Ширина террасы по X width</guilabel> и <guilabel>Ширина террасы по "
+"Y</guilabel>"
+
+#: synthetic.xml:2030(para)
+msgid ""
+"The width and height of one step in the horizontal and vertical directions, "
+"given in pixels but also displayed in physical units. It can be seen as a "
+"<quote>periods</quote> of the pattern."
+msgstr ""
+"Ширина и высота одной ступени в горизонтальном и вертикальном направлениях, "
+"задаваемая в пикселях, но также отображаемая в физических единицах длины. "
+"Может рассматриваться как <quote>периоды</quote> текстуры."
+
+#: synthetic.xml:2041(title)
+msgid "Columnar films <gwy:icon name=\"synthetic_columnar\"/>"
+msgstr "Столбчатые плёнки <gwy:icon name=\"synthetic_columnar\"/>"
+
+#: synthetic.xml:2044(para)
+msgid ""
+"The columnar film growth simulation utilises a simple Monte Carlo deposition "
+"algorithm in which small particles are incident on the surface from "
+"directions generated according to given paramerters, and they stick to the "
+"surface around the point where they hit it, increasing the height there "
+"locally. The shadowing effect then causes more particles to stick to higher "
+"parts of the surface and less particles to the lower parts. This positive "
+"local height feedback leads to the formation of columns. The algorithm "
+"considers the horizontal plane to be filled with identical copies of the "
+"surface, hence, the generated surfaces are also periodic (i.e. perfectly "
+"tilable). The surface generator has the following parameters:"
+msgstr ""
+"Модель вертикального роста плёнок (колоннами) использует простой механизм "
+"осаждения на основе алгоритма Монте-Карло, в котором малые частицы падают на "
+"поверхность с направлений, заданных нижеуказанными параметрами, прилипают к "
+"поверхности вблизи точки падения и увеличивают там локальную высоту. Эффект "
+"затенения при этом заставляет больше частиц прилипать к более высоким точкам "
+"поверхности, и меньше к более низким. Положительная обратная связь по высоте "
+"приводит к образованию колонн. Алгоритм рассматривает горизонтальную "
+"плоскость, заполненную идентичными копиями текущей поверхности, "
+"следовательно, генерируемые поверхности также будут периодическими (т.е. "
+"идеально сшиваться на границах). У генератора поверхности есть следующие "
+"параметры:"
+
+#: synthetic.xml:2064(para) synthetic.xml:2167(para)
+msgid ""
+"The average number of times a particle is generated above each surface pixel."
+msgstr "Среднее число частиц, генерируемых над каждым пикселем поверхности."
+
+#: synthetic.xml:2075(para)
+msgid ""
+"Local height increase occurring when the particle sticks to a pixel. Since "
+"the horizontal size of the particle is always one pixel the height is "
+"measured in pixels. A height of one pixel essentially means cubical "
+"particles, as far as growth is concerned. From the point of view of "
+"collision detection the particles are considered infinitely small."
+msgstr ""
+"Увеличение локальной высоты при прилипании частицы к поверхности. Поскольку "
+"горизонтальный размер частицы всегда один пиксель, высота измеряется в "
+"пикселях. Высота в один пиксель подразумевает кубические частицы, пока "
+"рассмотрение касается процесса роста. С точки зрения детекции столкновений "
+"частицы считаются бесконечно малыми."
+
+#: synthetic.xml:2087(guilabel)
+msgid "Inclination"
+msgstr "Наклон"
+
+#: synthetic.xml:2090(para)
+msgid ""
+"Central inclination angle with which the particles are generated (angle of "
+"incidence). The value of zero means very small angles of incidence have the "
+"highest probability. Large values mean that the particles are more likely to "
+"impinge at large angles than at small angles. But for large direction "
+"variance, the distribution is still isotropic in the horizontal plane."
+msgstr ""
+"Центральный угол наклона, с которым генерируются частицы (угол падения). "
+"Нулевое значение обозначает, что малые углы падения имеют наивысшую "
+"вероятность. Большие значения означают, что частицы более вероятно упадут с "
+"большего угла, чем с меньшего. Но для большого разброса направлений, "
+"распределение остаётся изотропным в горизонтальной плоскости."
+
+#: synthetic.xml:2105(para)
+msgid ""
+"Central direction in the horizontal plane with which the particles are "
+"generated. Large variance means the distribution is isotropic in the "
+"horizontal plane; for small variances the growth is anisotopic."
+msgstr ""
+"Центральное направление в горизонтальной плоскости, с которым генерируются "
+"частицы. Большой разброс означает изотропное распределение в горизонтальной "
+"плоскости; для малых дисперсий рост анизотропен."
+
+#: synthetic.xml:2115(guilabel)
+msgid "Relaxation"
+msgstr "Релаксация"
+
+#: synthetic.xml:2118(para)
+msgid ""
+"Method for determination of the pixel the particle will finally stick to. "
+"Two options exist at this moment. Weak relaxation, in which only the two "
+"pixels just immediately before collision and after collision are considered "
+"and the particle sticks to the lower of them. In the case of strong "
+"relaxation, a 3×3 neighbourhood is considered in addition. The particle can "
+"move to a lower neighbour pixel with a certain probability before sticking "
+"permanently."
+msgstr ""
+"Метод определения пикселя, к которому в конечном итоге прилипнет частица. На "
+"данный момент доступны два варианта. При слабой релаксации рассматриваются "
+"только два пикселя: непосредственно перед столкновением и после него, "
+"частица прилипает к более низкому из них. В случае сильной релаксации "
+"дополнительно рассматривается локальная область 3×3 пикселя. Частица может "
+"переместиться к более низкому соседнему пикселю с определённой вероятностью "
+"перед тем, как прилипнет насовсем к поверхности."
+
+#: synthetic.xml:2136(caption)
+msgid ""
+"Artificial columnar surfaces: loosely packed columns (left); tightly packed "
+"columns (centre); directional growth with strong relaxation (right)."
+msgstr ""
+"Искусственные колоннообразные поверхности: свободная упаковка колонн "
+"(слева), плотная упаковка колонн (по центру), направленный рост при сильной "
+"релаксации (справа)."
+
+#: synthetic.xml:2145(title)
+msgid ""
+"Ballistic deposition <gwy:icon name=\"synthetic_ballistic_deposition\"/>"
+msgstr ""
+"Баллистическое осаждение <gwy:icon name=\"synthetic_ballistic_deposition\"/>"
+
+#: synthetic.xml:2148(para)
+msgid ""
+"Vertical ballistic deposition is one of the simplest fundamental film growth "
+"models. Particles fall vertically onto randomly chosen sites (pixels). The "
+"height in the site is incremented by the particle height. However, if the "
+"new height would be smaller than the height in any of the four neigbour "
+"sites, the particle is assumed to stick to the neigbour columns. Thus height "
+"at the impact site then becomes the maximum of the neigbour heights instead. "
+"This is the only mechanism introducing lateral correlations in the resulting "
+"roughness."
+msgstr ""
+"Вертикальное баллистическое осаждение это одна из простейших фундаментальных "
+"моделей роста плёнок. Частицы падают вертикально в произвольно выбранное "
+"место (пиксель). Высота этого места увеличивается на высоту частицы. Однако, "
+"если новая высота окажется меньше высоты любого из четырёх соседних мест, "
+"частица считается прилипшей к соседней колонне. Таким образом, высота точки "
+"падения становится равной максимальной из окружающих высот. Это является "
+"единственным механизмом, вводящим корреляции в горизонтальной плоскости в "
+"результирующую шероховатость."
+
+#: synthetic.xml:2158(para)
+msgid "The simulation has only a few parameters:"
+msgstr "Расчёт имеет всего несколько параметров:"
+
+#: synthetic.xml:2178(para)
+msgid "Local height increase occurring when the particle falls onto a pixel."
+msgstr ""
+"Увеличение локальной высоты, которое происходит при падении частицы на "
+"пиксель."
+
+#: synthetic.xml:2190(caption)
+msgid ""
+"Artificial surfaces created by ballistic deposition: initial stage with "
+"relatively small correlation length (left); after correlations reached image "
+"size (centre); deposition starting from a microchip surface (right)."
+msgstr ""
+"Искусственные поверхности, созданные баллистическим осаждением: начальная "
+"фаза с достаточно малой длиной корреляции (слева); после того, как "
+"корреляции достигли размера изображения (по центру); осаждение, начатое с "
+"высоты поверхности микросхемы (справа)."
+
+#: synthetic.xml:2200(title)
+msgid "Waves <gwy:icon name=\"synthetic_waves\"/>"
+msgstr "Волны <gwy:icon name=\"synthetic_waves\"/>"
+
+#: synthetic.xml:2203(para)
+msgid ""
+"The wave synthesis method composes the image using interference of waves "
+"from a number of point sources. Beside the normal cosine wave, a few other "
+"wave types are available, each having a cosine and sine form that differ by "
+"phase shift <include href=\"eqi-pi-over-2.xml\"/> in all frequency "
+"components. When the wave is treated as complex, the cosine form is its real "
+"part and its sine form is its imaginary part."
+msgstr ""
+"Метод волнового синтеза генерирует изображение на основе интерференции волн "
+"от набора точечных источников. Помимо обычной косинусоидальной волны, "
+"доступны несколько других форм волны, каждая из которых имеет чётный и "
+"нечётный вариант, различающиеся на сдвиг фазы <include href=\"eqi-pi-over-2."
+"xml\"/> во всех частотных компонентах. Когда волна рассматривается как "
+"комплексная, чётная часть (косинусоида) образует действительную часть, а "
+"нечётная (синусоида) образует мнимую."
+
+#: synthetic.xml:2219(caption)
+msgid ""
+"Sine and cosine wave forms for the available wave types. Only the cosine "
+"form is used for displacement images; the entire complex wave is used for "
+"intensity and phase images."
+msgstr ""
+"Чётные и нечётные формы волны для различных доступных видов волн. Для "
+"изображений смещения используются только косинусоидальные формы; полная "
+"комплексная волна используется для генерации изображений интенсивности и "
+"фазы."
+
+#: synthetic.xml:2226(para)
+msgid "The generator has the following options:"
+msgstr "Для генератора доступны нижеследующие опции:"
+
+#: synthetic.xml:2232(guilabel)
+msgid "Quantity"
+msgstr "Величина"
+
+#: synthetic.xml:2235(para)
+msgid ""
+"Quantity to display in the image. Displacement is the sum of the real parts. "
+"Amplitude is the absolute value of the complex wave. Phase is the phase "
+"angle of the complex wave."
+msgstr ""
+"Величина для показа на изображении. Смещение это сумма действительных "
+"частей. Амплитуда это модуль комплексной волны. Фаза это фазовый угол "
+"комплексной волны."
+
+#: synthetic.xml:2244(guilabel)
+msgid "Number of waves"
+msgstr "Число волн"
+
+#: synthetic.xml:2247(para)
+msgid "The number of point sources the waves propagate from."
+msgstr "Число точечных источников, от которых распространяются волны."
+
+#: synthetic.xml:2254(guilabel)
+msgid "Wave form"
+msgstr "Форма волны"
+
+#: synthetic.xml:2257(para)
+msgid "One of the wave forms described above."
+msgstr "Одна из описанных выше форм волны."
+
+#: synthetic.xml:2267(para)
+msgid ""
+"Approximate amplitude (rms) of heights in the generated image. Note it "
+"differs from the amplitude of individual waves: the amplitude of heights in "
+"the generated image would grow with the square root of the number of waves "
+"in such case, whereas it in fact stays approxiately constant unless the "
+"amplitude changes."
+msgstr ""
+"Приблизительная амплитуда высот (среднеквадратичное отклонение) "
+"генерируемого изображения. Следует отметить, что она отличается от от "
+"амплитуды отдельных волн: амплитуда высот в сгенерированном изображении "
+"должна расти пропорционально квадратному корню из числа волн в этом случае, "
+"в то время как она фактически остаётся почти постоянной пока не меняется "
+"амплитуда."
+
+#: synthetic.xml:2278(guilabel)
+msgid "Frequency"
+msgstr "Частота"
+
+#: synthetic.xml:2281(para)
+msgid ""
+"Spatial frequency of the waves. It is relative to the image size, i.e. the "
+"value of 1.0 means wavelength equal to the lenght of the image side."
+msgstr ""
+"Пространственная частота волн. Измеряется относительно размера изображение, "
+"т.е. значение 1.0 означает длину волны, равную размеру стороны изображения."
+
+#: synthetic.xml:2289(term)
+msgid "<guilabel>X center</guilabel>, <guilabel>Y center</guilabel>"
+msgstr "<guilabel>X центра</guilabel>, <guilabel>Y центра</guilabel>"
+
+#: synthetic.xml:2294(para)
+msgid ""
+"Locations of the point sources. Zero corresponds to the image centre. The "
+"positions are also measured in image sizes. Generally, at least one of the "
+"corresponding variances should be non-zero; otherwise all the point sources "
+"coincide (some interesting patterns can be still generated with varying "
+"frequency though)."
+msgstr ""
+"Координаты точечных источников. Нуль соответствует центру изображения. "
+"Координаты измеряются в размерах изображения. В общем случае, хотя бы один "
+"из соответствующих разбросов должен быть ненулевым, иначе все точечные "
+"источники будут совпадать (хотя можно сгенерировать некоторые интересные "
+"текстуры варьируя частоты)."
+
+#: synthetic.xml:2306(guilabel)
+msgid "Decay"
+msgstr "Затухание"
+
+#: synthetic.xml:2309(para)
+msgid ""
+"Decay determines how quickly the waves are attenuated. The value is measured "
+"in inverse wavelengths and given as a decimal logarithm, indicated by the "
+"units <guilabel>log₁₀</guilabel>."
+msgstr ""
+"Затухание определяет как быстро волны ослабляются. Значение измеряется в "
+"обратных длинах волн и задаётся как десятичный логарифм, что показывается "
+"единицами измерения <guilabel>log₁₀</guilabel>."
+
+#: synthetic.xml:2322(caption)
+msgid ""
+"Artificial wave surfaces: displacement image generated with fairly large "
+"frequency variation (left); amplitude image for inverse cosh wave form "
+"(centre); phase image for a small cluster of far-away sources (right)."
+msgstr ""
+"Искуственные волнистые поверхности: карта смещений сгенерированная с "
+"достаточно большим разбросом частот (слева); изображение амплитуды для волны "
+"в форме обратного cosh (по центру); изображение фазы для малого кластера "
+"далёких источников (справа)."
+
+#: synthetic.xml:2332(title)
+msgid "Domains <gwy:icon name=\"synthetic_domains\"/>"
+msgstr "Домены <gwy:icon name=\"synthetic_domains\"/>"
+
+#: synthetic.xml:2335(para)
+msgid ""
+"The simulation implements a hybrid non-equilibrium Ising model [<link "
+"linkend=\"synthetic-ref-2\">2</link>], combining a discrete short-scale "
+"discrete Ising model with continuous slow inhibitor."
+msgstr ""
+"Расчёт реализует гибридную неравновесную модель Изинга [<link linkend="
+"\"synthetic-ref-2\">2</link>], совмещающую дискретную модель Изинга для "
+"малых расстояний с непрерывным медленным ингибитором."
+
+#: synthetic.xml:2341(para)
+msgid ""
+"The discrete variable <include href=\"eqi-u.xml\"/> has two possible values, "
+"between which it can flip probabilistically with probability <include href="
+"\"eq-ising-flipping.xml\"/> where <include href=\"eqi-Delta-E.xml\"/> is the "
+"change of energy resulting from flipping and <include href=\"eqi-T.xml\"/> "
+"is the temperature. The energy is given by the number of neighbours in the "
+"opposite state in the directions along the coordinate axes <include href="
+"\"eqi-n_o.xml\"/>, the number of neighbours in the opposite state in the "
+"directions along diagonals <include href=\"eqi-n_d.xml\"/> and also by bias "
+"caused by the inhibitor field <include href=\"eqi-v.xml\"/>: <include href="
+"\"eq-ising-energy.xml\"/>"
+msgstr ""
+"Дискретная переменная <include href=\"eqi-u.xml\"/> имеет два возможных "
+"значения, которые она меняет с вероятностью <include href=\"eq-ising-"
+"flipping.xml\"/> где <include href=\"eqi-Delta-E.xml\"/> – изменение энергии "
+"в результате смены состояния и <include href=\"eqi-T.xml\"/> – температура. "
+"Энергия задаётся числом соседей в противоположном состоянии в направлениях "
+"вдоль координатных осей <include href=\"eqi-n_o.xml\"/>, числом соседей в "
+"противоположном состоянии в направлении по диагоналям <include href=\"eqi-"
+"n_d.xml\"/> и также смещением, вызванным полем ингибитора  <include href="
+"\"eqi-v.xml\"/>: <include href=\"eq-ising-energy.xml\"/>"
+
+#: synthetic.xml:2358(para)
+msgid ""
+"The continuous inhibitor field <include href=\"eqi-v.xml\"/> is governed by "
+"a local differential equation coupled to the variable <include href=\"eqi-u."
+"xml\"/>: <include href=\"eq-ising-diffeq.xml\"/> where <include href=\"eqi-"
+"mu.xml\"/> is the inhibitor coupling and <include href=\"eqi-nu.xml\"/> is "
+"the bias parameter. The boundary conditions of the simulation are periodic, "
+"hence, the generated images are also periodic (i.e. perfectly tilable)."
+msgstr ""
+"Непрерывное поле ингибитора <include href=\"eqi-v.xml\"/> задано локальным "
+"дифференциальным уравнением, связанным с переменной  <include href=\"eqi-u."
+"xml\"/>: <include href=\"eq-ising-diffeq.xml\"/> где <include href=\"eqi-mu."
+"xml\"/> – связь ингибитора и <include href=\"eqi-nu.xml\"/> – параметр "
+"смещения. Граничные условия для расчёта периодические, следовательно, "
+"генерируемые изображения также будут периодическими (т.е. идеально "
+"совмещаться друг с другом на границе)."
+
+#: synthetic.xml:2368(para) synthetic.xml:2511(para) synthetic.xml:2849(para)
+msgid "The calculation has the following parameters:"
+msgstr "Расчёт управляется следующими параметрами:"
+
+#: synthetic.xml:2374(guilabel) synthetic.xml:2517(guilabel)
+#: synthetic.xml:2669(guilabel) synthetic.xml:3684(guilabel)
+msgid "Number of iterations"
+msgstr "Число шагов"
+
+#: synthetic.xml:2377(para)
+msgid ""
+"One iteration consists of four steps: A Monte Carlo update of <include href="
+"\"eqi-u.xml\"/>, a time step of solution of the differential equation for "
+"<include href=\"eqi-v.xml\"/>, another Monte Carlo step and another "
+"differential euqation time step. The values of <include href=\"eqi-v.xml\"/> "
+"shown correspond to the second update. The quantity shown as <include href="
+"\"eqi-u.xml\"/> is the average from the two values surrounding in time the "
+"corresponding value of <include href=\"eqi-v.xml\"/>. Hence the images of "
+"<include href=\"eqi-u.xml\"/> are three-valued, not two-valued."
+msgstr ""
+"Одна итерация расчёта состоит из четырёх шагов: обновление <include href="
+"\"eqi-u.xml\"/> методом Монте-Карло, шаг по времени в решении "
+"дифференциального уравнения для <include href=\"eqi-v.xml\"/>, другой шаг "
+"Монте-Карло и ещё один шаг по времени в дифференциальном уравнении. "
+"Показываемые значения <include href=\"eqi-v.xml\"/> соответствуют второму "
+"обновлению. Значение, показываемое как <include href=\"eqi-u.xml\"/> это "
+"среднее из двух значений, наиболее близких по времени к соответствующему "
+"значению <include href=\"eqi-v.xml\"/>. Таким образом, изображения <include "
+"href=\"eqi-u.xml\"/> трёхзначные, а не двузначные."
+
+#: synthetic.xml:2393(guilabel)
+msgid "Temperature"
+msgstr "Температура"
+
+#: synthetic.xml:2397(para)
+msgid ""
+"Temperature determines the probability with which the two-state variable "
+"<include href=\"eqi-u.xml\"/> can flip to the other value if it results in a "
+"configurations with higher energy or similar (flips that lower the energy a "
+"lot occur unconditonally). A larger temperature means less separation "
+"between the two <include href=\"eqi-u.xml\"/> domains."
+msgstr ""
+"Температура определяет вероятность, с которой переменная с двумя состояниями "
+"<include href=\"eqi-u.xml\"/> может переходить из одного в другое с энергией "
+"большей или равной (смена состояния, которая сильно понижает энергию, "
+"происходит сама по себе). Большая температура означает меньшее разделение "
+"между двумя доменами <include href=\"eqi-u.xml\"/>."
+
+#: synthetic.xml:2409(guilabel)
+msgid "Inhibitor strength"
+msgstr "Сила ингибитора"
+
+#: synthetic.xml:2413(para)
+msgid ""
+"Strength with which the continuous variable biases the energy of each pixel. "
+"For large values the inhibitor has larger influence compared to the surface "
+"tension."
+msgstr ""
+"Сила, с которой непрерывная переменная смещает энергию в каждом пикселе. Для "
+"больших значений ингибитор играет большую роль по сравнению с поверхностным "
+"натяжением."
+
+#: synthetic.xml:2422(guilabel)
+msgid "Inhibitor coupling"
+msgstr "Связь ингибитора"
+
+#: synthetic.xml:2426(para)
+msgid ""
+"Coupling factor between <include href=\"eqi-u.xml\"/> and <include href="
+"\"eqi-v.xml\"/> in the differential equation for <include href=\"eqi-v.xml\"/"
+">."
+msgstr ""
+"Фактор связи между <include href=\"eqi-u.xml\"/> и <include href=\"eqi-v.xml"
+"\"/> в дифференциальном уравнении для <include href=\"eqi-v.xml\"/>."
+
+#: synthetic.xml:2435(guilabel)
+msgid "Bias"
+msgstr "Смещение"
+
+#: synthetic.xml:2439(para)
+msgid ""
+"Bias in the differential equation for <include href=\"eqi-v.xml\"/> towards "
+"larger or smaller values."
+msgstr ""
+"Смещение в дифференциальном уравнении для <include href=\"eqi-v.xml\"/> в "
+"сторону больших или меньших значений."
+
+#: synthetic.xml:2447(guilabel)
+msgid "Monte Carlo time step"
+msgstr "Временной шаг метода Монте-Карло"
+
+#: synthetic.xml:2450(para)
+msgid ""
+"Time step in the differential equation corresponding to one Monte Carlo "
+"step. So this parameter determines the relative speed of the two processes."
+msgstr ""
+"Временной шаг в дифференциальном уравнении, соответствующий одному шагу в "
+"методе Монте-Карло. Таким образом, этот параметр определяет относительную "
+"скорость двух этих процессов."
+
+#: synthetic.xml:2462(para) synthetic.xml:2566(para)
+msgid "Range of values of the created images."
+msgstr "Диапазон значений создаваемых изображений."
+
+#: synthetic.xml:2468(para)
+msgid ""
+"Tab <guilabel>Presets</guilabel> contains a few loadable sets of parameters "
+"producing interesting patterns. Select a preset and press <guibutton>Load "
+"Selected Preset</guibutton> to load the parameters to the generator. The "
+"random seed is not a part of the preset. So the output images vary with the "
+"seed, but they keep the same general character (luck is also involved; some "
+"random seeds result in less interesting images than others)."
+msgstr ""
+"Вкладка <guilabel>Предустановки</guilabel> содержит несколько загружаемых "
+"наборов параметров, которые генерируют интересные структуры. Можно выбрать "
+"набор предустановок и нажать <guibutton>Загрузить выбранные предустановки</"
+"guibutton> чтобы загрузить набор параметров для данного генератора. "
+"Начальное число для генератора случайных чисел не является частью "
+"предустановок. Следовательно, для каждого начального числа получаемые "
+"изображения будут всё ещё варьироваться, но будут сохранять одинаковый общий "
+"облик (несколько зависит от удачи экспериментатора, некоторые случайные "
+"значения генерируют менее интересные изображения по сравнению с другими)."
+
+#: synthetic.xml:2481(caption)
+msgid ""
+"Artificial domain surfaces: spiral waves with long-range order (left); short-"
+"range ordered spiral waves at a higher temperature (centre); the continous "
+"variable for a low-temperature situation with small strength and coupling "
+"(right)."
+msgstr ""
+"Искусственные доменные поверхности: спиральные волны с дальним порядком "
+"(слева); упорядоченные спиральные волны с близким порядком при большей "
+"температуре (по центру); непрерывное изменение при ситуации низкой "
+"температуры с малой силой и связью (справа)."
+
+#: synthetic.xml:2492(title)
+msgid "Annealing <gwy:icon name=\"synthetic_anneal\"/>"
+msgstr "Отжиг <gwy:icon name=\"synthetic_anneal\"/>"
+
+#: synthetic.xml:2495(para)
+msgid ""
+"The simulation implements a simple cellular-automaton model of phase "
+"separation by annealing an imiscible lattice gas consisting of two "
+"components A and C. Only nearest neighbour interaction is considered. The "
+"difference of formation energies <include href=\"eq-anneal-formation-energy-"
+"difference.xml\"/> determines the preference for phase separation. The "
+"annealing proceeds by two neighbour cells (pixels) swaping positions. The "
+"always relax to an energentically preferred configuration but they can also "
+"switch to energentically less preferred configuration with a probability "
+"depending on the temperature <include href=\"eqi-T.xml\"/><include href=\"eq-"
+"anneal-swapping-probability.xml\"/> Since the probability depends only the "
+"ratio, we can put the Boltzmann equal to unity and then model depends only "
+"on a unitless temperature and relative fractions of the two components."
+msgstr ""
+"Модуль реализует простую модель клеточного автомата описывающего разделение "
+"фаз с помощью отжига не смешивающегося решеточного газа, состоящего из двух "
+"компонент A и C. Рассматривается только взаимодействие между ближайшими "
+"соседями. Различие в энергиях образования <include href=\"eq-anneal-"
+"formation-energy-difference.xml\"/> определяет предпочтение в разделении "
+"фаз. Отжиг происходит путём обмена местами двух соседних ячеек (пикселей). "
+"релаксация всегда происходит в сторону более энергетически выгодного "
+"расположения, однако они также могут переключаться в сторону менее выгодного "
+"с вероятностью, задаваемой температурой <include href=\"eqi-T.xml\"/"
+"><include href=\"eq-anneal-swapping-probability.xml\"/> Поскольку "
+"вероятность зависит только от соотношения компонент, можно задать постоянную "
+"Больцмана равной единице и тогда модель зависит только от безразмерной "
+"температуры и относительного соотношения двух компонент."
+
+#: synthetic.xml:2520(para)
+msgid ""
+"One iteration correspond to each pair of neighbour cell positions being "
+"checked for possible swapping once. However, this only holds in "
+"probabilistic sense. Some positions can be checked multiple times in one "
+"iterations, others not at all."
+msgstr ""
+"Одна итерация соответствует тому, что каждая пара расположений в соседних "
+"ячейках однократно проверяется на возможность замены. Однако, это "
+"сохраняется только в вероятностном смысле. Некоторые расположения могут быть "
+"проверены несколько раз в течение одной итерации, другие ни разу."
+
+#: synthetic.xml:2530(guilabel)
+msgid "Initial temperature"
+msgstr "Начальная температура"
+
+#: synthetic.xml:2533(para)
+msgid ""
+"The unitless temperature determines the probability with which cells can "
+"swap into less energetically preferred configuration, as described above. "
+"The initial temperature is the temperature at which the annealing begins."
+msgstr ""
+"Безразмерная температура определяет вероятность с которой ячейки могут "
+"меняться в сторону менее энергетически выгодной конфигурации, как описано "
+"выше. Начальная температура это температура при которой начинается отжиг."
+
+#: synthetic.xml:2543(guilabel)
+msgid "Final temperature"
+msgstr "Конечная температура"
+
+#: synthetic.xml:2546(para)
+msgid "The unitless temperature at which the simulation finishes."
+msgstr "Безразмерная температура при которой моделирование завершается."
+
+#: synthetic.xml:2553(guilabel)
+msgid "Component fraction"
+msgstr "Доля компонента"
+
+#: synthetic.xml:2556(para)
+msgid "Fraction of component C in the A–C mixture."
+msgstr "Доля компонента C в смеси A-C."
+
+#: synthetic.xml:2573(guilabel)
+msgid "Average iterations"
+msgstr "Число шагов усреднения"
+
+#: synthetic.xml:2576(para)
+msgid ""
+"The output image can capture just the final state, or it can be calculated "
+"by averaging a certain number of states before the end given by this "
+"parameter."
+msgstr ""
+"Выводимое изображение может захватывать только финальное состояние или оно "
+"может быть расчитано усреднением определенного числа состояний до конечного, "
+"задаваемого этим параметром."
+
+#: synthetic.xml:2584(para)
+msgid ""
+"Optionally, a three-component model can be enabled. The third component B "
+"behaves identically to A and C. However, the model now has more parameters:"
+msgstr ""
+"Опционально может быть задействована трёхкомпонентная модель. Третий "
+"компонент B ведёт себя подобно A и С. Однако, модель в этом случае будет "
+"содержать больше параметров:"
+
+#: synthetic.xml:2592(guilabel)
+msgid "Fraction of B"
+msgstr "Доля компонента B"
+
+#: synthetic.xml:2595(para)
+msgid ""
+"The fraction of component B in the mixture. The remainder is divided among A "
+"and C according to <guilabel>Component fraction</guilabel>."
+msgstr ""
+"Доля компонента B в смеси. Остаток будет поделен между A и С в соответствии "
+"с <guilabel>Долей компонента</guilabel>."
+
+#: synthetic.xml:2604(guilabel)
+msgid "Mixing energy AB"
+msgstr "Энергия смешивания AB"
+
+#: synthetic.xml:2607(para)
+msgid ""
+"Difference of formation energies for components A and B, relative to the "
+"maximum value."
+msgstr ""
+"Разница в энергиях формирования для компонент A и B по отношению к "
+"максимальному значению."
+
+#: synthetic.xml:2615(guilabel)
+msgid "Mixing energy AC"
+msgstr "Энергия смешивания AC"
+
+#: synthetic.xml:2618(para)
+msgid ""
+"Difference of formation energies for components A and C, relative to the "
+"maximum value."
+msgstr ""
+"Разница в энергиях формирования для компонент A и C по отношению к "
+"максимальному значению."
+
+#: synthetic.xml:2626(guilabel)
+msgid "Mixing energy BC"
+msgstr "Энергия смешивания BC"
+
+#: synthetic.xml:2629(para)
+msgid ""
+"Difference of formation energies for components B and C, relative to the "
+"maximum value."
+msgstr ""
+"Разница в энергиях формирования для компонент B и C по отношению к "
+"максимальному значению."
+
+#: synthetic.xml:2636(para)
+msgid ""
+"In order to keep the unitless temperature scaled consistently with the two-"
+"component model, the largest mixing energy is always normalised to 1. If you "
+"try to decrease it, the other two mixing energies increase instead, "
+"preserving the ratio, until one of them reaches the value 1. Then this "
+"energy difference becomes the largest and the previously largest one can be "
+"decreased further."
+msgstr ""
+"Для того, чтобы безразмерная температура масштабировалась одинаково с "
+"двухкомпонентной моделью, наибольшая энергия смешивания всегда нормируется к "
+"1. Если вы пытаетесь её уменьшить, две другие энергии смешивания "
+"увеличиваются вместо неё, сохраняя соотношение, до тех пор, пока одна из них "
+"не достигнет значения 1. Тогда эта разница энергий станет наибольшей и "
+"наибольшая до этого может уменьшаться дальше."
+
+#: synthetic.xml:2649(caption)
+msgid ""
+"Artificial annealing images generates for the two-component model and two "
+"different settings of the three-component model."
+msgstr ""
+"Искусственные изображения отжига созданные для двухкомпонентной модели и "
+"двух различных вариантов настроек трёхкомпонентной модели."
+
+#: synthetic.xml:2657(title)
+msgid "Coupled PDEs <gwy:icon name=\"synthetic_turing_pattern\"/>"
+msgstr ""
+"Связанные уравнения в частных производных <gwy:icon name="
+"\"synthetic_turing_pattern\"/>"
+
+#: synthetic.xml:2660(para)
+msgid ""
+"A number of interesting patterns can be generated by solving numerically "
+"coupled non-linear partial differential equations in the image plane. At "
+"present the module implements two generators with a common basic parameters:"
+msgstr ""
+"Большое число интересных текстур может создаваться с помощью численного "
+"решения связанных нелинейных дифференциальных уравнений в частных "
+"производных в плоскости изображения. В настоящее время модуль реализует два "
+"генератора с общими основными параметрами:"
+
+#: synthetic.xml:2672(para)
+msgid ""
+"The number of time steps when solving the coupled PDEs. Usually the state "
+"more or less ceases to evolve after a certain number of iterations – which, "
+"however, varies wildly with the pattern type and its parameters."
+msgstr ""
+"Число шагов по времени для решения связанных дифференциальных уравнений в "
+"частных производных. Решение практически перестаёт меняться после "
+"определенного числа итераций, которое, однако, очень сильно варьируется в "
+"зависимости от типа текстуры и её параметров."
+
+#: synthetic.xml:2682(title)
+msgid "Turing pattern"
+msgstr "Шаблон Тьюринга"
+
+#: synthetic.xml:2683(para)
+msgid ""
+"The Turing pattern generator can generate the single classic pattern in a "
+"relatively controllable manner. It has the following parameters:"
+msgstr ""
+"Генератор текстуры Тьюринга может генерировать одиночную классическую "
+"текстуру в относительно управляемом режиме. Он имеет следующие параметры:"
+
+#: synthetic.xml:2693(para)
+msgid "Characteristic width of stripes in the pattern."
+msgstr "Характеристические ширины полос в текстуре."
+
+#: synthetic.xml:2700(guilabel)
+msgid "Degree of chaos"
+msgstr "Степень хаоса"
+
+#: synthetic.xml:2703(para)
+msgid ""
+"An ad hoc parameter controlling the convergence of the solution. Small "
+"values produce orderly patterns. However, the equations can take extremely "
+"long time to converge for larger sizes. Large values produce more disturbed "
+"patterns, but much more quickly."
+msgstr ""
+"Специальный параметр, управляющий сходимостью решения. Малые значения "
+"приводят к более упорядоченным текстурам. Однако, решение может сходиться "
+"очень долго для больших раземеров изображения. Большие значения приводят к "
+"более возмущенным текстурам, однако, гораздо быстрее."
+
+#: synthetic.xml:2712(para)
+msgid ""
+"The pattern is generated by a two-component diffusion-reaction model "
+"simulation, with equations for both components of the form <include href="
+"\"eq-turing-diffeq.xml\"/> In the equation for the second component the "
+"roles are just swapped (and the constants differ). Function <include href="
+"\"eqi-f.xml\"/> is defined <include href=\"eq-turing-function-f.xml\"/> "
+"Constants <include href=\"eqi-p.xml\"/>, <include href=\"eqi-q.xml\"/> and "
+"<include href=\"eqi-r.xml\"/> are not controlled directly. They (and the "
+"time step) are calculated from size and degree of chaos according to a "
+"calibration formula."
+msgstr ""
+"Текстура генерируется двухкомпонентной моделью диффузия-реакция, с "
+"уравнениями для обоих компонентов в форме <include href=\"eq-turing-diffeq."
+"xml\"/> В уравнении для второго компонента роли просто меняются (и "
+"отличаются константы). Функция <include href=\"eqi-f.xml\"/> определяется "
+"как <include href=\"eq-turing-function-f.xml\"/> Константы <include href="
+"\"eqi-p.xml\"/>, <include href=\"eqi-q.xml\"/> и <include href=\"eqi-r.xml\"/"
+"> не управляются напрямую. Они (и шаг по времени) рассчитываются из размера "
+"и степени хаотичности в соответствии с калибровочной формулой."
+
+#: synthetic.xml:2729(caption)
+msgid ""
+"Three Turing patterns of the same characteristic stripe size and degree of "
+"chaos increasing from left to right."
+msgstr ""
+"Три текстуры Тьюринга с одной и той же характеристической шириной полосы и "
+"степенью хаоса увеличивающейся слева направо."
+
+#: synthetic.xml:2737(title)
+msgid "Diffusion reaction"
+msgstr "Диффузия-реакция"
+
+#: synthetic.xml:2738(para)
+msgid ""
+"The diffusion reaction model can generate a variety of patterns. However, "
+"one adjusts directly the reaction constants and parameters such as feature "
+"size are not possible to control. It has the following parameters:"
+msgstr ""
+"Модель диффузии-реакции может генерировать большое разнообразие текстур. "
+"Однако, прямая настройка скоростей реакции и параметров, таких как размер "
+"особенностей, невозможна. Модуль содержит следующие параметры:"
+
+#: synthetic.xml:2747(guilabel)
+msgid "Output type"
+msgstr "Тип вывода"
+
+#: synthetic.xml:2750(para)
+msgid "Which of the two components should be rendered to the image."
+msgstr "Какой из двух компонент будет отрисовываться на изображении."
+
+#: synthetic.xml:2757(guilabel)
+msgid "Removal rate"
+msgstr "Скорость удаления"
+
+#: synthetic.xml:2760(para)
+msgid "Removal rate constant for the reaction."
+msgstr "Константа скорости реакции, относящаяся к удалению материала."
+
+#: synthetic.xml:2767(guilabel)
+msgid "Feed rate"
+msgstr "Скорость питания"
+
+#: synthetic.xml:2770(para)
+msgid "Feed rate constant for the reaction."
+msgstr "Константа скорости притока (питания) материала в реакции."
+
+#: synthetic.xml:2777(guilabel)
+msgid "Source density"
+msgstr "Плотность источника"
+
+#: synthetic.xml:2780(para)
+msgid ""
+"The pixel density of fixed sources with low/high values. The density is per "
+"pixel, but not the factor 10<superscript>-3</superscript>."
+msgstr ""
+"Плотность на пиксель фиксированных источников с высоким/низким значениями. "
+"Плотность рассчитывается на пиксель, множитель 10<superscript>-3</"
+"superscript> не используется."
+
+#: synthetic.xml:2788(guilabel)
+msgid "No-source iterations"
+msgstr "Количество итераций без источника"
+
+#: synthetic.xml:2791(para)
+msgid ""
+"How many iterations at the end should be carried out with sources removed. "
+"It is possible to choose a number larger than the total number of "
+"iterations, although it is not very useful (the sources are removed "
+"immediately then)."
+msgstr ""
+"Как много итераций в конце будет проводиться после того, как источники будут "
+"убраны. Можно задать значение больше, чем общее количество итераций, но это "
+"не очень полезно (при таком задании источники будут убраны с самого начала)."
+
+#: synthetic.xml:2800(para)
+msgid ""
+"In most parameter ranges the reaction needs a source of reactants to produce "
+"interesting patterns. Without such supply the system state evolves to a "
+"constant flat image or checkerboard instability. One possibility of forcing "
+"an intersting pattern (often used in demonstrations) is a large spatial "
+"variation of the reaction constants through the domain. However, this does "
+"not allow computation of specific patterns for particular parameter values."
+msgstr ""
+"В большей части диапазонов параметров реакции требуется источник реагентов "
+"чтобы получались интересные текстуры. Без такого источника состояние системы "
+"развивается в постоянное плоское изображение или нестабильность в формате "
+"шахматной доски. Одной из возможностей стимулирования генерации интересных "
+"текстур (часто используемой в демонстрациях) является большая "
+"пространственная неоднородность констант реакции в области протекания. "
+"Однако, это не позволяет рассчитывать заданные специфичные текстуры для "
+"определенных наборов параметров."
+
+#: synthetic.xml:2809(para)
+msgid ""
+"So, instead, the module adds explicit sources. They are realised in a crude "
+"manner as random pixels which keep their low/high values (and can be "
+"sometimes observed in the animated evolution). They are not subject to the "
+"reaction, but they influence their neigbours."
+msgstr ""
+"Тогда, вместо этого, модуль добавляет явно заданные источники. Они "
+"реализованы в грубой форме как случайные пиксели, которые сохраняют свои "
+"низкие/высокие значения (и иногда их можно наблюдать в анимации эволюции). "
+"На них не действует реакция, но они влияют на своих ближайших соседей."
+
+#: synthetic.xml:2815(para)
+msgid ""
+"Some patterns are stable once they develop and nothing happens when sources "
+"are removed. Some are not and degenerate into one of the non-interesting "
+"states. Slightly different sets of patterns can be obtained with sources "
+"removed for a long time and with sources removed just briefly at the end. In "
+"addition, there are some interesting transitional patterns."
+msgstr ""
+"Некоторые текстуры будут стабильны после того, как они сформировались, и при "
+"удалении источников ничего не происходит. Некоторые нет и вырождаются в одно "
+"из неинтересных состояний. Немного разные наборы текстур могут быть получены "
+"при удалении источников на длительное время и при удалении источников "
+"ненадолго в конце. Кроме того, есть несколько интересных переходных текстур."
+
+#: synthetic.xml:2828(caption)
+msgid ""
+"Examples of patterns which can be produced by the diffusion reaction model."
+msgstr ""
+"Примеры текстур, которые могут быть получены с помощью модели диффузии-"
+"реакции."
+
+#: synthetic.xml:2837(title)
+msgid "Diffusion <gwy:icon name=\"synthetic_diffusion\"/>"
+msgstr "Диффузия <gwy:icon name=\"synthetic_diffusion\"/>"
+
+#: synthetic.xml:2840(para)
+msgid ""
+"The simulation implements a Monte Carlo discrete diffusion limited "
+"aggregation model. Pixel-shaped particles fall onto the surface and move "
+"around it until they stick to a cluster, slowly forming a monolayer. The "
+"flux of incoming particles is low so that only a few particles are free to "
+"move at any given time and the particles can travel a considerable distance "
+"on the surface before sticking. For typical parameter values, this leads to "
+"the formation of <quote>fractal flake</quote> clusters."
+msgstr ""
+"Модуль моделирования реализует дискретную модель диффузии с ограниченной "
+"агрегацией на основе метода Монте-Карло. Частицы в форме пикселей падают на "
+"поверхность и движутся вдоль неё пока не прилипают к кластеру, постепенно "
+"образуя монослой. Поток падающих частиц невелик, поэтому в каждый момент "
+"времени свободно двигается малое число частиц и частица может пройти "
+"заметное расстояние по поверхности до момента прилипания. Для типичных "
+"значений параметров это приводит к образованию кластеров в форме "
+"<quote>фрактальной снежинки</quote>."
+
+#: synthetic.xml:2858(para)
+msgid ""
+"The average number of times a particle falls onto any given pixel. Coverage "
+"value of 1 means the surface would be covered by a monolayer, assuming the "
+"particles cover it uniformly."
+msgstr ""
+"Среднее количество раз, когда частица попадает на заданный пиксель "
+"изображения. Значение покрытия 1 означает что поверхность будет покрыта "
+"монослоем, предполагая, что частицы покрывают её равномерно."
+
+#: synthetic.xml:2867(guilabel)
+msgid "Flux"
+msgstr "Поток"
+
+#: synthetic.xml:2870(para)
+msgid ""
+"The average number particles falling onto any given pixel per simulation "
+"step. Smaller values of flux lead to larger structures as the particles "
+"diffuse for longer time before they meet another particle. The value is "
+"given as a decimal logarithm, indicated by the units <guilabel>log₁₀</"
+"guilabel>."
+msgstr ""
+"Среднее число частиц, падающих на каждый заданный пиксель за один шаг "
+"моделирования. Меньшие значения потока приводят к более крупным структурам, "
+"поскольку частицы участвуют в диффузии более продолжительное время до "
+"встречи с другой частицей. Значение задано как десятичный логарифм, что "
+"показывается единицами измерения <guilabel>log₁₀</guilabel>."
+
+#: synthetic.xml:2884(para)
+msgid ""
+"The height of one particle which gives the height of the steps in the "
+"resulting image."
+msgstr ""
+"Высота отдельной частицы которая задаёт высоту ступеней в получаемом "
+"изображении."
+
+#: synthetic.xml:2892(guilabel)
+msgid "Sticking probability"
+msgstr "Вероятность прилипания"
+
+#: synthetic.xml:2895(para)
+msgid ""
+"The probability that a free particle will finally stick and stop moving when "
+"it touches another single particle. Probabilities that the particle will "
+"stick if it touches two or three particles increase progressively depending "
+"on this value. The sticking probability is always zero for a particle with "
+"no neighbours and always one for a particle with all four neighbours."
+msgstr ""
+"Вероятность того, что свободная частица окончательно прилипнет и перестанет "
+"двигаться, когда она касается другой отдельной частицы. Вероятности что "
+"частица прилипнет, если она коснётся двух или трёх частиц возрастает "
+"пропорционально в зависимости от этого значения. Вероятность прилипания "
+"всегда нулевая для частицы без соседей и всегда единица для частицы, "
+"окруженной четырьмя соседними."
+
+#: synthetic.xml:2907(guilabel)
+msgid "Activation probability"
+msgstr "Вероятность активации"
+
+#: synthetic.xml:2910(para)
+msgid ""
+"The probability a particle that has not stuck will move if it touches "
+"another particle. The probability for more touching particles decreases as a "
+"power of the single-particle probability. Particles without any neighbours "
+"can always move freely."
+msgstr ""
+"Вероятность для частицы, которая не прилипла что она сдвинется если она "
+"касается другой частицы. Вероятность для большего числа касающихся частиц "
+"уменьшается как степень вероятности для отдельной частицы. Частицы без "
+"соседей могут двигаться свободно всегда."
+
+#: synthetic.xml:2920(guilabel)
+msgid "Passing Schwoebel probability"
+msgstr "Вероятность прохождения Швёбеля"
+
+#: synthetic.xml:2923(para)
+msgid ""
+"A particle that has fallen on the top of an already formed cluster can have "
+"reduced probability to descend to the lower layer due to so called Schwoebel "
+"barrier. If this parameter is 1 there is no such barrier, i.e. particles can "
+"descend freely. Conversely, probability 0 means particles can never descend "
+"to the lower layer. The value is given as a decimal logarithm, indicated by "
+"the units <guilabel>log₁₀</guilabel>."
+msgstr ""
+"Частица, которая упала на верхушку уже сформированного кластера может иметь "
+"сниженную вероятность спуститься на более низкий уровень из-за так "
+"называемого барьера Швёбеля. Если этот параметр равен 1, барьера нет, т.е. "
+"частицы могут свободно спускаться. Наоборот, вероятность, равная 0, означает "
+"что частицы никогда не спустятся на более низкие уровни. Значение задано как "
+"десятичный логарифм, что показывается единицами измерения <guilabel>log₁₀</"
+"guilabel>."
+
+#: synthetic.xml:2935(para)
+msgid ""
+"Note that some parameter combinations, namely very small flux combined with "
+"very small Schwoebel barrier passing probability, can lead to excessively "
+"long simulation times."
+msgstr ""
+"Следует отметить, что некоторые комбинации параметров, а именно очень "
+"маленький поток и очень низкая вероятность преодолеть барьер Швёбеля, могут "
+"привести к очень долгим временам моделирования."
+
+#: synthetic.xml:2945(caption)
+msgid ""
+"Artificial diffusion surfaces: sparse clusters with high sticking "
+"probability (left); dense clusters with low sticking probability (centre); "
+"mutltilayer fractal structures with high Schwoebel barrier (right)."
+msgstr ""
+"Искусственные дифузионные поверхности: редкие кластеры с высокой "
+"вероятностью прилипания (слева); частые кластеры с низкой вероятностью "
+"прилипания (по центру); многослойные фрактальные структуры с высоким "
+"барьером Швёбеля (справа)."
+
+#: synthetic.xml:2955(title)
+msgid "Fibres <gwy:icon name=\"synthetic_fibres\"/>"
+msgstr "Волокна <gwy:icon name=\"synthetic_fibres\"/>"
+
+#: synthetic.xml:2958(para)
+msgid ""
+"The random fibre placement synthesis method is very similar to <link linkend="
+"\"object-synthesis\">Objects</link>, except instead of finite-sized objects "
+"it adds infinitely long (in principle) fibres to the surface."
+msgstr ""
+"Метод синтеза поверхности, основанный на случайном размещении волокон сильно "
+"похож на метод синтеза <link linkend=\"object-synthesis\">Объекты</link>, за "
+"исключением того, что вместо объектов ограниченного размера он добавляет "
+"бесконечно длинные (в принципе) волокна на поверхность."
+
+#: synthetic.xml:2964(para)
+msgid ""
+"The generator has quite a few parameters, divided into <guilabel>Generator</"
+"guilabel> and <guilabel>Placement</guilabel>. The first group contains the "
+"basic settings and parameters determining the profiles of individual fibres:"
+msgstr ""
+"Генератор имеет небольшой набор параметров, поделенных между вкладками "
+"<guilabel>Генератор</guilabel> и <guilabel>Размещение</guilabel>. Первая "
+"группа содержит основные настройки и параметры, определяющие профили "
+"отдельных волокон:"
+
+#: synthetic.xml:2976(para)
+msgid ""
+"The shape of profile across a fibre. Options <guilabel>Semi-circle</"
+"guilabel>, <guilabel>Triangle</guilabel>, <guilabel>Rectangle</guilabel> and "
+"<guilabel>Parabola</guilabel> are self-explanatory. <guilabel>Quadratic "
+"spline</guilabel> shape corresponds to the three-part piecewise quadratic "
+"function that is the basis function of quadratic B-spline."
+msgstr ""
+"Форма профиля поперёк волокна. Опции <guilabel>Полукруг</guilabel>, "
+"<guilabel>Треугольник</guilabel>, <guilabel>Прямоугольник</guilabel> и "
+"<guilabel>Парабола</guilabel> не требуют пояснений. Форма "
+"<guilabel>Квадратичный сплайн</guilabel> соответствует кусочной квадратичной "
+"функции, состоящей из трёх частей, которая является базисной функцией "
+"квадратичного B-сплайна."
+
+#: synthetic.xml:2995(para)
+msgid ""
+"The average number of times a fibre would be placed onto any given pixel. "
+"Coverage value of 1 means the surface would be exactly once covered by the "
+"fibres assuming that they covered it uniformly and did not overlap. Values "
+"larger than 1 mean more layers of fibres – and slower image generation. The "
+"value is approximate and the actual coverage depends somewhat on other "
+"parameters."
+msgstr ""
+"Среднее количество волокон перекрывающих один пиксель изображения. Значение "
+"покрытия 1 означает что поверхность будет ровно один раз покрыта волокнами, "
+"при этом они будут покрывать её равномерно и не будут пересекаться. Большие "
+"значения означают больше слоёв объектов и более медленную генерацию "
+"изображения. Значение является приблизительным и действительное покрытие "
+"немного зависит от других параметров."
+
+#: synthetic.xml:3010(para)
+msgid ""
+"Fibre width in pixels. It has the usual <guilabel>Variance</guilabel> "
+"associated, which determines the difference between entire fibres. However, "
+"the width can also vary along a single fibre. This is controlled by the "
+"<guilabel>Along fibre</guilabel> option. High values of variation along the "
+"fibre can in combination with some other options (in particular high "
+"lengthwise deformation and height variation) result in very odd looking "
+"images and possibly artefacts."
+msgstr ""
+"Ширина волокна в пикселях. Также имеет обычную связанную опцию "
+"<guilabel>Разброс</guilabel>, которая определяет различия между отдельными "
+"волокнами. Однако, для волокон ширина также может меняться вдоль каждого "
+"отдельного волокна. Это настраивается опцией <guilabel>Вдоль волокна</"
+"guilabel>. Высокие значения разброса вдоль волокна могут в сочетаниях с "
+"некоторыми другими опциями (в частности, высокими значениями деформации по "
+"длине и высокими значениями разброса толщины) приводить к странно выглядящим "
+"изображениям и возможным артефактам."
+
+#: synthetic.xml:3027(para)
+msgid ""
+"A quantity proportional to the height of the fibre, normally the height of "
+"the highest point. Similarly to <guilabel>Width</guilabel>, it has two "
+"variances, between entire fibres and along each individual fibre."
+msgstr ""
+"Величина, пропорциональная высоте волокна, обычно высота наивысшей точки. "
+"Также как и <guilabel>Ширина</guilabel>, она имеет два разброса, между "
+"отдельными волокнами и вдоль каждого индивидуального волокна."
+
+#: synthetic.xml:3033(para)
+msgid ""
+"Enabling <guilabel>Scales with width</guilabel> makes unperturbed heights to "
+"scale proportionally with fibre width. Otherwise the height is independent "
+"on size."
+msgstr ""
+"Выбор опции <guilabel>Масштабируется с шириной</guilabel> заставляет "
+"невозмущённые высоты масштабироваться пропорционально ширине волокна. В "
+"противном случае высота не зависит от размера."
+
+#: synthetic.xml:3049(para)
+msgid ""
+"The fibres can be truncated at a certain height, enabling creation of "
+"profiles in the form of truncated semi-circles, parabolas, etc. The "
+"truncation height is given as a proportion to the total fibre height. Unity "
+"means the fibre is not truncated, zero would mean complete removal of the "
+"fibre."
+msgstr ""
+"Волокна могут быть усечены на определённой высоте для создания профилей в "
+"форме усечённых полукругов, парабол, и т.п. Высота усечения задаётся в долях "
+"от общей высоты объекта. Единица означает неусечённую фигуру, ноль – полное "
+"удаление волокна."
+
+#: synthetic.xml:3059(para)
+msgid ""
+"The second group contains options controlling how fibres are deformed and "
+"added to the image:"
+msgstr ""
+"Вторая группа содержит опции, управляющие тем, как волокна деформируются и "
+"добавляются к изображению:"
+
+#: synthetic.xml:3069(para)
+msgid ""
+"The rotation of fibres, measured anticlockwise. Zero corresponds to the left-"
+"to-right orientation."
+msgstr ""
+"Поворот волокон, измеренный против часовой стрелки. Ноль соответствует "
+"ориентации слева направо."
+
+#: synthetic.xml:3080(para)
+msgid ""
+"Density controls how frequently the fibre is deformed along its length. Low "
+"density means gradual deformation on a large scale, whereas high density "
+"means the fibre is deformed often, leading to wavy or curly shapes."
+msgstr ""
+"Плотность управляет тем, как часто волокно деформируется по его длине. "
+"Низкая плотность соответствует постепенной деформации на больших масштабах, "
+"в то время, как высокая плотность означает что волокно деформируется часто, "
+"что приводит к волнистым и извилистым формам."
+
+#: synthetic.xml:3090(guilabel)
+msgid "Lateral"
+msgstr "Горизонтальный масштаб"
+
+#: synthetic.xml:3093(para)
+msgid ""
+"How much the fibre is deformed in the direction perpendicular to its main "
+"direction. Increasing this value makes the fibre wavy, but in a relatively "
+"regular manner."
+msgstr ""
+"Как сильно волокно деформировано в направлении, перпендикулярном его "
+"основному направлению. Увеличение этого значения делает волокно извилистым, "
+"правда в относительно правильной форме."
+
+#: synthetic.xml:3102(guilabel)
+msgid "Lengthwise"
+msgstr "По длине"
+
+#: synthetic.xml:3105(para)
+msgid ""
+"How much points of the fibre are moved along its length. Increasing this "
+"value causes irregular kinks and loops (or even knots) to appear."
+msgstr ""
+"Как сильно точки волокна смещаются вдоль его длины. Увеличение этого "
+"параметра вызывает появление неправильных перекручиваний и петель (или даже "
+"узлов)."
+
+#: synthetic.xml:3118(caption)
+msgid ""
+"Artificial fibre surfaces: moderately deformed fibres, all oriented more or "
+"less in the same direction (left); many layers of thin straight randomly "
+"oriented fibres (centre); parallel fibres with high lateral deformation "
+"density (right)."
+msgstr ""
+"Искусственные волокнистые поверхности: умеренно искривленные волокна, все "
+"ориентированные в более или менее одном направлении (слева); много слоёв "
+"тонких прямых случайно ориентированных волокон (по центру); параллельные "
+"волокна с высокой плотностью горизонтальных деформаций (справа)."
+
+#: synthetic.xml:3128(title)
+msgid "Lattice <gwy:icon name=\"synthetic_lattice\"/>"
+msgstr "Решетка <gwy:icon name=\"synthetic_lattice\"/>"
+
+#: synthetic.xml:3131(para)
+msgid ""
+"The lattice synthesis module creates surfaces based on randomised two-"
+"dimensional lattices. It has two major parts. The first part, controlled by "
+"parameters in tab <guilabel>Lattice</guilabel>, is the creation of a set of "
+"points in plane that are organised to a more or less randomised lattice. The "
+"second part, controlled by parameters in tab <guilabel>Surface</guilabel>, "
+"is the actual construction of a surface based on quantities calculated from "
+"Voronoi tessellation and/or Delaunay triangulation of the set of points."
+msgstr ""
+"Модуль синтеза решеток создаёт поверхности основанные на случайных двумерных "
+"решетках. Он содержит две основные части. В первой, управляемой параметрами "
+"во вкладке <guilabel>Решетка</guilabel>, создаётся набор точек в плоскости, "
+"которые организованы в более или менее случайную решетку. Вторая часть, "
+"управляемая параметрами во вкладке <guilabel>Поверхность</guilabel>, создаёт "
+"реальную поверхность, основанную на величинах, рассчитанных в ходе "
+"тесселяции Вороного и /или триангуляции Делоне для заданного набора точек."
+
+#: synthetic.xml:3141(para)
+msgid "The creation of the lattice has the following parameters:"
+msgstr "Создание решетки управляется следующими параметрами:"
+
+#: synthetic.xml:3147(guilabel)
+msgid "Lattice"
+msgstr "Решетка"
+
+#: synthetic.xml:3150(para)
+msgid ""
+"The base lattice type. The random lattice corresponds to completely randomly "
+"placed points. Other types correspond to regular organisations of points "
+"(square, hexagonal, triangular), well-known tilings (Cairo, snub square, "
+"Penrose) or surface reconstructions (silicon 7×7)."
+msgstr ""
+"Основной тип решетки. Случайная решетка соответствует полностью случайно "
+"расположенным точкам. Другие типы соответствуют правильному расположению "
+"точек  (квадратному, гексагональному, треугольному), хорошо известным "
+"мозаичным заполнениям (каирской, плосконосой квадратной, Пенроуза) или "
+"восстановлениям поверхности (кремний 7×7)."
+
+#: synthetic.xml:3164(para)
+msgid ""
+"The average cell size. More precisely, this parameter describes the mean "
+"point density. It is equal to the side of the square if the same number of "
+"points was organised to a square lattice."
+msgstr ""
+"Средний размер ячейки. Точнее, этот параметр описывает среднюю плотность "
+"точек. Он равен стороне квадрата, если такое же число точек организовано в "
+"квадратную решетку."
+
+#: synthetic.xml:3173(guilabel)
+msgid "Lattice relaxation"
+msgstr "Релаксация решетки"
+
+#: synthetic.xml:3176(para)
+msgid ""
+"Amount to which the lattice is allowed to relax. The relaxation process "
+"pushes points away from very close neighbours and towards large empty space. "
+"The net result is that cell sizes become more uniform. Of course, relaxation "
+"has no effect on regular lattices. It should be noted that relaxation "
+"requires progressive retessellation and large relaxation parameter values "
+"can slow down the surface generation considerably."
+msgstr ""
+"Величина, на которую решетке можно релаксировать. Процесс релаксации "
+"отталкивает точки от очень близких соседей в сторону большой пустой области. "
+"В целом это приводит к тому, что размеры ячеек становятся более "
+"равномерными. Естественно, процесс релаксации не влияет на правильные "
+"решетки. Следует отметить, что релаксация требует прогрессивной ретесселяции "
+"и большой параметр релаксации может существенно замедлить генерацию "
+"поверхности."
+
+#: synthetic.xml:3189(guilabel)
+msgid "Height relaxation"
+msgstr "Релаксация высоты"
+
+#: synthetic.xml:3192(para)
+msgid ""
+"Amount to which the random values assigned to each point (see below) are "
+"allowed to relax. The relaxation process is similar to diffusion and leads "
+"to overal smoothing of the random values."
+msgstr ""
+"Величина, на которую могут релаксировать случайные значения, присвоенные "
+"каждой точке (см. ниже). Процесс релаксации похож на диффузию и приводит к "
+"общему сглаживанию случайных значений."
+
+#: synthetic.xml:3204(para)
+msgid ""
+"The rotation of the lattice with respect to some base orientation, measured "
+"anticlockwise. It is only available for regular lattices as the random "
+"lattice is isotropic."
+msgstr ""
+"Поворот решетки по отношению к определённому исходному направлению, "
+"измеренный против часовой стрелки. Доступно только для правильных сеток, "
+"поскольку случайная сетка является изотропной."
+
+#: synthetic.xml:3212(term)
+msgid "<guilabel>Amplitude</guilabel>, <guilabel>Lateral scale</guilabel>"
+msgstr ""
+"<guilabel>Амплитуда</guilabel>, <guilabel>Горизонтальный масштаб</guilabel>"
+
+#: synthetic.xml:3217(para)
+msgid ""
+"Parameters that control the lattice deformation. They have the same meaning "
+"as in <link linkend=\"pattern-synthesis\">Pattern synthesis</link>."
+msgstr ""
+"Параметры, управляющие деформацией решетки. Имеют то же значение, что и в "
+"<link linkend=\"pattern-synthesis\">синтезе структур</link>."
+
+#: synthetic.xml:3225(para)
+msgid ""
+"The final surface is constructed as a weighted sum of a subset of basic "
+"quantities derived from the Voronoi tessellation or Delaunay triangulation. "
+"Each quantity can be enabled and disabled. When it is selected in the list, "
+"its weight in the sum and its thresholding parameters can be modified using "
+"the sliders. The lower and upper threshold cut the value range (which is "
+"always normalised to <include href=\"eqi-interval-0-1.xml\"/>) by changing "
+"all values larger than the upper threshold equal to the thresold value and "
+"similarly for the lower thresold."
+msgstr ""
+"Финальная поверхность строится как взвешенная сумма набора основных величин, "
+"полученных в результате тесселяции Вороного или триангуляции Делоне. Каждая "
+"величина может быть включена или выключена. Если она выбрана в списке, её "
+"вес добавляется к сумме и её пороговые параметры можно модифицировать двигая "
+"ползунки. Нижний и верхний порог ограничивают диапазон значений (который "
+"всегда нормализован до <include href=\"eqi-interval-0-1.xml\"/>) меняя все "
+"величины выше верхнего порога на величину порога и аналогично для нижнего."
+
+#: synthetic.xml:3236(para)
+msgid ""
+"Some of the basic quantities are calculated from lateral coordinates only. "
+"Some, however, are calculated from random values (<quote>heights</quote>) "
+"assigned to each point in the set. The available quantities include:"
+msgstr ""
+"Некоторые из основных величин рассчитываются только из горизонтальных "
+"координат. Некоторые, однако, рассчитываются из случайных значений "
+"(<quote>высот</quote>), присвоенных каждой точке множества. Доступные "
+"величины включают в себя:"
+
+#: synthetic.xml:3245(guilabel)
+msgid "Random constant"
+msgstr "Случайная постоянная"
+
+#: synthetic.xml:3248(para)
+msgid ""
+"Rounding interpolation between the random values assigned to each point of "
+"the set. This means each Voronoi cell is filled with a constant random value."
+msgstr ""
+"Округляющая интерполяция между случайными величинами, присвоенными каждой "
+"точке множества. Это означает, что каждая ячейка Вороного заполнена "
+"постоянной случайной величиной."
+
+#: synthetic.xml:3257(guilabel)
+msgid "Random linear"
+msgstr "Случаная линейная"
+
+#: synthetic.xml:3260(para)
+msgid ""
+"Linear interpolation between the random values assigned to each point of the "
+"set. Thus the surface is continuous, with each Delaunay triangle "
+"corresponding to a facet."
+msgstr ""
+"Линейная интерполяция между случайными величинами, присвоенными каждой точке "
+"множества. Следовательно, поверхность является непрерывной и каждому "
+"треугольнику Делоне соответствует грань поверхности."
+
+#: synthetic.xml:3269(guilabel)
+msgid "Random bumpy"
+msgstr "Случайная выпуклая"
+
+#: synthetic.xml:3272(para)
+msgid ""
+"An interpolation similar to the previous one, but non-linear, creating "
+"relatively level areas around each point of the set."
+msgstr ""
+"Интерполяция похожа на предыдущую, но является нелинейной, создавая "
+"относительно ровные области вокруг каждой точки множества."
+
+#: synthetic.xml:3280(guilabel)
+msgid "Radial distance"
+msgstr "Радиальное расстояние"
+
+#: synthetic.xml:3283(para)
+msgid "Distance to the closest point of the set."
+msgstr "Расстояние до ближайшей точки множества."
+
+#: synthetic.xml:3290(guilabel)
+msgid "Segmented distance"
+msgstr "Сегментированное расстояние"
+
+#: synthetic.xml:3293(para)
+msgid ""
+"Distance to the closest Voronoi cell border, scaled in each cell segment so "
+"that the set point is in the same distance from all borders."
+msgstr ""
+"Расстояние до ближайшей границы ячейки Вороного, масштабированное в каждом "
+"сегменте ячейки таким образом, чтобы точка множества была равноудалена от "
+"всех границ."
+
+#: synthetic.xml:3302(guilabel)
+msgid "Segmented random"
+msgstr "Сегментированное случайное"
+
+#: synthetic.xml:3305(para)
+msgid ""
+"The same quantity as segmented distance, but multiplied by the radndom value "
+"assigned to the point of the set."
+msgstr ""
+"Та же величина, что и сегментированное расстояние, но умноженная на "
+"случайное значение, присвоенное точке множества."
+
+#: synthetic.xml:3313(guilabel)
+msgid "Border distance"
+msgstr "Расстояние до границы"
+
+#: synthetic.xml:3316(para)
+msgid "Distance to the closest Voronoi cell border."
+msgstr "Расстояние до ближайшей границы ячейки Вороного."
+
+#: synthetic.xml:3323(guilabel)
+msgid "Border random"
+msgstr "Случайное до границы"
+
+#: synthetic.xml:3326(para)
+msgid ""
+"The same quantity as border distance, but multiplied by the radndom value "
+"assigned to the point of the set."
+msgstr ""
+"Та же величина, что и расстояние до границы, но умноженная на случайную "
+"величину, присвоенную точке множества."
+
+#: synthetic.xml:3334(guilabel)
+msgid "Second nearest distance"
+msgstr "Расстояние до второго ближайшего"
+
+#: synthetic.xml:3337(para)
+msgid "Distance to the second nearest point of the set."
+msgstr "Расстояние до второй ближайшей точки множества."
+
+#: synthetic.xml:3348(caption)
+msgid ""
+"Artificial lattice surfaces: faceted surface created by random linear "
+"interpolation (left); bumps in a distorted triangular pattern (centre); "
+"distorted rectangular pattern with segments separated by trenches (right)."
+msgstr ""
+"Искусственные решетчатые поверхности: граненная поверхность, создаваемая "
+"случайной линейной интерполяцией (слева); бугры на искаженной треугольной "
+"текстуре (по центру); искаженная прямоугольная текстура с сегментами, "
+"разделёнными бороздами (справа)."
+
+#: synthetic.xml:3359(title)
+msgid "Brownian <gwy:icon name=\"synthetic_brownian_motion\"/>"
+msgstr "Броуновский <gwy:icon name=\"synthetic_brownian_motion\"/>"
+
+#: synthetic.xml:3362(para)
+msgid ""
+"The module generates, among other things, surfaces with profiles similar to "
+"samples of fractional Brownian motion. The construction method is, however, "
+"not very sophisticated. Starting from corners of the image, interior points "
+"are recursively linearly interpolated along the horizontal and vertical "
+"axes, adding noise that scales with distance according to the given Hurst "
+"exponent. Some of the surfaces are essentially the same as those generated "
+"using <link linkend=\"spectral-synthesis\">spectral synthesis</link>, "
+"however, constructing them in the direct space instead of frequency space "
+"allows different modifications of their properties."
+msgstr ""
+"Этот модуль генерирует, помимо других вещей, поверхности с профилями, "
+"подобными дробному броуновскому движению. Метод создания, однако, не очень "
+"сложен. Начиная от углов изображения, внутренние точки рекурсивно линейно "
+"интерполируются вдоль горизонтальной и вертикальной осей, добавляя шум, "
+"который масштабируется с расстоянием согласно заданной экспоненте Хёрста. "
+"Некоторые из поверхностей окажутся такими же, как генерирует <link linkend="
+"\"spectral-synthesis\">спектральный синтез</link>, однако, создание их в "
+"линейном пространстве, а не в пространстве частот, позволяет менять их "
+"различные свойства."
+
+#: synthetic.xml:3374(para) synthetic.xml:3480(para) synthetic.xml:3550(para)
+msgid "The generator has the following parameters:"
+msgstr "Генератор настраивается нижеследующими параметрами:"
+
+#: synthetic.xml:3380(guilabel)
+msgid "Hurst exponent"
+msgstr "Экспонента Хёрста"
+
+#: synthetic.xml:3383(para)
+msgid ""
+"The design Hurst exponent <include href=\"eqi-H.xml\"/>. For the normal "
+"values between 0 and 1, the square root of <link linkend=\"height-height-"
+"correlation-1d\">height-height correlation function</link> grows as <include "
+"href=\"eqi-H.xml\"/>-th power of the distance. The construction algorithm "
+"permits formally even negative values beause it stops at the finite "
+"resolution of one pixel."
+msgstr ""
+"Экспонента Хёрста <include href=\"eqi-H.xml\"/>. Для нормальных значений "
+"между 0 и 1, квадратный корень из <link linkend=\"height-height-"
+"correlation-1d\">функции корреляции высота-высота</link> растёт как <include "
+"href=\"eqi-H.xml\"/>-тая степень расстояния. Алгоритм создания позволяет "
+"использовать даже отрицательные значения, поскольку он останавливается при "
+"конечном разрешении в один пиксель."
+
+#: synthetic.xml:3396(guilabel)
+msgid "Stationarity scale"
+msgstr "Масштаб стационарности"
+
+#: synthetic.xml:3399(para)
+msgid ""
+"Scale at which stationarity is enforced (note Fractional Brownian motion is "
+"not a stationary). When this scale is comparable to the image size or "
+"larger, it has little effect. However, when it is small the image becomes "
+"<quote>homogeneised</quote> instead of self-similar above this scale."
+msgstr ""
+"Масштаб, на котором принудительно реализуется стационарность (следует "
+"заметить, что дробное броуновское движение не является стационарным). Когда "
+"этот масштаб сравним с размером изображения или больше, он оказывает немного "
+"влияния. Однако, когда он мал, изображение становится <quote>усреднённым</"
+"quote> вместо самоподобия выше этого масштаба."
+
+#: synthetic.xml:3413(para)
+msgid ""
+"Distribution of the noise added during the generation. Uniform and Gaussian "
+"result in essentially the same surfaces (statistically); the former is "
+"faster though. More heavy-tailed distributions, i.e. exponential and "
+"especially power, lead to prominent peaks and valleys."
+msgstr ""
+"Распределение шума, добавленного при генерации. Равномерный и гауссов "
+"приводят в общем случае к одинаковым поверхностям (статистически); первый, "
+"однако, является более быстрым. Более тяжелые в хвосте распределения, т.е. "
+"экспоненциальное и особенно степенное, приводят к ярко выраженным пикам и "
+"впадинам."
+
+#: synthetic.xml:3427(para)
+msgid ""
+"Power <include href=\"eqi-alpha.xml\"/> for the power distribution. The "
+"probability density function is proportional to <include href=\"eq-fBm-power-"
+"pdf.xml\"/>"
+msgstr ""
+"Степень <include href=\"eqi-alpha.xml\"/> степенного распределения. Функция "
+"плотности вероятности пропорциональна <include href=\"eq-fBm-power-pdf.xml\"/"
+">"
+
+#: synthetic.xml:3439(para)
+msgid ""
+"The root mean square value of the heights (or of the differences from the "
+"mean plane which, however, always is the <include href=\"eqi-z-is-0.xml\"/> "
+"plane). Note this value applies to the specific generated image, not the "
+"process as such, which does not have finite RMS. Button <guilabel>Like "
+"Current Image</guilabel> sets the RMS value to that of the current image."
+msgstr ""
+"Среднеквадратичное значение высот (или отличий от средней плоскости, "
+"которая, однако, всегда является плоскостью <include href=\"eqi-z-is-0.xml\"/"
+">). Следует отметить, что это значение применяется к данному генерируемому "
+"изображению, не процессу как таковому, который не имеет конечного "
+"среднеквадратичного отклонения. Кнопка <guilabel>Как у текущего изображения</"
+"guilabel> устанавливает значение среднеквадратичного отклонения равным ему "
+"же для текущего изображения."
+
+#: synthetic.xml:3456(caption)
+msgid ""
+"Artificial Brownian surfaces: classic surface generated with H about 0.7 "
+"(left); nebula-like image generated with a heavy-tailed power distribution "
+"(centre); the effect of small stationarity scale (right)."
+msgstr ""
+"Искусственные броуновские  поверхности: классическая поверхность, созданная "
+"с H порядка 0,7 (слева); похожее на туманность изображение, сгенерированное "
+"с помощью степенного распределения с большой интенсивностью в хвосте (по "
+"центру); влияние малого масштаба стационарности (справа)."
+
+#: synthetic.xml:3467(title)
+msgid "Phases <gwy:icon name=\"synthetic_phases\"/>"
+msgstr "Фазы <gwy:icon name=\"synthetic_phases\"/>"
+
+#: synthetic.xml:3470(para)
+msgid ""
+"The module creates data somewhat resembling magnetic domain structures that "
+"have been studied by magnetic force microscopy (MFM). Unlike more physically "
+"correct but very computationally expensive approaches, it works by spectral "
+"synthesis of a surface with a limited range of spatial frequencies, and then "
+"application of morphological operations to obtain a two-phase image. The "
+"output image thus mostly contains of two values representing the two phases, "
+"although occasionally a middle <quote>in transition</quote> value can appear."
+msgstr ""
+"Модуль создаёт данные несколько напоминающие структуру магнитных доменов, "
+"изучаемых магнитно-силовой микроскопией (МСМ) или структуру полимеров в "
+"органических солнечных батареях, изучаемую каким-либо видом контрастирования "
+"состава (ИК, КР, силовые кривые). В отличие от более физически правильных, "
+"но требующих больших вычислительных ресурсов подходов, данный работает на "
+"основе спектрального синтеза поверхности с ограниченным набором "
+"пространственных частот и последующем применении морфологических операций "
+"для получения изображений двух фаз. Выходное изображение в данном методе в "
+"основном состоит из двух значений, соответствующих двум фазам, хотя иногда "
+"может появляться промежуточное <quote>переходное</quote> значение."
+
+#: synthetic.xml:3489(para)
+msgid "Typical width of the stripe."
+msgstr "Типичная ширина полосы."
+
+#: synthetic.xml:3496(guilabel)
+msgid "Size spread"
+msgstr "Разброс размеров"
+
+#: synthetic.xml:3499(para)
+msgid ""
+"Spread of sizes (or, more precisely, spatial frequencies). Small spread "
+"means smooth regular features. However, for very small spread values "
+"preferred directions may appear in the image (it becomes anisotropic) due to "
+"the exhaustion of allowed spatial frequencies. Large spread means less "
+"regular phase boundaries and also more in-transition regions."
+msgstr ""
+"Разброс размеров (или. точнее, пространственных частот). Малый разброс "
+"означает гладкие правильные элементы структуры. Однако, для очень малых "
+"значений разброса на изображении могут появиться предпочтительные "
+"направления (и оно станет анизотропным) вследствие исчерпания набора "
+"допустимых пространственных частот. Большой разброс означает менее "
+"правильные границы раздела фаз и большее количество переходных областей."
+
+#: synthetic.xml:3514(para)
+msgid ""
+"The difference between the values corresponding to the two phases, "
+"determining overall <include href=\"eqi-z.xml\"/>-scale of the image."
+msgstr ""
+"Различие в значениях соответствующих двум различным фазам, определяет общий "
+"масштаб изображения по <include href=\"eqi-z.xml\"/>."
+
+#: synthetic.xml:3527(caption)
+msgid ""
+"Artificial two-phase images: small size spread (left); larger size spread "
+"(right)."
+msgstr ""
+"Искусственные изображения двух фаз: малый разброс размеров (слева); больший "
+"разброс размеров (справа)."
+
+#: synthetic.xml:3536(title)
+msgid "Discs <gwy:icon name=\"synthetic_discs\"/>"
+msgstr "Диски <gwy:icon name=\"synthetic_discs\"/>"
+
+#: synthetic.xml:3539(para)
+msgid ""
+"The module creates data consisting of non-overlapping discs, possibly post-"
+"processed to form a surface covered by tiles. A similar result can be also "
+"achieved with <link linkend=\"object-synthesis\">Objects</link> when "
+"<guilabel>Avoid stacking</guilabel> is enabled. However, in this case the "
+"only a few seed discs are placed randomly, the remaining ones are always "
+"placed to the middle of the largest remaining empty space. This results in a "
+"more uniform distribution of sizes. Furthermore, the transformation to tiles "
+"creates structures where typically three tiles meet at angles close to 120 "
+"degrees, similarly to foam structures."
+msgstr ""
+"Модуль создаёт данные, состоящие из непересекающихся дисков, возможно "
+"постобработанных таким образом, чтобы образовать поверхность, покрытую "
+"черепицей (мозаичной текстурой). Подобного результата можно также достичь "
+"используя синтез <link linkend=\"object-synthesis\">Объектов</link> если "
+"включена опция <guilabel>Избегать наложения</guilabel>. Однако, в данном "
+"случае, только несколько затравочных дисков расположены случайным образом, "
+"остальные всегда помещаются в центр самого большого оставшегося пустого "
+"пространства. Это приводит к более равномерному распределению размеров. "
+"Более того, преобразование в черепицу создаёт структуру, где обычно три "
+"объекта встречаются под углами близкими к 120 градусам, подобно пенистым "
+"структурам."
+
+#: synthetic.xml:3556(guilabel)
+msgid "Starting radius"
+msgstr "Начальный радиус"
+
+#: synthetic.xml:3559(para)
+msgid "Radius of the seed discs placed randomly at the beginnig."
+msgstr "Радиус диска-затравки, случайно размещаемого в начале."
+
+#: synthetic.xml:3566(guilabel)
+msgid "Minimum radius"
+msgstr "Минимальный радиус"
+
+#: synthetic.xml:3569(para)
+msgid ""
+"The minimum allowed radius of all other discs. When there is no space for a "
+"disc of at least this size, the generation stop."
+msgstr ""
+"Минимально допустимый радиус всех остальных дисков. Когда не остаётся места "
+"для диска хотя бы такого размера, генерация останавливается."
+
+#: synthetic.xml:3577(guilabel)
+msgid "Separation"
+msgstr "Зазор"
+
+#: synthetic.xml:3580(para)
+msgid ""
+"Additional separation from neighbour discs. While <guilabel>Minimum radius</"
+"guilabel> detemines the minimum size of the actually placed dics, this "
+"parameter increases the minimum size of free space allowing placement."
+msgstr ""
+"Дополнительный отступ от соседних дисков. В то время, как "
+"<guilabel>Минимальный радиус</guilabel> задаёт минимальный размер "
+"действительно размещаемых дисков, этот параметр увеличивает минимальный "
+"размер свободного пространства, куда можно поместить диск."
+
+#: synthetic.xml:3590(guilabel)
+msgid "Transform to tiles"
+msgstr "Преобразовать в мозаику"
+
+#: synthetic.xml:3593(para)
+msgid ""
+"When enabled, all discs are expanded until they would touch their "
+"neighbours. The surface becomes tiles, with thin gaps between tiles."
+msgstr ""
+"Если включено, все диски расширяются до того момента, как они начнут "
+"касаться своих соседей. Поверхность становится мозаичной, с тонкими зазорами "
+"между отдельными фрагментами."
+
+#: synthetic.xml:3602(guilabel)
+msgid "Gap thickness"
+msgstr "Толщина зазора"
+
+#: synthetic.xml:3605(para)
+msgid "Width of gaps between tiles after the tile transformation."
+msgstr "Ширина зазора между элементами мозаики после преобразования."
+
+#: synthetic.xml:3612(guilabel)
+msgid "Apply opening filter"
+msgstr "Применить фильтр размыкания"
+
+#: synthetic.xml:3615(para)
+msgid ""
+"When enabled, the tiling is further post-processed using <link linkend="
+"\"maskops-opening\">opening filter</link> of given size. This removes too "
+"small tiles and makes the remaning ones rounder."
+msgstr ""
+"Если включено, мозаичное покрытие затем подвергается обработке <link linkend="
+"\"maskops-opening\">фильтра размыкания</link> заданного размера. Этот "
+"процесс убирает слишком маленькие детали и делает оставшиеся более округлыми."
+
+#: synthetic.xml:3628(para)
+msgid "Size of the opening filter."
+msgstr "Размер фильтра размыкания."
+
+#: synthetic.xml:3638(para)
+msgid ""
+"The height of discs or tiles with respect to the base, determining overall "
+"<include href=\"eqi-z.xml\"/>-scale of the image. Heights of individual "
+"features will be spread around this value when <guilabel>Variance</guilabel> "
+"is non-zero."
+msgstr ""
+"Высота дисков или мозаики по отношению к базовому уровню, определяет общий "
+"масштаб оси <include href=\"eqi-z.xml\"/> изображения. Высоты отдельных "
+"особенностей будут распределены вокруг этого значения когда параметр "
+"<guilabel>Разброс</guilabel> ненулевой."
+
+#: synthetic.xml:3652(caption)
+msgid ""
+"Artificial disc images: round discs with some height distribution (left); "
+"transformation to tiles (centre); erosion by opening filter (right)."
+msgstr ""
+"Изображения искусственных дисков: круглые диски с некоторым распределением "
+"высоты (слева); преобразование в мозаику (по центру); эрозия фильтром "
+"размыкания (справа)."
+
+#: synthetic.xml:3662(title)
+msgid "Dunes <gwy:icon name=\"synthetic_dunes\"/>"
+msgstr "Дюны <gwy:icon name=\"synthetic_dunes\"/>"
+
+#: synthetic.xml:3665(para)
+msgid ""
+"The module is based on a simple simulation of formation of eolian dunes "
+"[<link linkend=\"synthetic-ref-3\">3</link>]. Particles can be picked up by "
+"wind with a certain probability, transferred along the wind direction and "
+"deposited in another location. The function has the following parameters:"
+msgstr ""
+"Модуль основан на простом моделировании формирования ветровых дюн [<link "
+"linkend=\"synthetic-ref-3\">3</link>]. Частицы могут быть подхвачены ветром "
+"с определенной вероятностью, перенесены вдоль направления ветра и осесть в "
+"новом месте. Функция имеет следующие параметры:"
+
+#: synthetic.xml:3677(para)
+msgid "The average number of particles per one pixel."
+msgstr "Среднее число частиц на единичный пиксель."
+
+#: synthetic.xml:3687(para)
+msgid ""
+"One iteration correspond to wind picking up randomly one particle in each "
+"pixel and deposting it elsewhere. However, the pixels are chosen randomly. "
+"Some locations may be chosen multiple times in one iteraton, others not at "
+"all. Some selected locations may also be bare bedrock with no sand particle "
+"to pick up."
+msgstr ""
+"Одна итерация соответствует тому, что ветер подхватывает одну случайную "
+"частицу в каждом пикселе и она осаждается где-то ещё. Однако, пиксели при "
+"этом выбираются случайно. Некоторые места могут быть выбраны несколько раз в "
+"ходе одной итерации, другие ни разу. Некоторые из выбранных мест могут быть "
+"голой скалой-основанием на которой нет песчаных частиц чтобы их подхватить."
+
+#: synthetic.xml:3697(term)
+msgid "<guilabel>Direction</guilabel> and <guilabel>Spread</guilabel>"
+msgstr "<guilabel>Направление</guilabel> и <guilabel>Разброс</guilabel>"
+
+#: synthetic.xml:3701(para)
+msgid ""
+"The mean wind direction and wind direction spread. Small spread means the "
+"wind direction is consistent. Large values mean more random wind direction."
+msgstr ""
+"Среднее направление ветра и разброс этого направления. Малый разброс "
+"соответствует случаю, когда направление ветра постоянно. Большие значения "
+"соответствуют более случайному направлению ветра."
+
+#: synthetic.xml:3709(term)
+msgid "<guilabel>Minimum step</guilabel> and <guilabel>Step range</guilabel>"
+msgstr ""
+"<guilabel>Минимальный шаг</guilabel> и <guilabel>Диапазон шагов</guilabel>"
+
+#: synthetic.xml:3713(para)
+msgid ""
+"The sand particle can be imagined as only touching the surface occasionally "
+"and being carried by the wind high above it between. It can only be "
+"deposited when it touches the surface. The minimum step is the minimum "
+"distance (in pixels) of one such jump; the range gives the interval (again "
+"in pixels) from minimum to maximum jump length."
+msgstr ""
+"Песчаная частица может считаться касающейся поверхности временами и "
+"переносимой ветром высоко над поверхностью между касаниями. Она может осесть "
+"на поверхность когда она касается её. Минимальный шаг это минимальное "
+"расстояние (в пикселях) одного такого скачка; диапазон задаёт интервал "
+"(снова в пикселях) между минимальной и максимальной длиной прыжка."
+
+#: synthetic.xml:3724(guilabel)
+msgid "Stickng probability on rock"
+msgstr "Вероятность прилипания на скалах"
+
+#: synthetic.xml:3727(para)
+msgid ""
+"The probability the particle is deposited when it touches the bare bedrock."
+msgstr ""
+"Вероятность частицы осесть на поверхность когда она касается голой скалы."
+
+#: synthetic.xml:3734(guilabel)
+msgid "Stickng probability on sand"
+msgstr "Вероятность прилипания на песке"
+
+#: synthetic.xml:3737(para)
+msgid ""
+"The probability the particle is deposited when it touches the surface and "
+"there is already some sand. This probability should be generally higher than "
+"for bare rock."
+msgstr ""
+"Вероятность частицы осесть на поверхность когда она касается поверхности и "
+"там уже есть некоторое количество песка. Эта вероятность в общем случае "
+"должна быть выше, чем для голой скалы."
+
+#: synthetic.xml:3746(guilabel)
+msgid "Maximum slope"
+msgstr "Максимальный уклон"
+
+#: synthetic.xml:3749(para)
+msgid ""
+"When deposition of a particle (or picking up by wind) creates a too large "
+"height difference between neighbour pixels the sand becomes unstable. It "
+"then trickles down to either reduce the slopes of a hill for fill holes "
+"until the maximum slope is nowhere exceeded."
+msgstr ""
+"Когда осаждение частицы (или подхватывание её ветром) создаёт слишком "
+"большую разницу высоты между соседними пикселями песок становится "
+"нестабильным. Он после этого сползает вниз чтобы либо уменьшить высоту "
+"холма, либо заполнить впадины пока максимальный уклон нигде не будет "
+"превышен."
+
+#: synthetic.xml:3763(caption)
+msgid ""
+"Dune images: the default settings (left); long flat dunes with small maximum "
+"slope (centre); more isotropic dunes for highly random wind direction "
+"(right)."
+msgstr ""
+"Изображения дюн: с настройками по умолчанию (слева); длинные плоские дюны с "
+"небольшим максимальным уклоном (по центру); более изотропные дюны для "
+"направления ветра с высокой случайностью (справа)."
+
+#: synthetic.xml:3773(title)
+msgid "Plateaus <gwy:icon name=\"synthetic_plateaus\"/>"
+msgstr "Плато <gwy:icon name=\"synthetic_plateaus\"/>"
+
+#: synthetic.xml:3776(para)
+msgid ""
+"The surface is created by stacking flakes or plateaus on top of each other, "
+"starting from the largest and progressing to the smallest according to a "
+"scaling law. By default they do not overlap, but it can be enabled to allow "
+"overlapping flakes (a bit like those that might occur with 1D materials such "
+"as graphene). The generator has the following parameters:"
+msgstr ""
+"Поверхность создается наложением хлопьев или плато поверх друг друга, "
+"начиная с наибольшего и двигаясь к меньшему в соответствии с законом "
+"масштабирования. По умолчанию они не пересекаются, но можно включить режим "
+"наложения хлопьев (немного похоже на то, как происходит с одномерными "
+"материалами по типу графена). Генератор использует следующий набор "
+"параметров:"
+
+#: synthetic.xml:3786(guilabel)
+msgid "Maximum size"
+msgstr "Максимальный размер"
+
+#: synthetic.xml:3789(para)
+msgid "The approximate maximum radius of a plateau."
+msgstr "Приблизительный максимальный радиус плато."
+
+#: synthetic.xml:3796(guilabel)
+msgid "Minimum size"
+msgstr "Минимальный размер"
+
+#: synthetic.xml:3799(para)
+msgid "The approximate minimum radius of a plateau."
+msgstr "Приблизительный минимальный радиус плато."
+
+#: synthetic.xml:3806(guilabel)
+msgid "Size power law"
+msgstr "Степенной закон размера"
+
+#: synthetic.xml:3809(para)
+msgid ""
+"How fast the plateau size radius decreases with the increasing number of "
+"plateaus already there. High values mean the size decreases quickly and "
+"plateaus tend to be sparse and isolated. Low values mean the size decreases "
+"slowly and plateaus ten to be dense and stacked high."
+msgstr ""
+"Насколько быстро радиус плато уменьшается с увеличением количества уже "
+"помещенных плато. Большие значения означают то, что размер быстро убывает и "
+"плато имеют тенденцию быть редкими и изолированными. Малые значения означают "
+"что размер убывает медленно и плато имеют тенденцию быть плотными и "
+"складываться в высокие структуры."
+
+#: synthetic.xml:3815(warning)
+msgid ""
+"It may be difficult, or even impossible, to find positions for all the "
+"plateaus with given the maximum and minimum size and scaling power. Low "
+"powers are only useful with narrow size ranges. Otherwise the surface "
+"generation can be extremely slow – or even never finish at all."
+msgstr ""
+"Может быть сложно, или даже невозможно, найти положения всех плато с "
+"заданным максимальным и минимальным размером и степенью масштабирования. "
+"Низкие степени полезны только с узкими диапазонами размеров. В противном "
+"случае генератор поверхности будет очень медленным или вообще никогда не "
+"закончит работать."
+
+#: synthetic.xml:3826(guilabel)
+msgid "Shape irregularity"
+msgstr "Неправильность формы"
+
+#: synthetic.xml:3829(para)
+msgid "How much the shapes can differ from symmetrical discs."
+msgstr "Насколько сильно формы могут отклоняться от симметричных дисков."
+
+#: synthetic.xml:3836(guilabel)
+msgid "Overlap fraction"
+msgstr "Степень пересечения"
+
+#: synthetic.xml:3839(para)
+msgid "Approximate fraction of plateaus that overlap with another plateau."
+msgstr ""
+"Приблизительная доля плато, которые будут пересекаться с другими плато."
+
+#: synthetic.xml:3846(guilabel)
+msgid "Scale with power of size"
+msgstr "Масштабируется со степенью размера"
+
+#: synthetic.xml:3849(para)
+msgid ""
+"The power with which plateau height scales with its radius. For the default "
+"power of 0 all pleateaus have the same height (apart from possible random "
+"spread). Positive powers mean the height decreases as the size decreased. "
+"Negative powers mean smaller plateaus are taller, creating a spiky surface."
+msgstr ""
+"Степень, с которой высота плато масштабируется с его размером. Для заданной "
+"по умолчанию степени 0 все плато будут иметь одинаковую высоту (за "
+"исключением возможного случайного разброса). Положительные степени означают, "
+"что высота уменьшается с уменьшением размера. Отрицательные степени "
+"означают, что более маленькие плато будут выше, создавая поверхность с "
+"пиками."
+
+#: synthetic.xml:3864(caption)
+msgid ""
+"Plateau images: the default settings (left); approximately self-affine "
+"surface with small scaling power and minimum size (centre); somewhat "
+"overlapping irregular flakes (right)."
+msgstr ""
+"Изображения плато: с настройками по умолчанию (слева); приблизительно "
+"самоаффинная поверхность с небольшой степенью масштабирования и минимальным "
+"размером (по центру); несколько пересекающиеся хлопья неправильной формы "
+"(справа)."
+
+#: synthetic.xml:3874(title)
+msgid "Wetting"
+msgstr "Смачивание"
+
+#: synthetic.xml:3877(para)
+msgid ""
+"Wetting is a simple simulation of wetting front progressing through a random "
+"medium. The medium is represented as a voxel grid, where each voxel has a "
+"different resistance. The liquid always propagates to the least resistant "
+"voxel. The generator produces isotropic patterns with discrete heights "
+"corresponding to the levels to which the wetting front have progressed. It "
+"has a couple of parameters:"
+msgstr ""
+"Смачивание это простое моделирование движения границы смачивания через "
+"случайную среду. Среда представлена сеткой вокселей, где каждый воксель "
+"имеет разное сопротивление. Жидкость всегда распространяется через воксель с "
+"минимальным сопротивлением. Генератор создает изотропные текстуры с "
+"дискретной высотой, соответствующей уровням, до которых дошел фронт "
+"смачивания. Генератор имеет следующий набор параметров:"
+
+#: synthetic.xml:3891(para)
+msgid ""
+"The average number of times the liquid is propagated per pixel. The "
+"resulting image shows only the farthest points, so its average value is not "
+"in a simple relation to coverage."
+msgstr ""
+"Среднее количество раз, которое жидкость проходит через пиксель. "
+"Результирующее изображение показывает только наиболее дальние точки, таким "
+"образом его среднее значение не связано напрямую с покрытием."
+
+#: synthetic.xml:3900(guilabel)
+msgid "Diffusion"
+msgstr "Диффузия"
+
+#: synthetic.xml:3903(para)
+msgid ""
+"The probability of random propagation from neighbour voxels, not according "
+"to the resistance based priority. Note that the value is logarithmic."
+msgstr ""
+"Вероятность случайного распространения с соседних вокселей, не связанное с "
+"приоритетом основанным на сопротивлении. Следует отметить, что значение "
+"является логарифмическим."
+
+#: synthetic.xml:3916(caption)
+msgid ""
+"Wetting front images: a typical result with moderate coverage (left); "
+"initial stage of propagation (right)."
+msgstr ""
+"Изображения фронта смачивания: типичный результат с умеренным покрытием "
+"(слева); начальная стадия распространения (справа)."
+
+#: synthetic.xml:3925(title)
+msgid "References"
+msgstr "Ссылки"
+
+#: synthetic.xml:3926(para)
+msgid ""
+"[1] D. Nečas, P. Klapetek: Synthetic Data in Quantitative Scanning Probe "
+"Microscopy. Nanomaterials 11 (2021) 1746 <ulink url=\"http://dx.doi."
+"org/10.3390/nano11071746\">10.3390/nano11071746</ulink>"
+msgstr ""
+"[1] D. Nečas, P. Klapetek: Synthetic Data in Quantitative Scanning Probe "
+"Microscopy. Nanomaterials 11 (2021) 1746 <ulink url=\"http://dx.doi."
+"org/10.3390/nano11071746\">10.3390/nano11071746</ulink>"
+
+#: synthetic.xml:3931(para)
+msgid ""
+"[2] L. M. Pismen, M. I. Monine, G. V. Tchernikov: Patterns and localized "
+"structures in a hybrid non-equilibrium Ising model. Physica D 199 (2004) 82, "
+"<ulink url=\"http://dx.doi.org/10.1016/j.physd.2004.08.006\">doi:10.1016/j."
+"physd.2004.08.006</ulink>"
+msgstr ""
+"[2] L. M. Pismen, M. I. Monine, G. V. Tchernikov: Patterns and localized "
+"structures in a hybrid non-equilibrium Ising model. Physica D 199 (2004) 82, "
+"<ulink url=\"http://dx.doi.org/10.1016/j.physd.2004.08.006\">doi:10.1016/j."
+"physd.2004.08.006</ulink>"
+
+#: synthetic.xml:3937(para)
+msgid ""
+"[3] B. T. Werner: Eolian dunes: Computer simulations and attractor "
+"interpretation. Geology 23 (1995) 1107, <ulink url=\"http://dx.doi."
+"org/10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3."
+"CO;2\">doi:10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3.CO;2</ulink>"
+msgstr ""
+"[3] B. T. Werner: Eolian dunes: Computer simulations and attractor "
+"interpretation. Geology 23 (1995) 1107, <ulink url=\"http://dx.doi."
+"org/10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3."
+"CO;2\">doi:10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3.CO;2</ulink>"
+
+#~ msgid ""
+#~ "The shape (type) of placed objects. At present the possibilities include "
+#~ "half-spheres, boxes, pyramids, tetrahedrons and some more weird shapes."
+#~ msgstr ""
+#~ "Форма (вид) помещаемых объектов. В настоящее время можно использовать "
+#~ "полусферы, коробки, пирамиды, тетраэдры и некоторые более странные формы."
+
+#~ msgid "Holes"
+#~ msgstr "Отверстия"
+
+#~ msgid ""
+#~ "Artificial pattern surfaces: sharp steps oriented at 30 deg, deformed "
+#~ "with a deformation with a large autocorrelation length (left); non-"
+#~ "uniformly spaced ridges with moderate slopes between the top and bottom "
+#~ "planes, deformed with a deformation with a small autocorrelation length "
+#~ "(centre left); unperturbed pattern of rounded holes with a large "
+#~ "variation in size and depth (centre right); and somewhat offset and "
+#~ "deformed amphitheatre pattern (right)."
+#~ msgstr ""
+#~ "Искусственные структуры поверхностей: острые ступени под углом 30 "
+#~ "градусов, искаженные деформацией с большой длиной автокорреляции (слева); "
+#~ "неравномерно разбросанные борозды с умеренными уклонами между верхней и "
+#~ "нижней плоскостями, искаженные деформацией с малой длиной автокорреляции "
+#~ "(по центру слева); неискаженный шаблон скруглённых отверстий с большим "
+#~ "разбросом размеров и глубины 9по центру справа); и несколько смещенная и "
+#~ "деформированная структура в форме амфитеатра (справа)."
+
+#~ msgid ""
+#~ "Enabling <guilabel>Scales with size</guilabel> makes unperturbed heights "
+#~ "to scale proportionally with object size. Otherwise the height is "
+#~ "independent on size."
+#~ msgstr ""
+#~ "Выбор опции <guilabel>Масштабируется с размером</guilabel> заставляет "
+#~ "невозмущённые высоты масштабироваться пропорционально размеру объекта. В "
+#~ "противном случае высота не зависит от размера."
+
+#~ msgid ""
+#~ "[1] L. M. Pismen, M. I. Monine, G. V. Tchernikov: Physica D, (2004) 199 p "
+#~ "82"
+#~ msgstr ""
+#~ "[1] L. M. Pismen, M. I. Monine, G. V. Tchernikov: Physica D, (2004) 199 p "
+#~ "82"
+
+#~ msgid "Coerce <gwy:icon name=\"enforce_distribution\"/>"
+#~ msgstr "Задать статистику <gwy:icon name=\"enforce_distribution\"/>"
+
+#~ msgid ""
+#~ "The module transforms the values in a height field to enforce certain "
+#~ "prescribed statistical properties. The distribution of values can be "
+#~ "transformed to Gaussian, with mean value and rms roughness preserved, or "
+#~ "uniform, with minimum and maximum value preserved. It is also possible to "
+#~ "enforce the same distribution as another height field selected as "
+#~ "<guilabel>Template</guilabel>."
+#~ msgstr ""
+#~ "Этот модуль преобразует значения в поле данных таким образом, чтобы "
+#~ "установить некоторые заданные статистические свойства. Распределение "
+#~ "значений может быть преобразовано в гауссово, с сохранением среднего "
+#~ "значения и среднеквадратичной шероховатости, или равномерное, с "
+#~ "сохранением минимального и максимального значения. Также можно установить "
+#~ "такое же распределение, как у другого поля данных, выбранного в качестве "
+#~ "<guilabel>шаблона</guilabel>."
+
+#~ msgid ""
+#~ "The transformation preserves the ordering of the values, i.e. if one "
+#~ "point is higher than another before the transformation it will be also "
+#~ "higher after the transformation. Option <guilabel>Data processing</"
+#~ "guilabel> controls whether the transformation is applied to the image as "
+#~ "a whole (<guilabel>Entire image</guilabel>) or each row separately, with "
+#~ "the same distribution (<guilabel>By row (identically)</guilabel>). Note "
+#~ "that in the latter case if a template is selected each row of the "
+#~ "transformed image will have the same value distribution (approximately) "
+#~ "as the template."
+#~ msgstr ""
+#~ "Преобразование сохраняет порядок значений, т.е. если некоторая точка была "
+#~ "выше другой до преобразования, она также будет выше после него. Опция "
+#~ "<guilabel>обработка данных</guilabel> управляет тем, будет ли "
+#~ "преобразование применяться к изображению целиком (<guilabel>Всё "
+#~ "изображение</guilabel>) или к каждой строке отдельно, с одинаковым "
+#~ "распределением (<guilabel>По строкам (одинаково)</guilabel>). Следует "
+#~ "отметить, что если в последнем случае выбран шаблон для распределения, то "
+#~ "каждая строка преобразованного изображения будет иметь (примерно) такое "
+#~ "же распределение значений как шаблон."
+
+#~ msgid ""
+#~ "In addition, a different kind of transformation can be performed, "
+#~ "discretisation of the values into given number of levels. This operation "
+#~ "is selected with <guilabel>Discrete levels</guilabel>. There are two "
+#~ "different discretisations available, either the height levels are "
+#~ "equidistant from minimum to maximum value (<guilabel>Uniform</guilabel>) "
+#~ "or they are calculated so that after the transformation each level will "
+#~ "consist of approximately the same number of pixels (<guilabel>Same area</"
+#~ "guilabel>)."
+#~ msgstr ""
+#~ "В дополнение можно проводить другой тип преобразования, дискретизацию "
+#~ "значений на заданное количество уровней. Эта операция выбирается с "
+#~ "помощью опции <guilabel>Дискретные уровни</guilabel>. Доступны два "
+#~ "различных типа дискретизации, либо уровни высоты равноудалены от "
+#~ "минимального и максимального значения (<guilabel>Равномерное</guilabel>), "
+#~ "либо они рассчитываются таким образом, чтобы после преобразования каждый "
+#~ "уровень состоял из примерно одинакового количества пикселей "
+#~ "(<guilabel>Одинаковая площадь</guilabel>)."
+
+#~ msgid ""
+#~ "Two basic line defect types are available: steps and scars. Steps "
+#~ "represent abrupt changes in the value that continue to the end of the "
+#~ "scan (or until another step occurs). Scars are local changes of the value "
+#~ "with a finite duration, i.e. the values return to the original level "
+#~ "after some time. Ridges are similar but on a larger scale: they can span "
+#~ "several scan lines."
+#~ msgstr ""
+#~ "Доступны два основных типа линейных дефектов: ступеньки и царапины. "
+#~ "Ступеньки представляют собой резкие изменения значения, которые "
+#~ "продолжаются до конца скана (или пока не встретится новая ступенька). "
+#~ "Царапины — изменения значений с конечной длительностью, т.е. значения "
+#~ "возвращаются к исходным спустя какое-то время. Гребни представляют собой "
+#~ "то же самое, но в большем масштабе: они могут тянуться несколько линий "
+#~ "скана."
+
+#~ msgid "Sphere"
+#~ msgstr "Сфера"
+
+#~ msgid ""
+#~ "The direction in which the surface is changed by adding objects. Options "
+#~ "<guilabel>Positive</guilabel> and <guilabel>Negative</guilabel> mean that "
+#~ "adding objects forms hills and pits, respectively. The direction can be "
+#~ "also chosen randomly, which corresponds to <guilabel>Both (random)</"
+#~ "guilabel>."
+#~ msgstr ""
+#~ "Направление, в котором меняется поверхность при добавлении объектов. "
+#~ "Опции <guilabel>Положительные</guilabel> и <guilabel>Отрицательные</"
+#~ "guilabel> означают, что добавление объектов формирует выступы и впадины, "
+#~ "соответственно. Направление также может выбираться случайно, что "
+#~ "соответствует варианту <guilabel>Оба (случайно)</guilabel>."
+
+#~ msgid ""
+#~ "The rotation of objects with respect to some base orientation, measured "
+#~ "anticlockwise."
+#~ msgstr ""
+#~ "Поворот объектов по отношению к определённой исходной ориентации, "
+#~ "измеренный против часовой стрелки."
+
+#~ msgid "Spectral"
+#~ msgstr "Спектральный"
+
+#~ msgid "Objects"
+#~ msgstr "Объекты"
+
+#~ msgid "Noise"
+#~ msgstr "Шум"
+
+#~ msgid "Line Noise"
+#~ msgstr "Линейный шум"
+
+#~ msgid "Pattern"
+#~ msgstr "Структура"
+
+#~ msgid "Ballistic deposition"
+#~ msgstr "Баллистическое осаждение"
+
+#~ msgid "Waves"
+#~ msgstr "Волны"
+
+#~ msgid "Domains"
+#~ msgstr "Домены"
+
+#~ msgid "Fibres"
+#~ msgstr "Волокна"
+
+#~ msgid "Brownian"
+#~ msgstr "Броуновский"
+
+#~ msgid "Phases"
+#~ msgstr "Фазы"
+
+#~ msgid "Coerce"
+#~ msgstr "Задать статистику"
+
+#~ msgid ""
+#~ "The continuous inhibitor field <include href=\"eqi-v.xml\"/> is governed "
+#~ "by a local differential equation coupled to the variable <include href="
+#~ "\"eqi-u.xml\"/>:"
+#~ msgstr ""
+#~ "Непрерывное поле ингибитора <include href=\"eqi-v.xml\"/> описывается "
+#~ "локальным дифференциальным уравнением, связанным с переменной <include "
+#~ "href=\"eqi-u.xml\"/>:"
+
+#~ msgid ""
+#~ "The wave synthesis method composes the image using interference of waves "
+#~ "from a number of point sources."
+#~ msgstr ""
+#~ "Метод синтеза волн генерирует изображение используя интерференцию волн от "
+#~ "набора точечных источников."
+
+#~ msgid "Controls common to all pattern types include:"
+#~ msgstr "Общие элементы управления для всех видов структур включают в себя:"
+
+#~ msgid "All generated surfaces are periodic (i.e. perfectly tilable)."
+#~ msgstr ""
+#~ "Все генерируемые поверхности являются периодическими (т.е. они идеально "
+#~ "складываются в мозаику)."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eq-mfm-surface-charge-Fourier.xml 23151 2021-02-13 09:13:08Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informalequation id='eq-mfm-surface-charge-Fourier'>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref='eq-mfm-surface-charge-Fourier.svg' format='SVG'/>
+    </imageobject>
+    <textobject role='tex'>
+      <phrase>
+<![CDATA[
+A_M(\vec{k}) = \int_{-\infty}^{\infty} \sigma(\vec{r})\e^{\im\vec{k}\vec{r}} \d \vec{r}
+]]>
+      </phrase>
+    </textobject>
+  </mediaobject>
+</informalequation>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: installation-compiling-msvc.xml 21607 2018-11-07 13:13:11Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="installation-compiling-msvc">
+  <title>Компиляция для MS Windows с использованием Microsoft Visual Studio</title>
+  <sect2 id="installation-compiling-msvc-installation">
+    <title>Установка всего необходимого</title>
+    <para>Набор всего необходимого для сборки с помощью Visual Studio можно скачать <ulink url="http://sourceforge.net/projects/gwyddion/files/gwyddion/2.43/Gwyddion-2.43-msvc.zip/download">отсюда</ulink>.</para>
+    <sect3 id="installation-compiling-msvc-installation-solution">
+      <title>Решение</title>
+      <para>Скопируйте каталог <literal>msvc2015</literal> в каталог исходного кода gwyddion (каталог <literal>/trunk/gwyddion</literal> в <literal>svn</literal>, в дальнейшем для простоты мы будем называть его просто <literal>gwyddion</literal>).</para>
+    </sect3>
+    <sect3 id="installation-compiling-msvc-installation-generated_files">
+      <title>Сгенерированные файлы</title>
+      <para>Скопируйте содержимое каталога <literal>generated-files</literal> в каталог <literal>gwyddion</literal></para>
+    </sect3>
+    <sect3 id="installation-compiling-msvc-installation-python">
+      <title>Python 2.7</title>
+      <para>Установите Python 2.7. Версия 2.7.11 не работает. Последняя стабильная версия Python 2.7.9. пакеты установки python находятся в каталоге <literal>libs-install</literal>. Установите их в каталоги <literal>C:\libs\Python\Win32</literal> и <literal>C:\libs\Python\x64</literal>. Из-за того, что файл <literal>python27_d.lib</literal> отсутствует, не получится связать проект с библиотекой отладки Python. Задание переменных <literal>MS_NO_COREDLL</literal>, <literal>Py_NO_ENABLE_SHARED</literal> и <literal>SWIG_PYTHON_INTERPRETER_NO_DEBUG</literal> в данном случае не помогает.</para>
+      <sect4 id="installation-compiling-msvc-installation-python-resolution">
+        <title>Как исправить:</title>
+          <itemizedlist>
+            <listitem>скопируйте <literal>python27.lib</literal> в каталог <literal>python27_d.lib</literal></listitem>
+            <listitem>в <literal>pyconfig.h</literal> закомментируйте <literal>define Py_DEBUG</literal></listitem>
+          </itemizedlist>
+          <para><literal>python27_d.lib</literal> и <literal>pyconfig.h</literal> находятся в каталоге <literal>libs\Python27</literal> поэтому их можно просто скопировать в каталог <literal>C:\libs\Python27</literal>.</para>
+      </sect4>
+    </sect3>
+    <sect3 id="installation-compiling-msvc-installation-libraries">
+      <title>Библиотеки</title>
+      <para><command>Gwyddion</command> зависит от внешних библиотек. Необходимо установить пути к библиотекам как переменные окружения среды. Пути должны заканчиваться символом обратной косой черты '\'. Стабильные версии этих библиотек находятся в каталоге <literal>libs</literal>. Пример установки переменных окружения приведён ниже:</para>
+      <programlisting><![CDATA[
+CFITSIO_DIR = C:\libs\cfitsio\
+GTK_DIR = C:\libs\Gtk\
+GTKGLEXT_DIR = C:\libs\GetGLExt\
+LIBICONV_DIR = C:\libs\libiconv\
+LIBXML_DIR = C:\libs\libxml\
+PYTHON_DIR = C:\libs\Python27\
+ZLIB_DIR = C:\libs\zlib\
+]]></programlisting>
+    </sect3>
+    <sect3 id="installation-compiling-msvc-installation-build_events">
+      <title>'События сборки'</title>
+      <para>Частью сборки проекта будет копирование всех файлов, необходимых для запуска Gwyddion. Отдельные файлы копируются из каталога <literal>gwyddion</literal> в каталог <literal>$(OutDir)</literal> (или в соответствующий подкаталог). Файлы динамически связываемых библиотек (DLL) копируются в каталог <literal>$(OutDir)</literal> из путей к внешним библиотекам, заданным как переменные окружения. Команды доступны через пункт меню <literal>Project/Properties/Build Events/Post-Build Event</literal>.</para>
+    </sect3>
+  </sect2>
+  <sect2 id="installation-compiling-msvc-generating">
+    <title>Генерация решений</title>
+    <para><command>Gwyddion</command> собирается под Linux с использованием<command>autotools</command>. Преобразование процедур условной компиляции между различными платформами (особенно такой самобытной, как Windows) являются весьма нетривиальными (условия, зависимости, раскрытие переменных, различные файлы настроек в Linux/Windows вследствие различий в наборе доступных библиотек). Все эти особенности практически исключают возможность автоматического преобразования.</para>
+    <para><literal>gen-gwyddion-msvc-sln.py</literal> это скрипт, генерирующий решение и проекты Visual Studio. Скрипт необходимо поместить в каталог <literal>gwyddion</literal> (см. выше). Gwyddion нужно сначала скомпилировать под Linux из этого каталога перед запуском скрипта. Компиляция под Linux создаёт недостающие необходимые файлы .c и .h и позволяет генерировать экспортируемые файлы функций (.def). Эти файлы необходимы для сборки под Windows. Они сортируются в каталог <literal>generated-files</literal> и должны быть скопированы в каталог <literal>gwyddion</literal> под Windows. Скрипт создаёт файлы решения Visual Studio (<literal>solution</literal>) и проекты (<literal>projects</literal>) которые генерируются в каталоге <literal>msvc2015</literal>. Все генерируемые скриптом каталоги создаются внутри каталога <literal>gwyddion</literal>.</para>
+    <para>Файлы <literal>config.h</literal> и <literal>gwyconfig.h</literal> создаются при компиляции под Linux с помощью <command>autotools</command>. Они соответствуют Linux-окружению и должны быть изменены чтобы можно было собрать проект с помощью Visual Studio. Подготовленные файлы конфигурации, совместимые с Windows являются частью скрипта. Эти файлы копируются в каталог <literal>generated-files</literal> в процессе работы генерирующего скрипта.</para>
+    <sect3 id="installation-compiling-msvc-generating-procedure">
+      <title>Процедура:</title>
+      <sect4 id="installation-compiling-msvc-generating-procedure-compile">
+        <title>Компиляция на машине с Linux</title>
+        <para>На машине с Linux. Запустите <literal>./autogen.sh</literal> и <literal>make</literal> в каталоге с исходным кодом (обычно  <literal>gwyddion</literal>). См. раздел <ulink url="http://gwyddion.net/documentation/user-guide-en/installation-unix-source.html">Сборка в среде Linux/Unix</ulink>.</para>
+      </sect4>
+      <sect4 id="installation-compiling-msvc-generating-procedure-script">
+        <title>Запустите скрипт, чтобы создать файлы решения (<literal>solution</literal>) и скопируйте сгенерированные файлы.</title>
+        <para>На машине с Linux. Запустите <literal>gen-gwyddion-msvc-sln.py gwyddion</literal> в каталоге <literal>gwyddion</literal>. </para>
+        <para>
+        <informaltable id="table-generated_folders">
+          <tgroup cols="2">
+            <?dblatex ll?>
+            <thead>
+              <row>
+                <entry><literal>Генерируемый каталог</literal></entry>
+                <entry>Содержание</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry><literal>msvc2015</literal></entry>
+                <entry>Gwyddion Solution</entry>
+              </row>
+              <row>
+                <entry><literal>msvc2015/generated-files</literal></entry>
+                <entry>файлы .def, .c, .h</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        </para>
+        <para>Необходимо скопировать все файлы и каталоги из <literal>./msvc2015/generated-files</literal> на машине с Linux в <literal>./gwyddion</literal> на машине с Windows.</para>
+      </sect4>
+      <sect4 id="installation-compiling-msvc-generating-procedure-installation">
+        <title>Установка</title>
+        <para>Под Windows. См. раздел <link linkend="installation-compiling-msvc-installation">Установка всего необходимого</link>.</para>
+      </sect4>
+    </sect3>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

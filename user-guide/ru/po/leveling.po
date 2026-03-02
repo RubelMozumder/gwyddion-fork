@@ -1,0 +1,746 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2024-01-05 21:56+0400\n"
+"PO-Revision-Date: 2024-01-05 21:59+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: leveling.xml:6(title)
+msgid "Data Levelling and Background Subtraction"
+msgstr "Выравнивание данных и вычитание фона"
+
+#: leveling.xml:8(title)
+msgid "Levelling"
+msgstr "Выравнивание"
+
+#: leveling.xml:9(para)
+msgid ""
+"The data obtained from SPM microscopes are very often not levelled at all; "
+"the microscope directly outputs raw data values computed from piezoscanner "
+"voltage, strain gauge, interferometer or other detection system values. This "
+"way of exporting data enables the user to choose his/her own method of "
+"levelling data."
+msgstr ""
+"Данные, полученные со сканирующих зондовых микроскопов нередко вообще никак "
+"не выровнены; микроскоп напрямую выводит сырые данные, пересчитанные из "
+"напряжения на пьезосканере, измерения деформации, данных интерферометра или "
+"другой системы детекции смещений. Такой способ экспорта данных позволяет "
+"выбрать пользователю его/её собственный метод выравнивания данных."
+
+#: leveling.xml:16(para)
+msgid ""
+"The choice of levelling method should be based on your SPM system "
+"configuration. Basically, for systems with independent scanner(s) for each "
+"axis, plane levelling should be sufficient. For systems with scanner(s) "
+"moving in all three axes (tube scanners) 2nd degree polynomial levelling "
+"should be used."
+msgstr ""
+"Выбор метода выравнивания должен быть основан на конфигурации вашего СЗМ. В "
+"основном, для систем с независимыми сканерами для каждой оси обычно "
+"достаточно вычета плоскости. Для систем со сканером/сканерами, двигающимися "
+"по всем трём осям (сканерами на пьезотрубке) нужно использовать выравнивание "
+"вычетом полинома второго порядка."
+
+#: leveling.xml:23(para)
+msgid ""
+"Of course, you can use higher degree levelling for any data, however, this "
+"can suppress real features on the surface (namely waviness of the surface) "
+"and therefore alter the statistical functions and quantities evaluated from "
+"the surface."
+msgstr ""
+"Разумеется, можно использовать выравнивание более высоких порядков для любых "
+"данных, однако, при этом могут быть утрачены реальные свойства поверхности "
+"(а именно её волнистость) и, следовательно, изменятся все статистические "
+"функции и величины, получаемые из анализа данной поверхности."
+
+#: leveling.xml:30(title)
+msgid ""
+"Fix Zero and Zero Mean Value <gwy:icon name=\"fix_zero\"/><gwy:icon name="
+"\"zero_mean\"/>"
+msgstr ""
+"Исправить нуль и Обнулить среднее значение <gwy:icon name=\"fix_zero\"/><gwy:"
+"icon name=\"zero_mean\"/>"
+
+#: leveling.xml:37(guimenu) leveling.xml:44(guimenu) leveling.xml:68(guimenu)
+#: leveling.xml:116(guimenu) leveling.xml:179(guimenu)
+#: leveling.xml:215(guimenu) leveling.xml:250(guimenu)
+#: leveling.xml:287(guimenu) leveling.xml:312(guimenu)
+#: leveling.xml:334(guimenu) leveling.xml:353(guimenu)
+#: leveling.xml:377(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: leveling.xml:38(guisubmenu) leveling.xml:45(guisubmenu)
+#: leveling.xml:69(guisubmenu) leveling.xml:85(guimenuitem)
+#: leveling.xml:117(guisubmenu) leveling.xml:180(guisubmenu)
+#: leveling.xml:216(guisubmenu) leveling.xml:251(guisubmenu)
+#: leveling.xml:288(guisubmenu) leveling.xml:313(guisubmenu)
+#: leveling.xml:335(guisubmenu) leveling.xml:354(guisubmenu)
+msgid "Level"
+msgstr "Выравнивание"
+
+#: leveling.xml:39(guimenuitem)
+msgid "Fix Zero"
+msgstr "Исправить нуль"
+
+#: leveling.xml:46(guimenuitem)
+msgid "Zero Mean Value"
+msgstr "Обнулить среднее значение"
+
+#: leveling.xml:49(para)
+msgid ""
+"The simplest functions that are connected with data levelling are "
+"<guimenuitem>Fix Zero</guimenuitem> and <guimenuitem>Zero Mean Value</"
+"guimenuitem> that just add a constant to all the data to move the minimum "
+"and mean value to zero, respectively."
+msgstr ""
+"Простейшие функции, связанные с выравниванием данных это "
+"<guimenuitem>Исправить нуль</guimenuitem> и <guimenuitem>Обнулить среднее "
+"значение</guimenuitem>, которые просто добавляют постоянное значение ко всем "
+"элементам поля данных чтобы переместить, соответственно, минимум или среднее "
+"значение в нуль."
+
+#: leveling.xml:58(title)
+msgid "Plane Level <gwy:icon name=\"level\"/>"
+msgstr "Выравнивание плоскости <gwy:icon name=\"level\"/>"
+
+#: leveling.xml:61(primary)
+msgid "plane levelling"
+msgstr "выравнивание плоскости"
+
+#: leveling.xml:63(primary) leveling.xml:94(primary) leveling.xml:111(primary)
+#: leveling.xml:245(primary)
+msgid "levelling"
+msgstr "выравнивание"
+
+#: leveling.xml:64(secondary)
+msgid "mean plane subtraction"
+msgstr "вычет средней плоскости"
+
+#: leveling.xml:70(guimenuitem)
+msgid "Plane Level"
+msgstr "Выровнять плоскость"
+
+#: leveling.xml:73(para)
+msgid ""
+"Plane levelling is usually one of the first functions applied to raw SPM "
+"data. The plane is computed from all the image points and is subtracted from "
+"the data."
+msgstr ""
+"Выравнивание плоскости обычно является одной из первых функций, применяемых "
+"к необработанным данным СЗМ. Плоскость рассчитывается по всем точкам "
+"изображения и затем вычитается из данных."
+
+#: leveling.xml:78(para)
+msgid ""
+"If a mask is present plane levelling offers to use the data under mask for "
+"the plane fitting, exclude the data under mask or ignore the mask and use "
+"the entire data."
+msgstr ""
+"Если на изображение наложена маска, выравнивание плоскости предлагает или "
+"использовать данные под маской для аппроксимации плоскостью, или исключить "
+"данные под маской, или игнорировать маску и использовать полный набор данных."
+
+#: leveling.xml:83(tip)
+msgid ""
+"You can quickly apply plane levelling by simply right-clicking on the image "
+"window and selecting <placeholder-1/>."
+msgstr ""
+"Можно быстро применить выравнивание плоскости щелчком правой кнопкой мыши на "
+"окно изображения и выбором <placeholder-1/>."
+
+#: leveling.xml:89(title)
+msgid "Three Point Levelling Tool <gwy:icon name=\"level_triangle\"/>"
+msgstr ""
+"Инструмент выравнивания по трём точкам <gwy:icon name=\"level_triangle\"/>"
+
+#: leveling.xml:92(primary)
+msgid "three-point levelling"
+msgstr "выравнивание по трём точкам"
+
+#: leveling.xml:95(secondary)
+msgid "three-point"
+msgstr "по трём точкам"
+
+#: leveling.xml:97(para)
+msgid ""
+"The <link linkend=\"tool-level3\">Three Point Levelling tool</link> can be "
+"used for levelling very complicated surface structures. The user can simply "
+"mark three points in the image that should be at the same level, and then "
+"click <guibutton>Apply</guibutton>. The plane is computed from these three "
+"points and is subtracted from the data."
+msgstr ""
+"Инструмент <link linkend=\"tool-level3\">выравнивание по трём точкам</link> "
+"можно использовать для выравнивания очень сложных структур поверхности. "
+"Пользователь просто выбирает три точки на изображении, которые должны быть "
+"на одном уровне, и затем нажимает <guibutton>Применить</guibutton>.  "
+"Плоскость рассчитывается по этим трём точкам и вычитается из данных."
+
+#: leveling.xml:106(title)
+msgid "Facet Level <gwy:icon name=\"facet_level\"/>"
+msgstr "Выравнивание граней <gwy:icon name=\"facet_level\"/>"
+
+#: leveling.xml:109(primary)
+msgid "facet levelling"
+msgstr "выравнивание граней"
+
+#: leveling.xml:112(secondary)
+msgid "to align facets horizontally"
+msgstr "выровнять грани горизонтально"
+
+#: leveling.xml:118(guimenuitem)
+msgid "Facet Level"
+msgstr "Выравнивание граней"
+
+#: leveling.xml:121(para)
+msgid ""
+"<link linkend=\"facet-level\">Facet Level</link> levels data by subtracting "
+"a plane similarly to the standard <link linkend=\"plane-level\">Plane Level</"
+"link> function. However, the plane is determined differently: it makes "
+"facets of the surface as horizontal as possible. Thus for surfaces with flat "
+"horizontal areas it leads to much better results than the standard Plane "
+"Level especially if large objects are present."
+msgstr ""
+"<link linkend=\"facet-level\">Выравнивание граней</link> выравнивает данные "
+"вычетом плоскости подобно обычной функции <link linkend=\"plane-level"
+"\">Выравнивание плоскости</link>. Однако, плоскость определяется по другому: "
+"она пытается сделать грани на поверхности максимально горизонтальными. Таким "
+"образом, для поверхностей с большими горизонтальными областями, это ведёт к "
+"гораздо лучшим результатам, чем обычное выравнивание плоскостью, особенно "
+"если на поверхности присутствуют крупные объекты."
+
+#: leveling.xml:130(para)
+msgid ""
+"On the other hand, it is not suitable for some types of surface. These "
+"includes random surfaces, data with considerable fine noise and non-"
+"topographic images as the method does not work well if the typical lateral "
+"dimensions and <quote>heights</quote> differ by many orders."
+msgstr ""
+"С другой стороны, оно не всегда подходит для некоторых типов поверхностей. "
+"Сюда входят случайные поверхности. данные с заметным тонким шумом и "
+"нетопографичекие изображения поскольку метод не работает нормально если "
+"характерные пространственные размеры и <quote>высоты</quote> различаются на "
+"много порядков."
+
+#: leveling.xml:137(para)
+msgid ""
+"Similarly to <link linkend=\"plane-level\">Plane Level</link>, Facet Level "
+"can include or exclude the data under mask. This choice is offered only if a "
+"mask is present."
+msgstr ""
+"Подобно <link linkend=\"plane-level\">выравниванию плоскостью</link>, "
+"выравнивание граней может включать или исключать данные под маской. Этот "
+"выбор предоставляется только если маска есть."
+
+#: leveling.xml:142(para)
+msgid ""
+"Finding the orientation of the facets is an iterative process that works as "
+"follows. First, the variation of local normals is determined: <include href="
+"\"eq-facet-level-dispersion.xml\"/> where <include href=\"eqi-vec-n_i.xml\"/"
+"> is the vector of local facet normal (see <link linkend=\"inclinations-"
+"coordinates\">inclination coordinates</link>) in the <include href=\"eqi-i."
+"xml\"/>-th pixel. Then the prevalent normal is estimated as <include href="
+"\"eq-facet-level-new-normal.xml\"/> where <include href=\"eqi-c-is-1-over-20."
+"xml\"/> is a constant. Subsequently, the plane corresponding to the "
+"prevalent normal <include href=\"eqi-vec-n.xml\"/> is subtracted and these "
+"three steps are repeated until the process converges. The gaussian weighting "
+"factors serve to pick a single set of similar local facet normals and "
+"converge to their mean direction. Without these factors, the procedure would "
+"obviously converge in one step to the overall mean normal – and hence would "
+"be completely equivalent to plain plane levelling."
+msgstr ""
+"Определение ориентации граней — итерационный процесс, работающий следующим "
+"образом. Вначале определяется разброс значений локальных нормалей: <xi:"
+"include href=\"eq-facet-level-dispersion.xml\"/> где <xi:include href=\"eqi-"
+"vec-n_i.xml\"/> — вектор нормали к локальной грани (см. <link linkend="
+"\"inclinations-coordinates\">координаты наклонов</link>) в <xi:include href="
+"\"eqi-i.xml\"/>-том пикселе. Затем преобладающая нормаль оценивается как <xi:"
+"include href=\"eq-facet-level-new-normal.xml\"/> где <xi:include href=\"eqi-"
+"c-is-1-over-20.xml\"/> — константа. Далее плоскость, соответствующая "
+"преобладающей нормали <xi:include href=\"eqi-vec-n.xml\"/>, вычитается и все "
+"три шага повторяются, пока процесс не сойдётся. Гауссовы факторы веса служат "
+"для выбора одного набора подобных нормалей к локальным граням и сходимости к "
+"их среднему направлению. Без этих факторов процедура очевидно сойдётся за "
+"один шаг к общей средней нормали и, следовательно, будет полностью "
+"эквивалентна обычному выравниванию плоскостью."
+
+#: leveling.xml:165(caption)
+msgid ""
+"Facet Level example: (a) uncorrected, sloping data; (b) data levelled by "
+"standard plane fitting (Plane Level); (c) data levelled by Facet Level."
+msgstr ""
+"Пример выравнивания граней: (a) нескорректированные данные с наклоном; "
+"(b) данные, выровненные стандартным вычетом плоскости (Выравнивание "
+"плоскости); (c) данные, выровненные выравниванием граней."
+
+#: leveling.xml:175(title) leveling.xml:181(guimenuitem)
+msgid "Level Rotate"
+msgstr "Выравнивание поворотом"
+
+#: leveling.xml:176(primary)
+msgid "rotation levelling"
+msgstr "выравнивание поворотом"
+
+#: leveling.xml:184(para)
+msgid ""
+"<link linkend=\"level-rotate\">Level Rotate</link> behaves similarly to "
+"<link linkend=\"plane-level\">Plane Level</link>, however it does not simply "
+"subtract the fitted plane from the data. Instead, this module takes the "
+"fitted plane parameters and rotates the image data by a calculated amount to "
+"make it lie in a plane. So unlike <link linkend=\"plane-level\">Plane Level</"
+"link>, this module should therefore preserve angle data in the image."
+msgstr ""
+"<link linkend=\"level-rotate\">Выравнивание поворотом</link> ведёт себя "
+"подобно <link linkend=\"plane-level\">Выравниванию плоскостью</link>, "
+"однако, в данном случае аппроксимирующая плоскость не вычитается просто из "
+"данных. Вместо этого, этот модуль берёт параметры аппроксимирующей плоскости "
+"и поворачивает данные изображения на вычисленную величину таким образом, "
+"чтобы данные лежали в плоскости. Таким образом, в отличие от <link linkend="
+"\"plane-level\">выравнивания плоскостью</link>, этот модуль сохраняет данные "
+"об углах на изображении."
+
+#: leveling.xml:196(title)
+msgid "Background Subtraction"
+msgstr "Вычет фона"
+
+#: leveling.xml:197(primary)
+msgid "background subtraction"
+msgstr "вычет фона"
+
+#: leveling.xml:198(para)
+msgid ""
+"Gwyddion has several special modules for background subtraction. All allow "
+"you to extract the subtracted background to a separate data window."
+msgstr ""
+"Gwyddion содержит несколько специальных модулей для вычета фона. Все они "
+"позволяют извлечь вычитаемый фон в отдельное окно данных."
+
+#: leveling.xml:204(link)
+msgid "filtering tools"
+msgstr "инструментов фильтрации"
+
+#: leveling.xml:205(link)
+msgid "Data Arithmetic"
+msgstr "Арифметики данных"
+
+#: leveling.xml:202(tip)
+msgid ""
+"For finer control, you can use any of Gwyddion's <placeholder-1/> on an "
+"image, and then use the <placeholder-2/> module to subtract the results from "
+"your original image."
+msgstr ""
+"Для более тонкого контроля можно использовать любой из <placeholder-1/> "
+"Gwyddion на изображении и затем применить модуль <placeholder-2/> чтобы "
+"вычесть результат из оригинального изображения."
+
+#: leveling.xml:209(title)
+msgid "Polynomial Background <gwy:icon name=\"polynom_level\"/>"
+msgstr "Полиномиальный фон <gwy:icon name=\"polynom_level\"/>"
+
+#: leveling.xml:212(primary)
+msgid "polynomial background"
+msgstr "полиномиальный фон"
+
+#: leveling.xml:217(guimenuitem)
+msgid "Polynomial Background"
+msgstr "Полиномиальный фон"
+
+#: leveling.xml:220(para)
+msgid ""
+"Fits data by a polynomial of the given degree and subtracts this polynomial. "
+"In the <guilabel>Independent degree</guilabel> mode the horizontal and "
+"vertical polynomial orders can be generally set separately, i.e. the fitted "
+"polynomial is <include href=\"eq-polynomial-independent-degree.xml\"/> where "
+"<include href=\"eqi-m.xml\"/> and <include href=\"eqi-n.xml\"/> are the "
+"selected horizontal and vertical polynomial degrees, respectively. In the "
+"<guilabel>Limited total degree</guilabel> mode the fitted polynomial is "
+"<include href=\"eq-polynomial-limited-total-degree.xml\"/> where <include "
+"href=\"eqi-n.xml\"/> is the selected total polynomial degree."
+msgstr ""
+"Аппроксимирует данные полиномом заданного порядка и вычитает этот полином. В "
+"режиме <guilabel>Независимые степени</guilabel> порядки для полиномов по "
+"горизонтали и вертикали могут быть в общем случае заданы различными, т.е. "
+"аппроксимирующий полином будет <xi:include href=\"eq-polynomial-independent-"
+"degree.xml\"/> где <xi:include href=\"eqi-m.xml\"/> и <xi:include href=\"eqi-"
+"n.xml\"/>  выбранные степени полиномов по горизонтали и вертикали, "
+"соответственно. В режиме <guilabel>Ограниченная общая степень</guilabel> "
+"аппроксимирующий полином будет <xi:include href=\"eq-polynomial-limited-"
+"total-degree.xml\"/> где <xi:include href=\"eqi-n.xml\"/> — выбранная общая "
+"степень."
+
+#: leveling.xml:234(para)
+msgid ""
+"Similarly to <link linkend=\"plane-level\">Plane Level</link>, polynomial "
+"background subtraction can include or exclude the data under mask. This "
+"choice is offered only if a mask is present."
+msgstr ""
+"Подобно <link linkend=\"plane-level\">выравниванию плоскостью</link>, "
+"вычитание полиномиального фона может включать или исключать данные под "
+"маской. Этот выбор предоставляется только если маска есть."
+
+#: leveling.xml:241(title)
+msgid "Flatten base <gwy:icon name=\"level_flatten_base\"/>"
+msgstr "Выровнять основание <gwy:icon name=\"level_flatten_base\"/>"
+
+#: leveling.xml:246(secondary)
+msgid "of flat surface with positive features"
+msgstr "плоской поверхности с выступающими особенностями"
+
+#: leveling.xml:252(guimenuitem)
+msgid "Flatten Base"
+msgstr "Выровнять основание"
+
+#: leveling.xml:255(para)
+msgid ""
+"When a number of large features are present on a flat base surface the "
+"combination of masking, plane, facet and/or polynomial levelling can be used "
+"to level the flat base. It can require, however, several steps and trial and "
+"error parameter adjustment. <guilabel>Flatten Base</guilabel> attempts to "
+"perform this levelling automatically using a combination of facet and "
+"polynomial levelling with automated masking. It attempts to maximise the "
+"sharpness of the height distribution peak corresponding to the flat base "
+"surface."
+msgstr ""
+"Когда на плоском основании поверхности присутствует некоторое количество "
+"больших выступающих частей можно использовать маску выступающих частей и "
+"затем выравнивание плоскостью, выравнивание граней и/или полиномиальное "
+"выравнивание для правильного выравнивания плоскости основания. Это может, "
+"однако, потребовать нескольких шагов и подбора параметров методом проб и "
+"ошибок. Команда <guilabel>Выровнять основание</guilabel> пытается выполнить "
+"такое выравнивание автоматически используя комбинацию выравнивания граней и "
+"полиномиального вместе с автоматическим выбором маски. Она пытается "
+"максимально оптимизировать остроту пика функции распределения высот, "
+"соответствующую плоской базовой поверхности."
+
+#: leveling.xml:274(link)
+msgid "adaptive colour scale"
+msgstr "адаптивной шкалой псевдоцвета"
+
+#: leveling.xml:270(caption)
+msgid ""
+"Flatten Base example: original image, levelled using Facet Level, levelled "
+"using Plane Level, levelled using Flatten Base. The original image is shown "
+"in linear colour scale, the levelled images are shown in <placeholder-1/>. "
+"The graph below each image shows the corresponding height distribution (with "
+"the same axis ranges)."
+msgstr ""
+"Пример применения команды выравнивания основания: исходное изображение, "
+"изображение, выровненное с помощью выравнивания граней, выравнивания "
+"плоскости, выровненное с помощью функции выровнять основание. Исходное "
+"изображение показано с линейной шкалой псевдоцвета, выровненные с "
+"<placeholder-1/>. График под каждым из изображений показывает "
+"соответствующее ему распределение высоты (с одинаковыми диапазонами осей)."
+
+#: leveling.xml:282(title)
+msgid "Revolve Arc <gwy:icon name=\"revolve_arc\"/>"
+msgstr "Вращение дуги <gwy:icon name=\"revolve_arc\"/>"
+
+#: leveling.xml:289(guimenuitem)
+msgid "Revolve Arc"
+msgstr "Вращение дуги"
+
+#: leveling.xml:292(para)
+msgid ""
+"Data are levelled by revolving a virtual <quote>arc</quote> of given radius "
+"horizontally or vertically over (or under) the data. The envelope of this "
+"arc is treated as a background, resulting in removal of features larger than "
+"the arc radius (approximately). It is also possible to apply the levelling "
+"in both directions – in this case the arc is first revolved horizontally, "
+"then vertically."
+msgstr ""
+"Данные выравниваются вращением виртуальной <quote>дуги</quote> заданного "
+"радиуса горизонтально или вертикально над (или под) данными. Огибающая этой "
+"дуги считается фоном, что ведёт к удалению деталей больше, чем радиус дуги "
+"(примерно). Также возможно применить выравнивание в обоих направлениях, в "
+"этом случае дуга сначала движется горизонтально, затем вертикально."
+
+#: leveling.xml:300(para)
+msgid ""
+"By default the arc is revolved on the bottom side, preserving positive "
+"features (peaks). It is also possible to roll it on the top side by enabling "
+"<guilabel>Invert height</guilabel>."
+msgstr ""
+"По умолчанию дуга вращается на нижней стороне, сохраняя положительные "
+"выступающие области (пики). Также возможно вращать её на верхней стороне "
+"включением опции <guilabel>Инвертировать высоту</guilabel>."
+
+#: leveling.xml:307(title)
+msgid "Revolve Sphere <gwy:icon name=\"revolve_sphere\"/>"
+msgstr "Вращение сферы <gwy:icon name=\"revolve_sphere\"/>"
+
+#: leveling.xml:314(guimenuitem)
+msgid "Revolve Sphere"
+msgstr "Вращение сферы"
+
+#: leveling.xml:317(para)
+msgid ""
+"Data are levelled by revolving a virtual <quote>sphere</quote> of given over "
+"(or under) the data. The envelope of this sphere is treated as a background, "
+"resulting in removal of features larger than the sphere radius "
+"(approximately)."
+msgstr ""
+"Данные выравниваются вращением виртуальной <quote>сферы</quote> заданного "
+"радиуса горизонтально или вертикально над (или под) данными. Огибающая этой "
+"сферы считается фоном, что ведёт к удалению деталей примерно больше, чем "
+"радиус сферы (примерно)."
+
+#: leveling.xml:325(title)
+msgid "Median Level <gwy:icon name=\"level_median\"/>"
+msgstr "Медианное выравнивание <gwy:icon name=\"level_median\"/>"
+
+#: leveling.xml:329(primary)
+msgid "median"
+msgstr "срединный"
+
+#: leveling.xml:330(secondary) leveling.xml:349(secondary)
+msgid "background removal"
+msgstr "удаление фона"
+
+#: leveling.xml:336(guimenuitem)
+msgid "Median Level"
+msgstr "Выровнять по срединному"
+
+#: leveling.xml:339(para)
+msgid ""
+"The median levelling operation filters data with a median filter using a "
+"large kernel and treats the result as background. Only features smaller than "
+"approximately the kernel size will be kept."
+msgstr ""
+"Операция выравнивания медианой фильтрует данные медианным фильтром с большим "
+"ядром и считает результат фоном. Только детали меньше, чем приблизительно "
+"размер ядра останутся на изображении."
+
+#: leveling.xml:346(title) leveling.xml:355(guimenuitem)
+msgid "Trimmed Mean"
+msgstr "Усечённое среднее"
+
+#: leveling.xml:348(primary)
+msgid "trimmed mean"
+msgstr "усечённое среднее"
+
+#: leveling.xml:358(para)
+msgid ""
+"A more general variant of <link linkend=\"median-level\">Median Level</link> "
+"is the trimmed mean filter. In trimmed mean given fractions of lowest and "
+"highest values are discarded and the remaining data are averaged. For no "
+"discarded values the filter is identical to the mean value filter, whereas "
+"for the maximum possible number of discarded values (symmetrically) it "
+"becomes the median filter. The amount of discarded values can be given as a "
+"fraction (percentile) or as a specific number."
+msgstr ""
+"Более общий вариант <link linkend=\"median-level\">Медианного выравнивания</"
+"link> это фильтр усечённого среднего. В усечённом среднем заданные доли "
+"наименьших и наибольших значений отбрасываются и затем оставшиеся данные "
+"усредняются. Если данные не отбрасываются то фильтр эквивалентен фильтру "
+"среднего, в то время, как в случае максимального количества отбрасываемых "
+"(симметрично) значений он становится медианным фильтром. Количество "
+"отбрасываемых значений может задаваться долей (перцентилем) или заданным "
+"числом."
+
+#: leveling.xml:371(title)
+msgid "K-th Rank Filter"
+msgstr "Фильтр K-того ранга"
+
+#: leveling.xml:373(primary)
+msgid "k-th rank filter"
+msgstr "фильтр K-того ранга"
+
+#: leveling.xml:378(guisubmenu)
+msgid "Integral Transforms"
+msgstr "Интегральные преобразования"
+
+#: leveling.xml:379(guimenuitem)
+msgid "Rank Filter"
+msgstr "Фильтр ранга"
+
+#: leveling.xml:382(para)
+msgid ""
+"Another operation which generalises <link linkend=\"median-level\">Median "
+"Level</link> is the k-th rank filter. Imaging all the values in the "
+"neighbourhood of a pixel sorted, the median filter selects the value exactly "
+"in the middle. The k-th rank filter allows specifying any other rank or "
+"percentile to select at the filter output."
+msgstr ""
+"Другая операция, которая обобщает <link linkend=\"median-level\">Медианное "
+"выравнивание</link> это фильтр K-того ранга. Представляя все пиксели в "
+"окрестности заданного отсортированными, медианный фильтр выбирает значение "
+"точно по центру. Фильтр K-того ранга позволяет задать любой другой ранг или "
+"перцентиль как результат работы фильтра."
+
+#: leveling.xml:390(para)
+msgid ""
+"This means the filter can reproduce minimum, maximum and median filters – "
+"and anything between. It can also directly perform two rank filters "
+"simultaneously and calculating their difference. This is not useful for "
+"levelling, but allows for instance the calculation of local inter-quartile "
+"range for each pixel."
+msgstr ""
+"Это означает что данный фильтр может воспроизводить фильтры минимума, "
+"максимума и срединного – и любой промежуточный вариант. Он также может "
+"напрямую рассчитывать результат выполнения двух фильтров ранга одновременно "
+"и разницу между ними. Это бесполезно для выравнивания, но позволяет, "
+"например, расчёт локального межквартильного диапазона для каждого пикселя."
+
+#~ msgid "Curvature <gwy:icon name=\"curvature\"/>"
+#~ msgstr "Кривизна <gwy:icon name=\"curvature\"/>"
+
+#~ msgid "curvature"
+#~ msgstr "кривизна"
+
+#~ msgid "Curvature"
+#~ msgstr "Кривизна"
+
+#~ msgid ""
+#~ "The global surface curvature parameters are calculated by fitting a "
+#~ "quadratic polynomial and finding its main axes. Positive signs of the "
+#~ "curvature radii correspond to a concave (cup-like) surface, whereas "
+#~ "negative signs to convex (cap-like) surface, mixed signs mean a saddle-"
+#~ "like surface."
+#~ msgstr ""
+#~ "Глобальные параметры кривизны поверхности рассчитываются аппроксимацией "
+#~ "квадратичным полиномом и определением его главных осей. Положительные "
+#~ "знаки радиусов кривизны соответствуют вогнутой (чашеподобной) "
+#~ "поверхности, отрицательные выпуклой (куполоподобной), смешанные знаки "
+#~ "обозначают седловидную поверхность."
+
+#~ msgid ""
+#~ "Beside the parameter table, it is possible to set the line selection on "
+#~ "the data to the fitted quadratic surface axes and/or directly read "
+#~ "profiles along them. The zero of the abscissa is placed to the "
+#~ "intersection of the axes."
+#~ msgstr ""
+#~ "Помимо таблицы параметров, можно задать выбранные линии на данных вдоль "
+#~ "осей аппроксимирующей квадратичной поверхности и/или напрямую считать "
+#~ "профили вдоль них. Нулевое значение абсциссы помещается в пересечение "
+#~ "осей."
+
+#~ msgid ""
+#~ "Similarly to the background subtraction functions, if a mask is present "
+#~ "on the data the module offers to include or exclude the data under mask."
+#~ msgstr ""
+#~ "Подобно функциям вычета фона, если на данных присутствует маска, модуль "
+#~ "предлагает включить или исключить данные под маской."
+
+#~ msgid ""
+#~ "Curvature dialog screenshot showing the strong deflection of a glass "
+#~ "plate with a thin film with compressive internal stress."
+#~ msgstr ""
+#~ "Снимок экрана диалогового окна кривизны. показывающего сильное отклонение "
+#~ "стеклянной пластинки с тонкой плёнкой с сжимающим внутренним напряжением."
+
+#~ msgid "Fit Shape <gwy:icon name=\"fit_shape\"/>"
+#~ msgstr "Аппроксимировать форму <gwy:icon name=\"fit_shape\"/>"
+
+#~ msgid "fitting"
+#~ msgstr "аппроксимация"
+
+#~ msgid "3D shapes to topographical images"
+#~ msgstr "3D формы относительно изображения топографии"
+
+#~ msgid "Fit Shape"
+#~ msgstr "Аппроксимировать форму"
+
+#~ msgid ""
+#~ "Form removal as well as measurement of geometrical parameters can be "
+#~ "performed by fitting geometrical shapes on the data using the least-"
+#~ "squares method. The <guilabel>Fit Shape</guilabel> module is essentially "
+#~ "the same for images and XYZ data and it is <link linkend=\"fit-shape"
+#~ "\">described in detail</link> in the XYZ data processing part. Only the "
+#~ "differences are mentioned here."
+#~ msgstr ""
+#~ "Удаление формы, а также измерение геометрических параметров можно "
+#~ "производить путём аппроксимации данных геометрическими формами используя "
+#~ "метод наименьших квадратов. Модуль <guilabel>Аппроксимировать форму</"
+#~ "guilabel> практически одинаков для изображений и данных XYZ и он <link "
+#~ "linkend=\"fit-shape\">детально описан</link> в разделе о работе с данными "
+#~ "XYZ, поэтому здесь упомянуты только отличающиеся особенности."
+
+#~ msgid ""
+#~ "Standard masking is supported for images. That is if a mask is present "
+#~ "the dialog offers to use the data under the mask, exclude the data under "
+#~ "mask or ignore the mask and use the entire data. Since the excluded "
+#~ "pixels can be outliers or image parts not conforming to the chosen shape "
+#~ "it it possible to avoid them also in the difference image by disabling "
+#~ "<guilabel>Calculate differences for excluded pixels</guilabel>."
+#~ msgstr ""
+#~ "Для изображений поддерживается стандартная работа с маской. То есть, если "
+#~ "маска присутствует, то диалоговое окно предлагает использовать данные под "
+#~ "маской, исключить данные под маской или игнорировать маску и использовать "
+#~ "все данные. Поскольку исключённые пиксели могут быть выпадающими или "
+#~ "частью изображения, не вписывающейся в заданную фигуру, можно также "
+#~ "исключить их на изображении разности выключив переключатель "
+#~ "<guilabel>Рассчитать различия для исключенных пикселей</guilabel>."
+
+#~ msgid "This operation can be very slow for large sphere radii."
+#~ msgstr "Этот метод может быть очень медленным для больших радиусов сферы."
+
+#~ msgid "This operation can be very slow for large kernels."
+#~ msgstr "Этот метод может быть очень медленным для больших ядер."
+
+#~ msgid "Fix Zero and Zero Mean Value"
+#~ msgstr "Исправить нуль и обнулить среднее значение."
+
+#~ msgid ""
+#~ "Plane Level <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_level-24.png\" format=\"PNG\"/></imageobject></inlinemediaobject></"
+#~ "guiicon>"
+#~ msgstr ""
+#~ "Выравнивание плоскости "
+#~ "<guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_level-24.png\" format=\"PNG\"/></imageobject></inlinemediaobject></"
+#~ "guiicon>"
+
+#~ msgid ""
+#~ "Three Point Leveling Tool "
+#~ "<guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_level_triangle-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Инструмент выравнивания по трём точкам "
+#~ "<guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_level_triangle-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Facet Level <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_facet_level-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Выравнивание граней <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_facet_level-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Polynomial Background <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_polynom-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Полиномиальный фон <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_polynom-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid "Flatten base"
+#~ msgstr "Выровнять основание"
+
+#~ msgid "Fit sphere"
+#~ msgstr "Аппроксимировать сферой"
+
+#~ msgid ""
+#~ "Fits part of sphere surface on the data. Sphere orientation (i.e. centre "
+#~ "position) and initial fit values can be preset before fitting. Marquardt-"
+#~ "Levenberg fitting routine is used to calculate the result."
+#~ msgstr ""
+#~ "Аппроксимирует данные частью поверхности сферы. Ориентация сферы (т.е. "
+#~ "положение центра) и начальные параметры аппроксимации могут быть заданы "
+#~ "до начала аппроксимации. Процедура аппроксимации Левенберга - Марквардта "
+#~ "используется для расчёта результата."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

@@ -1,0 +1,622 @@
+/*
+ *  $Id: volume_rephase.c 25693 2023-09-22 12:17:47Z yeti-dn $
+ *  Copyright (C) 2019-2023 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/brick.h>
+#include <libprocess/gwyprocess.h>
+#include <libgwydgets/gwynullstore.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+
+#define RUN_MODES (GWY_RUN_INTERACTIVE)
+
+enum {
+    PREVIEW_SIZE = 360,
+};
+
+enum {
+    PARAM_XPOS,
+    PARAM_YPOS,
+    PARAM_ZPOS,
+    PARAM_OTHER_VOLUME,
+    PARAM_RIGHT,
+    PARAM_INVERT,
+};
+
+typedef struct {
+    gint x;
+    gint y;
+    gint z;
+} RephasePos;
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    GwyDataLine *zcalibration;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GwyContainer *data;
+    GwyDataField *image;
+    GwyGraphModel *gmodel;
+    GwySelection *iselection;
+    GwySelection *gselection;
+    GwyParamTable *table;
+    GtkWidget *dialog;
+    GtkWidget *dataview;
+    gboolean changing_selection;
+} ModuleGUI;
+
+static gboolean         module_register        (void);
+static GwyParamDef*     define_module_params   (void);
+static void             rephase                (GwyContainer *data,
+                                                GwyRunType run);
+static GwyDialogOutcome run_gui                (ModuleArgs *args,
+                                                GwyContainer *data,
+                                                gint id);
+static void             param_changed          (ModuleGUI *gui,
+                                                gint id);
+static void             dialog_response_after  (GtkDialog *dialog,
+                                                gint response,
+                                                ModuleGUI *gui);
+static void             execute                (ModuleArgs *args,
+                                                GwyContainer *data,
+                                                gint id);
+static void             preview                (gpointer user_data);
+static void             point_selection_changed(ModuleGUI *gui,
+                                                gint id,
+                                                GwySelection *selection);
+static void             plane_selection_changed(ModuleGUI *gui,
+                                                gint id,
+                                                GwySelection *selection);
+static void             update_position        (ModuleGUI *gui,
+                                                const RephasePos *pos,
+                                                gboolean assume_changed);
+static void             extract_image_plane    (ModuleArgs *args,
+                                                GwyDataField *dfield);
+static void             extract_graph_curve    (ModuleArgs *args,
+                                                GwyGraphCurveModel *gcmodel);
+static void             extract_gmodel         (ModuleArgs *args,
+                                                GwyGraphModel *gmodel);
+static void             fill_pos_from_params   (GwyParams *params,
+                                                RephasePos *pos);
+static void             sanitise_params        (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Swaps phase in continuous data based on user's selection"),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "2.1",
+    "Petr Klapetek",
+    "2019",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_rephase)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_rephase",
+                             (GwyVolumeFunc)&rephase,
+                             N_("/SPM M_odes/_Adjust Phase..."),
+                             NULL,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("Change phase in continuous data"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_int(paramdef, PARAM_XPOS, "xpos", _("_X"), -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_YPOS, "ypos", _("_Y"), -1, G_MAXINT, -1);
+    gwy_param_def_add_int(paramdef, PARAM_ZPOS, "zpos", _("_Z"), -1, G_MAXINT, -1);
+    gwy_param_def_add_volume_id(paramdef, PARAM_OTHER_VOLUME, "other_volume", _("Related dataset"));
+    gwy_param_def_add_boolean(paramdef, PARAM_RIGHT, "right", _("Place second curve to the _right"), TRUE);
+    gwy_param_def_add_boolean(paramdef, PARAM_INVERT, "invert", _("_Invert second curve"), TRUE);
+    return paramdef;
+}
+
+static void
+rephase(GwyContainer *data, GwyRunType run)
+{
+    ModuleArgs args;
+    GwyDialogOutcome outcome;
+    gint id;
+
+    g_return_if_fail(run & RUN_MODES);
+    g_return_if_fail(g_type_from_name("GwyLayerPoint"));
+
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &args.brick,
+                                     GWY_APP_BRICK_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_BRICK(args.brick));
+    args.params = gwy_params_new_from_settings(define_module_params());
+    args.zcalibration = gwy_brick_get_zcalibration(args.brick);
+    sanitise_params(&args);
+
+    outcome = run_gui(&args, data, id);
+    gwy_params_save_to_settings(args.params);
+    if (outcome == GWY_DIALOG_CANCEL)
+        goto end;
+
+    execute(&args, data, id);
+
+end:
+    g_object_unref(args.params);
+}
+
+static void
+append_position(GwyParamTable *table, gint id, gint res)
+{
+    gwy_param_table_append_slider(table, id);
+    gwy_param_table_slider_restrict_range(table, id, 0, res-1);
+    gwy_param_table_set_unitstr(table, id, _("px"));
+    gwy_param_table_slider_set_mapping(table, id, GWY_SCALE_MAPPING_LINEAR);
+    gwy_param_table_slider_add_alt(table, id);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GwyBrick *brick = args->brick;
+    GtkWidget *hbox, *graph, *align;
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    GwyGraphArea *area;
+    ModuleGUI gui;
+    GwyDialogOutcome outcome;
+    GwyGraphCurveModel *gcmodel;
+    const guchar *gradient;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.data = gwy_container_new();
+    gui.image = gwy_data_field_new(PREVIEW_SIZE, PREVIEW_SIZE, 1.0, 1.0, TRUE);
+    gwy_container_set_object(gui.data, gwy_app_get_data_key_for_id(0), gui.image);
+    if (gwy_container_gis_string(data, gwy_app_get_brick_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(gui.data, gwy_app_get_data_palette_key_for_id(0), gradient);
+
+    gui.gmodel = gwy_graph_model_new();
+    g_object_set(gui.gmodel, "label-visible", FALSE, NULL);
+    gcmodel = gwy_graph_curve_model_new();
+    gwy_graph_model_add_curve(gui.gmodel, gcmodel);
+    g_object_unref(gcmodel);
+
+    gui.dialog = gwy_dialog_new(_("Adjust Phase in Volume Data"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(0);
+    gwy_dialog_add_content(dialog, hbox, FALSE, FALSE, 4);
+
+    align = gtk_alignment_new(0.0, 0.0, 0.0, 0.0);
+    gtk_box_pack_start(GTK_BOX(hbox), align, FALSE, FALSE, 0);
+
+    gui.dataview = gwy_create_preview(gui.data, 0, PREVIEW_SIZE, FALSE);
+    gui.iselection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(gui.dataview), 0, "Point", 1, TRUE);
+    gtk_container_add(GTK_CONTAINER(align), gui.dataview);
+
+    graph = gwy_graph_new(gui.gmodel);
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gtk_widget_set_size_request(graph, PREVIEW_SIZE, PREVIEW_SIZE);
+    gtk_box_pack_start(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+
+    area = GWY_GRAPH_AREA(gwy_graph_get_area(GWY_GRAPH(graph)));
+    gwy_graph_area_set_status(area, GWY_GRAPH_STATUS_XLINES);
+    gui.gselection = gwy_graph_area_get_selection(area, GWY_GRAPH_STATUS_XLINES);
+
+    hbox = gwy_hbox_new(24);
+    gwy_dialog_add_content(dialog, hbox, TRUE, TRUE, 4);
+
+    table = gui.table = gwy_param_table_new(args->params);
+    gwy_param_table_append_volume_id(table, PARAM_OTHER_VOLUME);
+    /* TODO: Petr, implement me! Probably the dimensions need to match?
+    gwy_param_table_data_id_set_filter(table, PARAM_OTHER_VOLUME, filter_other_data, &gui, NULL);
+    */
+    append_position(table, PARAM_XPOS, gwy_brick_get_xres(brick));
+    gwy_param_table_alt_set_brick_pixel_x(table, PARAM_XPOS, brick);
+    append_position(table, PARAM_YPOS, gwy_brick_get_yres(brick));
+    gwy_param_table_alt_set_brick_pixel_y(table, PARAM_YPOS, brick);
+    append_position(table, PARAM_ZPOS, 2*gwy_brick_get_zres(brick)-1);
+    if (args->zcalibration)
+        gwy_param_table_alt_set_calibration(table, PARAM_ZPOS, args->zcalibration);
+    else
+        gwy_param_table_alt_set_brick_pixel_z(table, PARAM_ZPOS, brick);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_checkbox(table, PARAM_RIGHT);
+    gwy_param_table_append_checkbox(table, PARAM_INVERT);
+    gwy_dialog_add_param_table(dialog, table);
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+
+    g_signal_connect_swapped(gui.table, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(gui.gselection, "changed", G_CALLBACK(plane_selection_changed), &gui);
+    g_signal_connect_swapped(gui.iselection, "changed", G_CALLBACK(point_selection_changed), &gui);
+    g_signal_connect_after(dialog, "response", G_CALLBACK(dialog_response_after), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+
+    outcome = gwy_dialog_run(dialog);
+
+    g_object_unref(gui.gmodel);
+    g_object_unref(gui.image);
+    g_object_unref(gui.data);
+
+    return outcome;
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    ModuleArgs *args = gui->args;
+    RephasePos pos;
+
+    if (id == PARAM_XPOS || id == PARAM_YPOS || id == PARAM_ZPOS) {
+        fill_pos_from_params(args->params, &pos);
+        update_position(gui, &pos, TRUE);
+    }
+    gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+point_selection_changed(ModuleGUI *gui,
+                        gint id,
+                        GwySelection *selection)
+{
+    GwyDataField *field = gui->image;
+    gint xres = gwy_data_field_get_xres(field), yres = gwy_data_field_get_yres(field);
+    gint i, j;
+    RephasePos pos;
+    gdouble xy[2];
+
+    gwy_debug("%d (%d)", gui->changing_selection, id);
+    if (gui->changing_selection)
+        return;
+    if (id != 0 || !gwy_selection_get_object(selection, id, xy))
+        return;
+
+    fill_pos_from_params(gui->args->params, &pos);
+    j = CLAMP(gwy_data_field_rtoj(field, xy[0]), 0, xres-1);
+    i = CLAMP(gwy_data_field_rtoi(field, xy[1]), 0, yres-1);
+
+    pos.x = j;
+    pos.y = i;
+    update_position(gui, &pos, FALSE);
+}
+
+static void
+plane_selection_changed(ModuleGUI *gui,
+                        gint id,
+                        GwySelection *selection)
+{
+    ModuleArgs *args = gui->args;
+    GwyBrick *brick = args->brick;
+    gint zres = gwy_brick_get_zres(brick);
+    RephasePos pos;
+    gdouble r;
+
+    gwy_debug("%d (%d)", gui->changing_selection, id);
+    if (gui->changing_selection)
+        return;
+    if (id != 0 || !gwy_selection_get_object(selection, id, &r))
+        return;
+
+    fill_pos_from_params(args->params, &pos);
+    pos.z = CLAMP(gwy_brick_rtok_cal(brick, r), 0, 2*zres-1);
+    update_position(gui, &pos, FALSE);
+}
+
+static void
+dialog_response_after(G_GNUC_UNUSED GtkDialog *dialog, gint response, ModuleGUI *gui)
+{
+    ModuleArgs *args = gui->args;
+    GwyBrick *brick = args->brick;
+
+    if (response == GWY_RESPONSE_RESET) {
+        gwy_params_set_int(args->params, PARAM_XPOS, gwy_brick_get_xres(brick)/2);
+        gwy_params_set_int(args->params, PARAM_YPOS, gwy_brick_get_yres(brick)/2);
+        gwy_params_set_int(args->params, PARAM_ZPOS, gwy_brick_get_zres(brick)/2);
+    }
+}
+
+static void
+update_position(ModuleGUI *gui, const RephasePos *pos, gboolean assume_changed)
+{
+    ModuleArgs *args = gui->args;
+    GwyParams *params = args->params;
+    GwyBrick *brick = args->brick;
+    gdouble xy[2], z;
+    gboolean plane_changed = FALSE, point_changed = FALSE;
+    RephasePos currpos;
+
+    fill_pos_from_params(params, &currpos);
+    xy[0] = gwy_brick_itor(brick, pos->x);
+    xy[1] = gwy_brick_jtor(brick, pos->y);
+    z = gwy_brick_ktor_cal(brick, pos->z);
+    point_changed = (pos->x != currpos.x || pos->y != currpos.y);
+    plane_changed = (pos->z != currpos.z);
+
+    gui->changing_selection = TRUE;
+    gwy_param_table_set_int(gui->table, PARAM_XPOS, pos->x);
+    gwy_param_table_set_int(gui->table, PARAM_YPOS, pos->y);
+    gwy_param_table_set_int(gui->table, PARAM_ZPOS, pos->z);
+    if (assume_changed || point_changed)
+        gwy_selection_set_object(gui->iselection, 0, xy);
+    if (assume_changed || plane_changed)
+        gwy_selection_set_object(gui->gselection, 0, &z);
+    gui->changing_selection = FALSE;
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    ModuleArgs *args = gui->args;
+    GwyGraphCurveModel *gcmodel;
+
+    extract_gmodel(args, gui->gmodel);
+    gcmodel = gwy_graph_model_get_curve(gui->gmodel, 0);
+    extract_graph_curve(args, gcmodel);
+
+    extract_image_plane(args, gui->image);
+    gwy_data_field_data_changed(gui->image);
+    gwy_set_data_preview_size(GWY_DATA_VIEW(gui->dataview), PREVIEW_SIZE);
+}
+
+/* Gets the two brick values for lev, corrected for shift and direction/inversion. lev should go from 0 to zres. */
+static gboolean
+get_shifted_values(GwyBrick *b1, GwyBrick *b2,
+                   gint col, gint row, gint lev,
+                   gint shift, gint right, gint invert,
+                   gdouble *val1, gdouble *val2)
+{
+    const gdouble *b1data = b1->data, *b2data = b2->data;
+    gint xres = b1->xres, yres = b1->yres, zres = b1->zres;
+    gint pos;
+
+    if (right) {
+        pos = lev + shift;
+        if (pos < zres)
+            *val1 = b1data[col + xres*row  + xres*yres*pos];
+        else {
+            if (invert) {
+                pos = 2*zres - pos - 1;
+                *val1 = b2data[col + xres*row  + xres*yres*pos];
+            }
+            else {
+                /* ??? ??? ??? ??? ??? val1 is unset. */
+            }
+        }
+
+        pos = lev + shift + zres;
+        if (pos < 2*zres) {
+            pos = 2*zres - pos - 1;
+            *val2 = b2data[col + xres*row  + xres*yres*pos];
+        }
+        else {
+            pos -= 2*zres;
+            *val2 = b1data[col + xres*row  + xres*yres*pos];
+        }
+    }
+    else {
+        *val1 = 3;
+        *val2 = 4;
+    }
+    return TRUE;
+}
+
+static void
+execute(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GwyParams *params = args->params;
+    GwyBrick *second_brick = gwy_params_get_volume(params, PARAM_OTHER_VOLUME);
+    gint z = gwy_params_get_int(args->params, PARAM_ZPOS);
+    gboolean right = gwy_params_get_boolean(args->params, PARAM_RIGHT);
+    gboolean invert = gwy_params_get_boolean(args->params, PARAM_INVERT);
+    GwyBrick *result1, *result2, *brick = args->brick;
+    gint xres = gwy_brick_get_xres(brick), yres = gwy_brick_get_yres(brick), zres = gwy_brick_get_zres(brick);
+    gint newid;
+    gint col, row, lev;
+    gdouble *r1data, *r2data;
+    gdouble val1 = 0, val2 = 0, lastval1, lastval2;
+
+    result1 = gwy_brick_new_alike(args->brick, TRUE);
+    result2 = gwy_brick_new_alike(args->brick, TRUE);
+
+    r1data = gwy_brick_get_data(result1);
+    r2data = gwy_brick_get_data(result2);
+
+    for (col = 0; col < xres; col++) {
+        for (row = 0; row < yres; row++) {
+            for (lev = 0; lev < zres; lev++) {
+                 if (get_shifted_values(brick, second_brick, col, row, lev, z, right, invert, &val1, &val2)) {
+                     r1data[col + xres*row + xres*yres*lev] = val1;
+                     r2data[col + xres*row + xres*yres*lev] = val2;
+                     lastval1 = val1;
+                     lastval2 = val2;
+                 }
+                 else {
+                     r1data[col + xres*row + xres*yres*lev] = lastval1;
+                     r2data[col + xres*row + xres*yres*lev] = lastval2;
+                 }
+            }
+        }
+    }
+    gwy_brick_data_changed(result1);
+    gwy_brick_data_changed(result2);
+
+    newid = gwy_app_data_browser_add_brick(result1, NULL, data, TRUE);
+
+    gwy_app_set_brick_title(data, newid, _("Phase adjusted result A"));
+    gwy_app_sync_volume_items(data, data, id, newid, FALSE,
+                              GWY_DATA_ITEM_GRADIENT,
+                              0);
+    gwy_app_volume_log_add_volume(data, -1, newid);
+
+    newid = gwy_app_data_browser_add_brick(result2, NULL, data, TRUE);
+
+    gwy_app_set_brick_title(data, newid, _("Phase adjusted result B"));
+    gwy_app_sync_volume_items(data, data, id, newid, FALSE,
+                              GWY_DATA_ITEM_GRADIENT,
+                              0);
+    gwy_app_volume_log_add_volume(data, -1, newid);
+
+    g_object_unref(result1);
+    g_object_unref(result2);
+}
+
+static void
+extract_image_plane(ModuleArgs *args, GwyDataField *dfield)
+{
+    gint zres = gwy_brick_get_zres(args->brick);
+    gint z = gwy_params_get_int(args->params, PARAM_ZPOS);
+    gboolean right = gwy_params_get_boolean(args->params, PARAM_RIGHT);
+    gboolean invert = gwy_params_get_boolean(args->params, PARAM_INVERT);
+    GwyBrick *second_brick = gwy_params_get_volume(args->params, PARAM_OTHER_VOLUME);
+    GwyBrick *brick = args->brick;
+
+    if (right) {
+       if (z < zres)
+           gwy_brick_extract_xy_plane(brick, dfield, z);
+       else if (second_brick) {
+           if (invert)
+               gwy_brick_extract_xy_plane(brick, dfield, 2*zres - z - 1);
+           else
+               gwy_brick_extract_xy_plane(brick, dfield, z - zres);
+       }
+    }
+
+    gwy_data_field_data_changed(dfield);
+}
+
+static void
+extract_graph_curve(ModuleArgs *args, GwyGraphCurveModel *gcmodel)
+{
+    GwyParams *params = args->params;
+    GwyBrick *second_brick = gwy_params_get_volume(params, PARAM_OTHER_VOLUME);
+    gboolean right = gwy_params_get_boolean(args->params, PARAM_RIGHT);
+    gboolean invert = gwy_params_get_boolean(args->params, PARAM_INVERT);
+    GwyBrick *brick = args->brick;
+    GwyDataLine *line = gwy_data_line_new(1, 1.0, FALSE);
+    GwyDataLine *second_line = gwy_data_line_new(1, 1.0, FALSE);
+    GwyDataLine *merged_line;
+    gint zres = gwy_brick_get_zres(args->brick);
+    gdouble zreal = gwy_brick_get_zreal(args->brick);
+    RephasePos pos;
+    gchar *desc;
+    gint i;
+    gdouble *data, *data1, *data2;
+
+    fill_pos_from_params(params, &pos);
+    gwy_debug("(%d, %d, %d)", pos.x, pos.y, pos.z);
+    gwy_brick_extract_line(brick, line, pos.x, pos.y, 0, pos.x, pos.y, zres, FALSE);
+    gwy_brick_extract_line(second_brick, second_line, pos.x, pos.y, 0, pos.x, pos.y, zres, FALSE);
+
+    merged_line = gwy_data_line_new(2*zres, 2*zreal, FALSE);
+    data = gwy_data_line_get_data(merged_line);
+    data1 = gwy_data_line_get_data(line);
+    data2 = gwy_data_line_get_data(second_line);
+
+    for (i = 0; i < zres; i++) {
+        if (right) {
+            data[i] = data1[i];
+            data[i + zres] = (invert ? data2[zres-i-1] : data2[i]);
+        }
+        else {
+            data[i] = data2[i];
+            data[i + zres] = (invert ? data1[zres-i-1] : data1[i]);
+        }
+    }
+
+    desc = g_strdup_printf(_("Merged graph at x: %d y: %d"), pos.x, pos.y);
+    g_object_set(gcmodel,
+                 "description", desc,
+                 "mode", GWY_GRAPH_CURVE_LINE,
+                 NULL);
+    g_free(desc);
+
+    gwy_graph_curve_model_set_data_from_dataline(gcmodel, merged_line, 0, 0);
+
+    g_object_unref(line);
+    g_object_unref(second_line);
+    g_object_unref(merged_line);
+}
+
+static void
+extract_gmodel(ModuleArgs *args, GwyGraphModel *gmodel)
+{
+    GwyBrick *brick = args->brick;
+    GwySIUnit *xunit, *yunit;
+
+    xunit = (args->zcalibration ? gwy_data_line_get_si_unit_y(args->zcalibration) : gwy_brick_get_si_unit_z(brick));
+    yunit = gwy_brick_get_si_unit_w(brick);
+    g_object_set(gmodel,
+                 "title", _("Volume Z graphs"),
+                 "si-unit-x", xunit,
+                 "si-unit-y", yunit,
+                 "axis-label-bottom", "z",
+                 "axis-label-left", "w",
+                 NULL);
+}
+
+static void
+fill_pos_from_params(GwyParams *params, RephasePos *pos)
+{
+    pos->x = gwy_params_get_int(params, PARAM_XPOS);
+    pos->y = gwy_params_get_int(params, PARAM_YPOS);
+    pos->z = gwy_params_get_int(params, PARAM_ZPOS);
+}
+
+static inline void
+clamp_int_param(GwyParams *params, gint id, gint min, gint max, gint default_value)
+{
+    gint p = gwy_params_get_int(params, id);
+
+    if (p < min || p > max)
+        gwy_params_set_int(params, id, default_value);
+}
+
+static void
+sanitise_params(ModuleArgs *args)
+{
+    GwyParams *params = args->params;
+    gint xres = gwy_brick_get_xres(args->brick);
+    gint yres = gwy_brick_get_yres(args->brick);
+    gint zres = gwy_brick_get_zres(args->brick);
+
+    clamp_int_param(params, PARAM_XPOS, 0, xres-1, xres/2);
+    clamp_int_param(params, PARAM_YPOS, 0, yres-1, yres/2);
+    clamp_int_param(params, PARAM_ZPOS, 0, zres-1, zres/2);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

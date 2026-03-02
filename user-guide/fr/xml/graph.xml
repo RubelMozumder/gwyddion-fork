@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: graph.xml 19283 2016-11-17 21:37:37Z francheu $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='graph-processing'>
+  <title>Analyse de graphes</title>
+  <para>
+    De nombreux modules d'analyse des données de Gwyddion produisent des
+    graphes. Ceux-ci peuvent être exportés sous forme de fichier texte ou être
+    analysé directement avec Gwyddion grâce à plusieurs module d'analyse de
+    graphes. Ces modules se situent dans le menu Graphes de la fenêtre
+    principale de Gwyddion. Notez que le nombre de modules est pour l'instant
+    assez limité et ceux-ci permettent de faire les opérations de base les plus
+    courantes en analyse de données SPM. Vous pouvez utiliser votre programme
+    d'analyse de graphes favori pour obtenir plus d'outils..
+  </para>
+  <para>
+    Les modules de graphes disponibles dans Gwyddion sont présentés brièvement
+    dans cette section.
+  </para>
+  <sect2 id='basic-graph-operations'>
+    <title>Opérations basiques</title>
+    <para>
+      Les fonctions de zoom et de lecture des valeurs sont accessibles
+      directement dans la fenêtre de graphe :
+    </para>
+    <itemizedlist>
+      <listitem>
+        Axes logarithmiques – les axes horizontal et vertical peuvent passer
+        du format linéaire au logarithmique à l'aide du bouton d'échelle
+        logarithmique. Le passage à l'échelle logarithmique n'est possible que
+        pour les valeurs positives (en abcisse ou ordonnée).
+      </listitem>
+      <listitem>
+        Zoomer et dézoomer – dessinez simplement la zone à afficher avec la
+        souris après avoir sélectionné le bouton zoom. Le bouton dézoomer
+        permet d'afficher toutes les données.
+      </listitem>
+      <listitem>
+        Mesure de distance – permet à l'utilisateur de sélectionner plusieurs
+        points sur le graphe et d'en afficher les distance et les angles entre
+        chacun.
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2 id='graph-level'>
+    <title>Mise à niveau de graphes</title>
+    <para>
+      La mise à niveau de graphe est un
+      module très simple réalisant un ajustement linéaire de chaque courbe et
+      en soustrait la fonction linéaire calculée.
+    </para>
+  </sect2>
+  <sect2 id='graph-align'>
+    <title>Alignement de graphes</title>
+    <para>
+      L'alignement de graphes décale les courbes horizontalement pour maximiser
+      leur corrélation mutuelle, c'est-à-dire qu'elle fait correspondre les 
+      détails communs entre les deux courbes. Cette fonction est utile pour
+      comparer des profils pris à des endroits différents d'une surface.
+    </para>
+  </sect2>
+  <sect2 id='graph-logscale'>
+    <title>Transformée logarithmique</title>
+    <para>
+      Les contrôles de la fenêtre du graphe permettent de passer les axes de
+      l'échelle liénaire à l'échelle logarithmique. Toutefois, pour 
+      l'ajustement de données à l'aide de fonctions de type puissance, il peut
+      être utile de transformer physiquement les données en prenant le 
+      logarithme des valeurs. La fonction de transformée logarithmique permet
+      de réaliser une telle conversion. Vous pouvez choisir l'axe à 
+      transformer (<xi:include href="eqi-x.xml"/>, 
+      <xi:include href="eqi-y.xml"/> ou les deux), définir le comportement pour
+      les valeurs négatives, ou choisir la base logarithmique. Un nouveau graphe
+      est alors créé, avec toutes les courbes transformées tel que désiré.
+    </para>
+  </sect2>
+  <sect2 id='graph-fit'>
+    <title>Ajustement de fonction</title>
+    <indexterm><primary>ajustement de fonction</primary></indexterm>
+    <para>
+      L'ajustement de courbe est conçu avant tout pour ajuster des fonctions
+      statistiques utilisées pour le calcul de paramètres de rugosité. Les
+      fonctions disponibles sont donc pour la plupart des fonctions statistiques
+      de surfaces ayant des fonctions d'autocorrélation gaussienne ou
+      exponentielles. Il propose aussi quelques fonctions plus communes.
+    </para>
+    <para>
+      Au sein du module vous pouvez sélectionner la zone à ajuster (avec souris
+      ou numériquement), tester divers paramètres initiaux, ou laisser le module
+      les évaluer, pour finalement ajuster les données à l'aide de l'aide de
+      l'algorithme de Marquardt-Levenberg.
+    </para>
+    <para>
+      Vous obtiendrez alors la courbe ajustée ainsi que ses paramètres.
+      L'ajustement peut être sauvegardé dans un fichier à l'aide du bouton
+      <guibutton>Sauvegarder</guibutton> button.  Le bouton
+      <guibutton>OK</guibutton> permet d'ajouter la courbe ajustée au graphe, si
+      vous ne le souhaitez pas vous pouvez quitter le module avec le bouton
+      <guibutton>Annuler</guibutton>.
+    </para>
+    <informalfigure id='fig-graph-fit-screenshot'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='graph_fit.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Fenêtre du module d'ajustement de courbe
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='fd-curve-fitting'>
+    <title>Ajustement de courbe force-distance</title>
+    <para>
+      Le module d'ajustement de courbe force-distance est très similaire au
+      module précédent, il est juste spécialisé pour les courbes force-distance.
+      Le module permet pour l'instant d'ajuster la partie montante d'une courbe
+      force-distance (qui correspond aux forces attractives) à l'aide de
+      différents modèles :
+    </para>
+    <itemizedlist>
+      <listitem>
+        force de van der Waals entre un hémisphère et le demi-espace
+      </listitem>
+      <listitem>
+        force de van der Waals entre une pyramide et le demi-espace
+      </listitem>
+      <listitem>
+        force de van der Waals entre une pyramide tronquée et le demi-espace
+      </listitem>
+      <listitem>
+        force de van der Waals entre une sphère et le demi-espace
+      </listitem>
+      <listitem>
+        force de van der Waals entre deux sphères
+      </listitem>
+      <listitem>
+        force de van der Waals entre un cône et le demi-espace
+      </listitem>
+      <listitem>
+        force de van der Waals entre un cylindre et le demi-espace
+      </listitem>
+      <listitem>
+        force de van der Waals entre une paraboloïde et le demi-espace
+      </listitem>
+    </itemizedlist>
+    <para>
+      Notez que la courbe à ajuster doit être une véritable courbe
+      force-distance, et non une courbe déplacement-distance ou
+      senseur-distance. La conversion de la déflection du cantilever en force
+      doit être faite avant d'utiliser ce module.
+    </para>
+    <para>
+      Sachez aussi que pour les cantilevers ayant des constantes
+      d'ammortissement courtes, la quantité de données utilisables est limitée
+      dans la région attractive à cause des effets de rebonds au contact.
+    </para>
+  </sect2>
+  <sect2 id='graph-critical-dimension'>
+    <title>Dimension critique</title>
+    <indexterm><primary>dimension critique</primary></indexterm>
+    <para>
+      Le module dimension critique peut être utilisé pour ajuster certains
+      objets <quote>typiques</quote> obtenus lors de l'analyse de profils
+      extraits de puces électroniques ou de surface similaires. Ces objets sont
+      localisés sur le graphe et leurs propriétés sont calculées.
+    </para>
+    <para>
+      L'interface utilisateur de ce module est pratiquement identique à celle du
+      module d'ajustement de graphe.
+    </para>
+    <informalfigure id='fig-graph-cd-screenshot'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='graph_cd.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Fenêtre de dialogue du module de calcul de dimension critique.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='graph-dos-spectrum'>
+    <title>Spectre DOS</title>
+    <indexterm><primary>Spectre DOS</primary></indexterm>
+    <para>
+        Le module de spectre DOS sert à obtenir des spectres de densités d'états
+        (Density-of-States) à partir de mesures de spectroscopie STM I-V 
+        (réponse courant-tension obtenue par microscopie à effet tunnel). Il 
+        calcule <xi:include href="eq-graph-dos.xml"/> et l'affiche sous forme
+        de graphe.
+    </para>
+  </sect2>
+  <sect2 id='graph-peaks'>
+    <title>Localisation des pics</title>
+    <indexterm><primary>pics</primary></indexterm>
+    <para>
+      Les pics les plus importants d'un graphe peuvent être automatiquement
+      localisés avec une précision inférieure à l'échantillonnage. Vous pouvez
+      spécifier le nombre des pics les plus proéminents dans la case
+      <guilabel>nombre des pics</guilabel>, et la fonction les marquera 
+      en conséquence. La proéminence d'un pic dépend de sa hauteur, son aire 
+      ainsi que sa distance par rapport aux autres pics. En général, l'idée que 
+      se fait la fonction de la proéminence des pics est assez proche de celle
+      obtenue par détermination visuelle. Si vous êtes en désaccord avec les 
+      pics obtenus, vous pouvez en demander un nombre plus important puis 
+      ignorer ceux qui ne vous jugez pas satisfaisant.
+    </para>
+    <para>
+      Une table résumant tous les pics est affichée sur la gauche, ceux-ci 
+      étant classés en fonction de <guilabel>classer les pics par</guilabel>.  
+      Le classement par position signifie que les pics sont listés dans le 
+      même ordre que sur le graphes, de gauche à droite. Le classement par
+      proéminence signifie que les pics les plus significatifs sont listés en 
+      premier.
+    </para>
+    <para>
+      Plusieurs caractéristiques sont données pour chaque pic :
+      position (abscisse) <xi:include href="eqi-x.xml"/>,
+      hauteur <xi:include href="eqi-h.xml"/>,
+      aire <xi:include href="eqi-A.xml"/>,
+      et largeur (ou variance) <xi:include href="eqi-w.xml"/>.
+      La position est calculée par un ajustement quadratique du maximum du pic.
+      Les caractéristiques restantes dépendent de la définition de 
+      l'arrière-plan du pic. Les choix possibles incluent 
+      <guilabel>zéro</guilabel>, c'est-à-dire que la base du pic est toujours 
+      considérée comme valant zéro, et <guilabel>minimum bilatéral</guilabel>,
+      c'est-à-dire que l'arrière-plan du pic est une fonction saut passant par
+      le minimum de la courbe le plus proche de part et d'autre du pic.
+    </para>
+    <informalfigure id='fig-graph-peaks'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='graph-peaks.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Exemple de localisation automatique des pics pour une courbe de 
+          distribution des hauteurs.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

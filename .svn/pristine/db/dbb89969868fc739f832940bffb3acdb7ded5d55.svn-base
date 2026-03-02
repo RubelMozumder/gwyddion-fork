@@ -1,0 +1,14 @@
+--- gtk+-2.24.31/gtk/gtkentrycompletion.c.orig	2016-07-03 20:01:01.000000000 +0200
++++ gtk+-2.24.31/gtk/gtkentrycompletion.c	2019-04-06 13:21:03.678392589 +0200
+@@ -1587,6 +1587,11 @@ _gtk_entry_completion_compute_prefix (Gt
+   if (completion->priv->text_column < 0)
+     return NULL;
+ 
++  /* Not sure why it can happen, but just return NULL when there is no
++   * filter_model (yet). */
++  if (!completion->priv->filter_model)
++    return NULL;
++
+   valid = gtk_tree_model_get_iter_first (GTK_TREE_MODEL (completion->priv->filter_model),
+ 					 &iter);
+   

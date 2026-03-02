@@ -1,0 +1,254 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-user-guide\n"
+"POT-Creation-Date: 2022-01-07 20:29+0400\n"
+"PO-Revision-Date: 2022-01-07 20:32+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: data-browser.xml:6(title)
+msgid "Data Browser"
+msgstr "Браузер данных"
+
+#: data-browser.xml:7(primary)
+msgid "data browser"
+msgstr "браузер данных"
+
+#: data-browser.xml:8(para)
+msgid ""
+"Data browser is a window that displays the structure of currently focused "
+"file. It shows the content as represented in Gwyddion which may differ "
+"somewhat from the organization in the original software."
+msgstr ""
+"Браузер данных — окно, которое показывает структуру текущего активного "
+"файла. Оно показывает содержимое так, как оно представлено внутри Gwyddion, "
+"что может в чём-то отличаться от организации данных в оригинальном "
+"программном обеспечении."
+
+#: data-browser.xml:13(para)
+msgid ""
+"Gwyddion supports an arbitrary number of two-dimensional data fields per "
+"file. Depending on the context, they are also often called images or height "
+"fields in this guide (individual images are also occasionally called "
+"channels although other, non-image data types consist of channels as well). "
+"The dimensions of images in one file may differ and also the physical "
+"dimensions and values can be arbitrary physical quantities."
+msgstr ""
+"Gwyddion поддерживает произвольное число двумерных полей данных в файле. В "
+"зависимости от контекста в этом руководстве они также называются "
+"изображениями или полями высоты (отдельные изображения могут иногда случайно "
+"называться каналами, хотя другие, не связанные с изображениями типы данных, "
+"состоят также из каналов). Размеры изображений в одном файле могут "
+"различаться,  физические размеры и значения также могут быть произвольными "
+"физическими величинами."
+
+#: data-browser.xml:22(para)
+msgid ""
+"In addition, one-dimensional data, represented as graphs, and single-point "
+"spectra can be present in the same file. The data browser is a tool for "
+"browsing and managing all the available data in the file."
+msgstr ""
+"Дополнительно в том же файле могут присутствовать трёхмерные объёмные "
+"данные, данные XYZ и одномерные данные, представленные в виде графиков, и "
+"данные спектроскопии в точках. Окно просмотра данных предназначено для "
+"просмотра и управления всеми доступными данными в файле."
+
+#: data-browser.xml:32(caption)
+msgid "Data browser displaying several images."
+msgstr "Браузер данных, показывающий несколько изображений."
+
+#: data-browser.xml:38(title)
+msgid "Controlling the Browser"
+msgstr "Управление браузером"
+
+#: data-browser.xml:39(para)
+msgid ""
+"Since the data browser always displays the structure of currently focused "
+"file, its contents change as you switch between different windows, possibly "
+"showing data from different files. There is no difference between native "
+"Gwyddion files (<filename>.gwy</filename>) and other files. Once a file is "
+"loaded its structure is shown as if it was a Gwyddion file."
+msgstr ""
+"Поскольку окно браузера данных всегда показывает структуру текущего "
+"активного файла, его содержимое меняется при переходе между разными окнами. "
+"которые могут показывать данные различных файлов. Независимо, сохранён ли "
+"файл в родном формате Gwyddion (<filename>.gwy</filename>) или в любом "
+"другом, после того, как он загружен, его структура отображается как если бы "
+"он хранился в формате Gwyddion."
+
+#: data-browser.xml:51(guilabel) data-browser.xml:85(title)
+msgid "Images"
+msgstr "Изображения"
+
+#: data-browser.xml:52(guilabel) data-browser.xml:101(title)
+msgid "Graphs"
+msgstr "Графики"
+
+#: data-browser.xml:53(guilabel) data-browser.xml:109(title)
+msgid "Spectra"
+msgstr "Спектры"
+
+#: data-browser.xml:54(guilabel) data-browser.xml:119(title)
+msgid "Volume"
+msgstr "Объём"
+
+#: data-browser.xml:55(guilabel) data-browser.xml:129(title)
+msgid "XYZ"
+msgstr "XYZ"
+
+#: data-browser.xml:56(guilabel) data-browser.xml:136(title)
+msgid "Curve Maps"
+msgstr "Карты кривых"
+
+#: data-browser.xml:47(para)
+msgid ""
+"The data browser has several tabs, one for each type of data that can be "
+"present in the file: <placeholder-1/> Each list shows names of the data "
+"objects and some additional properties that depend on the specific data "
+"type. The names can be edited after double-clicking on them."
+msgstr ""
+"Окно браузера данных содержит несколько вкладок, по одной на каждый тип "
+"данных, который может быть в файле: <placeholder-1/>. Каждый список "
+"показывает имена объектов данных и некоторые дополнительные свойства, "
+"которые зависят от типа данных. Имена можно исправлять двойным нажатием по "
+"ним."
+
+#: data-browser.xml:62(para)
+msgid ""
+"Individual images, graphs, spectra, volume, XYZ or curve map data can be "
+"deleted, duplicated or extracted to new Gwyddion native file using the "
+"buttons at the bottom of the browser. It is also possible to copy them to "
+"another file by dragging a data browser row to any window belonging to the "
+"target file. To rename a data item, select it and press <keycap>Enter</"
+"keycap> or triple-click on it with the mouse."
+msgstr ""
+"Отдельные изображения, графики, спектры, объёмные данные, данные XYZ и карты "
+"кривых можно удалять, копировать или извлекать в новый файл данных Gwyddion "
+"используя кнопки внизу окна браузера данных. Также можно скопировать их в "
+"другой файл, перетащив строку из окна браузера данных в любое окно, "
+"относящееся к целевому файлу. Чтобы переименовать элемент данных, его нужно "
+"выбрать и нажать <keycap>Enter</keycap> или три раза кликнуть по нему мышкой."
+
+#: data-browser.xml:70(para)
+msgid ""
+"The close button in the top right corner of the data browser closes the "
+"current file, discarding all unsaved changes. A file is also closed when all "
+"windows displaying data from this file are closed."
+msgstr ""
+"Кнопка закрытия в правом верхнем углу браузера данных закрывает текущий "
+"файл, теряя все несохранённые изменения. Файл также закроется когда все "
+"окна, отображающие данные из этого файла, будут закрыты."
+
+#: data-browser.xml:75(para)
+msgid ""
+"If the data browser is closed it can be recalled using the "
+"<menuchoice><guimenu>Info</guimenu><guimenuitem>Show Data Browser</"
+"guimenuitem></menuchoice> command."
+msgstr ""
+"Если окно списка каналов закрыто, его можно вызвать используя команду "
+"<menuchoice><guimenu>Информация</guimenu><guimenuitem>Показать браузер "
+"данных</guimenuitem></menuchoice>."
+
+#: data-browser.xml:94(guilabel)
+msgid "M"
+msgstr "M"
+
+#: data-browser.xml:94(listitem)
+msgid "<placeholder-1/> – mask"
+msgstr "<placeholder-1/> – маска"
+
+#: data-browser.xml:95(guilabel)
+msgid "P"
+msgstr "P"
+
+#: data-browser.xml:95(listitem)
+msgid "<placeholder-1/> – presentation"
+msgstr "<placeholder-1/> – презентация"
+
+#: data-browser.xml:96(guilabel)
+msgid "C"
+msgstr "C"
+
+#: data-browser.xml:96(listitem)
+msgid "<placeholder-1/> – calibration"
+msgstr "<placeholder-1/> – калибровка"
+
+#: data-browser.xml:86(para)
+msgid ""
+"The image list shows thumbnails, check-boxes controlling whether the image "
+"is visible (i.e. displayed in a window) and image names. Right to the name "
+"the presence of <link linkend=\"presentations-masks\">presentation, mask</"
+"link> or <link linkend=\"caldata\">calibration</link> is indicated by the "
+"following letters: <placeholder-1/>"
+msgstr ""
+"Браузер данных показывает миниатюры изображений, флажки, управляющие, будет "
+"ли виден канал (т.е. будет ли он показан в отдельном окне), и названия "
+"изображений. Наличие <link linkend=\"presentations-masks\">презентации и/или "
+"маски</link> отображается показом следующих символов справа от имени: "
+"<placeholder-1/>"
+
+#: data-browser.xml:102(para)
+msgid ""
+"The graph list shows check-boxes controlling whether the graph is visible "
+"and graph names. Right to the name the number of curves in the graph is "
+"displayed."
+msgstr ""
+"Список графиков показывает флажки видимости и имена графиков. Справа от "
+"имени отображается число кривых в графике."
+
+#: data-browser.xml:110(para)
+msgid ""
+"The spectrum list shows the spectra name and the number of points in the "
+"set. Since single-point spectra are displayed and operated on only in "
+"connection with a two-dimensional data using the <link linkend=\"single-"
+"point-spectra\">spectroscopy tool</link>, there is no check-box controlling "
+"the visibility."
+msgstr ""
+"Список спектров показывает названия спектров и число точек в наборе. "
+"Поскольку данные спектроскопии в точке отображаются и обрабатываются только "
+"в связке с двумерными данными используя <link linkend=\"single-point-spectra"
+"\">инструмент спектроскопии</link>, у них нет флажков, управляющих "
+"видимостью."
+
+#: data-browser.xml:120(para)
+msgid ""
+"The volume data list shows the data name and the number of levels in the <xi:"
+"include href=\"eqi-z.xml\"/> direction, i.e. perpendicular to the section "
+"displayed in the window. A letter <guilabel>Z</guilabel> after the number of "
+"levels indicates the presence of a <xi:include href=\"eqi-z.xml\"/>-axis "
+"calibration."
+msgstr ""
+"Список объёмных данных показывает имя данных и число слоёв в направлении оси "
+"<xi:include href=\"eqi-z.xml\"/>, т.е. перпендикулярно сечению, показанному "
+"на экране. Буква <guilabel>Z</guilabel> после числа слоёв показывает наличие "
+"калибровки оси <xi:include href=\"eqi-z.xml\"/>."
+
+#: data-browser.xml:130(para)
+msgid ""
+"The XYZ data list shows the data name and the number of points in the XYZ "
+"point set."
+msgstr ""
+"Список данных XYZ показывает название данных и число точек в наборе точек "
+"XYZ."
+
+#: data-browser.xml:137(para)
+msgid ""
+"The XYZ data list shows the data name and the number of curves (data series) "
+"in each point of the map. If the curves are segmented the number of segments "
+"is displayed after a colon."
+msgstr ""
+"Список карт кривых показывает название набора данных и количество кривых "
+"(серий данных) в каждой точке карты. Если кривые сегментированы, число "
+"сегментов показывается после запятой."
+
+#~ msgid "Channels"
+#~ msgstr "Каналы"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

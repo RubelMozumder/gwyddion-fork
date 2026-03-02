@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="640.68341"
+   height="201.70276"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.92.4 (unknown)"
+   sodipodi:docname="correct-affine.svg"
+   viewBox="0 0 600.64068 189.09634">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.1425949"
+     inkscape:cx="206.6429"
+     inkscape:cy="170.73347"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1149"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-31.192522,-48.536526)">
+    <image
+       sodipodi:absref="/home/yeti/Projects/Gwyddion/user-guide/common/srcimages/correct-affine-original.png"
+       xlink:href="correct-affine-original.png"
+       y="48.536526"
+       x="31.192522"
+       id="image3047"
+       height="151.98573"
+       width="151.44292" />
+    <image
+       sodipodi:absref="/home/yeti/Projects/Gwyddion/user-guide/common/srcimages/correct-affine-corrected.png"
+       xlink:href="correct-affine-corrected.png"
+       y="48.536526"
+       x="471.74118"
+       id="image3171"
+       height="188.73471"
+       width="160.09206" />
+    <image
+       sodipodi:absref="/home/yeti/Projects/Gwyddion/user-guide/common/srcimages/correct-affine-dialog.png"
+       xlink:href="correct-affine-dialog.png"
+       y="48.536526"
+       x="187.04111"
+       id="image3233"
+       height="189.09633"
+       width="280.29437" />
+    <text
+       xml:space="preserve"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;baseline-shift:baseline;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.2714031;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       x="39.474277"
+       y="68.983841"
+       id="text3236"><tspan
+         sodipodi:role="line"
+         id="tspan3238"
+         x="39.474277"
+         y="68.983841"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.19857407px;line-height:1.39999998;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';stroke-width:0.2714031">(a)</tspan></text>
+    <text
+       id="text4008"
+       y="68.983841"
+       x="195.076"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;baseline-shift:baseline;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.2714031;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       xml:space="preserve"><tspan
+         y="68.983841"
+         x="195.076"
+         id="tspan4010"
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.19857407px;line-height:1.39999998;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';stroke-width:0.2714031">(b)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;baseline-shift:baseline;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.2714031;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       x="478.90512"
+       y="68.983841"
+       id="text4012"><tspan
+         sodipodi:role="line"
+         id="tspan4014"
+         x="478.90512"
+         y="68.983841"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.19857407px;line-height:1.39999998;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';stroke-width:0.2714031">(c)</tspan></text>
+  </g>
+</svg>

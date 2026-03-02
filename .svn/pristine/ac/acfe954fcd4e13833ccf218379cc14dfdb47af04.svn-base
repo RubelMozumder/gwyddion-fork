@@ -1,0 +1,1538 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informaltable id='table-file-formats'>
+  <indexterm>
+    <primary>fichier</primary>
+    <primary>formats supportés</primary>
+  </indexterm>
+  <tgroup cols='6' align='left'>
+    <?dblatex XXlcccc?>
+    <thead>
+      <row>
+        <entry>Format de fichier</entry>
+        <entry>Extensions</entry>
+        <entry>Module</entry>
+        <entry>Lecture</entry>
+        <entry>Écriture</entry>
+        <entry>SPS</entry>
+        <entry>Volume</entry>
+      </row>
+    </thead>
+    <tbody>
+    <!-- This is a GENERATED file. -->
+    <!-- From module accurexii-txt.c -->
+    <row>
+      <entry>Accurex II texte</entry>
+      <entry>.txt</entry>
+      <entry>accurexii-txt</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module afmw-spec.c -->
+    <row>
+      <entry>AFM Workshop spectroscopy</entry>
+      <entry>.csv</entry>
+      <entry>afmw-spec</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module aistfile.c -->
+    <row>
+      <entry>AIST-NT</entry>
+      <entry>.aist</entry>
+      <entry>aistfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module alicona.c -->
+    <row>
+      <entry>Alicona Imaging AL3D</entry>
+      <entry>.al3d</entry>
+      <entry>alicona</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module ambfile.c -->
+    <row>
+      <entry>Ambios AMB</entry>
+      <entry>.amb</entry>
+      <entry>ambfile</entry>
+      <entry>Oui<footnote id="table-file-formats-fn1" label="a"><para>The import module is unfinished due to the lack of documentation,
+testing files and/or people willing to help with the testing.  If you can
+help please contact us.</para></footnote></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module ambprofile.c -->
+    <row>
+      <entry>Ambios 1D profilometry data</entry>
+      <entry>.dat, .xml</entry>
+      <entry>ambprofile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module anasys_xml.c -->
+    <row>
+      <entry>Analysis Studio XML</entry>
+      <entry>.axd, .axz</entry>
+      <entry>anasys_xml</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module anfatec.c -->
+    <row>
+      <entry>Anfatec</entry>
+      <entry>.par, .int</entry>
+      <entry>anfatec</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module apedaxfile.c -->
+    <row>
+      <entry>A.P.E. Research DAX</entry>
+      <entry>.dax</entry>
+      <entry>apedaxfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>A.P.E. Research APDT</entry>
+      <entry>.apdt</entry>
+      <entry>apedaxfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module apefile.c -->
+    <row>
+      <entry>A.P.E. Research DAT</entry>
+      <entry>.dat</entry>
+      <entry>apefile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module asciiexport.c -->
+    <row>
+      <entry>Matrice de données au format texte</entry>
+      <entry>.txt</entry>
+      <entry>asciiexport</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module assing-afm.c -->
+    <row>
+      <entry>Assing AFM</entry>
+      <entry>.afm</entry>
+      <entry>assing-afm</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module attocube.c -->
+    <row>
+      <entry>Attocube Systems ASC</entry>
+      <entry>.asc</entry>
+      <entry>attocube</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module bcrfile.c -->
+    <row>
+      <entry>Image Metrology BCR, BCRF</entry>
+      <entry>.bcr, .bcrf</entry>
+      <entry>bcrfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module burleigh_bii.c -->
+    <row>
+      <entry>Burleigh BII</entry>
+      <entry>.bii</entry>
+      <entry>burleigh_bii</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module burleigh.c -->
+    <row>
+      <entry>Burleigh IMG v2.1</entry>
+      <entry>.img</entry>
+      <entry>burleigh</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module burleigh_exp.c -->
+    <row>
+      <entry>Burleigh données exportées</entry>
+      <entry>.txt, .bin</entry>
+      <entry>burleigh_exp</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module codevfile.c -->
+    <row>
+      <entry>Code V interférogramme</entry>
+      <entry>.int</entry>
+      <entry>codevfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module createc.c -->
+    <row>
+      <entry>Createc DAT</entry>
+      <entry>.dat</entry>
+      <entry>createc</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module csmfile.c -->
+    <row>
+      <entry>Benyuan CSM</entry>
+      <entry>.csm</entry>
+      <entry>csmfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module dektakvca.c -->
+    <row>
+      <entry>Dektak OPDx profilométrie</entry>
+      <entry>.OPDx</entry>
+      <entry>dektakvca</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module dektakxml.c -->
+    <row>
+      <entry>Dektak XML profilométrie</entry>
+      <entry>.xml</entry>
+      <entry>dektakxml</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module dimensionfile.c -->
+    <row>
+      <entry>Veeco Dimension 3100D</entry>
+      <entry>.001, .002, etc.</entry>
+      <entry>dimensionfile</entry>
+      <entry>Oui<footnoteref linkend="table-file-formats-fn1" label="a"/></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module dm3file.c -->
+    <row>
+      <entry>Digital Micrograph DM3 TEM</entry>
+      <entry>.dm3</entry>
+      <entry>dm3file</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Digital Micrograph DM4 TEM</entry>
+      <entry>.dm4</entry>
+      <entry>dm3file</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module dmefile.c -->
+    <row>
+      <entry>DME Rasterscope</entry>
+      <entry>.img</entry>
+      <entry>dmefile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module dumbfile.c -->
+    <row>
+      <entry>Gwyddion données dumb dump</entry>
+      <entry>.dump</entry>
+      <entry>dumbfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module ecsfile.c -->
+    <row>
+      <entry>ECS</entry>
+      <entry>.img</entry>
+      <entry>ecsfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module evovisxml.c -->
+    <row>
+      <entry>Données de profilométrie Evovis XML</entry>
+      <entry>.xml</entry>
+      <entry>evovisxml</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module ezdfile.c -->
+    <row>
+      <entry>Nanosurf EZD, NID</entry>
+      <entry>.ezd, .nid</entry>
+      <entry>ezdfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module femtoscan.c -->
+    <row>
+      <entry>FemtoScan SPM</entry>
+      <entry>.spm</entry>
+      <entry>femtoscan</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module femtoscan-txt.c -->
+    <row>
+      <entry>Données texte FemtoScan</entry>
+      <entry>.txt</entry>
+      <entry>femtoscan-txt</entry>
+      <entry>Oui<footnote id="table-file-formats-fn2" label="b"><para>En assumant un échantillonnage régulier selon X et Y.</para></footnote></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- Module file.c contains no magic. -->
+    <!-- From module fitsfile.c -->
+    <row>
+      <entry>Flexible Image Transport System (FITS)</entry>
+      <entry>.fits, .fit</entry>
+      <entry>fitsfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module formats3d.c -->
+    <row>
+      <entry>rille structurée VTK</entry>
+      <entry>.vtk</entry>
+      <entry>formats3d</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>PLY 3D Polygon</entry>
+      <entry>.ply</entry>
+      <entry>formats3d</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Wavefront OBJ 3D</entry>
+      <entry>.obj</entry>
+      <entry>formats3d</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Object 3D</entry>
+      <entry>.off</entry>
+      <entry>formats3d</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Stereolitographie STL 3D (binaire)</entry>
+      <entry>.stl</entry>
+      <entry>formats3d</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Données XYZ</entry>
+      <entry>.xyz, .dat</entry>
+      <entry>formats3d</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module gdeffile.c -->
+    <row>
+      <entry>DME GDEF</entry>
+      <entry>.gdf</entry>
+      <entry>gdeffile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module gsffile.c -->
+    <row>
+      <entry>Gwyddion Simple Field</entry>
+      <entry>.gsf</entry>
+      <entry>gsffile</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module gwyfile.c -->
+    <row>
+      <entry>Gwyddion données natives</entry>
+      <entry>.gwy</entry>
+      <entry>gwyfile</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module gxyzffile.c -->
+    <row>
+      <entry>Gwyddion XYZ</entry>
+      <entry>.gxyzf</entry>
+      <entry>gxyzffile</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module hdf4file.c -->
+    <row>
+      <entry>Psi HDF4</entry>
+      <entry>.hdf</entry>
+      <entry>hdf4file</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module hdf5file.c -->
+    <row>
+      <entry>Asylum Research Ergo HDF5</entry>
+      <entry>.h5</entry>
+      <entry>hdf5file</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module hitachi-afm.c -->
+    <row>
+      <entry>Hitachi AFM</entry>
+      <entry>.afm</entry>
+      <entry>hitachi-afm</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module hitachi-sem.c -->
+    <row>
+      <entry>Hitachi S-3700 et S-4800 SEM</entry>
+      <entry>.txt + image</entry>
+      <entry>hitachi-sem</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module igorfile.c -->
+    <row>
+      <entry>WaveMetrics IGOR binaire v5</entry>
+      <entry>.ibw</entry>
+      <entry>igorfile</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- Module imgexport.c contains no magic. -->
+    <!-- From module intelliwave.c -->
+    <row>
+      <entry>IntelliWave ESD</entry>
+      <entry>.esd</entry>
+      <entry>intelliwave</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module intematix.c -->
+    <row>
+      <entry>Intematix SDF</entry>
+      <entry>.sdf</entry>
+      <entry>intematix</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module iso28600.c -->
+    <row>
+      <entry>ISO 28600:2011</entry>
+      <entry>.spm</entry>
+      <entry>iso28600</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>Limité<footnote id="table-file-formats-fn3" label="c"><para>Les courbes spectrales sont importées en tant que graphes, les informations de position sont perdues.</para></footnote></entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module jeol.c -->
+    <row>
+      <entry>JEOL</entry>
+      <entry>.tif</entry>
+      <entry>jeol</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module jeoltem.c -->
+    <row>
+      <entry>JEOL TEM</entry>
+      <entry>.tif</entry>
+      <entry>jeoltem</entry>
+      <entry>Oui<footnoteref linkend="table-file-formats-fn1" label="a"/></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module jpkscan.c -->
+    <row>
+      <entry>JPK Instruments</entry>
+      <entry>.jpk, .jpk-qi-image, .jpk-force, .jpk-force-map, .jpk-qi-data</entry>
+      <entry>jpkscan</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module jspmfile.c -->
+    <row>
+      <entry>JEOL JSPM</entry>
+      <entry>.tif</entry>
+      <entry>jspmfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module keyence.c -->
+    <row>
+      <entry>Keyence VK3, VK4, VK6, VK7</entry>
+      <entry>.vk3, .vk4, .vk6, .vk7</entry>
+      <entry>keyence</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module leica.c -->
+    <row>
+      <entry>Leica LIF</entry>
+      <entry>.lif</entry>
+      <entry>leica</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module lextfile.c -->
+    <row>
+      <entry>Olympus LEXT 4000</entry>
+      <entry>.lext</entry>
+      <entry>lextfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module magellan.c -->
+    <row>
+      <entry>FEI Magellan SEM</entry>
+      <entry>.tif</entry>
+      <entry>magellan</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module mapvue.c -->
+    <row>
+      <entry>MapVue</entry>
+      <entry>.map</entry>
+      <entry>mapvue</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- Module matfile.c contains no magic. -->
+    <!-- From module metropro.c -->
+    <row>
+      <entry>Zygo MetroPro DAT</entry>
+      <entry>.dat</entry>
+      <entry>metropro</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module microprof.c -->
+    <row>
+      <entry>MicroProf TXT</entry>
+      <entry>.txt</entry>
+      <entry>microprof</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>MicroProf FRT</entry>
+      <entry>.frt</entry>
+      <entry>microprof</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module miffile.c -->
+    <row>
+      <entry>DME MIF</entry>
+      <entry>.mif</entry>
+      <entry>miffile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module mifile.c -->
+    <row>
+      <entry>Molecular Imaging MI</entry>
+      <entry>.mi</entry>
+      <entry>mifile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Limité<footnoteref linkend="table-file-formats-fn3" label="c"/></entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module mulfile.c -->
+    <row>
+      <entry>Aarhus MUL</entry>
+      <entry>.mul</entry>
+      <entry>mulfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanoeducator.c -->
+    <row>
+      <entry>Nanoeducator</entry>
+      <entry>.mspm, .stm, .spm</entry>
+      <entry>nanoeducator</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanomagnetics.c -->
+    <row>
+      <entry>Nanomagnetics NMI</entry>
+      <entry>.nmi</entry>
+      <entry>nanomagnetics</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanonics.c -->
+    <row>
+      <entry>Nanonics NAN</entry>
+      <entry>.nan</entry>
+      <entry>nanonics</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanonis.c -->
+    <row>
+      <entry>Nanonis SXM</entry>
+      <entry>.sxm</entry>
+      <entry>nanonis</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanonis-spec.c -->
+    <row>
+      <entry>Nanonis STS</entry>
+      <entry>.dat</entry>
+      <entry>nanonis-spec</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanoobserver.c -->
+    <row>
+      <entry>Nano-Solution / NanoObserver</entry>
+      <entry>.nao</entry>
+      <entry>nanoobserver</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanoscan.c -->
+    <row>
+      <entry>Nanoscan XML</entry>
+      <entry>.xml</entry>
+      <entry>nanoscan</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanoscantech.c -->
+    <row>
+      <entry>NanoScanTech</entry>
+      <entry>.nstdat</entry>
+      <entry>nanoscantech</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module nanoscope.c -->
+    <row>
+      <entry>Veeco Nanoscope III</entry>
+      <entry>.spm, .001, .002, etc.</entry>
+      <entry>nanoscope</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Limité<footnoteref linkend="table-file-formats-fn3" label="c"/></entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module nanoscope-ii.c -->
+    <row>
+      <entry>Veeco Nanoscope II</entry>
+      <entry>.001, .002, etc.</entry>
+      <entry>nanoscope-ii</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nanosystemz.c -->
+    <row>
+      <entry>NanoSystem</entry>
+      <entry>.spm</entry>
+      <entry>nanosystemz</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Limité<footnoteref linkend="table-file-formats-fn3" label="c"/></entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module nanotop.c -->
+    <row>
+      <entry>Nanotop SPM</entry>
+      <entry>.spm</entry>
+      <entry>nanotop</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module netcdf.c -->
+    <row>
+      <entry>GSXM NetCDF</entry>
+      <entry>.nc</entry>
+      <entry>netcdf</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nmmxyz.c -->
+    <row>
+      <entry>Nano Measuring Machine</entry>
+      <entry>.dsc + .dat</entry>
+      <entry>nmmxyz</entry>
+      <entry>Oui<footnote id="table-file-formats-fn4" label="d"><para>Les données XYZ sont interpolée en une grille régulière lors de l'import.</para></footnote></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nova-asc.c -->
+    <row>
+      <entry>Nova ASCII</entry>
+      <entry>.txt</entry>
+      <entry>nova-asc</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module nrrdfile.c -->
+    <row>
+      <entry>Nearly raw raster data (NRRD)</entry>
+      <entry>.nrrd</entry>
+      <entry>nrrdfile</entry>
+      <entry>Oui<footnote id="table-file-formats-fn5" label="e"><para>Toutes les variantes ne sont pas implementées.</para></footnote></entry>
+      <entry>Oui<footnote id="table-file-formats-fn6" label="f"><para>Les données sont exportées selon un format fixé en virgule flottante avec un ordre des octets natif.</para></footnote></entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module nt-mdt.c -->
+    <row>
+      <entry>NT-MDT</entry>
+      <entry>.mdt</entry>
+      <entry>nt-mdt</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module nxiifile.c -->
+    <row>
+      <entry>EM4SYS NX II</entry>
+      <entry>.bmp</entry>
+      <entry>nxiifile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module oirfile.c -->
+    <row>
+      <entry>Olympus OIR</entry>
+      <entry>.oir</entry>
+      <entry>oirfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Olympus packed OIR</entry>
+      <entry>.poir</entry>
+      <entry>oirfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module oldmda.c -->
+    <row>
+      <entry>NT-MDT old MDA</entry>
+      <entry>.sxml, .dat</entry>
+      <entry>oldmda</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module ols.c -->
+    <row>
+      <entry>Olympus LEXT 3000</entry>
+      <entry>.ols</entry>
+      <entry>ols</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module ometiff.c -->
+    <row>
+      <entry>Open Microscopy OME TIFF</entry>
+      <entry>.ome.tiff, .ome.tif</entry>
+      <entry>ometiff</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module omicron.c -->
+    <row>
+      <entry>Omicron SCALA</entry>
+      <entry>.par + .tf*, .tb*, .sf*, .sb*</entry>
+      <entry>omicron</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module omicronflat.c -->
+    <row>
+      <entry>Omicron flat</entry>
+      <entry>.*_flat</entry>
+      <entry>omicronflat</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module omicronmatrix.c -->
+    <row>
+      <entry>Omicron MATRIX</entry>
+      <entry>.mtrx</entry>
+      <entry>omicronmatrix</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Limité<footnoteref linkend="table-file-formats-fn3" label="c"/></entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module opdfile.c -->
+    <row>
+      <entry>Wyko OPD</entry>
+      <entry>.opd</entry>
+      <entry>opdfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Wyko ASCII</entry>
+      <entry>.asc</entry>
+      <entry>opdfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module opengps.c -->
+    <row>
+      <entry>OpenGPS X3P (ISO 5436-2)</entry>
+      <entry>.x3p</entry>
+      <entry>opengps</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module phoenix.c -->
+    <row>
+      <entry>Mission NASA Phoenix Mars AFM</entry>
+      <entry>.dat, .lbl + .tab</entry>
+      <entry>phoenix</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module pixmap.c -->
+    <row>
+      <entry>Pixmap images</entry>
+      <entry>.png, .jpeg, .tiff, .tga, .pnm, .bmp</entry>
+      <entry>pixmap</entry>
+      <entry>Oui<footnote id="table-file-formats-fn7" label="g"><para>L'import est basé sur Gdk-Pixbuf et peut donc varier selon les systèmes.</para></footnote></entry>
+      <entry>Oui<footnote id="table-file-formats-fn8" label="h"><para>En général avec perte de données, proposé pour des raisons de présentation. L'export en niveaux de gris 16bit est possible vers les formats PNG, TIFF et PNM.</para></footnote></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module pltfile.c -->
+    <row>
+      <entry>Nanosurf PLT</entry>
+      <entry>.plt</entry>
+      <entry>pltfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module pnifile.c -->
+    <row>
+      <entry>Pacific Nanotechnology PNI</entry>
+      <entry>.pni</entry>
+      <entry>pnifile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module princetonspe.c -->
+    <row>
+      <entry>Princeton Instruments caméra SPE</entry>
+      <entry>.spe</entry>
+      <entry>princetonspe</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module psia.c -->
+    <row>
+      <entry>Park Systems</entry>
+      <entry>.tiff, .tif</entry>
+      <entry>psia</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module psppt.c -->
+    <row>
+      <entry>Park Systems PS-PPT</entry>
+      <entry>.ps-ppt</entry>
+      <entry>psppt</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module pt3file.c -->
+    <row>
+      <entry>SymPhoTime TTTR v2.0</entry>
+      <entry>.pt3</entry>
+      <entry>pt3file</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module quazarnpic.c -->
+    <row>
+      <entry>Quazar NPIC</entry>
+      <entry>.npic</entry>
+      <entry>quazarnpic</entry>
+      <entry>Oui<footnoteref linkend="table-file-formats-fn1" label="a"/></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module quesant.c -->
+    <row>
+      <entry>Quesant AFM</entry>
+      <entry>.afm</entry>
+      <entry>quesant</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module rawfile.c -->
+    <row>
+      <entry>Fichier texte brut</entry>
+      <entry>-</entry>
+      <entry>rawfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Fichier binaire quelconque</entry>
+      <entry>-</entry>
+      <entry>rawfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module rawgraph.c -->
+    <row>
+      <entry>Graphe au format texte (brut)</entry>
+      <entry>-</entry>
+      <entry>rawgraph</entry>
+      <entry>Oui<footnote id="table-file-formats-fn9" label="i"><para>Pour l'instant, seules les données sous forme de deux colonnes, importées sous formes de courbes, sont
+      supportées.</para></footnote></entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module renishaw.c -->
+    <row>
+      <entry>Renishaw WiRE Data File</entry>
+      <entry>.wdf</entry>
+      <entry>renishaw</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module rhk-sm3.c -->
+    <row>
+      <entry>RHK Instruments SM3</entry>
+      <entry>.sm3</entry>
+      <entry>rhk-sm3</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Limité<footnoteref linkend="table-file-formats-fn3" label="c"/></entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module rhk-sm4.c -->
+    <row>
+      <entry>RHK Instruments SM4</entry>
+      <entry>.sm4</entry>
+      <entry>rhk-sm4</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Limité<footnoteref linkend="table-file-formats-fn3" label="c"/></entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module rhk-spm32.c -->
+    <row>
+      <entry>RHK Instruments SM2</entry>
+      <entry>.sm2</entry>
+      <entry>rhk-spm32</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Limité<footnoteref linkend="table-file-formats-fn3" label="c"/></entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module robotics.c -->
+    <row>
+      <entry>Automation and Robotics Dual Lens Mapper</entry>
+      <entry>.mcr, .mct, .mce</entry>
+      <entry>robotics</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module s94file.c -->
+    <row>
+      <entry>S94 STM</entry>
+      <entry>.s94</entry>
+      <entry>s94file</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module sdfile.c -->
+    <row>
+      <entry>Surfstand Surface</entry>
+      <entry>.sdf</entry>
+      <entry>sdfile</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Micromap SDFA</entry>
+      <entry>.sdfa</entry>
+      <entry>sdfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module seiko.c -->
+    <row>
+      <entry>Seiko SII</entry>
+      <entry>.xqb, .xqd, .xqt, .xqp, .xqj, .xqi</entry>
+      <entry>seiko</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module sensofar.c -->
+    <row>
+      <entry>Sensofar PLu</entry>
+      <entry>.plu, .apx</entry>
+      <entry>sensofar</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+     <!-- From module sensofarx.c -->
+    <row>
+      <entry>Sensofar PLUx</entry>
+      <entry>.plux</entry>
+      <entry>sensofarx</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+   <!-- From module sensolytics.c -->
+    <row>
+      <entry>Sensolytics DAT</entry>
+      <entry>.dat</entry>
+      <entry>sensolytics</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module shimadzu.c -->
+    <row>
+      <entry>Shimadzu</entry>
+      <entry>.sph, .spp, .001, .002, etc.</entry>
+      <entry>shimadzu</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Shimadzu ASCII</entry>
+      <entry>.txt</entry>
+      <entry>shimadzu</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module sicmfile.c -->
+    <row>
+      <entry>IonScope SICM</entry>
+      <entry>.img</entry>
+      <entry>sicmfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module sis.c -->
+    <row>
+      <entry>Surface Imaging Systems</entry>
+      <entry>.sis</entry>
+      <entry>sis</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module spcfile.c -->
+    <row>
+      <entry>Thermo Fisher SPC</entry>
+      <entry>.spc</entry>
+      <entry>spcfile</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module spip-asc.c -->
+    <row>
+      <entry>SPIP ASCII</entry>
+      <entry>.asc</entry>
+      <entry>spip-asc</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module spmlab.c -->
+    <row>
+      <entry>Thermicroscopes SPMLab R4-R7</entry>
+      <entry>.tfr, .ffr, etc.</entry>
+      <entry>spmlab</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module spmlabf.c -->
+    <row>
+      <entry>Thermicroscopes SPMLab virgule flottante</entry>
+      <entry>.flt</entry>
+      <entry>spmlabf</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module spml.c -->
+    <row>
+      <entry>SPML (Scanning Probe Microscopy Markup Language)</entry>
+      <entry>.xml</entry>
+      <entry>spml</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module spmxfile.c -->
+    <row>
+      <entry>ATC SPMxFormat</entry>
+      <entry>.spm</entry>
+      <entry>spmxfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module stmprg.c -->
+    <row>
+      <entry>Omicron STMPRG</entry>
+      <entry>tp*, ta*</entry>
+      <entry>stmprg</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module stpfile.c -->
+    <row>
+      <entry>Molecular Imaging STP</entry>
+      <entry>.stp</entry>
+      <entry>stpfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module surffile.c -->
+    <row>
+      <entry>Surf</entry>
+      <entry>.sur</entry>
+      <entry>surffile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module tescan.c -->
+    <row>
+      <entry>Tescan MIRA SEM</entry>
+      <entry>.tif</entry>
+      <entry>tescan</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Tescan LYRA SEM</entry>
+      <entry>.hdr + .png</entry>
+      <entry>tescan</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module tiaser.c -->
+    <row>
+      <entry>FEI Tecnai imaging and analysis (anciennement Emispec)</entry>
+      <entry>.ser</entry>
+      <entry>tiaser</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module unisoku.c -->
+    <row>
+      <entry>Corning Tropel UltraSort</entry>
+      <entry>.ttf</entry>
+      <entry>ttffile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Corning Tropel CSV</entry>
+      <entry>.csv</entry>
+      <entry>ttffile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module unisoku.c -->
+    <row>
+      <entry>Unisoku</entry>
+      <entry>.hdr + .dat</entry>
+      <entry>unisoku</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module win_stm.c -->
+    <row>
+      <entry>WinSTM</entry>
+      <entry>.stm</entry>
+      <entry>win_stm</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module wipfile.c -->
+    <row>
+      <entry>WITec Project</entry>
+      <entry>.wip</entry>
+      <entry>wipfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module witec-asc.c -->
+    <row>
+      <entry>WITec ASCII</entry>
+      <entry>.dat</entry>
+      <entry>witec-asc</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module witfile.c -->
+    <row>
+      <entry>WITec</entry>
+      <entry>.wit</entry>
+      <entry>witfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module wrustfile.c -->
+    <row>
+      <entry>Department of Nanometrology, WRUST</entry>
+      <entry>.dat</entry>
+      <entry>wrustfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module wsffile.c -->
+    <row>
+      <entry>AFM Workshop</entry>
+      <entry>.wsf</entry>
+      <entry>wsffile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module wsxmfile.c -->
+    <row>
+      <entry>Nanotec WSxM</entry>
+      <entry>.tom, .top, .stp</entry>
+      <entry>wsxmfile</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <row>
+      <entry>Nanotec WSxM</entry>
+      <entry>.cur</entry>
+      <entry>wsxmfile</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- Module xyzexport.c contains no magic. -->
+    <!-- From module zeiss.c -->
+    <row>
+      <entry>Carl Zeiss SEM</entry>
+      <entry>.tif</entry>
+      <entry>zeiss</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- Module zeissczi.c contains no magic. -->
+    <!-- From module zeisslsm.c -->
+    <row>
+      <entry>Carl Zeiss CLSM</entry>
+      <entry>.lsm</entry>
+      <entry>zeisslsm</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>Oui</entry>
+    </row>
+    <!-- From module zemax.c -->
+    <row>
+      <entry>Zemax grid sag</entry>
+      <entry>.dat</entry>
+      <entry>zemax</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    <!-- From module hdrimage.cc -->
+    <row>
+      <entry>images OpenEXR</entry>
+      <entry>.exr</entry>
+      <entry>hdrimage</entry>
+      <entry>Oui</entry>
+      <entry>Oui</entry>
+      <entry>—</entry>
+      <entry>—</entry>
+    </row>
+    </tbody>
+  </tgroup>
+</informaltable>

@@ -1,0 +1,381 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2017-2023 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/brick.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-volume.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+
+#define RUN_MODES (GWY_RUN_IMMEDIATE | GWY_RUN_INTERACTIVE)
+
+enum {
+    PARAM_X,
+    PARAM_Y,
+    PARAM_Z,
+    PARAM_NEW_CHANNEL,
+
+    MESSAGE_CALIBRATION
+};
+
+typedef enum {
+    AXIS_XPOS = 0,
+    AXIS_XNEG = 1,
+    AXIS_YPOS = 2,
+    AXIS_YNEG = 3,
+    AXIS_ZPOS = 4,
+    AXIS_ZNEG = 5,
+} AxisType;
+
+typedef struct {
+    GwyParams *params;
+    GwyBrick *brick;
+    /* Cached input data properties. */
+    gboolean has_zcal;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyParamTable *table;
+    gint last_changed;
+    gint second_last_changed;
+} ModuleGUI;
+
+static gboolean         module_register     (void);
+static GwyParamDef*     define_module_params(void);
+static void             volume_swaxes       (GwyContainer *data,
+                                             GwyRunType mode);
+static GwyDialogOutcome run_gui             (ModuleArgs *args);
+static void             param_changed       (ModuleGUI *gui,
+                                             gint id);
+static void             update_third_axis   (ModuleGUI *gui,
+                                             gint changed_axis);
+static gboolean         axes_are_consistent (const AxisType *xyz);
+static void             execute             (ModuleArgs *args,
+                                             GwyContainer *data,
+                                             gint id);
+static void             sanitize_params     (ModuleArgs *args);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Swaps axes of volume data."),
+    "Yeti <yeti@gwyddion.net>",
+    "2.0",
+    "David Nečas (Yeti)",
+    "2017",
+};
+
+GWY_MODULE_QUERY2(module_info, volume_swaxes)
+
+static gboolean
+module_register(void)
+{
+    gwy_volume_func_register("volume_swaxes",
+                             (GwyVolumeFunc)&volume_swaxes,
+                             N_("/_Basic Operations/S_wap Axes..."),
+                             GWY_STOCK_VOLUME_SWAP_AXES,
+                             RUN_MODES,
+                             GWY_MENU_FLAG_VOLUME,
+                             N_("Swap axes"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum axes[] = {
+        { N_("X"),           AXIS_XPOS,  },
+        { N_("X, reversed"), AXIS_XNEG,  },
+        { N_("Y"),           AXIS_YPOS,  },
+        { N_("Y, reversed"), AXIS_YNEG,  },
+        { N_("Z"),           AXIS_ZPOS,  },
+        { N_("Z, reversed"), AXIS_ZNEG,  },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_volume_func_current());
+    gwy_param_def_add_gwyenum(paramdef, PARAM_X, "x", _("Current _X axis will become"),
+                              axes, G_N_ELEMENTS(axes), AXIS_XPOS);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_Y, "y", _("Current _Y axis will become"),
+                              axes, G_N_ELEMENTS(axes), AXIS_YPOS);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_Z, "z", _("Current _Z axis will become"),
+                              axes, G_N_ELEMENTS(axes), AXIS_ZPOS);
+    gwy_param_def_add_boolean(paramdef, PARAM_NEW_CHANNEL, "new_channel", _("Create new volume data"), FALSE);
+    return paramdef;
+}
+
+static void
+volume_swaxes(GwyContainer *data, GwyRunType mode)
+{
+    ModuleArgs args;
+    GwyDialogOutcome outcome;
+    gint id;
+
+    g_return_if_fail(mode & RUN_MODES);
+
+    gwy_clear(&args, 1);
+    gwy_app_data_browser_get_current(GWY_APP_BRICK, &args.brick,
+                                     GWY_APP_BRICK_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_BRICK(args.brick));
+
+    args.has_zcal = !!gwy_brick_get_zcalibration(args.brick);
+    args.params = gwy_params_new_from_settings(define_module_params());
+    sanitize_params(&args);
+    if (mode == GWY_RUN_INTERACTIVE) {
+        outcome = run_gui(&args);
+        gwy_params_save_to_settings(args.params);
+        if (outcome == GWY_DIALOG_CANCEL)
+            goto finish;
+    }
+
+    execute(&args, data, id);
+
+finish:
+    g_object_unref(args.params);
+}
+
+static GwyDialogOutcome
+run_gui(ModuleArgs *args)
+{
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    ModuleGUI gui;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.last_changed = 1;
+    gui.second_last_changed = 0;
+
+    gui.dialog = gwy_dialog_new(_("Swap Volume Axes"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_RESET, GTK_RESPONSE_CANCEL, GTK_RESPONSE_OK, 0);
+
+    table = gui.table = gwy_param_table_new(args->params);
+    gwy_param_table_append_combo(table, PARAM_X);
+    gwy_param_table_append_combo(table, PARAM_Y);
+    gwy_param_table_append_combo(table, PARAM_Z);
+    gwy_param_table_append_checkbox(table, PARAM_NEW_CHANNEL);
+    if (args->has_zcal) {
+        gwy_param_table_append_separator(table);
+        gwy_param_table_append_message(table, MESSAGE_CALIBRATION, NULL);
+    }
+    gwy_dialog_add_content(dialog, gwy_param_table_widget(table), FALSE, FALSE, 0);
+    gwy_dialog_add_param_table(dialog, table);
+
+    g_signal_connect_swapped(table, "param-changed", G_CALLBACK(param_changed), &gui);
+
+    return gwy_dialog_run(dialog);
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    GwyParams *params = gui->args->params;
+    GwyParamTable *table = gui->table;
+
+    if (id == PARAM_X)
+        update_third_axis(gui, 0);
+    else if (id == PARAM_Y)
+        update_third_axis(gui, 1);
+    else if (id == PARAM_Z)
+        update_third_axis(gui, 2);
+
+    /* Must do this after possible cross-updates. */
+    {
+        AxisType x = gwy_params_get_enum(params, PARAM_X);
+        AxisType y = gwy_params_get_enum(params, PARAM_Y);
+        AxisType z = gwy_params_get_enum(params, PARAM_Z);
+        gboolean new_channel = gwy_params_get_boolean(params, PARAM_NEW_CHANNEL);
+        gboolean is_noop = (x == AXIS_XPOS && y == AXIS_YPOS && z == AXIS_ZPOS && !new_channel);
+
+        gtk_dialog_set_response_sensitive(GTK_DIALOG(gui->dialog), GTK_RESPONSE_OK, !is_noop);
+
+        if (gui->args->has_zcal) {
+            gwy_param_table_set_label(table, MESSAGE_CALIBRATION,
+                                      (z == AXIS_ZPOS || z == AXIS_ZNEG) ? "" : _("Z axis calibration will be lost."));
+        }
+    }
+}
+
+static void
+update_third_axis(ModuleGUI *gui, gint changed_axis)
+{
+    ModuleArgs *args = gui->args;
+    AxisType xyz[3], fixed;
+    gint i, third, axis_to_fix;
+
+    if (changed_axis == gui->last_changed) {
+        /* Dd nothing. */
+    }
+    else if (changed_axis == gui->second_last_changed)
+        GWY_SWAP(gint, gui->last_changed, gui->second_last_changed);
+    else {
+        gui->second_last_changed = gui->last_changed;
+        gui->last_changed = changed_axis;
+    }
+
+    for (i = 0; i < 3; i++)
+        xyz[i] = gwy_params_get_enum(args->params, PARAM_X + i);
+
+    if (axes_are_consistent(xyz))
+        return;
+
+    third = 3 - (gui->last_changed + gui->second_last_changed);
+    if (xyz[third]/2 == xyz[gui->last_changed]/2)
+        axis_to_fix = third;
+    else
+        axis_to_fix = gui->second_last_changed;
+
+    fixed = (2*(3 - xyz[(axis_to_fix + 1) % 3]/2 - xyz[(axis_to_fix + 2) % 3]/2)) | (xyz[axis_to_fix] & 1);
+    gwy_param_table_set_enum(gui->table, PARAM_X + axis_to_fix, fixed);
+}
+
+static gboolean
+axes_are_consistent(const AxisType *xyz)
+{
+    if (xyz[0]/2 == xyz[1]/2 || xyz[1]/2 == xyz[2]/2 || xyz[2]/2 == xyz[0]/2)
+        return FALSE;
+    return TRUE;
+}
+
+static void
+execute(ModuleArgs *args, GwyContainer *data, gint id)
+{
+    GwyParams *params = args->params;
+    AxisType ax = gwy_params_get_enum(params, PARAM_X);
+    AxisType ay = gwy_params_get_enum(params, PARAM_Y);
+    AxisType az = gwy_params_get_enum(params, PARAM_Z);
+    AxisType bx = 2*(ax/2), by = 2*(ay/2);
+    gboolean new_channel = gwy_params_get_boolean(params, PARAM_NEW_CHANNEL);
+    GwyBrickTransposeType transtype;
+    gboolean xinv = ax & 1, yinv = ay & 1, zinv = az & 1;
+    GwyBrick *result, *brick = args->brick;
+    GwyDataField *tmp, *preview = NULL;
+    gdouble xoff, yoff;
+    gint xres, yres, newid;
+    GQuark quarks[2];
+
+    if (bx == AXIS_XPOS && by == AXIS_YPOS)
+        transtype = GWY_BRICK_TRANSPOSE_XYZ;
+    else if (bx == AXIS_XPOS && by == AXIS_ZPOS)
+        transtype = GWY_BRICK_TRANSPOSE_XZY;
+    else if (bx == AXIS_YPOS && by == AXIS_XPOS)
+        transtype = GWY_BRICK_TRANSPOSE_YXZ;
+    else if (bx == AXIS_YPOS && by == AXIS_ZPOS)
+        transtype = GWY_BRICK_TRANSPOSE_YZX;
+    else if (bx == AXIS_ZPOS && by == AXIS_XPOS)
+        transtype = GWY_BRICK_TRANSPOSE_ZXY;
+    else if (bx == AXIS_ZPOS && by == AXIS_YPOS)
+        transtype = GWY_BRICK_TRANSPOSE_ZYX;
+    else {
+        g_return_if_reached();
+    }
+
+    result = gwy_brick_new(1, 1, 1, 1.0, 1.0, 1.0, FALSE);
+    gwy_brick_transpose(brick, result, transtype, xinv, yinv, zinv);
+
+    /* Reuse the old preview if the XY plane is preserved. */
+    if (gwy_container_gis_object(data, gwy_app_get_brick_preview_key_for_id(id), &preview)
+        && (bx == AXIS_XPOS || bx == AXIS_YPOS)
+        && (by == AXIS_XPOS || by == AXIS_YPOS)) {
+        if (ax == AXIS_YPOS && ay == AXIS_XNEG)
+            tmp = gwy_data_field_new_rotated_90(preview, TRUE);
+        else if (ax == AXIS_YNEG && ay == AXIS_XPOS)
+            tmp = gwy_data_field_new_rotated_90(preview, FALSE);
+        else {
+            tmp = gwy_data_field_duplicate(preview);
+            if (ax == AXIS_XPOS && ay == AXIS_YPOS) {
+                /* Do nothing. */
+            }
+            else if (ax == AXIS_XNEG && ay == AXIS_YNEG)
+                gwy_data_field_invert(tmp, TRUE, TRUE, FALSE);
+            else if (ax == AXIS_XNEG && ay == AXIS_YPOS)
+                gwy_data_field_invert(tmp, FALSE, TRUE, FALSE);
+            else if (ax == AXIS_XPOS && ay == AXIS_YNEG)
+                gwy_data_field_invert(tmp, TRUE, FALSE, FALSE);
+            else if (ax == AXIS_YPOS && ay == AXIS_XPOS)
+                gwy_data_field_flip_xy(preview, tmp, FALSE);
+            else if (ax == AXIS_YNEG && ay == AXIS_XNEG)
+                gwy_data_field_flip_xy(preview, tmp, TRUE);
+            else {
+                g_assert_not_reached();
+            }
+        }
+        GWY_SWAP(GwyDataField*, tmp, preview);
+
+        xoff = gwy_data_field_get_xoffset(preview);
+        yoff = gwy_data_field_get_yoffset(preview);
+        gwy_data_field_set_xoffset(preview, yoff);
+        gwy_data_field_set_yoffset(preview, xoff);
+    }
+    else {
+        xres = gwy_brick_get_xres(result);
+        yres = gwy_brick_get_yres(result);
+        preview = gwy_data_field_new(xres, yres, xres, yres, FALSE);
+        gwy_brick_mean_xy_plane(result, preview);
+    }
+
+    /* Create new channel or modify the current one. */
+    if (new_channel) {
+        newid = gwy_app_data_browser_add_brick(result, preview, data, TRUE);
+        gwy_app_set_brick_title(data, newid, _("Rotated Data"));
+        gwy_app_volume_log_add_volume(data, id, newid);
+        gwy_app_sync_volume_items(data, data, id, newid, FALSE, GWY_DATA_ITEM_GRADIENT, 0);
+    }
+    else {
+        quarks[0] = gwy_app_get_brick_key_for_id(id);
+        quarks[1] = gwy_app_get_brick_preview_key_for_id(id);
+        gwy_app_undo_qcheckpointv(data, G_N_ELEMENTS(quarks), quarks);
+        gwy_container_set_object(data, quarks[0], result);
+        gwy_container_set_object(data, quarks[1], preview);
+        gwy_app_volume_log_add_volume(data, id, id);
+    }
+
+    g_object_unref(result);
+    g_object_unref(preview);
+}
+
+static void
+sanitize_params(ModuleArgs *args)
+{
+    AxisType xyz[3];
+    gint i;
+
+    for (i = 0; i < 3; i++)
+        xyz[i] = gwy_params_get_enum(args->params, PARAM_X + i);
+
+    /* Do not bother fixing invalid configurations, just reset to the default no-op. */
+    if (!axes_are_consistent(xyz)) {
+        for (i = 0; i < 3; i++)
+            gwy_params_reset(args->params, PARAM_X + i);
+    }
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,658 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: feature-measurement.xml 25338 2023-05-18 14:29:38Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='feature-measurement' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Feature Measurement</title>
+  <para>
+    Menu
+    <menuchoice>
+      <guisubmenu>Measure Features</guisubmenu>
+    </menuchoice>
+    offers several functions for the measurement of specific shapes or
+    features in topographical images.
+  </para>
+  <sect2 id='curvature'>
+    <title>
+      Curvature <gwy:icon name='curvature'/>
+    </title>
+    <indexterm><primary>curvature</primary></indexterm>
+      <para>
+        <menuchoice>
+          <guimenu>Data Process</guimenu>
+          <guisubmenu>Measure Features</guisubmenu>
+          <guimenuitem>Curvature</guimenuitem>
+        </menuchoice>
+      </para>
+    <para>
+      The global surface curvature parameters are calculated by fitting a
+      quadratic polynomial and finding its main axes.  Positive signs of the
+      curvature radii correspond to a concave (cup-like) surface, whereas
+      negative signs to convex (cap-like) surface, mixed signs mean a
+      saddle-like surface.
+    </para>
+    <para>
+      Beside the parameter table, it is possible to set the line selection on
+      the data to the fitted quadratic surface axes and/or directly read
+      profiles along them.  The zero of the abscissa is placed to the
+      intersection of the axes.
+    </para>
+    <para>
+      Similarly to the background subtraction functions, if a mask is present
+      on the data the module offers to include or exclude the data under mask.
+    </para>
+    <informalfigure id='fig-curvature'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='curvature.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Curvature dialogue screenshot showing the strong deflection of a glass
+          plate with a thin film with compressive internal stress.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='fit-shape-image'>
+    <title>
+      Fit Shape <gwy:icon name='fit_shape'/>
+    </title>
+    <indexterm>
+      <primary>fitting</primary>
+      <secondary>3D shapes to topographical images</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Measure Features</guisubmenu>
+        <guimenuitem>Fit Shape</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Form removal as well as measurement of geometrical parameters can be
+      performed by fitting geometrical shapes on the data using the
+      least-squares method.  The <guilabel>Fit Shape</guilabel> module is
+      essentially the same for images and XYZ data and it is
+      <link linkend='fit-shape'>described in detail</link> in the XYZ data
+      processing part. Only the differences are mentioned here.
+    </para>
+    <para>
+      Standard masking is supported for images.  That is if a mask is present
+      the dialogue offers to use the data under the mask, exclude the data under
+      mask or ignore the mask and use the entire data.  Since the excluded
+      pixels can be outliers or image parts not conforming to the chosen shape
+      it it possible to avoid them also in the difference image by disabling
+      <guilabel>Calculate differences for excluded pixels</guilabel>.
+    </para>
+  </sect2>
+  <sect2 id='facet-analysis'>
+    <title>
+      Facet Analysis <gwy:icon name='facet_analysis'/>
+    </title>
+    <indexterm><primary>facet analysis</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Measure Features</guisubmenu>
+        <guimenuitem>Facet Analysis</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Facet analysis enables to interactively study orientations of facets
+      occurring in the data and mark facets of specific orientations on the
+      image. The top left view displays data with preview of marked facets. The
+      smaller bottom left view, called facet view below, displays the
+      two-dimensional slope distribution.
+    </para>
+    <informalfigure id='fig-facet-analysis'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='facet-analysis.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Facet analysis screenshot, showing two selected points on the angular
+          distribution and marked facets for one of them.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      The centre of facet view always correspond to zero inclination (horizontal
+      facets), slope in <xi:include href="eqi-x.xml"/>-direction
+      increases towards left and right border and slope in
+      <xi:include href="eqi-y.xml"/>-direction increases towards top and bottom
+      borders.  The exact coordinate system is a bit complex (an area preserving
+      transformation between spherical angles and the planar facet view is used)
+      and it adapts to the range of slopes in the particular data displayed.  The
+      range of inclinations is displayed below the facet view.
+    </para>
+    <para>
+      Points selected on the facet view, i.e. directions in space, are listed in
+      the top right corner as both angles and unit vector components.  You can
+      also choose the direction of the selected point by clicking on the image
+      view.  The direction is then set to the local facet at that position in
+      the image.
+    </para>
+    <para>
+      Standard controls allowing manipulation with the entire list or the
+      selected point are below the list.  Button <guibutton>Refine</guibutton>
+      tries to improve the position of selected point to a local maximum in the
+      facet view.  Button <guibutton>Mark</guibutton> creates a mask on the image
+      corresponding to the selected direction and a range of close directions.
+      The directions are simultaneously shown on the facet view.  The mean
+      normal of the selected region is displayed as <guilabel>Mean
+      normal</guilabel> below.
+    </para>
+    <para>
+      The bottom right part contains tabs with settings and some advanced
+      operations.
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Facet</guilabel>
+        </term>
+        <listitem>
+          <para>
+            <guilabel>Facet plane size</guilabel> controls the size (radius) of
+            plane locally fitted in each point to determine the local
+            inclination.  The special value 0 stands for no plane fitting, the
+            local inclination is determined from symmetric
+            <xi:include href="eqi-x.xml"/> and <xi:include href="eqi-y.xml"/>
+            derivatives in each point.  The choice of neighbourhood size is
+            crucial for meaningful results: it must be smaller than the features
+            one is interested in to avoid their smoothing, on the other hand it
+            has to be large enough to suppress noise present in the image.
+          </para>
+          <para>
+            <guilabel>Tolerance</guilabel> determines the range of directions
+            for marking.  It also determines the search range for refining the
+            the selected direction.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Rotation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The set of selected directions can be rotated in space using either
+            the shader control or by changing individual angles.  The rotation
+            angle around the vertical axis is denoted
+            <xi:include href="eqi-alpha.xml"/> and it is applied first.  The
+            directions are then rotated by angle
+            <xi:include href="eqi-theta.xml"/>
+            in the direction given by azimuth
+            <xi:include href="eqi-phi.xml"/>.
+          </para>
+          <para>
+            The global rotation cannot be mixed with movement of individual
+            points on the facet view. Once you start changing points there,
+            the global rotation is reset and the current positions, whatever
+            they are, become the initial positions.  During rotation you can
+            reset it to the starting state using the
+            <guibutton>Reset</guibutton> button.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Lattice</guilabel>
+        </term>
+        <listitem>
+          <para>
+            A set of directions corresponding to low-number Miller indices can
+            be created by choosing the lattice type, its parameters and
+            pressing button <guibutton>Create points</guibutton>.  The absolute
+            lengths of the cell edges are not important for the directions,
+            only their ratios are.  Therefore, they can be given in arbitrary
+            units.
+          </para>
+          <para>
+            Together with rotation, this function can be useful for matching the
+            image facets to crystallographic planes.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-facet-analysis-sizes'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='facet-analysis-sizes.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Illustration of the influence of fitted plane size on the distribution
+          of a scan of a delaminated DLC surface with considerable fine noise.
+          One can see the distribution is completely obscured by the noise at
+          small plane sizes.  The neighbourhood sizes are: (a) 0, (b) 2, (c) 4,
+          (d) 7.  The angle and false colour mappings are full-scale for each
+          particular image, i.e. they vary among them.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='facet-measurement'>
+    <title>
+      Facet Measurement <gwy:icon name='facet_measure'/>
+    </title>
+    <indexterm><primary>facet analysis</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Measure Features</guisubmenu>
+        <guimenuitem>Facet Measurement</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Facet measurement allows to interactively select and mark several facets
+      of specific orientations on the image, measure their positions and store
+      the results in a table. The top left view displays data with preview of
+      marked facets. The smaller bottom left view, called facet view below,
+      displays the two-dimensional slope distribution.
+    </para>
+    <para>
+      The centre of facet view always correspond to zero inclination (horizontal
+      facets), slope in <xi:include href="eqi-x.xml"/>-direction
+      increases towards left and right border and slope in
+      <xi:include href="eqi-y.xml"/>-direction increases towards top and bottom
+      borders.  The exact coordinate system is a bit complex (an area preserving
+      transformation between spherical angles and the planar facet view is used)
+      and it adapts to the range of slopes in the particular data displayed.  The
+      range of inclinations is displayed below the facet view.
+    </para>
+    <para>
+      <guilabel>Facet plane size</guilabel> controls the size (radius) of
+      plane locally fitted in each point to determine the local
+      inclination.  The special value 0 stands for no plane fitting, the
+      local inclination is determined from symmetric
+      <xi:include href="eqi-x.xml"/> and <xi:include href="eqi-y.xml"/>
+      derivatives in each point.  The choice of neighbourhood size is
+      crucial for meaningful results: it must be smaller than the features
+      one is interested in to avoid their smoothing, on the other hand it
+      has to be large enough to suppress noise present in the image.
+    </para>
+    <para>
+      <guilabel>Tolerance</guilabel> determines the range of directions
+      for marking.  It also determines the search range for refining the
+      the selected direction.
+    </para>
+    <para>
+      The currently selected point in facet view (facet orientation) is
+      displayed as <guilabel>Selected</guilabel>
+      <xi:include href="eqi-theta.xml"/> and <xi:include href="eqi-phi.xml"/>.
+      Button <guilabel>Refine</guilabel> tries to improve the position of
+      selected point to a local maximum in the facet view.  Button
+      <guibutton>Mark</guibutton> creates a mask on the image corresponding to
+      the selected direction and a range of close directions.
+      If <guilabel>Instant facet marking</guilabel> is enabled facets are marked
+      immediately as the selected point changes (the
+      <guibutton>Mark</guibutton> button is then disabled).
+    <para>
+    </para>
+      Once you are satisfied with the facet selection press
+      <guibutton>Measure</guibutton> to add a measurement to the table below.
+      Each row of the table contains
+    </para>
+    <itemizedlist>
+      <listitem>Point index <xi:include href='eqi-n.xml'/>.</listitem>
+      <listitem>
+        Number of pixels marked and used for the measurement.
+      </listitem>
+      <listitem>
+        Tolerance <xi:include href='eqi-t.xml'/> used in the measurement.
+      </listitem>
+      <listitem>
+        Mean polar angle <xi:include href='eqi-theta.xml'/> of the facet
+        normal.
+      </listitem>
+      <listitem>
+        Mean azimuthal angle <xi:include href='eqi-phi.xml'/> of the facet
+        normal.
+      </listitem>
+      <listitem>
+        Facet normal as a unit vector <xi:include href='eqi-vector-x-y-z.xml'/>
+      </listitem>
+      <listitem>
+        Standard deviation of facet normals within the marked set
+        <xi:include href='eqi-delta.xml'/>.
+      </listitem>
+    </itemizedlist>
+    <para>
+      The mean normals are calculated by simple averaging of the unit normal
+      vectors <xi:include href='eqi-vec-n.xml'/>, which is appropriate when
+      their spread is relatively small. The standard deviation is calculated
+      in radians as follows
+      <xi:include href="eq-standard-deviation-of-normals.xml"/>
+      where bar denotes the mean normal.
+    </para>
+  </sect2>
+  <sect2 id='measure-lattice'>
+    <title>
+      Lattice <gwy:icon name='measure_lattice'/>
+    </title>
+    <indexterm><primary>lattice measurement</primary></indexterm>
+    <indexterm>
+      <primary>pitch measurement</primary>
+      <secondary>two-dimensional</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>power spectral density function</primary>
+      <secondary>lattice measurement</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>autocorrelation function</primary>
+      <secondary>lattice measurement</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Measure Features</guisubmenu>
+        <guimenuitem>Lattice</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Parameters of regular two-dimensional structures can be obtained by
+      analysing data transformed into a form that captures their regularity.
+      The ACF and PSDF are particularly well-suited for this because they
+      exhibit peaks corresponding to the Bravais lattice vectors for the
+      periodic pattern.
+    </para>
+    <para>
+      Peaks in the two-dimensional ACF correspond to lattice vectors in the
+      direct space (and their integer multiples and linear combinations).
+      Peaks in the two-dimensional PSDF correspond to lattice vectors of the
+      <emphasis>reciprocal</emphasis> lattice. The matrices formed by the
+      lattice vectors in direct and frequency space are transposed inverses
+      of each other. With a suitable transformation either can be used to
+      measure the lattice.
+    </para>
+    <para>
+      The Gwyddion function <guimenuitem>Measure Lattice</guimenuitem>
+      can utilise either ACF or PSDF for the measurement.  Since
+      regular lattices with large periods correspond to peaks in the ACF
+      image that are far apart but peaks in the PSDF that are close, it is
+      preferable to use the ACF in this case to improve the resolution.
+      Conversely, the PSDF image is more suitable if the lattice periods are
+      small.  In the dialogue you can switch freely between direct and
+      frequency space representations and the selected lattice is transformed
+      as necessary.
+    </para>
+    <para>
+      If scan lines contain lots of high-frequency noise the horizontal ACF
+      (middle row in the ACF image) can be also quite noisy.  In such case
+      it is better to interpolate it from the surrounding rows by enabling
+      the option <guilabel>Interpolate horizontal ACF</guilabel>.
+    </para>
+    <para>
+      The button <guibutton>Estimate</guibutton> attempts to find
+      automatically the lattice for the image.  When it does not select the
+      vectors as you would like you can adjust the vectors in the image
+      manually.  The selection can be done either in a manner similar to
+      <link linkend='correct-affine'>Affine Distortion</link> (this
+      corresponds to choosing <guilabel>Show lattice as</guilabel>
+      <guilabel>Lattice</guilabel>), or only the two vectors can be shown and
+      adjusted (<guilabel>Vectors</guilabel>).  Either way, when you
+      choose approximately the peak positions, pressing the
+      <guibutton>Refine</guibutton> button adjusts the positions of the
+      vectors to improve the match with the peaks.  Button
+      <guibutton>Reset</guibutton> can be used to restore the vectors to
+      a sane initial state.
+    </para>
+    <para>
+      The lattice vectors are always displayed as direct-space vectors, with
+      components, total lengths and directions.  The angle shown as
+      <xi:include href='eqi-phi.xml'/> is the angle between the two vectors.
+    </para>
+    <para>
+      The direct lattice vectors <xi:include href='eqi-vec-a_1.xml'/> and
+      <xi:include href='eqi-vec-a_2.xml'/> are related to the reciprocal lattice
+      vectors <xi:include href='eqi-vec-b_1.xml'/> and <xi:include href='eqi-vec-b_2.xml'/>
+      by the following relation:
+      <xi:include href="eq-reciprocal-lattice-vectors.xml"/>
+      where <xi:include href='eqi-R.xml'/> denotes a 90 degree rotation
+      matrix. The inverse transform is similar. Therefore, the lattice vectors
+      must always be considered as a pair. Changing for instance
+      <xi:include href='eqi-vec-b_1.xml'/> in the PSDF image changes both
+      <xi:include href='eqi-vec-a_1.xml'/> and <xi:include href='eqi-vec-a_2.xml'/>.
+    </para>
+    <para>
+      Sometimes it is useful to measure a single lattice vector, e.g. in images
+      of one-dimensional periodic structures. The second vector then gets in
+      the way. For this there exists a single-vector mode, enabled by
+      <guilabel>Measure single vector</guilabel>. It hides the
+      second vectors and ensures <xi:include href='eqi-vec-a_1.xml'/> are
+      <xi:include href='eqi-vec-b_1.xml'/> are parallel and with mutually reciprocal
+      lengths, as expected.
+    </para>
+  </sect2>
+  <sect2 id='measure-terraces'>
+    <title>
+      Terraces <gwy:icon name='terrace_measure'/>
+    </title>
+    <indexterm><primary>terrace measurement</primary></indexterm>
+    <indexterm><primary>amphitheatre measurement</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Measure Features</guisubmenu>
+        <guimenuitem>Terraces</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Terrace measurement can be used either to measure steps between plateaus
+      in terrace or amphitheatre-like structures, or calibration by measuring
+      such structures with precisely known step heights – in particular atomic
+      steps on silicon [<link linkend='feature-measurement-ref-1'>1</link>].
+    </para>
+    <para>
+      The image processing has several parts:
+    </para>
+    <orderedlist>
+      <listitem>
+        edge detection using the <link linkend='gaussian-step'>Gaussian
+        step</link> filter,
+      </listitem>
+      <listitem>
+        segmentation into terraces,
+      </listitem>
+      <listitem>
+        fitting the image with polynomial background, allowing each terrace
+        to be offset vertically differently,
+      </listitem>
+      <listitem>
+        estimation of step height and integer levels of individual terraces,
+        and
+      </listitem>
+      <listitem>
+        fitting the image again, assuming given integer levels.
+      </listitem>
+    </orderedlist>
+    <para>
+      Some of them are optional.  Furthermore, filtering and segmentation is
+      interactive, whereas fitting is only run when button
+      <guibutton>Fit</guibutton> is pressed.  Intermediate results can be
+      visualised by choosing the image to display using the
+      <guilabel>Display</guilabel> menu.  At the beginning, the most useful
+      image is usually <guilabel>Marked terraces</guilabel> which shows
+      individual recognised terraces in different colours.
+    </para>
+    <para>
+      Parameter <guilabel>Step detection kernel</guilabel> of edge detection
+      is the same as for the Gaussian step filter.  The following parameters
+      control segmentation:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Step detection threshold</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Threshold for the edge-detection (as a percentage of maximum
+            value of the filtered image).  Too small threshold leads to
+            fragmented terraces as too much of the image is considered edges.
+            Too high threshold leads to merging of terraces which are actually
+            at different heights – this is often best checked using the
+            <guilabel>Marked terraces</guilabel> image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Step broadening</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Regions recognised as edges are widened by given number of pixels.
+            This helps with separation of terraces which should stay separate.
+            In addition, it excludes regions too close to edges from polynomial
+            fitting.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Minimum terrace area</guilabel>
+        </term>
+        <listitem>
+          <para>
+            After segmentation, only sufficiently large terraces are kept.
+            This option specifies the minimum terrace area, given as a fraction
+            of the entire image area.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Segmentation can be augmented – or replaced – by a user-supplied mask.
+      If the image has a mask, the standard masking options are offered.
+      Here <guilabel>Exclude masked region</guilabel> means excluding
+      it from the detected terraces.  This allowing prevention of unwanted
+      terrace merging – for instance by drawing manually small pieces of the
+      boundaries using <link linkend='mask-editor'>Mask Editor tool</link>.
+    </para>
+    <para>
+      If option <guilabel>Do not segment, use only mask</guilabel> is enabled,
+      no filtering is done and the mask is directly used as marked terraces
+      (or their edges, depending on the masking mode).  Filtering of terraces
+      by area is still applied.
+    </para>
+    <para>
+      The total degree of the two-dimensional polynomial to fit is determined
+      by parameter <guilabel>Polynomial degree</guilabel>.  The polynomial
+      is constructed in the same manner as in
+      <link linkend='polynomial-level'>Polynomial levelling</link> with
+      limited total degree, except for the different base heights of each
+      terrace.
+    </para>
+    <para>
+      The subsequent processing depends on whether
+      <guilabel>Independents heights</guilabel> is enabled.  If terrace
+      heights are independent, each detected terrace is allowed to have
+      arbitrary height offset.  The module does not attempt to fit the data
+      with one common step height.  This is generally not useful with mono
+      atomic steps which should be all of the same height, but can be useful
+      for other types of terrace-like structures. The terrace list still
+      shows estimated integer levels – which may or may not be meaningful in
+      this case.
+    </para>
+    <para>
+      When heights are not independent, the module estimates the common step
+      height and assigns an integer level to each terrace – this means the
+      height of any terrace differs from any other by an integer multiple of
+      the step height.  Using this initial estimate, the polynomial fitting is
+      performed again, leading to the final value of the step height.
+    </para>
+    <informalfigure id='fig-terracefit-screenshot'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='terracefit-screenshot.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Terrace measurement dialogue screenshot showing marked terraces for
+          an amphitheatre structure formed by atomic steps on silicon.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      The lower part of tab <guilabel>Parameters</guilabel> shows an overview
+      of the fitting results:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <guilabel>Fitted step height</guilabel>, usually the main result,
+        shown with error obtained from the least-squares method,
+      </listitem>
+      <listitem>
+        <guilabel>Mean square difference</guilabel> between the data and
+        fit (including only terraces, not edges),
+      </listitem>
+      <listitem>
+        <guilabel>Terrace discrepancy</guilabel>, the mean square difference
+        between actual average terrace height and its height as a multiple
+        of step height, and
+      </listitem>
+      <listitem>
+        <guilabel>Number of terraces</guilabel> found, marked and used for the
+        fitting.
+      </listitem>
+    </itemizedlist>
+    <para>
+      Tab <guilabel>Terraces</guilabel> contains a table detailing properties
+      of individual terraces.  Each row corresponds to one terrace.  The
+      columns are:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <xi:include href="eqi-n.xml"/>, terrace index (and colour in
+        <guilabel>Marked terraces</guilabel> image),
+      </listitem>
+      <listitem>
+        <xi:include href="eqi-h.xml"/>, average height – actual, not multiple
+        of step height,
+      </listitem>
+      <listitem>
+        <xi:include href="eqi-k.xml"/>, integer level (multiple of
+        step height),
+      </listitem>
+      <listitem>
+        <xi:include href="eqi-A_px.xml"/>, area in pixels,
+      </listitem>
+      <listitem>
+        <xi:include href="eqi-Delta.xml"/>, discrepancy, i.e. difference
+        between average height and the assigned multiple of step height, and
+      </listitem>
+      <listitem>
+        <xi:include href="eqi-r.xml"/>, residuum, mean square difference
+        between fit and data.
+      </listitem>
+    </itemizedlist>
+    <para>
+      For relatively noisy data, discrepancies can be clearer indicators of
+      correct fit than fit residua.
+    </para>
+    <para>
+      The resulting step height varies slightly with algorithm parameters.
+      This dependence can be investigated using <guilabel>Survey</guilabel>
+      by performing an automated scan over a range of polynomial degrees
+      and/or step broadenings.  All parameters not scanned in the survey are
+      kept at values selected in the <guilabel>Parameters</guilabel> tab.
+    </para>
+    <para>
+      The survey is executed by pressing <guilabel>Execute</guilabel> and can
+      take a while to finish.  When it finishes a file dialogue will appear,
+      allowing to choose the file where the resulting table should be saved.
+    </para>
+  </sect2>
+  <sect2 id='feature-measurement-ref'>
+    <title>References</title>
+    <para id='feature-measurement-ref-1'>
+      [1] J. Garnæs, D. Nečas, L. Nielsen, M. Madsen, A. Torras-Rosell, G.
+      Zeng, P. Klapetek, A. Yacoot, Algorithms for using silicon steps for
+      scanning probe microscope evaluation.
+      Metrologia 57 (2020) 064002,
+      <ulink url='http://dx.doi.org/10.1088/1681-7575/ab9ad3'>doi:10.1088/1681-7575/ab9ad3</ulink>
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

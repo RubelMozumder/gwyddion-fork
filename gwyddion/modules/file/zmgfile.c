@@ -1,0 +1,248 @@
+/*
+ *  $Id: zmgfile.c 26119 2024-01-08 10:09:07Z yeti-dn $
+ *  Copyright (C) 2024 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-kla-zeta-profilometry">
+ *   <comment>KLA Zeta profilometry data</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="Zeta-Instruments_Zeta3D_file_type = "/>
+ *   </magic>
+ *   <glob pattern="*.zmg"/>
+ *   <glob pattern="*.ZMG"/>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * KLA Zeta profilometry data
+ * .zmg
+ * Read
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwyutils.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/datafield.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils-file.h>
+
+#include "err.h"
+#include "get.h"
+
+#define MAGIC "Zeta-Instruments_Zeta3D_file_type = "
+#define MAGIC_SIZE (sizeof(MAGIC)-1)
+
+#define EXTENSION ".zmg"
+
+enum { HEADER_SIZE = 505 };
+
+static gboolean      module_register(void);
+static gint          zmg_detect     (const GwyFileDetectInfo *fileinfo,
+                                     gboolean only_name);
+static GwyContainer* zmg_load       (const gchar *filename,
+                                     GwyRunType mode,
+                                     GError **error);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports KLA Zeta profilometry files."),
+    "Yeti <yeti@gwyddion.net>",
+    "0.1",
+    "David Nečas (Yeti)",
+    "2024",
+};
+
+GWY_MODULE_QUERY2(module_info, zmgfile)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("zmgfile",
+                           N_("KLA Zeta profilometry files (.zmg)"),
+                           (GwyFileDetectFunc)&zmg_detect,
+                           (GwyFileLoadFunc)&zmg_load,
+                           NULL,
+                           NULL);
+
+    return TRUE;
+}
+
+static gint
+zmg_detect(const GwyFileDetectInfo *fileinfo,
+           gboolean only_name)
+{
+    gint score = 0;
+
+    if (only_name) {
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 20 : 0;
+    }
+
+    if (fileinfo->buffer_len > MAGIC_SIZE
+        && fileinfo->file_size >= HEADER_SIZE + 2
+        && memcmp(fileinfo->head, MAGIC, MAGIC_SIZE) == 0)
+        score = 100;
+
+    return score;
+}
+
+static GwyContainer*
+zmg_load(const gchar *filename,
+         G_GNUC_UNUSED GwyRunType mode,
+         GError **error)
+{
+    enum {
+        XRES_OFFSET          = 0x55,
+        YRES_OFFSET          = 0x59,
+        XSCALE_OFFSET        = 0x61,
+        YSCALE_OFFSET        = 0x65,
+        ZSCALE_OFFSET        = 0x69,
+        COMMENT_SIZE1_OFFSET = 0x75,
+        COMMENT_SIZE2_OFFSET = 0xc7,
+        RECIPE_NAME_OFFSET   = 0x83,
+    };
+
+    GwyContainer *container = NULL;
+    guchar *buffer = NULL;
+    const guchar *p;
+    gsize expected_size, size = 0;
+    GError *err = NULL;
+    GwyDataField *dfield = NULL;
+    gint xres, yres, id;
+    gdouble xscale, yscale, zscale;
+    G_GNUC_UNUSED guint csize1, csize2;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+
+    if (size < HEADER_SIZE + 2) {
+        err_TOO_SHORT(error);
+        goto end;
+    }
+
+    if (memcmp(buffer, MAGIC, MAGIC_SIZE) != 0) {
+        err_FILE_TYPE(error, "ZMG");
+        goto end;
+    }
+
+    p = buffer + COMMENT_SIZE1_OFFSET;
+    csize1 = gwy_get_guint32_le(&p);
+    p = buffer + COMMENT_SIZE2_OFFSET;
+    csize2 = gwy_get_guint32_le(&p);
+    /* These might give the number of zeros after COMMENT_SIZE2. More or less. The values are 300 and there are 302
+     * bytes until image data from the end of COMMENT_SIZE2. Who knows. */
+    gwy_debug("size1 %u, size2 %u", csize1, csize2);
+
+    p = buffer + XRES_OFFSET;
+    xres = gwy_get_guint32_le(&p);
+    p = buffer + YRES_OFFSET;
+    yres = gwy_get_guint32_le(&p);
+    gwy_debug("xres %d, yres %d", xres, yres);
+    if (err_DIMENSION(error, xres) || err_DIMENSION(error, yres))
+        goto end;
+
+    expected_size = xres*yres*sizeof(guint16);
+    if (err_SIZE_MISMATCH(error, HEADER_SIZE + expected_size, size, FALSE))
+        goto end;
+
+    container = gwy_container_new();
+
+    p = buffer + XSCALE_OFFSET;
+    xscale = gwy_get_gfloat_le(&p);
+    p = buffer + YSCALE_OFFSET;
+    yscale = gwy_get_gfloat_le(&p);
+    p = buffer + ZSCALE_OFFSET;
+    zscale = gwy_get_gfloat_le(&p);
+    gwy_debug("scales x %g, y %g, z %g", xscale, yscale, zscale);
+    sanitise_real_size(&xscale, "xscale");
+    sanitise_real_size(&yscale, "yscale");
+    sanitise_real_size(&zscale, "zscale");
+
+    dfield = gwy_data_field_new(xres, yres, xres*xscale * 1e-6, yres*yscale * 1e-6, FALSE);
+    gwy_convert_raw_data(buffer + HEADER_SIZE, xres*yres, 1,
+                         GWY_RAW_DATA_UINT16, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                         gwy_data_field_get_data(dfield), zscale * 1e-6, 0.0);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(dfield), "m");
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(dfield), "m");
+
+    id = 0;
+    gwy_container_pass_object(container, gwy_app_get_data_key_for_id(id), dfield);
+    gwy_app_channel_title_fall_back(container, id);
+    gwy_file_channel_import_log_add(container, id, NULL, filename);
+
+    /* XXX:
+     *
+     * After that, there seem to be strange-sized data. Like if the first image is 1920×1440 this one is
+     * 2880×1440. And even that does not look right as if the column length was somehow wrong (but the row length
+     * was correct).
+     *
+     * Then there are 2 bytes (they seem to contain 1536 which again looks like some kind of dimension, but not the
+     * dimension of anything I can find).
+     *
+     * Then another image with normal dimensions, showing some kind of second derivative (edge detection filter).
+     *
+     * Then 4 bytes.
+     *
+     * And two bytes are hard to tell where. The last image might start another 2 bytes later? Both the initial 2
+     * bytes and the last two bytes look pretty contiguous with the image content. A 4+4 split seems a bit more
+     * likely than 2+6, but who knows.
+     *
+     * None of this seems very useful, so just ignore it, at least for now. */
+
+#if 0
+    dfield = gwy_data_field_new(xres, yres, xres*xscale * 1e-6, yres*yscale * 1e-6, FALSE);
+    gwy_convert_raw_data(buffer + size - (expected_size + 4), xres*yres, 1,
+                         GWY_RAW_DATA_UINT16, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                         gwy_data_field_get_data(dfield), zscale * 1e-6, 0.0);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(dfield), "m");
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(dfield), "m");
+
+    id = 2;
+    gwy_container_pass_object(container, gwy_app_get_data_key_for_id(id), dfield);
+    gwy_app_channel_title_fall_back(container, id);
+    gwy_file_channel_import_log_add(container, id, NULL, filename);
+
+    if (2*expected_size + HEADER_SIZE + 8 + 2880*1440 <= size) {
+        xres = 2880;
+        yres = 1440;
+        dfield = gwy_data_field_new(xres, yres, xres*xscale * 1e-6, yres*yscale * 1e-6, FALSE);
+        gwy_convert_raw_data(buffer + HEADER_SIZE + expected_size, xres*yres, 1,
+                             GWY_RAW_DATA_UINT16, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                             gwy_data_field_get_data(dfield), zscale * 1e-6, 0.0);
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(dfield), "m");
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(dfield), "m");
+
+        id = 1;
+        gwy_container_pass_object(container, gwy_app_get_data_key_for_id(id), dfield);
+        gwy_app_channel_title_fall_back(container, id);
+        gwy_file_channel_import_log_add(container, id, NULL, filename);
+    }
+#endif
+
+end:
+    gwy_file_abandon_contents(buffer, size, NULL);
+
+    return container;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

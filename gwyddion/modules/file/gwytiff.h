@@ -1,0 +1,406 @@
+/*
+ *  $Id: gwytiff.h 26193 2024-02-22 12:12:42Z yeti-dn $
+ *  Copyright (C) 2007-2024 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+#ifndef __GWY_TIFF__
+#define __GWY_TIFF__ 1
+
+#include <glib.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwymodule/gwymodule-file.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * This is a rudimentary built-in TIFF reader.
+ *
+ * It is required to read some TIFF-based files because the software that writes them is very creative with regard to
+ * the specification.  In other words, we need to read some incorrect TIFFs too.
+ *
+ * Names starting GWY_TIFF, GwyTIFF and gwy_tiff are reserved.
+ */
+
+/* Search in all directories */
+#define GWY_TIFF_ANY_DIR ((guint)-1)
+
+/* Convenience functions for the 0th directory */
+#define gwy_tiff_get_sint0(T, t, r) gwy_tiff_get_sint((T), 0, (t), (r))
+#define gwy_tiff_get_uint0(T, t, r) gwy_tiff_get_uint((T), 0, (t), (r))
+#define gwy_tiff_get_float0(T, t, r) gwy_tiff_get_float((T), 0, (t), (r))
+#define gwy_tiff_get_string0(T, t, r) gwy_tiff_get_string((T), 0, (t), (r))
+
+/* TIFF format versions */
+typedef enum {
+    GWY_TIFF_CLASSIC   = 42,
+    GWY_TIFF_BIG       = 43,    /* The proposed BigTIFF format */
+} GwyTIFFVersion;
+
+/* TIFF data types */
+typedef enum {
+    GWY_TIFF_NOTYPE    = 0,
+    GWY_TIFF_BYTE      = 1,
+    GWY_TIFF_ASCII     = 2,
+    GWY_TIFF_SHORT     = 3,
+    GWY_TIFF_LONG      = 4,
+    GWY_TIFF_RATIONAL  = 5,
+    GWY_TIFF_SBYTE     = 6,
+    GWY_TIFF_UNDEFINED = 7,
+    GWY_TIFF_SSHORT    = 8,
+    GWY_TIFF_SLONG     = 9,
+    GWY_TIFF_SRATIONAL = 10,
+    GWY_TIFF_FLOAT     = 11,
+    GWY_TIFF_DOUBLE    = 12,
+    GWY_TIFF_IFD       = 13,
+    /* Not sure what they are but they are assigned. */
+    GWY_TIFF_UNICODE   = 14,
+    GWY_TIFF_COMPLEX   = 15,
+    /* BigTIFF */
+    GWY_TIFF_LONG8     = 16,
+    GWY_TIFF_SLONG8    = 17,
+    GWY_TIFF_IFD8      = 18,
+} GwyTIFFDataType;
+
+/* Standard TIFF tags */
+typedef enum {
+    GWY_TIFFTAG_NEW_SUB_FILE_TYPE = 254,
+    GWY_TIFFTAG_SUB_FILE_TYPE     = 255,
+    GWY_TIFFTAG_IMAGE_WIDTH       = 256,
+    GWY_TIFFTAG_IMAGE_LENGTH      = 257,
+    GWY_TIFFTAG_BITS_PER_SAMPLE   = 258,
+    GWY_TIFFTAG_COMPRESSION       = 259,
+    GWY_TIFFTAG_PHOTOMETRIC       = 262,
+    GWY_TIFFTAG_FILL_ORDER        = 266,
+    GWY_TIFFTAG_DOCUMENT_NAME     = 269,
+    GWY_TIFFTAG_IMAGE_DESCRIPTION = 270,
+    GWY_TIFFTAG_MAKE              = 271,
+    GWY_TIFFTAG_MODEL             = 272,
+    GWY_TIFFTAG_STRIP_OFFSETS     = 273,
+    GWY_TIFFTAG_ORIENTATION       = 274,
+    GWY_TIFFTAG_SAMPLES_PER_PIXEL = 277,
+    GWY_TIFFTAG_ROWS_PER_STRIP    = 278,
+    GWY_TIFFTAG_STRIP_BYTE_COUNTS = 279,
+    GWY_TIFFTAG_X_RESOLUTION      = 282,
+    GWY_TIFFTAG_Y_RESOLUTION      = 283,
+    GWY_TIFFTAG_PLANAR_CONFIG     = 284,
+    GWY_TIFFTAG_RESOLUTION_UNIT   = 296,
+    GWY_TIFFTAG_SOFTWARE          = 305,
+    GWY_TIFFTAG_DATE_TIME         = 306,
+    GWY_TIFFTAG_ARTIST            = 315,
+    GWY_TIFFTAG_PREDICTOR         = 317,
+    GWY_TIFFTAG_COLORMAP          = 320,
+    GWY_TIFFTAG_TILE_WIDTH        = 322,
+    GWY_TIFFTAG_TILE_LENGTH       = 323,
+    GWY_TIFFTAG_TILE_OFFSETS      = 324,
+    GWY_TIFFTAG_TILE_BYTE_COUNTS  = 325,
+    GWY_TIFFTAG_EXTRA_SAMPLES     = 338,
+    GWY_TIFFTAG_SAMPLE_FORMAT     = 339,
+    /* EXIF tags, used in LEXT. */
+    GWY_TIFFTAG_EXIF_IFD                        = 34665,
+    GWY_TIFFTAG_EXIF_VERSION                    = 36864,
+    GWY_TIFFTAG_EXIF_DATETIME_ORIGINAL          = 36867,
+    GWY_TIFFTAG_EXIF_DATETIME_DIGITIZED         = 36868,
+    GWY_TIFFTAG_EXIF_USER_COMMENT               = 37510,
+    GWY_TIFFTAG_EXIF_DATETIME_SUBSEC            = 37520,
+    GWY_TIFFTAG_EXIF_DATETIME_ORIGINAL_SUBSEC   = 37521,
+    GWY_TIFFTAG_EXIF_DATETIME_DIGITIZED_SUBSEC  = 37522,
+    GWY_TIFFTAG_EXIF_DEVICE_SETTING_DESCRIPTION = 41995,
+} GwyTIFFTag;
+
+/* Values of some standard tags.
+ * Note only values interesting for us are enumerated.  Add more from the standard if needed.  */
+
+/* Baseline readers are required to implement NONE, HUFFMAN and PACKBITS.
+ * PACKBITS seems to be used in the wild occasionally.
+ * HUFFMAN is only for bilevel images and can be probably ignored. */
+typedef enum {
+    GWY_TIFF_COMPRESSION_NONE           = 1,
+    GWY_TIFF_COMPRESSION_CCITT_HUFFMAN  = 2,
+    GWY_TIFF_COMPRESSION_CCITT_T4       = 3,
+    GWY_TIFF_COMPRESSION_CCITT_T6       = 4,
+    GWY_TIFF_COMPRESSION_LZW            = 5,
+    GWY_TIFF_COMPRESSION_OJPEG          = 6,
+    GWY_TIFF_COMPRESSION_JPEG_DCT       = 7,
+    GWY_TIFF_COMPRESSION_ADOBE_DEFLATE  = 8,
+    GWY_TIFF_COMPRESSION_LEGACY_DEFLATE = 32946,
+    GWY_TIFF_COMPRESSION_PACKBITS       = 32773,
+} GwyTIFFCompression;
+
+typedef enum {
+    GWY_TIFF_ORIENTATION_TOPLEFT  = 1,
+    GWY_TIFF_ORIENTATION_TOPRIGHT = 2,
+    GWY_TIFF_ORIENTATION_BOTRIGHT = 3,
+    GWY_TIFF_ORIENTATION_BOTLEFT  = 4,
+    GWY_TIFF_ORIENTATION_LEFTTOP  = 5,
+    GWY_TIFF_ORIENTATION_RIGHTTOP = 6,
+    GWY_TIFF_ORIENTATION_RIGHTBOT = 7,
+    GWY_TIFF_ORIENTATION_LEFTBOT  = 8,
+} GwyTIFFOrientation;
+
+typedef enum {
+    GWY_TIFF_PHOTOMETRIC_MIN_IS_WHITE      = 0,
+    GWY_TIFF_PHOTOMETRIC_MIN_IS_BLACK      = 1,
+    GWY_TIFF_PHOTOMETRIC_RGB               = 2,
+    GWY_TIFF_PHOTOMETRIC_PALETTE           = 3,
+    GWY_TIFF_PHOTOMETRIC_TRANSPARENCY_MASK = 4,
+    GWY_TIFF_PHOTOMETRIC_YCBCR             = 6,
+    GWY_TIFF_PHOTOMETRIC_CIELAB_1976       = 8,
+} GwyTIFFPhotometric;
+
+typedef enum {
+    GWY_TIFF_SUBFILE_FULL_IMAGE_DATA    = 1,
+    GWY_TIFF_SUBFILE_REDUCED_IMAGE_DATA = 2,
+    GWY_TIFF_SUBFILE_SINGLE_PAGE        = 3,
+} GwyTIFFSubFileType;
+
+typedef enum {
+    GWY_TIFF_NEW_SUBFILE_REDUCED_IMAGE_BIT = (1u << 0),
+    GWY_TIFF_NEW_SUBFILE_SINGLE_PAGE_BIT   = (1u << 1),
+    GWY_TIFF_NEW_SUBFILE_TRANSPARENCY_BIT  = (1u << 2),
+} GwyTIFFNewSubFileType;
+
+typedef enum {
+    GWY_TIFF_PLANAR_CONFIG_CONTIGNUOUS = 1,
+    GWY_TIFF_PLANAR_CONFIG_SEPARATE    = 2,
+} GwyTIFFPlanarConfig;
+
+typedef enum {
+    GWY_TIFF_FILL_ORDER_MSBITS = 1,
+    GWY_TIFF_FILL_ORDER_LSBITS = 2,
+} GwyTIFFFillOrder;
+
+typedef enum {
+    GWY_TIFF_PREDICTOR_NONE  = 1,
+    GWY_TIFF_PREDICTOR_HDIFF = 2,
+} GwyTIFFPredictor;
+
+typedef enum {
+    GWY_TIFF_RESOLUTION_UNIT_NONE       = 1,
+    GWY_TIFF_RESOLUTION_UNIT_INCH       = 2,
+    GWY_TIFF_RESOLUTION_UNIT_CENTIMETER = 3,
+} GwyTIFFResolutionUnit;
+
+/* This does not determine bits per sample! */
+typedef enum {
+    GWY_TIFF_SAMPLE_FORMAT_UNSIGNED_INTEGER   = 1,
+    GWY_TIFF_SAMPLE_FORMAT_SIGNED_INTEGER     = 2,
+    GWY_TIFF_SAMPLE_FORMAT_FLOAT              = 3,
+    GWY_TIFF_SAMPLE_FORMAT_UNDEFINED          = 4,
+    GWY_TIFF_SAMPLE_FORMAT_COMPLEX_SIGNED_INT = 5,
+    GWY_TIFF_SAMPLE_FORMAT_COMPLEX_FLOAT      = 6,
+} GwyTIFFSampleFormat;
+
+typedef guint (*GwyTIFFUnpackFunc)(const guchar *packed,
+                                   guint packedsize,
+                                   guchar *unpacked,
+                                   guint tounpack);
+
+/* TIFF structure representation */
+typedef struct {
+    guint tag;
+    GwyTIFFDataType type;
+    guint64 count;
+    guchar value[8];   /* The actual length is only 4 bytes in classic TIFF */
+} GwyTIFFEntry;
+
+typedef struct {
+    guchar *data;
+    guint64 size;
+    GPtrArray *dirs;  /* Array of GwyTIFFEntry GArray*. */
+    guint16 (*get_guint16)(const guchar **p);
+    gint16 (*get_gint16)(const guchar **p);
+    guint32 (*get_guint32)(const guchar **p);
+    gint32 (*get_gint32)(const guchar **p);
+    guint64 (*get_guint64)(const guchar **p);
+    gint64 (*get_gint64)(const guchar **p);
+    gfloat (*get_gfloat)(const guchar **p);
+    gdouble (*get_gdouble)(const guchar **p);
+    guint64 (*get_length)(const guchar **p);    /* 32bit, 64bit for BigTIFF */
+    GwyTIFFVersion version;
+    guint tagvaluesize;
+    guint tagsize;
+    guint ifdsize;
+    GwyByteOrder byte_order;
+    gboolean allow_compressed;
+} GwyTIFF;
+
+/* State-object for image data reading */
+typedef struct {
+    /* public for reading */
+    guint dirno;
+    guint64 width;
+    guint64 height;
+    guint bits_per_sample;  /* We only support uniform bits per sample. */
+    guint samples_per_pixel;
+    guint extra_samples;
+    GwyTIFFOrientation orientation;
+    GwyTIFFPhotometric photometric;
+    GwyTIFFSubFileType subfiletype;
+    GwyTIFFNewSubFileType newsubfiletype;
+    /* private */
+    guint64 strip_rows;
+    guint64 tile_width;
+    guint64 tile_height;
+    guint64 rowstride;            /* For a single tile if image is tiled. */
+    guint64 *offsets;             /* Either for strips or tiles. */
+    guint64 *bytecounts;          /* Either for strips or tiles. */
+    gdouble *rowbuf;
+    GwyTIFFSampleFormat sample_format;
+    GwyTIFFCompression compression;
+    GwyTIFFPlanarConfig planar_config;
+    GwyRawDataType rawtype;
+    /* Decompression (keeping track of current state). */
+    GwyTIFFUnpackFunc unpack_func;
+    gsize unpacked_alloc_size;
+    guchar *unpacked;       /* Buffer for unpacking, large enough to hold one * strip or tile. */
+    guint64 which_unpacked; /* Which strip or tile we have in unpacked[]; G_MAXUINT64 means none. */
+} GwyTIFFImageReader;
+
+G_GNUC_UNUSED
+static gpointer
+err_TIFF_REQUIRED_TAG(GError **error, GwyTIFFTag tag)
+{
+    g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_DATA,
+                _("Required tag %u was not found."), tag);
+    return NULL;
+}
+
+/* Parameters version and byteorder are inout.  If they are non-zero, the file must match the specified value to be
+ * accepted.  In any case, they are set to the true values on success (and it returns position in buffer after the
+ * header, which should usually be treated just as NULL/non-NULL boolean flag). */
+G_GNUC_INTERNAL const guchar*       gwy_tiff_detect                 (const guchar *buffer,
+                                                                     gsize size,
+                                                                     GwyTIFFVersion *version,
+                                                                     GwyByteOrder *byteorder);
+G_GNUC_INTERNAL void                gwy_tiff_allow_compressed       (GwyTIFF *tiff,
+                                                                     gboolean setting);
+G_GNUC_INTERNAL GwyTIFF*            gwy_tiff_load                   (const gchar *filename,
+                                                                     GError **error);
+G_GNUC_INTERNAL void                gwy_tiff_free                   (GwyTIFF *tiff);
+G_GNUC_INTERNAL guint               gwy_tiff_get_n_dirs             (const GwyTIFF *tiff);
+G_GNUC_INTERNAL const GwyTIFFEntry* gwy_tiff_find_tag_in_dir        (const GArray *tags,
+                                                                     guint tag);
+G_GNUC_INTERNAL const GwyTIFFEntry* gwy_tiff_find_tag               (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag);
+G_GNUC_INTERNAL GwyTIFFImageReader* gwy_tiff_get_image_reader       (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint max_samples,
+                                                                     GError **error);
+/* Idempotent, can use like this: reader = gwy_tiff_image_reader_free(reader); */
+G_GNUC_INTERNAL GwyTIFFImageReader* gwy_tiff_image_reader_free      (GwyTIFFImageReader *reader);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_bool_entry         (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry,
+                                                                     gboolean *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_bool               (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag,
+                                                                     gboolean *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_uint_entry         (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry,
+                                                                     guint *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_uint               (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag,
+                                                                     guint *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_uints_entry        (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry,
+                                                                     guint64 expected_count,
+                                                                     gboolean at_least,
+                                                                     guint *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_uints              (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag,
+                                                                     guint64 expected_count,
+                                                                     gboolean at_least,
+                                                                     guint *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_sint_entry         (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry,
+                                                                     gint *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_sint               (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag,
+                                                                     gint *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_size_entry         (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry,
+                                                                     guint64 *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_size               (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag,
+                                                                     guint64 *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_float_entry        (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry,
+                                                                     gdouble *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_float              (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag,
+                                                                     gdouble *retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_string_entry       (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry,
+                                                                     gchar **retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_get_string             (const GwyTIFF *tiff,
+                                                                     guint dirno,
+                                                                     guint tag,
+                                                                     gchar **retval);
+G_GNUC_INTERNAL gboolean            gwy_tiff_read_image_row         (const GwyTIFF *tiff,
+                                                                     GwyTIFFImageReader *reader,
+                                                                     guint channelno,
+                                                                     guint rowno,
+                                                                     gdouble q,
+                                                                     gdouble z0,
+                                                                     gdouble *dest);
+G_GNUC_INTERNAL gboolean            gwy_tiff_read_image_row_averaged(const GwyTIFF *tiff,
+                                                                     GwyTIFFImageReader *reader,
+                                                                     guint rowno,
+                                                                     gdouble q,
+                                                                     gdouble z0,
+                                                                     gdouble *dest);
+/* You should not need the following functions. But you occassionally might, e.g. when a tag contains some embedded
+ * binary header. */
+G_GNUC_INTERNAL guint               gwy_tiff_data_type_size         (GwyTIFFDataType type);
+G_GNUC_INTERNAL const guchar*       gwy_tiff_entry_get_data_pointer (const GwyTIFF *tiff,
+                                                                     const GwyTIFFEntry *entry);
+G_GNUC_INTERNAL gboolean            gwy_tiff_data_fits              (const GwyTIFF *tiff,
+                                                                     guint64 offset,
+                                                                     guint64 item_size,
+                                                                     guint64 nitems);
+/* Only useful for modules which mess with the TIFF directory, like fix stange tag types, and want to revalidate the
+ * resulting pile of rubbish afterwards.
+ *
+ * NOT intended for normal use as everything is validated by gwy_tiff_load(). */
+G_GNUC_INTERNAL gboolean            gwy_tiff_tags_valid             (const GwyTIFF *tiff,
+                                                                     GError **error);
+/* Only useful for modules which need to scan extra IFDs hidden in weird in the file, i.e. other IFDs than normal TIFF
+ * directories. Yes, this also happens, mosty notably as EXIF (which we might add specific support for, if it becomes
+ * a common occurrence).
+ *
+ * NOT intended for normal use as everything is validated by gwy_tiff_load(). */
+G_GNUC_INTERNAL GArray*             gwy_tiff_scan_ifd               (const GwyTIFF *tiff,
+                                                                     guint64 offset,
+                                                                     const guchar **pafter,
+                                                                     GError **error);
+G_GNUC_INTERNAL gboolean            gwy_tiff_ifd_is_vaild           (const GwyTIFF *tiff,
+                                                                     const GArray *tags,
+                                                                     GError **error);
+G_GNUC_INTERNAL void                gwy_tiff_sort_tag_array         (GArray *tags);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+
+/* vim: set cin et columns=120 tw=118 ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

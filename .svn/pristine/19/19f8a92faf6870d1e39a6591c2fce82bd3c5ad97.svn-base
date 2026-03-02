@@ -1,0 +1,454 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion docs\n"
+"POT-Creation-Date: 2019-01-05 16:05+0400\n"
+"PO-Revision-Date: 2019-01-05 16:06+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: table-grain-quantities.xml:6(entry)
+msgid "Symbol"
+msgstr "Символ"
+
+#: table-grain-quantities.xml:7(entry)
+msgid "Group"
+msgstr "Группа"
+
+#: table-grain-quantities.xml:8(entry)
+msgid "Name"
+msgstr "Название"
+
+#: table-grain-quantities.xml:13(varname)
+msgid "x_c"
+msgstr "x_c"
+
+#: table-grain-quantities.xml:14(entry) table-grain-quantities.xml:19(entry)
+msgid "Position"
+msgstr "Положение"
+
+#: table-grain-quantities.xml:15(entry)
+msgid "Center x position"
+msgstr "Положение центра по x"
+
+#: table-grain-quantities.xml:18(varname)
+msgid "y_c"
+msgstr "y_c"
+
+#: table-grain-quantities.xml:20(entry)
+msgid "Center y position"
+msgstr "Положение центра по y"
+
+#: table-grain-quantities.xml:23(varname)
+msgid "z_min"
+msgstr "z_min"
+
+#: table-grain-quantities.xml:24(entry) table-grain-quantities.xml:29(entry)
+#: table-grain-quantities.xml:34(entry) table-grain-quantities.xml:39(entry)
+#: table-grain-quantities.xml:44(entry) table-grain-quantities.xml:49(entry)
+#: table-grain-quantities.xml:54(entry)
+msgid "Value"
+msgstr "Value"
+
+#: table-grain-quantities.xml:25(entry)
+msgid "Minimum value"
+msgstr "Минимальное значение"
+
+#: table-grain-quantities.xml:28(varname)
+msgid "z_max"
+msgstr "z_max"
+
+#: table-grain-quantities.xml:30(entry)
+msgid "Maximum value"
+msgstr "Максимальное значение"
+
+#: table-grain-quantities.xml:33(varname)
+msgid "z_m"
+msgstr "z_m"
+
+#: table-grain-quantities.xml:35(entry)
+msgid "Mean value"
+msgstr "Среднее значение"
+
+#: table-grain-quantities.xml:38(varname)
+msgid "z_med"
+msgstr "z_med"
+
+#: table-grain-quantities.xml:40(entry)
+msgid "Median value"
+msgstr "Срединное значение"
+
+#: table-grain-quantities.xml:43(varname)
+msgid "z_rms"
+msgstr "z_rms"
+
+#: table-grain-quantities.xml:45(entry)
+msgid "RMS value"
+msgstr "Среднеквадратичное значение"
+
+#: table-grain-quantities.xml:48(varname)
+msgid "b_min"
+msgstr "b_min"
+
+#: table-grain-quantities.xml:50(entry)
+msgid "Minimum value on boundary"
+msgstr "Минимальное значение на границе"
+
+#: table-grain-quantities.xml:53(varname)
+msgid "b_max"
+msgstr "b_max"
+
+#: table-grain-quantities.xml:55(entry)
+msgid "Maximum value on boundary"
+msgstr "Максимальное значение на границе"
+
+#: table-grain-quantities.xml:58(varname)
+msgid "A_px"
+msgstr "A_px"
+
+#: table-grain-quantities.xml:59(entry) table-grain-quantities.xml:64(entry)
+#: table-grain-quantities.xml:69(entry) table-grain-quantities.xml:74(entry)
+#: table-grain-quantities.xml:79(entry) table-grain-quantities.xml:84(entry)
+#: table-grain-quantities.xml:89(entry)
+msgid "Area"
+msgstr "Площадь"
+
+#: table-grain-quantities.xml:60(entry)
+msgid "Pixel area"
+msgstr "Площадь в пикселях"
+
+#: table-grain-quantities.xml:63(varname)
+msgid "A_0"
+msgstr "A_0"
+
+#: table-grain-quantities.xml:65(entry)
+msgid "Projected area"
+msgstr "Площадь проекции"
+
+#: table-grain-quantities.xml:68(varname)
+msgid "A_s"
+msgstr "A_s"
+
+#: table-grain-quantities.xml:70(entry)
+msgid "Surface area"
+msgstr "Площадь поверхности"
+
+#: table-grain-quantities.xml:73(varname)
+msgid "a_eq"
+msgstr "a_eq"
+
+#: table-grain-quantities.xml:75(entry)
+msgid "Equivalent square side"
+msgstr "Сторона эквивалентного квадрата"
+
+#: table-grain-quantities.xml:78(varname)
+msgid "r_eq"
+msgstr "r_eq"
+
+#: table-grain-quantities.xml:80(entry)
+msgid "Equivalent disc radius"
+msgstr "Радиус эквивалентного диска"
+
+#: table-grain-quantities.xml:83(varname)
+msgid "A_h"
+msgstr "A_h"
+
+#: table-grain-quantities.xml:85(entry)
+msgid "Area above half-height"
+msgstr "Площадь выше половинной высоты"
+
+#: table-grain-quantities.xml:88(varname)
+msgid "A_c"
+msgstr "A_c"
+
+#: table-grain-quantities.xml:90(entry)
+msgid "Area of convex hull"
+msgstr "Площадь выпуклой оболочки"
+
+#: table-grain-quantities.xml:93(varname)
+msgid "V_0"
+msgstr "V_0"
+
+#: table-grain-quantities.xml:94(entry) table-grain-quantities.xml:99(entry)
+#: table-grain-quantities.xml:104(entry)
+msgid "Volume"
+msgstr "Объём"
+
+#: table-grain-quantities.xml:95(entry)
+msgid "Zero basis volume"
+msgstr "Объём между нулевой плоскостью и поверхностью"
+
+#: table-grain-quantities.xml:98(varname)
+msgid "V_min"
+msgstr "V_min"
+
+#: table-grain-quantities.xml:100(entry)
+msgid "Grain minimum basis volume"
+msgstr "Объём между поверхностью и плоскостью, проходящей через минимум зерна"
+
+#: table-grain-quantities.xml:103(varname)
+msgid "V_L"
+msgstr "V_L"
+
+#: table-grain-quantities.xml:105(entry)
+msgid "Laplacian background basis volume"
+msgstr "Объём между поверхностью и фоном, вычисленным по Лапласу"
+
+#: table-grain-quantities.xml:108(varname)
+msgid "L_b0"
+msgstr "L_b0"
+
+#: table-grain-quantities.xml:109(entry) table-grain-quantities.xml:114(entry)
+#: table-grain-quantities.xml:119(entry) table-grain-quantities.xml:124(entry)
+#: table-grain-quantities.xml:129(entry) table-grain-quantities.xml:134(entry)
+#: table-grain-quantities.xml:139(entry) table-grain-quantities.xml:144(entry)
+#: table-grain-quantities.xml:149(entry) table-grain-quantities.xml:154(entry)
+#: table-grain-quantities.xml:159(entry) table-grain-quantities.xml:164(entry)
+#: table-grain-quantities.xml:169(entry) table-grain-quantities.xml:174(entry)
+#: table-grain-quantities.xml:179(entry) table-grain-quantities.xml:184(entry)
+msgid "Boundary"
+msgstr "Граница"
+
+#: table-grain-quantities.xml:110(entry)
+msgid "Projected boundary length"
+msgstr "Длина границы проекции"
+
+#: table-grain-quantities.xml:113(varname)
+msgid "D_min"
+msgstr "D_min"
+
+#: table-grain-quantities.xml:115(entry)
+msgid "Minimum bounding size"
+msgstr "Минимальный ограничивающий размер"
+
+#: table-grain-quantities.xml:118(varname)
+msgid "phi_min"
+msgstr "phi_min"
+
+#: table-grain-quantities.xml:120(entry)
+msgid "Minimum bounding direction"
+msgstr "Направление минимального ограничивающего размера"
+
+#: table-grain-quantities.xml:123(varname)
+msgid "D_max"
+msgstr "D_max"
+
+#: table-grain-quantities.xml:125(entry)
+msgid "Maximum bounding size"
+msgstr "Максимальный ограничивающий размер"
+
+#: table-grain-quantities.xml:128(varname)
+msgid "phi_max"
+msgstr "phi_max"
+
+#: table-grain-quantities.xml:130(entry)
+msgid "Maximum bounding direction"
+msgstr "Направление максимального ограничивающего размера"
+
+#: table-grain-quantities.xml:133(varname)
+msgid "R_i"
+msgstr "R_i"
+
+#: table-grain-quantities.xml:135(entry)
+msgid "Maximum inscribed disc radius"
+msgstr "Максимальный радиус вписанного диска"
+
+#: table-grain-quantities.xml:138(varname)
+msgid "x_i"
+msgstr "x_i"
+
+#: table-grain-quantities.xml:140(entry)
+msgid "Maximum inscribed disc center x position"
+msgstr "Положение центра по x максимального вписанного диска"
+
+#: table-grain-quantities.xml:143(varname)
+msgid "y_i"
+msgstr "y_i"
+
+#: table-grain-quantities.xml:145(entry)
+msgid "Maximum inscribed disc center y position"
+msgstr "Положение центра по y максимального вписанного диска"
+
+#: table-grain-quantities.xml:148(varname)
+msgid "R_e"
+msgstr "R_e"
+
+#: table-grain-quantities.xml:150(entry)
+msgid "Minimum circumcircle radius"
+msgstr "Минимальный радиус описанной окружности"
+
+#: table-grain-quantities.xml:153(varname)
+msgid "x_e"
+msgstr "x_e"
+
+#: table-grain-quantities.xml:155(entry)
+msgid "Minimum circumcircle center x position"
+msgstr "Положение центра по x минимальной описанной окружности"
+
+#: table-grain-quantities.xml:158(varname)
+msgid "y_e"
+msgstr "y_e"
+
+#: table-grain-quantities.xml:160(entry)
+msgid "Minimum circumcircle center y position"
+msgstr "Положение центра по y минимальной описанной окружности"
+
+#: table-grain-quantities.xml:163(varname)
+msgid "R_m"
+msgstr "R_m"
+
+#: table-grain-quantities.xml:165(entry)
+msgid "Mean radius"
+msgstr "Средний радиус"
+
+#: table-grain-quantities.xml:168(varname)
+msgid "M_min"
+msgstr "M_min"
+
+#: table-grain-quantities.xml:170(entry)
+msgid "Minimum Martin diameter"
+msgstr "Минимальный диаметр Мартина"
+
+#: table-grain-quantities.xml:173(varname)
+msgid "omega_min"
+msgstr "omega_min"
+
+#: table-grain-quantities.xml:175(entry)
+msgid "Direction of minimum Martin diameter"
+msgstr "Направление минимального диаметра Мартина"
+
+#: table-grain-quantities.xml:178(varname)
+msgid "M_max"
+msgstr "M_max"
+
+#: table-grain-quantities.xml:180(entry)
+msgid "Maximum Martin diameter"
+msgstr "Максимальный диаметр Мартина"
+
+#: table-grain-quantities.xml:183(varname)
+msgid "omega_max"
+msgstr "omega_max"
+
+#: table-grain-quantities.xml:185(entry)
+msgid "Direction of maximum Martin diameter"
+msgstr "Направление максимального диаметра Мартина"
+
+#: table-grain-quantities.xml:188(varname)
+msgid "theta"
+msgstr "theta"
+
+#: table-grain-quantities.xml:189(entry) table-grain-quantities.xml:194(entry)
+msgid "Slope"
+msgstr "Уклон"
+
+#: table-grain-quantities.xml:190(entry)
+msgid "Inclination θ"
+msgstr "Наклон θ"
+
+#: table-grain-quantities.xml:193(varname)
+msgid "phi"
+msgstr "phi"
+
+#: table-grain-quantities.xml:195(entry)
+msgid "Inclination φ"
+msgstr "Наклон φ"
+
+#: table-grain-quantities.xml:198(varname)
+msgid "x_0"
+msgstr "x_0"
+
+#: table-grain-quantities.xml:199(entry) table-grain-quantities.xml:204(entry)
+#: table-grain-quantities.xml:209(entry) table-grain-quantities.xml:214(entry)
+#: table-grain-quantities.xml:219(entry) table-grain-quantities.xml:224(entry)
+#: table-grain-quantities.xml:229(entry)
+msgid "Curvature"
+msgstr "Кривизна"
+
+#: table-grain-quantities.xml:200(entry)
+msgid "Curvature center x position"
+msgstr "Положение центра кривизны по x"
+
+#: table-grain-quantities.xml:203(varname)
+msgid "y_0"
+msgstr "y_0"
+
+#: table-grain-quantities.xml:205(entry)
+msgid "Curvature center y position"
+msgstr "Положение центра кривизны по y"
+
+#: table-grain-quantities.xml:208(varname)
+msgid "z_0"
+msgstr "z_m"
+
+#: table-grain-quantities.xml:210(entry)
+msgid "Curvature center z value"
+msgstr "Значение z центра кривизны"
+
+#: table-grain-quantities.xml:213(varname)
+msgid "kappa_1"
+msgstr "kappa_1"
+
+#: table-grain-quantities.xml:215(entry)
+msgid "Curvature 1"
+msgstr "Кривизна 1"
+
+#: table-grain-quantities.xml:218(varname)
+msgid "kappa_2"
+msgstr "kappa_2"
+
+#: table-grain-quantities.xml:220(entry)
+msgid "Curvature 2"
+msgstr "Кривизна 2"
+
+#: table-grain-quantities.xml:223(varname)
+msgid "phi_1"
+msgstr "phi_1"
+
+#: table-grain-quantities.xml:225(entry)
+msgid "Curvature angle 1"
+msgstr "Угол кривизны 1"
+
+#: table-grain-quantities.xml:228(varname)
+msgid "phi_2"
+msgstr "phi_2"
+
+#: table-grain-quantities.xml:230(entry)
+msgid "Curvature angle 2"
+msgstr "Угол кривизны 2"
+
+#: table-grain-quantities.xml:233(varname)
+msgid "a_e1"
+msgstr "a_e1"
+
+#: table-grain-quantities.xml:234(entry) table-grain-quantities.xml:239(entry)
+#: table-grain-quantities.xml:244(entry)
+msgid "Moment"
+msgstr "Момент"
+
+#: table-grain-quantities.xml:235(entry)
+msgid "Major semiaxis of equivalent ellipse"
+msgstr "Большая полуось эквивалентного эллипса"
+
+#: table-grain-quantities.xml:238(varname)
+msgid "a_e2"
+msgstr "a_e2"
+
+#: table-grain-quantities.xml:240(entry)
+msgid "Minor semiaxis of equivalent ellipse"
+msgstr "Малая полуось эквивалентного эллипса"
+
+#: table-grain-quantities.xml:243(varname)
+msgid "phi_e1"
+msgstr "phi_e1"
+
+#: table-grain-quantities.xml:245(entry)
+msgid "Orientation of equivalent ellipse"
+msgstr "Ориентация эквивалентного эллипса"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

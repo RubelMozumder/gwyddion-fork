@@ -1,0 +1,601 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2020-01-04 17:27+0400\n"
+"PO-Revision-Date: 2020-01-04 17:28+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: filters.xml:6(title)
+msgid "Filters"
+msgstr "Фильтры"
+
+#: filters.xml:8(title)
+msgid "Basic Filters Tool <gwy:icon name=\"filter\"/>"
+msgstr "Инструмент основные фильтры <gwy:icon name=\"filter\"/>"
+
+#: filters.xml:11(para)
+msgid ""
+"The basic <link linkend=\"tool-filters\">Filters tool</link> lets you apply "
+"several simple filters to your image. This can be very useful for data "
+"denoising; however, the real measured data will get altered in the process, "
+"so great care should be taken not to destroy important features of the image."
+msgstr ""
+"Инструмент <link linkend=\"tool-filters\">основные фильтры</link> позволяет "
+"применить к вашему изображению несколько простых фильтров. Это может быть "
+"весьма полезно для удаления шума с данных; однако, реально измеренные данные "
+"изменяются в процессе применения фильтра, и требуется особая аккуратность "
+"чтобы не удалить с изображения важные детали."
+
+#: filters.xml:18(para)
+msgid ""
+"All filters alter the data based on the values in the neighbourhood of the "
+"filtered pixel. For some filters the size and shape of the neighbourhood is "
+"fixed. For most, however, the size can be controlled with parameter "
+"<guilabel>Size</guilabel>. Apart from Gaussian-based filters (described "
+"below) the size determines the diameter of the neighbourhood in pixels. It "
+"is thus advisable to use filters of odd sizes because their effect is "
+"symmetric."
+msgstr ""
+"Все фильтры меняют данные на основе значений в некоторой окрестности "
+"фильтруемого пикселя. Для некоторых фильтров размер и форма окрестности "
+"являются фиксированными. Для большинства, однако, размер может "
+"контролироваться параметром <guilabel>размер</guilabel>. Размер определяет "
+"диаметр окрестности для всех фильтров, кроме основанных на гауссовой функции "
+"(описанных ниже). Следовательно, рекомендуется использовать фильтры "
+"нечётного размера поскольку их действие будет симметричным."
+
+#: filters.xml:29(term)
+msgid "Mean value"
+msgstr "Среднее значение"
+
+#: filters.xml:32(primary)
+msgid "mean"
+msgstr "среднее"
+
+#: filters.xml:33(secondary) filters.xml:48(secondary)
+#: filters.xml:76(secondary) filters.xml:80(secondary)
+#: filters.xml:92(secondary) filters.xml:96(secondary)
+#: filters.xml:108(secondary) filters.xml:120(secondary)
+msgid "filter"
+msgstr "фильтр"
+
+#: filters.xml:36(primary) filters.xml:51(primary) filters.xml:63(primary)
+#: filters.xml:159(primary) filters.xml:181(primary)
+msgid "denoising"
+msgstr "удаление шума"
+
+#: filters.xml:37(secondary)
+msgid "mean filter"
+msgstr "фильтр среднего"
+
+#: filters.xml:30(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> The "
+"filtered value is the mean value of the neighbourhood of the original pixel."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> Значение "
+"после фильтра это среднее значение точек окружения исходного пикселя."
+
+#: filters.xml:44(term)
+msgid "Median value"
+msgstr "Срединное значение"
+
+#: filters.xml:47(primary)
+msgid "median"
+msgstr "срединное"
+
+#: filters.xml:52(secondary)
+msgid "median filter"
+msgstr "фильтр срединного"
+
+#: filters.xml:45(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> The "
+"filtered value is the median value of the neighbourhood of the original "
+"pixel."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> Значение "
+"после фильтра это срединное значение точек окружения исходного пикселя."
+
+#: filters.xml:59(term)
+msgid "Conservative denoise"
+msgstr "Выборочная уборка шума"
+
+#: filters.xml:61(primary)
+msgid "conservative denoise filter"
+msgstr "фильтр выборочной уборки шума"
+
+#: filters.xml:64(secondary)
+msgid "conservative"
+msgstr "выборочная"
+
+#: filters.xml:60(listitem)
+msgid ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/"
+"><placeholder-3/></indexterm> The filter checks whether the value is the "
+"extreme within its neighbourhood. Non-extreme values are preserved. Extreme "
+"values are replaced by the second highest (lowest) values."
+msgstr ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/"
+"><placeholder-3/></indexterm> Фильтр  проверяет, не является ли значение "
+"экстремумом в окрестности. Значения, не являющиеся экстремумами, "
+"сохраняются. Значения экстремумов заменяются следующим наибольшим "
+"(наименьшим) значением."
+
+#: filters.xml:72(term)
+msgid "Minimum"
+msgstr "Минимум"
+
+#: filters.xml:75(primary)
+msgid "minimum"
+msgstr "минимум"
+
+#: filters.xml:79(primary)
+msgid "erosion"
+msgstr "эрозия"
+
+#: filters.xml:73(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> Also known "
+"as erosion filter, it replaces values by the minimum found in the "
+"neighbourhood. Specifically, the erosion is performed with a flat disc of "
+"specified diameter."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> Также "
+"известен как фильтр эрозии, заменяет значение минимальным в окрестности. "
+"Точнее, эрозия проводится с помощью плоского диска заданного диаметра."
+
+#: filters.xml:88(term)
+msgid "Maximum"
+msgstr "Максимум"
+
+#: filters.xml:91(primary)
+msgid "maximum"
+msgstr "максимум"
+
+#: filters.xml:95(primary)
+msgid "dilation"
+msgstr "расширение"
+
+#: filters.xml:89(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> Also known "
+"as dilation filter, it replaces values by the maximum found in the "
+"neighbourhood. Specifically, the dilation is performed with a flat disc of "
+"specified diameter."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></"
+"indexterm><indexterm><placeholder-3/><placeholder-4/></indexterm> Также "
+"известен как фильтр расширения, заменяет значение максимальным в "
+"окрестности. Точнее, расширение проводится с помощью плоского диска "
+"заданного диаметра."
+
+#: filters.xml:104(term)
+msgid "Opening"
+msgstr "Размыкание"
+
+#: filters.xml:107(primary)
+msgid "opening"
+msgstr "размыкание"
+
+#: filters.xml:105(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> Opening is erosion "
+"followed by dilation. Positive bumps are thus removed from the surface, "
+"while smooth areas and negative bumps (holes) are more or less preserved."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> Фильтр размыкания – "
+"эрозия, за которой следует расширение. Положительные выступы при этом "
+"удаляются с поверхности, в то время как гладкие области и впадины в той или "
+"иной мере сохраняются."
+
+#: filters.xml:116(term)
+msgid "Closing"
+msgstr "Замыкание"
+
+#: filters.xml:119(primary)
+msgid "closing"
+msgstr "замыкание"
+
+#: filters.xml:117(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> Closing is dilation "
+"followed by erosion. Negative bumps (holes) are thus removed from the "
+"surface, while smooth areas and positive bumps are more or less preserved."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> Фильтр замыкания – "
+"расширение, за которым следует эрозия. Отрицательные выступы при этом "
+"удаляются с поверхности, в то время как гладкие области и выступы в той или "
+"иной мере сохраняются."
+
+#: filters.xml:128(term)
+msgid "ASF opening"
+msgstr "ППФ размыкания"
+
+#: filters.xml:131(primary) filters.xml:146(primary)
+msgid "alternating sequential filter"
+msgstr "переменный последовательный фильтр"
+
+#: filters.xml:132(secondary)
+msgid "closing-opening"
+msgstr "замыкание-размыкание"
+
+#: filters.xml:129(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> A simple opening or "
+"closing filter may be too rough for correction of defects of varying sizes. "
+"The alternating sequential filter (ASF) consists of a sequence of closing "
+"and opening operations with progressively increasing discs up to the given "
+"size. It preserves better the shape of features that should not be removed "
+"by the opening. The final operation of this filter is opening."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> Простой фильтр "
+"размыкания или замыкания может быть слишком грубым для коррекции дефектов "
+"переменного размера. Переменный последовательный фильтр (ППФ) состоит из "
+"последовательности операций замыкания и размыкания с последовательно "
+"увеличивающимся диском до заданного размера. Он лучше сохраняет форму особых "
+"деталей, которые не должны удаляться размыканием. Последней операцией "
+"фильтра является размыкание."
+
+#: filters.xml:143(term)
+msgid "ASF closing"
+msgstr "ППФ замыкания"
+
+#: filters.xml:147(secondary)
+msgid "opening-closing"
+msgstr "размыкание-замыкание"
+
+#: filters.xml:144(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> The ASF closing "
+"filter differs from the ASF opening filter only by the order of the "
+"elementary operations. The final operation of this filter is closing."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm> Переменный "
+"последовательный фильтр замыкания отличается от фильтра размыкания только "
+"порядком базовых операций. Последней операцией данного фильтра будет "
+"замыкание."
+
+#: filters.xml:155(term)
+msgid "Kuwahara"
+msgstr "Кувахара"
+
+#: filters.xml:157(primary) filters.xml:160(secondary)
+msgid "Kuwahara filter"
+msgstr "фильтр Кувахары"
+
+#: filters.xml:156(listitem)
+msgid ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/"
+"><placeholder-3/></indexterm> Kuwahara filter is an edge-preserving "
+"smoothing filter."
+msgstr ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/"
+"><placeholder-3/></indexterm> Фильтр Кувахары – сохраняющий кромки "
+"сглаживающий фильтр."
+
+#: filters.xml:166(term)
+msgid "Dechecker"
+msgstr "Убрать \"шахматную доску\""
+
+#: filters.xml:168(primary)
+msgid "dechecker filter"
+msgstr "фильтр, убирающий шахматную доску"
+
+#: filters.xml:169(primary)
+msgid "checker pattern removal filter"
+msgstr "фильтр, убирающий шахматную текстуру"
+
+#: filters.xml:167(listitem)
+msgid ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/></"
+"indexterm> A simple slightly smoothing filter specially designed to remove "
+"checker pattern from the image while preserving other details. It is a "
+"convolution filter with kernel <include href=\"eq-filters-dechecker.xml\"/>"
+msgstr ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/></"
+"indexterm> Сглаживающий фильтр, специально предназначенный для удаления "
+"текстур, напоминающих шахматную доску, с изображений при сохранении других "
+"особенностей. Это фильтр свёртки с ядром <include href=\"eq-filters-"
+"dechecker.xml\"/>"
+
+#: filters.xml:177(term)
+msgid "Gaussian"
+msgstr "Гауссов"
+
+#: filters.xml:179(primary) filters.xml:182(secondary)
+msgid "Gaussian filter"
+msgstr "гауссов фильтр"
+
+#: filters.xml:178(listitem)
+msgid ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/"
+"><placeholder-3/></indexterm> The Gaussian filter is a smoothing filter, the "
+"size parameter determines the FWHM (full width at half maximum) of the "
+"Gaussian. The relation between FWHM and <include href=\"eqi-sigma.xml\"/> is "
+"<include href=\"eq-gaussian-fwhm.xml\"/>"
+msgstr ""
+"<indexterm><placeholder-1/></indexterm><indexterm><placeholder-2/"
+"><placeholder-3/></indexterm> Гауссов фильтр – сглаживающий фильтр, параметр "
+"размера определяет полную ширину на половинной высоте гауссовой кривой. "
+"Соотношение между полной шириной на половинной высоте и <include href=\"eqi-"
+"sigma.xml\"/>: <include href=\"eq-gaussian-fwhm.xml\"/>"
+
+#: filters.xml:191(term)
+msgid "Sharpen"
+msgstr "Сделать резким"
+
+#: filters.xml:193(primary)
+msgid "sharpening filter"
+msgstr "фильтр повышения контраста"
+
+#: filters.xml:192(listitem)
+msgid ""
+"<indexterm><placeholder-1/></indexterm> A simple sharpening operation which "
+"is complementary to the Gaussian filter. First it smooths the image further "
+"with the corresponding Gaussian filter. The result is then extrapolated "
+"backwards to estimate the sharper image."
+msgstr ""
+"<indexterm><placeholder-1/></indexterm> Простая операция повышения "
+"контраста, которая является обратной гауссову фильтру. Сначала он "
+"дополнительно сглаживает изображение соответствующим гауссовым фильтром. "
+"Результат затем экстраполируется обратно чтобы получить оценку более резкого "
+"изображения."
+
+#: filters.xml:201(para)
+msgid ""
+"By default, these filters will be applied to the entire image. However, you "
+"can apply a filter to a specific region within your image by selecting it "
+"with the mouse. This can be useful for correcting poorly measured areas "
+"within a good image."
+msgstr ""
+"По умолчанию, эти фильтры будут применяться ко всему изображению. Но можно "
+"применить фильтр к отдельной области, выбрав её мышью. Это может быть "
+"полезно для коррекции плохо промеренных областей в хорошем изображении."
+
+#: filters.xml:207(para)
+msgid ""
+"It is also possible to limit the area by masking. In this case the mask "
+"determines the active pixels whose values will be modified by the filter. "
+"Pixels in the neighbourhood of the active area can however still enter the "
+"calculation passively, i.e. their values can influence the result."
+msgstr ""
+"Также можно ограничить область применения фильтра с помощью маски. В этом "
+"случае маска задаёт активные пиксели, значение которых будет изменяться "
+"фильтром. Пиксели в окрестности активной области могут по прежнему "
+"участвовать в расчёте пассивно, т.е. их значения будут влиять на результат."
+
+#: filters.xml:214(para)
+msgid ""
+"Several of the basic filters can be used for simple denoising and defect "
+"removal. Further defect marking and removal functions are described in "
+"section <link linkend=\"editing-correction\">Data Editing</link>, see for "
+"instance <link linkend=\"mask-of-outliers\">Mask of Outliers</link> and "
+"<link linkend=\"remove-data-under-mask\">Interpolate Data Under Mask</link>. "
+"More advanced denoising functions in Gwyddion, for example DWT denoising and "
+"FFT filtering, are described in section <link linkend=\"edit-extended"
+"\">Extended Data Editing</link>."
+msgstr ""
+"Несколько основных фильтров можно использовать для простого удаления шума и "
+"дефектов. Дальнейшая работа с функциями выделения дефектов и их удаления "
+"описана в разделе <link linkend=\"editing-correction\">редактирование "
+"данных</link>, в качестве примера можно привести <link linkend=\"mask-of-"
+"outliers\">маску выпадающего</link> и <link linkend=\"remove-data-under-mask"
+"\">интерполировать данные под маской</link>. Более продвинутые функции "
+"удаления шума в Gwyddion, например, удаление шума с помощью дискретного "
+"вейвлет-преобразования (DWT) и Фурье-фильтрации, описаны в разделе <link "
+"linkend=\"edit-extended\">расширенное редактирование данных</link>."
+
+#: filters.xml:232(caption)
+msgid ""
+"Screenshot of filter tool with median filter applied to a rectangular "
+"selection"
+msgstr ""
+"Снимок экрана инструмента фильтрации с применением фильтра среднего к "
+"прямоугольной выделенной области."
+
+#: filters.xml:240(title)
+msgid "Convolution Filter <gwy:icon name=\"convolution\"/>"
+msgstr "Фильтр свёртки <gwy:icon name=\"convolution\"/>"
+
+#: filters.xml:244(primary)
+msgid "convolution"
+msgstr "свёртка"
+
+#: filters.xml:245(secondary)
+msgid "with given kernel"
+msgstr "с заданным ядром"
+
+#: filters.xml:249(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: filters.xml:250(guisubmenu)
+msgid "Integral Transforms"
+msgstr "Интегральные преобразования"
+
+#: filters.xml:251(guisubmenu)
+msgid "Convolution Filter"
+msgstr "Фильтр свёртки"
+
+#: filters.xml:254(para)
+msgid ""
+"Discrete convolutions with arbitrary kernels up to <include href=\"eqi-9x9."
+"xml\"/> can be performed using Convolution Filter (see <link linkend="
+"\"convolve\">Image Convolution</link> for convolution of two images)."
+msgstr ""
+"Дискретные свёртки с произвольным ядром до <include href=\"eqi-9x9.xml\"/> "
+"могут производиться используя фильтр свёртки (см. <link linkend=\"convolve"
+"\">свёртку изображений</link> для операции свёртки двух изображений)."
+
+#: filters.xml:260(para)
+msgid ""
+"The <guilabel>Divisor</guilabel> entry represents a common factor all the "
+"coefficients are divided by before applying the filter. This allows to use "
+"denormalized coefficients that are often nicer numbers. The normalization "
+"can be also calculated automatically when <guilabel>automatic</guilabel> is "
+"checked. When the sum of the coefficients is non-zero, it makes the filter "
+"sum-preserving, i.e. it normalizes the sum of coefficients to unity. When "
+"the sum of the coefficients is zero, the automatic factor is simply let "
+"equal to 1."
+msgstr ""
+"Текстовое поле <guilabel>Делитель</guilabel> представляет собой общий "
+"множитель, на который делятся все коэффициенты перед применением фильтра. "
+"Это позволяет использовать ненормализованные коэффициенты, которые нередко "
+"представляются круглыми числами. Нормализация также может быть посчитана "
+"автоматически когда установлен флаг <guilabel>автоматически</guilabel>. Если "
+"сумма коэффициентов ненулевая, это делает фильтр сохраняющим сумму, т.е. она "
+"является множителем, который нормализует сумму коэффициентов к единице. "
+"Когда сумма коэффициентов равна нулю, автоматический фактор просто "
+"становится равным 1."
+
+#: filters.xml:271(para)
+msgid ""
+"Since many filters used in practice exhibit various types of symmetry, the "
+"coefficients can be automatically completed according to the selected "
+"symmetry type (odd, even). Note the completion is performed on pressing "
+"<keycap>Enter</keycap> in the coefficient entry."
+msgstr ""
+"Поскольку многие практически используемые фильтры проявляют различные формы "
+"симметрии, коэффициенты могут быть автоматически дополнены в соответствии с "
+"выбранным типом симметрии (четные, нечетные). Дополнение происходит при "
+"нажатии <keycap>Enter</keycap> в поле ввода коэффициента."
+
+#: filters.xml:277(para)
+msgid ""
+"In a fresh installation only a sample Identity filter is present (which is "
+"not particularly useful as it does nothing). This filter cannot be modified, "
+"to create a new filter use the <guilabel>New</guilabel> button on the "
+"<guilabel>Presets</guilabel> page."
+msgstr ""
+"Сразу после установки доступен только пример фильтра Identity "
+"(тождественность, он не слишком полезен, т.к. ничего не делает). этот фильтр "
+"не может быть изменён, чтобы создать новый используйте кнопку "
+"<guilabel>Новый</guilabel> на вкладке <guilabel>Предустановки</guilabel>."
+
+#~ msgid ""
+#~ "Basic Filters Tool <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_filter-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Инструмент <quote>Основные фильтры</quote> "
+#~ "<guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_filter-24.png\" format=\"PNG\"/></imageobject></inlinemediaobject></"
+#~ "guiicon>"
+
+#~ msgid ""
+#~ "<indexterm><placeholder-1/><placeholder-2/></indexterm> Alternating "
+#~ "sequential filter (ASF), closing – a simple opening or closing filter may "
+#~ "be too rough for correction of defects of varying sizes. The ASF consists "
+#~ "of a sequence of opening and closing operations with progressively "
+#~ "increasing discs up to the given size and preserves better the shape of "
+#~ "features that should not be removed by the opening. The final operation "
+#~ "of this filter is the closing."
+#~ msgstr ""
+#~ "<indexterm><placeholder-1/><placeholder-2/></indexterm> Переменный "
+#~ "последовательный фильтр (Alternating sequential filter, ASF) замыкания – "
+#~ "простой фильтр размыкания или замыкания может быть слишком грубым для "
+#~ "коррекции дефектов переменного размера. Переменный последовательный "
+#~ "фильтр состоит из последовательности операций замыкания и размыкания с "
+#~ "последовательно увеличивающимся диском до заданного размера. Он лучше "
+#~ "сохраняет форму особых деталей, которые не должны удаляться размыканием. "
+#~ "Последней операцией фильтра является замыкание."
+
+#~ msgid ""
+#~ "Moreover, there are more denoising functions in Gwyddion, for example DWT "
+#~ "denoising and FFT filtering. For details see section <link linkend=\"edit-"
+#~ "extended\">Extended Data Edit</link>."
+#~ msgstr ""
+#~ "Более того, в Gwyddion есть ещё функции удаления шума, такие как удаление "
+#~ "шума дискретным вейвлет-преобразованием и фильтрация БПФ. Смотрите главу "
+#~ "<link linkend=\"edit-extended\">расширенное редактирование данных</link> "
+#~ "для дополнительной информации."
+
+#~ msgid ""
+#~ "If you need to only suppress some values in the SPM data that are "
+#~ "obviously wrong, you can also try the <link linkend=\"mask-of-outliers"
+#~ "\">Mask of Outliers</link> module and the <link linkend=\"remove-data-"
+#~ "under-mask\">Remove Data Under Mask</link> module. For details see "
+#~ "section <link linkend=\"editing-correction\">Data Edit</link>."
+#~ msgstr ""
+#~ "Если нужно просто удалить некоторые значения на данных СЗМ, которые "
+#~ "очевидно неверны, можно также попробовать модули <link linkend=\"mask-of-"
+#~ "outliers\">Маска выпадающего</link> и <link linkend=\"remove-data-under-"
+#~ "mask\">Удалить данные под маской</link>. Смотрите главу <link linkend="
+#~ "\"editing-correction\">редактирование данных</link>. "
+
+#~ msgid ""
+#~ "<indexterm><primary>dechecker filter</primary></"
+#~ "indexterm><indexterm><primary>checker pattern removal filter</primary></"
+#~ "indexterm> Dechecker filter – a smoothing filter specially designed to "
+#~ "remove checker pattern from the image while preserving other details. It "
+#~ "is a convolution filter with kernel <informalequation id=\"eq-filters-"
+#~ "dechecker\"><mediaobject><imageobject><imagedata fileref=\"eq-filters-"
+#~ "dechecker.png\" format=\"PNG\"/></"
+#~ "imageobject><textobject><phrase>Dechecker filter 5 × 5 coefficient "
+#~ "matrix</phrase></textobject><textobject role=\"tex\"><phrase><![CDATA[\n"
+#~ "w_{\\rm dechecker}\n"
+#~ "  = \\pmatrix{0&1/144&-1/72&1/144&0\\cr\n"
+#~ "             1/144&-1/18&1/9&-1/18&1/144\\cr\n"
+#~ "             -1/72&1/9&7/9&1/9&-1/72\\cr\n"
+#~ "             1/144&-1/18&1/9&-1/18&1/144\\cr\n"
+#~ "             0&1/144&-1/72&1/144&0\\cr}\n"
+#~ "]]></phrase></textobject></mediaobject></informalequation>"
+#~ msgstr ""
+#~ "<indexterm><primary>фильтр, убирающий шахматную доску</quote></primary></"
+#~ "indexterm> Фильтр <quote>убрать шахматную доску</quote> – сглаживающий "
+#~ "фильтр, специально предназначенный для удаления текстур. напоминающих "
+#~ "шахматную доску из изображения при сохранении других особенностей. Это "
+#~ "фильтр свёртки с ядром<informalequation id=\"eq-filters-dechecker"
+#~ "\"><mediaobject><imageobject><imagedata fileref=\"eq-filters-dechecker.png"
+#~ "\" format=\"PNG\"/></imageobject><textobject><phrase> Матрица "
+#~ "коэфициентов 5 × 5 фильтра, убирающего шахматную доску </phrase></"
+#~ "textobject><textobject role=\"tex\"><phrase><![CDATA[\n"
+#~ "w_{\\rm dechecker}\n"
+#~ "  = \\pmatrix{0&1/144&-1/72&1/144&0\\cr\n"
+#~ "             1/144&-1/18&1/9&-1/18&1/144\\cr\n"
+#~ "             -1/72&1/9&7/9&1/9&-1/72\\cr\n"
+#~ "             1/144&-1/18&1/9&-1/18&1/144\\cr\n"
+#~ "             0&1/144&-1/72&1/144&0\\cr}\n"
+#~ "]]></phrase></textobject></mediaobject></informalequation>"
+
+#~ msgid ""
+#~ "<indexterm><primary>gaussian filter</primary></indexterm> Gaussian "
+#~ "filter – a smoothing filter, the size parameter determines the FWHM (full "
+#~ "width at half maximum) of the Gaussian. The relation between FWHM "
+#~ "and <inlineequation><mathphrase>σ</mathphrase><alt>\\sigma</alt></"
+#~ "inlineequation> is <informalequation id=\"eq-gaussian-fwhm"
+#~ "\"><mediaobject><imageobject><imagedata fileref=\"eq-gaussian-fwhm.png\" "
+#~ "format=\"PNG\"/></imageobject><textobject><phrase>FWHM-sigma relation for "
+#~ "Gaussian</phrase></textobject><textobject role=\"tex\"><phrase><![CDATA[\n"
+#~ "{\\rm FWHM} = 2\\sqrt{2\\ln 2}\\,\\sigma\\approx2.35482\\sigma\n"
+#~ "]]></phrase></textobject></mediaobject></informalequation>"
+#~ msgstr ""
+#~ "<indexterm><primary>гауссов фильтр</primary></indexterm> Гауссов фильтр – "
+#~ "сглаживающий фильтр, параметр размера определяет полную ширину на "
+#~ "половинной высоте гауссовой кривой. Соотношение между полной шириной на "
+#~ "половинной высоте и <inlineequation><mathphrase>σ</mathphrase><alt>"
+#~ "\\sigma</alt></inlineequation>: <informalequation id=\"eq-gaussian-fwhm"
+#~ "\"><mediaobject><imageobject><imagedata fileref=\"eq-gaussian-fwhm.png\" "
+#~ "format=\"PNG\"/></imageobject><textobject><phrase>соотношение между "
+#~ "полной шириной на половинной высоте и сигма для Гауссовой функции</"
+#~ "phrase></textobject><textobject role=\"tex\"><phrase><![CDATA[\n"
+#~ "{\\rm FWHM} = 2\\sqrt{2\\ln 2}\\,\\sigma\\approx2.35482\\sigma\n"
+#~ "]]></phrase></textobject></mediaobject></informalequation>"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

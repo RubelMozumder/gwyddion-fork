@@ -1,0 +1,373 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2023-05-05 08:34+0400\n"
+"PO-Revision-Date: 2023-05-05 08:38+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <dn2010@gwyddion.net>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: roughness-iso.xml:6(title)
+msgid "One-Dimensional Roughness Parameters <gwy:icon name=\"iso_roughness\"/>"
+msgstr "Одномерные параметры шероховатости <gwy:icon name=\"iso_roughness\"/>"
+
+#: roughness-iso.xml:10(primary)
+msgid "roughness"
+msgstr "шероховатость"
+
+#: roughness-iso.xml:11(secondary)
+msgid "ISO parameters"
+msgstr "параметры ISO"
+
+#: roughness-iso.xml:13(para)
+msgid ""
+"Standardized one-dimensional roughness parameters can be evaluated with the "
+"<link linkend=\"tool-roughness\">Roughness tool</link>."
+msgstr ""
+"Стандартизованные одномерные параметры шероховатости могут быть рассчитаны с "
+"помощью <link linkend=\"tool-roughness\">инструмента измерения "
+"шероховатости</link>."
+
+#: roughness-iso.xml:17(para)
+msgid ""
+"The one-dimensional texture is split into waviness (the low-frequency "
+"components defining the overall shape) and roughness (the high-frequency "
+"components) at the cut-off frequency. This frequency is specified in the "
+"units of the Nyquist frequency, that is value 1.0 corresponds to the Nyquist "
+"frequency. It is also displayed as the corresponding real-space wavelength."
+msgstr ""
+"Одномерная текстура разбивается на волнистость (низкочастотные компоненты, "
+"определяющие общую форму) и шероховатость (высокочастотные компоненты) по "
+"частоте среза. Частота измеряется в долях от частоты Найквиста, то есть, "
+"значение 1.0 соответствует самой частоте Найквиста. Она также показывает как "
+"соответствующая ей длина волны в реальном пространстве."
+
+#: roughness-iso.xml:25(para)
+msgid ""
+"In the following formulas we assume the mean value of <include href=\"eqi-"
+"r_j.xml\"/> is zero, i.e. it holds <include href=\"eq-roughness-iso-rj.xml\"/"
+">"
+msgstr ""
+"В следующих формулах мы считаем среднее значение <include href=\"eqi-r_j.xml"
+"\"/> равным нулю, т.е. оно содержит <include href=\"eq-roughness-iso-rj.xml"
+"\"/>"
+
+#: roughness-iso.xml:31(title)
+msgid "Roughness Amplitude Parameters"
+msgstr "Параметры амплитуды шероховатости"
+
+#: roughness-iso.xml:34(term)
+msgid "Roughness Average <include href=\"eqi-R_a.xml\"/>"
+msgstr "Средняя шероховатость <include href=\"eqi-R_a.xml\"/>"
+
+#: roughness-iso.xml:38(para) roughness-iso.xml:91(para)
+#: roughness-iso.xml:107(para)
+msgid ""
+"Standards: ASME B46.1-1995, ASME B46.1-1985, ISO 4287-1997, ISO 4287/1-1997."
+msgstr ""
+"Стандарты:  ASME B46.1-1995, ASME B46.1-1985, ISO 4287-1997, ISO "
+"4287/1-1997, ГОСТ 25142-82."
+
+#: roughness-iso.xml:42(para)
+msgid ""
+"Arithmetical mean deviation. The average deviation of all points roughness "
+"profile from a mean line over the evaluation length <include href=\"eq-"
+"roughness-iso-Ra.xml\"/>"
+msgstr ""
+"Среднее арифметическое отклонение профиля. Среднее отклонение всех точек "
+"профиля шероховатости от средней линии на длине оценки <include href=\"eq-"
+"roughness-iso-Ra.xml\"/>"
+
+#: roughness-iso.xml:47(para)
+msgid ""
+"An older means of specifying a range for <include href=\"eqi-R_a.xml\"/> is "
+"RHR. This is a symbol on a drawing specifying a minimum and maximum value "
+"for <include href=\"eqi-R_a.xml\"/>."
+msgstr ""
+"Старым способом указания диапазона для <include href=\"eqi-R_a.xml\"/> "
+"является RHR (roughness height rating, рейтинг высоты неровностей). Это "
+"символ на чертежах, указывающий минимальное и максимальное значения для "
+"<include href=\"eqi-R_a.xml\"/>."
+
+#: roughness-iso.xml:56(term)
+msgid "Root Mean Square Roughness <include href=\"eqi-R_q.xml\"/>"
+msgstr "Среднеквадратичная шероховатость <include href=\"eqi-R_q.xml\"/>"
+
+#: roughness-iso.xml:60(para)
+msgid "Standards: ASME B46.1-1995, ISO 4287-1997, ISO 4287/1-1997."
+msgstr ""
+"Стандарты: ASME B46.1-1995, ISO 4287-1997, ISO 4287/1-1997, ГОСТ 25142-82."
+
+#: roughness-iso.xml:63(para)
+msgid ""
+"The average of the measured height deviations taken within the evaluation "
+"length and measured from the mean line <include href=\"eq-roughness-iso-Rq."
+"xml\"/>"
+msgstr ""
+"Среднее значение измеренных отклонений от средней линии взятых на длине "
+"оценки <include href=\"eq-roughness-iso-Rq.xml\"/>"
+
+#: roughness-iso.xml:71(term)
+msgid "Maximum Height of the Profile <include href=\"eqi-R_t.xml\"/>"
+msgstr "Максимальная высота профиля <include href=\"eqi-R_t.xml\"/>"
+
+#: roughness-iso.xml:75(para) roughness-iso.xml:124(para)
+msgid "Standards: ASME B46.1-1995, ISO 4287-1997."
+msgstr "Стандарты:  ASME B46.1-1995, ISO 4287-1997, ГОСТ 25142-82."
+
+#: roughness-iso.xml:78(para)
+msgid ""
+"Maximum peak-to-peak-valley height. The absolute value between the highest "
+"and lowest peaks <include href=\"eq-roughness-iso-Rt.xml\"/>"
+msgstr ""
+"Максимальная высота от пика до пика впадины. Абсолютное значение разности "
+"между самым высоким и самым низким пиком <include href=\"eq-roughness-iso-Rt."
+"xml\"/>"
+
+#: roughness-iso.xml:86(term)
+msgid ""
+"Maximum Profile Valley Depth <include href=\"eqi-R_v.xml\"/>, <include href="
+"\"eqi-R_m.xml\"/>"
+msgstr ""
+"Максимальная глубина впадины профиля <include href=\"eqi-R_v.xml\"/>, "
+"<include href=\"eqi-R_m.xml\"/>"
+
+#: roughness-iso.xml:95(para)
+msgid ""
+"Lowest valley. This is the depth of the deepest valley in the roughness "
+"profile over the evaluation length <include href=\"eq-roughness-iso-Rv.xml\"/"
+">"
+msgstr ""
+"Самая глубокая впадина. Глубина наиболее глубокой впадины на профиле "
+"шероховатости на длине оценки <include href=\"eq-roughness-iso-Rv.xml\"/>"
+
+#: roughness-iso.xml:103(term)
+msgid "Maximum Profile Peak Height <include href=\"eqi-R_p.xml\"/>"
+msgstr "Максимальная высота пика профиля <include href=\"eqi-R_p.xml\"/>"
+
+#: roughness-iso.xml:111(para)
+msgid ""
+"Highest peak. This is the height of the highest peak in the roughness "
+"profile over the evaluation length <include href=\"eq-roughness-iso-Rp.xml\"/"
+">"
+msgstr ""
+"Наиболее высокий пик. Это высота наиболее высокого пика на профиле "
+"шероховатости на длине оценки <include href=\"eq-roughness-iso-Rp.xml\"/>"
+
+#: roughness-iso.xml:119(term)
+msgid "Average Maximum Height of the Profile <include href=\"eqi-R_tm.xml\"/>"
+msgstr "Средняя максимальная высота профиля <include href=\"eqi-R_tm.xml\"/>"
+
+#: roughness-iso.xml:127(para)
+msgid ""
+"Mean peak-to-valley roughness. It is determined by the difference between "
+"the highest peak ant the lowest valley within multiple samples in the "
+"evaluation length <include href=\"eq-roughness-iso-Rtm.xml\"/> where "
+"<include href=\"eqi-R_vm.xml\"/> and <include href=\"eqi-R_pm.xml\"/> are "
+"defined below."
+msgstr ""
+"Средняя шероховатость между пиком и впадиной. Определяется по разнице между "
+"самым высоким пиком и самой глубокой впадиной для нескольких выборок "
+"заданной длины оценки <include href=\"eq-roughness-iso-Rtm.xml\"/> где "
+"<include href=\"eqi-R_vm.xml\"/> и <include href=\"eqi-R_pm.xml\"/> "
+"определены ниже."
+
+#: roughness-iso.xml:135(para)
+msgid ""
+"For profile data it is based on five sample lengths (<include href=\"eqi-m-"
+"is-5.xml\"/>). The number of samples corresponds with the ISO standard."
+msgstr ""
+"Для данных профиля она основывается на пяти базовых длинах (<include href="
+"\"eqi-m-is-5.xml\"/>). Число выборок соответствует стандарту ISO."
+
+#: roughness-iso.xml:143(term)
+msgid "Average Maximum Profile Valley Depth <include href=\"eqi-R_vm.xml\"/>"
+msgstr ""
+"Средняя максимальная глубина впадины профиля <include href=\"eqi-R_vm.xml\"/>"
+
+#: roughness-iso.xml:148(para) roughness-iso.xml:167(para)
+#: roughness-iso.xml:185(para) roughness-iso.xml:200(para)
+#: roughness-iso.xml:230(para) roughness-iso.xml:246(para)
+#: roughness-iso.xml:262(para) roughness-iso.xml:278(para)
+#: roughness-iso.xml:295(para)
+msgid "Standards: ISO 4287-1997."
+msgstr "Стандарты: ISO 4287-1997."
+
+#: roughness-iso.xml:151(para)
+msgid ""
+"The mean valley depth based on one peak per sampling length. The single "
+"deepest valley is found in five sampling lengths (<include href=\"eqi-m-is-5."
+"xml\"/>) and then averaged <include href=\"eq-roughness-iso-Rvm.xml\"/> "
+"where <include href=\"eq-roughness-iso-Rvi.xml\"/>"
+msgstr ""
+"Средняя глубина впадины основывается на одном пике на каждую базовую длину. "
+"Одна наиболее глубокая долина находится на каждой из пяти базовых длин "
+"(<include href=\"eqi-m-is-5.xml\"/>) и затем усредняется <include href=\"eq-"
+"roughness-iso-Rvm.xml\"/> где <include href=\"eq-roughness-iso-Rvi.xml\"/>"
+
+#: roughness-iso.xml:162(term)
+msgid "Average Maximum Profile Peak Height <include href=\"eqi-R_pm.xml\"/>"
+msgstr ""
+"Средняя максимальная высота пика профиля <include href=\"eqi-R_pm.xml\"/>"
+
+#: roughness-iso.xml:170(para)
+msgid ""
+"The mean peak height based on one peak per sampling length. The single "
+"highest peak is found in five sampling lengths (<include href=\"eqi-m-is-5."
+"xml\"/>) and then averaged <include href=\"eq-roughness-iso-Rpm.xml\"/> "
+"where <include href=\"eq-roughness-iso-Rpi.xml\"/>"
+msgstr ""
+"Средняя высота пика основывается на одном пике на базовую длину. По одному "
+"самому высокому пику находится на каждой из пяти базовых длин (<include href="
+"\"eqi-m-is-5.xml\"/>) и затем усредняется <include href=\"eq-roughness-iso-"
+"Rpm.xml\"/> где <include href=\"eq-roughness-iso-Rpi.xml\"/>"
+
+#: roughness-iso.xml:181(term)
+msgid "Base roughness depth <include href=\"eqi-R_3z.xml\"/>"
+msgstr "Базовая глубина шероховатости <include href=\"eqi-R_3z.xml\"/>"
+
+#: roughness-iso.xml:188(para)
+msgid ""
+"The distance between the third highest peak and the third lowest valley. A "
+"peak is a portion of the surface above the mean line crossings."
+msgstr ""
+"Расстояние между третьим по высоте пиком и третьей по глубине впадиной. "
+"Пиком называется часть поверхности выше пересечения со средней линией."
+
+#: roughness-iso.xml:196(term)
+msgid "Base roughness profile depth <include href=\"eqi-R_3zISO.xml\"/>"
+msgstr ""
+"Базовая глубина профиля шероховатости <include href=\"eqi-R_3zISO.xml\"/>"
+
+#: roughness-iso.xml:203(para)
+msgid ""
+"The height of the third highest peak from the third lowest valley per "
+"sampling length. The base roughness depth is found in five sampling lengths "
+"and then averaged."
+msgstr ""
+"Высота третьего по высоте пика относительно третьей по глубине впадины на "
+"базовой длине. Базовая глубина шероховатости определяется по пяти базовым "
+"длинам и затем усредняется."
+
+#: roughness-iso.xml:211(term)
+msgid "Ten-point height <include href=\"eqi-R_z.xml\"/>"
+msgstr "Высота по десяти точкам <include href=\"eqi-R_z.xml\"/>"
+
+#: roughness-iso.xml:215(para)
+msgid "Standards: ISO 4287-1997"
+msgstr "Стандарты: ISO 4287-1997, ГОСТ 25142-82"
+
+#: roughness-iso.xml:218(para)
+msgid ""
+"The average absolute value of the five highest peaks and the five lowest "
+"valleys over the evaluation length."
+msgstr ""
+"Среднее абсолютное значение из пяти самых высоких пиков и пяти самых "
+"глубоких впадин на длине оценки."
+
+#: roughness-iso.xml:225(term)
+msgid ""
+"Average peak-to-valley profile roughness <include href=\"eqi-R_zISO.xml\"/>"
+msgstr ""
+"Средняя шероховатость профиля от пика до впадины <include href=\"eqi-R_zISO."
+"xml\"/>"
+
+#: roughness-iso.xml:233(para)
+msgid ""
+"The average peak-to-valley roughness based on one peak and one valley per "
+"sampling length. The single largest deviation is found in five sampling "
+"lengths and then averaged. It is identical to <include href=\"eqi-R_tm.xml\"/"
+">."
+msgstr ""
+"Средняя шероховатость от пика до впадины основана на одном пике и одной "
+"впадине на базовую длину. Одно наибольшее отклонение находится на пяти "
+"базовых длинах и затем усредняется. Она идентична <include href=\"eqi-R_tm."
+"xml\"/>."
+
+#: roughness-iso.xml:242(term)
+msgid "The Amplitude Distribution Function ADF"
+msgstr "Функция распределения амплитуды ADF"
+
+#: roughness-iso.xml:249(para)
+msgid ""
+"The amplitude distribution function is a probability function that gives the "
+"probability that a profile of the surface has a certain height <include href="
+"\"eqi-z.xml\"/> at any position <include href=\"eqi-x.xml\"/>."
+msgstr ""
+"Функция распределения амплитуды — функция вероятности, которая задаёт "
+"вероятность того, что профиль поверхности будет иметь определённую высоту "
+"<include href=\"eqi-z.xml\"/> в любом произвольном его месте <include href="
+"\"eqi-x.xml\"/>."
+
+#: roughness-iso.xml:258(term)
+msgid "The Bearing Ratio Curve BRC"
+msgstr "Относительная опорная кривая BRC"
+
+#: roughness-iso.xml:265(para)
+msgid ""
+"The Bearing Ratio Curve is related to the ADF, it is the corresponding "
+"cumulative probability distribution and sees much greater use in surface "
+"finish. The bearing ratio curve is the integral (from the top down) of the "
+"ADF."
+msgstr ""
+"Относительная опорная кривая относится к функции распределения амплитуды, "
+"это соответствующее интегральное распределение вероятности, которое гораздо "
+"чаще применяется в обработке поверхностей. Относительная опорная кривая это "
+"интеграл (сверху вниз) от функции распределения амплитуды."
+
+#: roughness-iso.xml:274(term)
+msgid "Skewness <include href=\"eqi-R_sk.xml\"/>"
+msgstr "Асимметрия <include href=\"eqi-R_sk.xml\"/>"
+
+#: roughness-iso.xml:281(para)
+msgid ""
+"Skewness is a parameter that describes the shape of the ADF. Skewness is a "
+"simple measure of the asymmetry of the ADF, or, equivalently, it measures "
+"the symmetry of the variation of a profile about its mean line <include href="
+"\"eq-roughness-iso-Rsk.xml\"/>"
+msgstr ""
+"Асимметрия — параметр, который описывает форму функции распределения "
+"амплитуды. Асимметрия — простая мера асимметрии функции распределения "
+"амплитуды или, что то же самое, она показывает симметрию изменения профиля "
+"относительно его средней линии <include href=\"eq-roughness-iso-Rsk.xml\"/>"
+
+#: roughness-iso.xml:291(term)
+msgid "Kurtosis <include href=\"eqi-R_ku.xml\"/>"
+msgstr "Эксцесс <include href=\"eqi-R_ku.xml\"/>"
+
+#: roughness-iso.xml:298(para)
+msgid ""
+"Kurtosis is the ADF shape parameter considered. Kurtosis relates to the "
+"uniformity of the ADF or, equivalently, to the spikiness of the profile. "
+"<include href=\"eq-roughness-iso-Rku.xml\"/>"
+msgstr ""
+"Эксцесс — параметр, учитывающий форму функции распределения амплитуды. "
+"Эксцесс относится к равномерности функции распределения амплитуды или, что "
+"то же самое, к степени изрезанности (числу пиков) профиля. <include href="
+"\"eq-roughness-iso-Rku.xml\"/>"
+
+#: roughness-iso.xml:307(term)
+msgid "Swedish height <include href=\"eqi-H.xml\"/>"
+msgstr "Шведская высота <include href=\"eqi-H.xml\"/>"
+
+#: roughness-iso.xml:311(para)
+msgid ""
+"Height difference between two predefined lines. The upper line exposes 5 % "
+"of the surface and the lower line exposes 90 %. In other words it is the "
+"difference between 95th and 10th height distribution percentiles. <include "
+"href=\"eqi-H.xml\"/> is less sensitive to data spikes than <include href="
+"\"eqi-R_t.xml\"/>."
+msgstr ""
+"Разница высоты между двумя предварительно заданными линиями. Верхняя линия "
+"оставляет открытой 5 % от поверхности и нижняя линия 90 %. Другими словами, "
+"это разница между 95м и 10м перцентилем функции распределения высоты. "
+"<include href=\"eqi-H.xml\"/> менее чувствительная к выбросам данных, чем "
+"<include href=\"eqi-R_t.xml\"/>."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

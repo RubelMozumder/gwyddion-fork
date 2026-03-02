@@ -1,0 +1,34 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+name = 'fitfunc-gaussian'
+set samples 201
+set lmargin at screen 0.11
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+a = 1
+b = 1
+x0 = 2*b
+y0 = 0.15*a
+
+f(x) = y0 + a * exp(-((x-x0)/b)**2)
+xm = b/sqrt(2)
+M = f(x0)
+
+unset grid
+set key top right Left reverse samplen 1.5
+set xtics out nomirror ('x₀' x0 0, 'x₀+b/√2' x0+xm 0, 'x₀−b/√2' x0-xm 0)
+set ytics out nomirror ('0' 0 0, 'y₀' y0 0, 'y₀+a' M 0)
+set xrange [0:5]
+set yrange [0:1.1*M]
+set arrow from x0,0 to x0,M nohead ls 10
+set arrow from x0-xm,0 to x0-xm,f(x0-xm) nohead ls 10
+set arrow from x0+xm,0 to x0+xm,f(x0+xm) nohead ls 10
+set arrow from 0,y0 to 5,y0 nohead ls 10
+set arrow from 0,M to x0,M nohead ls 10
+set output name.'.svg'
+
+plot \
+    f(x) with lines title 'Gaussian' linestyle 1
+

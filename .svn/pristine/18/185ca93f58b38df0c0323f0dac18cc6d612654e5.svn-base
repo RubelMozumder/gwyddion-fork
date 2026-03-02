@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="installation-devel">
+  <title>Снимок Subversion, Разработка</title>
+  <para><application>Gwyddion</application> использует систему контроля версий <ulink url="http://subversion.apache.org/">Subversion</ulink> для управления ревизиями исходного кода. Организация репозитория описана на <ulink url="http://gwyddion.net/resources.php#subversion">страницах проекта</ulink>.  Например, последнюю ревизию самой программы можно получить из системы контроля версий командой <informalexample><literallayout><userinput>svn checkout http://svn.code.sf.net/p/gwyddion/code/trunk/gwyddion</userinput></literallayout></informalexample></para>
+  <para>Репозиторий не содержит никаких генерируемых файлов, независимо от того, насколько экзотичные инструменты могут понадобиться для их генерации. Следовательно, требуется использование дополнительных пакетов, для сборки свежего снимка. Также существуют определённые ограничения платформы. Дополнительные инструменты и пакеты которые нужны для разработки те же, что нужны при сборке из снимка <application>Subversion</application>. Точнее, все инструменты нужны для сборки из свежего снимка, в то время, как разработка может требовать только их подмножество или вообще не требовать, в зависимости от типа и масштаба изменений исходного кода.</para>
+  <para>Дополнительные зависимости для сборки версии для разработчиков</para>
+  <itemizedlist>
+    <listitem><ulink url="http://www.gnu.org/software/autoconf/">GNU autoconf</ulink> ≥ 2.60</listitem>
+    <listitem><ulink url="http://www.gnu.org/software/automake/">GNU automake</ulink> ≥ 1.11</listitem>
+    <listitem><ulink url="http://www.gnu.org/software/libtool/">GNU libtool</ulink> ≥ 1.4</listitem>
+    <listitem><ulink url="http://www.python.org/">Python</ulink> ≥ 2.4</listitem>
+    <listitem><ulink url="http://www.gtk.org/gtk-doc/">gtk-doc</ulink> ≥ 1.12</listitem>
+    <listitem><ulink url="http://www.gnu.org/software/gettext/">GNU gettext</ulink> ≥ 0.12, включая средства для разработки</listitem>
+    <listitem><ulink url="http://www.inkscape.org/">Inkscape</ulink> ≥ 0.91</listitem>
+    <listitem>
+      <ulink url="http://xmlsoft.org/XSLT/">xsltproc</ulink>
+    </listitem>
+    <listitem>
+      <ulink url="http://epydoc.sourceforge.net/">Epydoc</ulink>
+    </listitem>
+    <listitem><ulink url="http://pmt.sourceforge.net/pngcrush/">pngcrush</ulink> ≥ 1.8.9</listitem>
+    <listitem>скорее всего версии GNU для большинства инструментов: компилятор, binutils, …</listitem>
+  </itemizedlist>
+  <para>После загрузки свежего снимка, запустите <userinput>./autogen.sh</userinput> с теми же аргументами, которые вы хотели бы передать <command>configure</command>. Следует отметить. что автоматически добавляются опции <option>--enable-maintainer-mode</option> и <option>--enable-gtk-doc</option>, чтобы убедиться, чт оправила создания и обновления различных файлов будут активны. В общем случае нужно использовать эту опцию <command>configure</command> каждый раз, когда вы собираетесь изменить исходный код программы нетривиальным путём.</para>
+  <para>На некоторых системах <command>autogen.sh</command> может закончиться с ошибкой даже если у вас установлены требуемые версии autotools. Эти системы не устанавливают общие команды <command>autoconf</command> или <command>automake</command>, а делят их на версии, вроде <command>autoconf261</command> или <command>automake19</command>. Найти, например, <quote><command>automake</command>1.9 или новее</quote> без знания насколько новым он может быть будет весьма нетривиальной задачей.  Следовательно, <command>autogen.sh</command> даже не пытается этого сделать. Можно или создать не содержащие версий символические ссылки на команды с версиями или запустить <command>autogen.sh</command> следующим образом: <informalexample><userinput> AUTOCONF=autoconf261 AUTOHEADER=autoheader261 ./autogen.sh </userinput></informalexample> Может потребоваться установка следующих переменных: <envar>ACLOCAL</envar>, <envar>AUTOCONF</envar>, <envar>AUTOHEADER</envar>, <envar>AUTOM4TE</envar>, <envar>AUTOMAKE</envar>, <envar>LIBTOOLIZE</envar>. Дополнительно, некоторые операционные системы могут установить макрос <command>autoconf</command> в такое место, где <command>aclocal</command> по умолчанию их не найдёт. Это может быть исправлено установкой переменной <envar>ACLOCAL_FLAGS</envar>, где будут указаны дополнительные пути поиска для <command>aclocal</command>: <informalexample><userinput> ACLOCAL_FLAGS="-I /usr/local/share/aclocal" ./autogen.sh </userinput></informalexample></para>
+  <para>Нередко требуется комбинировать эти настройки. Например, на FreeBSD, где все инструменты разделены по версиям, обычно требуется выполнить (разбито на строки для простоты чтения): <informalexample><literallayout><userinput>AUTOCONF=autoconf261 \
+AUTOHEADER=autoheader261 \
+AUTOM4TE=autom4te261 \
+AUTOMAKE=automake19 \
+ACLOCAL=aclocal19 \
+ACLOCAL_FLAGS="-I /usr/local/share/aclocal" \
+CPPFLAGS=-I/usr/local/include \
+LDFLAGS=-L/usr/local/lib \
+./autogen.sh --prefix=<replaceable>...</replaceable></userinput></literallayout></informalexample></para>
+  <para>Если <command>autogen.sh</command> заканчивается удачно, далее программу можно собирать как обычно.</para>
+  <sect2 id="installation-devel-ms-windows">
+    <title>MS Windows</title>
+    <para>Поскольку стандартный метод создания исполняемых файлов MS Windows состоит в кросс-компиляции в Linux, рекомендуемый способ разработки для MS Windows также состоит в сборке под Linux. Это можно делать как на физически другом компьютере используя <command>ssh</command>, так и на виртуальной машине запущенной на том же компьютере, что и основная система MS Windows. В обоих случаях каталоги сборки Gwyddion (и другие каталоги) могут быть общими для Linux и MS Windows используя либо Samba, либо механизм общих каталогов виртуальной машины. Собранные таким образом исполняемые файлы можно сразу тестировать в MS Windows не перенося их туда и обратно.</para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

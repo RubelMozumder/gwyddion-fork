@@ -1,0 +1,2273 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-user-guide\n"
+"POT-Creation-Date: 2024-01-05 10:05+0400\n"
+"PO-Revision-Date: 2024-01-05 10:07+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: file-format-table.xml:6(primary)
+msgid "file"
+msgstr "файл"
+
+#: file-format-table.xml:7(primary)
+msgid "supported formats"
+msgstr "поддерживаемые форматы"
+
+#: file-format-table.xml:13(entry)
+msgid "File Format"
+msgstr "Формат файлов"
+
+#: file-format-table.xml:14(entry)
+msgid "Extensions"
+msgstr "Расширения"
+
+#: file-format-table.xml:15(entry)
+msgid "Module"
+msgstr "Модуль"
+
+#: file-format-table.xml:16(entry)
+msgid "Read"
+msgstr "Чтение"
+
+#: file-format-table.xml:17(entry)
+msgid "Write"
+msgstr "Запись"
+
+#: file-format-table.xml:18(entry)
+msgid "SPS"
+msgstr "Спектроскопия"
+
+#: file-format-table.xml:19(entry)
+msgid "Volume"
+msgstr "Объём"
+
+#: file-format-table.xml:20(entry)
+msgid "Curve map"
+msgstr "Карта кривых"
+
+#: file-format-table.xml:27(entry)
+msgid "Accurex II text data"
+msgstr "Текстовые данные Accurex II"
+
+#: file-format-table.xml:28(entry) file-format-table.xml:171(entry)
+#: file-format-table.xml:401(entry) file-format-table.xml:769(entry)
+#: file-format-table.xml:977(entry) file-format-table.xml:1444(entry)
+msgid ".txt"
+msgstr ""
+
+#: file-format-table.xml:29(entry)
+msgid "accurexii-txt"
+msgstr ""
+
+#: file-format-table.xml:30(entry) file-format-table.xml:43(entry)
+#: file-format-table.xml:52(entry) file-format-table.xml:63(entry)
+#: file-format-table.xml:86(entry) file-format-table.xml:97(entry)
+#: file-format-table.xml:99(entry) file-format-table.xml:119(entry)
+#: file-format-table.xml:123(entry) file-format-table.xml:130(entry)
+#: file-format-table.xml:140(entry) file-format-table.xml:151(entry)
+#: file-format-table.xml:162(entry) file-format-table.xml:165(entry)
+#: file-format-table.xml:174(entry) file-format-table.xml:184(entry)
+#: file-format-table.xml:185(entry) file-format-table.xml:195(entry)
+#: file-format-table.xml:206(entry) file-format-table.xml:217(entry)
+#: file-format-table.xml:228(entry) file-format-table.xml:239(entry)
+#: file-format-table.xml:250(entry) file-format-table.xml:261(entry)
+#: file-format-table.xml:272(entry) file-format-table.xml:283(entry)
+#: file-format-table.xml:294(entry) file-format-table.xml:316(entry)
+#: file-format-table.xml:326(entry) file-format-table.xml:337(entry)
+#: file-format-table.xml:348(entry) file-format-table.xml:359(entry)
+#: file-format-table.xml:370(entry) file-format-table.xml:381(entry)
+#: file-format-table.xml:392(entry) file-format-table.xml:415(entry)
+#: file-format-table.xml:427(entry) file-format-table.xml:437(entry)
+#: file-format-table.xml:446(entry) file-format-table.xml:447(entry)
+#: file-format-table.xml:457(entry) file-format-table.xml:466(entry)
+#: file-format-table.xml:467(entry) file-format-table.xml:476(entry)
+#: file-format-table.xml:477(entry) file-format-table.xml:487(entry)
+#: file-format-table.xml:498(entry) file-format-table.xml:499(entry)
+#: file-format-table.xml:509(entry) file-format-table.xml:510(entry)
+#: file-format-table.xml:511(entry) file-format-table.xml:512(entry)
+#: file-format-table.xml:520(entry) file-format-table.xml:521(entry)
+#: file-format-table.xml:531(entry) file-format-table.xml:542(entry)
+#: file-format-table.xml:552(entry) file-format-table.xml:554(entry)
+#: file-format-table.xml:555(entry) file-format-table.xml:556(entry)
+#: file-format-table.xml:562(entry) file-format-table.xml:572(entry)
+#: file-format-table.xml:583(entry) file-format-table.xml:594(entry)
+#: file-format-table.xml:605(entry) file-format-table.xml:606(entry)
+#: file-format-table.xml:617(entry) file-format-table.xml:628(entry)
+#: file-format-table.xml:639(entry) file-format-table.xml:640(entry)
+#: file-format-table.xml:650(entry) file-format-table.xml:672(entry)
+#: file-format-table.xml:674(entry) file-format-table.xml:676(entry)
+#: file-format-table.xml:683(entry) file-format-table.xml:694(entry)
+#: file-format-table.xml:705(entry) file-format-table.xml:708(entry)
+#: file-format-table.xml:716(entry) file-format-table.xml:727(entry)
+#: file-format-table.xml:738(entry) file-format-table.xml:749(entry)
+#: file-format-table.xml:760(entry) file-format-table.xml:771(entry)
+#: file-format-table.xml:781(entry) file-format-table.xml:792(entry)
+#: file-format-table.xml:803(entry) file-format-table.xml:807(entry)
+#: file-format-table.xml:814(entry) file-format-table.xml:825(entry)
+#: file-format-table.xml:827(entry) file-format-table.xml:836(entry)
+#: file-format-table.xml:847(entry) file-format-table.xml:858(entry)
+#: file-format-table.xml:871(entry) file-format-table.xml:880(entry)
+#: file-format-table.xml:882(entry) file-format-table.xml:891(entry)
+#: file-format-table.xml:902(entry) file-format-table.xml:904(entry)
+#: file-format-table.xml:905(entry) file-format-table.xml:913(entry)
+#: file-format-table.xml:916(entry) file-format-table.xml:917(entry)
+#: file-format-table.xml:924(entry) file-format-table.xml:935(entry)
+#: file-format-table.xml:946(entry) file-format-table.xml:957(entry)
+#: file-format-table.xml:979(entry) file-format-table.xml:990(entry)
+#: file-format-table.xml:1000(entry) file-format-table.xml:1014(entry)
+#: file-format-table.xml:1022(entry) file-format-table.xml:1024(entry)
+#: file-format-table.xml:1025(entry) file-format-table.xml:1033(entry)
+#: file-format-table.xml:1044(entry) file-format-table.xml:1054(entry)
+#: file-format-table.xml:1068(entry) file-format-table.xml:1076(entry)
+#: file-format-table.xml:1087(entry) file-format-table.xml:1098(entry)
+#: file-format-table.xml:1100(entry) file-format-table.xml:1109(entry)
+#: file-format-table.xml:1120(entry) file-format-table.xml:1123(entry)
+#: file-format-table.xml:1131(entry) file-format-table.xml:1141(entry)
+#: file-format-table.xml:1152(entry) file-format-table.xml:1163(entry)
+#: file-format-table.xml:1185(entry) file-format-table.xml:1196(entry)
+#: file-format-table.xml:1207(entry) file-format-table.xml:1218(entry)
+#: file-format-table.xml:1229(entry) file-format-table.xml:1233(entry)
+#: file-format-table.xml:1240(entry) file-format-table.xml:1262(entry)
+#: file-format-table.xml:1273(entry) file-format-table.xml:1283(entry)
+#: file-format-table.xml:1305(entry) file-format-table.xml:1307(entry)
+#: file-format-table.xml:1308(entry) file-format-table.xml:1316(entry)
+#: file-format-table.xml:1327(entry) file-format-table.xml:1338(entry)
+#: file-format-table.xml:1349(entry) file-format-table.xml:1360(entry)
+#: file-format-table.xml:1371(entry) file-format-table.xml:1372(entry)
+#: file-format-table.xml:1381(entry) file-format-table.xml:1392(entry)
+#: file-format-table.xml:1403(entry) file-format-table.xml:1414(entry)
+#: file-format-table.xml:1425(entry) file-format-table.xml:1429(entry)
+#: file-format-table.xml:1436(entry) file-format-table.xml:1446(entry)
+#: file-format-table.xml:1457(entry) file-format-table.xml:1468(entry)
+#: file-format-table.xml:1481(entry) file-format-table.xml:1490(entry)
+#: file-format-table.xml:1491(entry) file-format-table.xml:1501(entry)
+#: file-format-table.xml:1512(entry) file-format-table.xml:1523(entry)
+#: file-format-table.xml:1534(entry) file-format-table.xml:1545(entry)
+#: file-format-table.xml:1556(entry) file-format-table.xml:1567(entry)
+#: file-format-table.xml:1578(entry) file-format-table.xml:1588(entry)
+#: file-format-table.xml:1599(entry) file-format-table.xml:1601(entry)
+#: file-format-table.xml:1602(entry) file-format-table.xml:1610(entry)
+#: file-format-table.xml:1620(entry) file-format-table.xml:1631(entry)
+#: file-format-table.xml:1642(entry) file-format-table.xml:1653(entry)
+#: file-format-table.xml:1655(entry) file-format-table.xml:1656(entry)
+#: file-format-table.xml:1664(entry) file-format-table.xml:1675(entry)
+#: file-format-table.xml:1686(entry) file-format-table.xml:1697(entry)
+#: file-format-table.xml:1708(entry) file-format-table.xml:1709(entry)
+#: file-format-table.xml:1718(entry) file-format-table.xml:1730(entry)
+#: file-format-table.xml:1742(entry) file-format-table.xml:1745(entry)
+#: file-format-table.xml:1753(entry) file-format-table.xml:1764(entry)
+#: file-format-table.xml:1775(entry) file-format-table.xml:1786(entry)
+#: file-format-table.xml:1787(entry)
+msgid "Yes"
+msgstr "Да"
+
+#: file-format-table.xml:31(entry) file-format-table.xml:32(entry)
+#: file-format-table.xml:33(entry) file-format-table.xml:34(entry)
+#: file-format-table.xml:41(entry) file-format-table.xml:42(entry)
+#: file-format-table.xml:44(entry) file-format-table.xml:45(entry)
+#: file-format-table.xml:53(entry) file-format-table.xml:54(entry)
+#: file-format-table.xml:55(entry) file-format-table.xml:56(entry)
+#: file-format-table.xml:64(entry) file-format-table.xml:65(entry)
+#: file-format-table.xml:66(entry) file-format-table.xml:67(entry)
+#: file-format-table.xml:76(entry) file-format-table.xml:77(entry)
+#: file-format-table.xml:78(entry) file-format-table.xml:79(entry)
+#: file-format-table.xml:87(entry) file-format-table.xml:88(entry)
+#: file-format-table.xml:89(entry) file-format-table.xml:90(entry)
+#: file-format-table.xml:98(entry) file-format-table.xml:100(entry)
+#: file-format-table.xml:101(entry) file-format-table.xml:109(entry)
+#: file-format-table.xml:110(entry) file-format-table.xml:111(entry)
+#: file-format-table.xml:112(entry) file-format-table.xml:120(entry)
+#: file-format-table.xml:121(entry) file-format-table.xml:122(entry)
+#: file-format-table.xml:131(entry) file-format-table.xml:132(entry)
+#: file-format-table.xml:133(entry) file-format-table.xml:134(entry)
+#: file-format-table.xml:141(entry) file-format-table.xml:142(entry)
+#: file-format-table.xml:143(entry) file-format-table.xml:144(entry)
+#: file-format-table.xml:152(entry) file-format-table.xml:153(entry)
+#: file-format-table.xml:154(entry) file-format-table.xml:155(entry)
+#: file-format-table.xml:163(entry) file-format-table.xml:164(entry)
+#: file-format-table.xml:166(entry) file-format-table.xml:173(entry)
+#: file-format-table.xml:175(entry) file-format-table.xml:176(entry)
+#: file-format-table.xml:177(entry) file-format-table.xml:186(entry)
+#: file-format-table.xml:187(entry) file-format-table.xml:188(entry)
+#: file-format-table.xml:196(entry) file-format-table.xml:197(entry)
+#: file-format-table.xml:198(entry) file-format-table.xml:199(entry)
+#: file-format-table.xml:207(entry) file-format-table.xml:208(entry)
+#: file-format-table.xml:209(entry) file-format-table.xml:210(entry)
+#: file-format-table.xml:218(entry) file-format-table.xml:219(entry)
+#: file-format-table.xml:220(entry) file-format-table.xml:221(entry)
+#: file-format-table.xml:229(entry) file-format-table.xml:230(entry)
+#: file-format-table.xml:231(entry) file-format-table.xml:232(entry)
+#: file-format-table.xml:240(entry) file-format-table.xml:241(entry)
+#: file-format-table.xml:242(entry) file-format-table.xml:243(entry)
+#: file-format-table.xml:251(entry) file-format-table.xml:252(entry)
+#: file-format-table.xml:253(entry) file-format-table.xml:254(entry)
+#: file-format-table.xml:262(entry) file-format-table.xml:263(entry)
+#: file-format-table.xml:264(entry) file-format-table.xml:265(entry)
+#: file-format-table.xml:273(entry) file-format-table.xml:274(entry)
+#: file-format-table.xml:275(entry) file-format-table.xml:276(entry)
+#: file-format-table.xml:284(entry) file-format-table.xml:285(entry)
+#: file-format-table.xml:286(entry) file-format-table.xml:287(entry)
+#: file-format-table.xml:295(entry) file-format-table.xml:296(entry)
+#: file-format-table.xml:297(entry) file-format-table.xml:298(entry)
+#: file-format-table.xml:306(entry) file-format-table.xml:307(entry)
+#: file-format-table.xml:308(entry) file-format-table.xml:309(entry)
+#: file-format-table.xml:317(entry) file-format-table.xml:318(entry)
+#: file-format-table.xml:319(entry) file-format-table.xml:320(entry)
+#: file-format-table.xml:327(entry) file-format-table.xml:328(entry)
+#: file-format-table.xml:329(entry) file-format-table.xml:330(entry)
+#: file-format-table.xml:338(entry) file-format-table.xml:339(entry)
+#: file-format-table.xml:340(entry) file-format-table.xml:341(entry)
+#: file-format-table.xml:349(entry) file-format-table.xml:350(entry)
+#: file-format-table.xml:351(entry) file-format-table.xml:352(entry)
+#: file-format-table.xml:360(entry) file-format-table.xml:361(entry)
+#: file-format-table.xml:362(entry) file-format-table.xml:363(entry)
+#: file-format-table.xml:371(entry) file-format-table.xml:372(entry)
+#: file-format-table.xml:373(entry) file-format-table.xml:374(entry)
+#: file-format-table.xml:382(entry) file-format-table.xml:383(entry)
+#: file-format-table.xml:384(entry) file-format-table.xml:385(entry)
+#: file-format-table.xml:393(entry) file-format-table.xml:394(entry)
+#: file-format-table.xml:395(entry) file-format-table.xml:396(entry)
+#: file-format-table.xml:404(entry) file-format-table.xml:405(entry)
+#: file-format-table.xml:406(entry) file-format-table.xml:407(entry)
+#: file-format-table.xml:416(entry) file-format-table.xml:417(entry)
+#: file-format-table.xml:418(entry) file-format-table.xml:419(entry)
+#: file-format-table.xml:426(entry) file-format-table.xml:428(entry)
+#: file-format-table.xml:429(entry) file-format-table.xml:430(entry)
+#: file-format-table.xml:436(entry) file-format-table.xml:438(entry)
+#: file-format-table.xml:439(entry) file-format-table.xml:440(entry)
+#: file-format-table.xml:448(entry) file-format-table.xml:449(entry)
+#: file-format-table.xml:450(entry) file-format-table.xml:456(entry)
+#: file-format-table.xml:458(entry) file-format-table.xml:459(entry)
+#: file-format-table.xml:460(entry) file-format-table.xml:468(entry)
+#: file-format-table.xml:469(entry) file-format-table.xml:470(entry)
+#: file-format-table.xml:478(entry) file-format-table.xml:479(entry)
+#: file-format-table.xml:480(entry) file-format-table.xml:488(entry)
+#: file-format-table.xml:489(entry) file-format-table.xml:490(entry)
+#: file-format-table.xml:491(entry) file-format-table.xml:500(entry)
+#: file-format-table.xml:501(entry) file-format-table.xml:502(entry)
+#: file-format-table.xml:513(entry) file-format-table.xml:522(entry)
+#: file-format-table.xml:523(entry) file-format-table.xml:524(entry)
+#: file-format-table.xml:532(entry) file-format-table.xml:533(entry)
+#: file-format-table.xml:534(entry) file-format-table.xml:535(entry)
+#: file-format-table.xml:543(entry) file-format-table.xml:544(entry)
+#: file-format-table.xml:545(entry) file-format-table.xml:546(entry)
+#: file-format-table.xml:553(entry) file-format-table.xml:563(entry)
+#: file-format-table.xml:564(entry) file-format-table.xml:565(entry)
+#: file-format-table.xml:566(entry) file-format-table.xml:573(entry)
+#: file-format-table.xml:574(entry) file-format-table.xml:575(entry)
+#: file-format-table.xml:576(entry) file-format-table.xml:584(entry)
+#: file-format-table.xml:585(entry) file-format-table.xml:586(entry)
+#: file-format-table.xml:587(entry) file-format-table.xml:595(entry)
+#: file-format-table.xml:596(entry) file-format-table.xml:597(entry)
+#: file-format-table.xml:598(entry) file-format-table.xml:607(entry)
+#: file-format-table.xml:608(entry) file-format-table.xml:609(entry)
+#: file-format-table.xml:618(entry) file-format-table.xml:619(entry)
+#: file-format-table.xml:620(entry) file-format-table.xml:621(entry)
+#: file-format-table.xml:629(entry) file-format-table.xml:630(entry)
+#: file-format-table.xml:631(entry) file-format-table.xml:632(entry)
+#: file-format-table.xml:642(entry) file-format-table.xml:643(entry)
+#: file-format-table.xml:651(entry) file-format-table.xml:652(entry)
+#: file-format-table.xml:653(entry) file-format-table.xml:654(entry)
+#: file-format-table.xml:662(entry) file-format-table.xml:663(entry)
+#: file-format-table.xml:664(entry) file-format-table.xml:665(entry)
+#: file-format-table.xml:673(entry) file-format-table.xml:675(entry)
+#: file-format-table.xml:684(entry) file-format-table.xml:685(entry)
+#: file-format-table.xml:686(entry) file-format-table.xml:687(entry)
+#: file-format-table.xml:695(entry) file-format-table.xml:696(entry)
+#: file-format-table.xml:697(entry) file-format-table.xml:698(entry)
+#: file-format-table.xml:706(entry) file-format-table.xml:707(entry)
+#: file-format-table.xml:709(entry) file-format-table.xml:717(entry)
+#: file-format-table.xml:718(entry) file-format-table.xml:719(entry)
+#: file-format-table.xml:720(entry) file-format-table.xml:728(entry)
+#: file-format-table.xml:729(entry) file-format-table.xml:730(entry)
+#: file-format-table.xml:731(entry) file-format-table.xml:739(entry)
+#: file-format-table.xml:740(entry) file-format-table.xml:741(entry)
+#: file-format-table.xml:742(entry) file-format-table.xml:750(entry)
+#: file-format-table.xml:751(entry) file-format-table.xml:752(entry)
+#: file-format-table.xml:753(entry) file-format-table.xml:761(entry)
+#: file-format-table.xml:762(entry) file-format-table.xml:763(entry)
+#: file-format-table.xml:764(entry) file-format-table.xml:772(entry)
+#: file-format-table.xml:773(entry) file-format-table.xml:774(entry)
+#: file-format-table.xml:775(entry) file-format-table.xml:782(entry)
+#: file-format-table.xml:783(entry) file-format-table.xml:784(entry)
+#: file-format-table.xml:785(entry) file-format-table.xml:793(entry)
+#: file-format-table.xml:794(entry) file-format-table.xml:795(entry)
+#: file-format-table.xml:796(entry) file-format-table.xml:804(entry)
+#: file-format-table.xml:806(entry) file-format-table.xml:815(entry)
+#: file-format-table.xml:816(entry) file-format-table.xml:817(entry)
+#: file-format-table.xml:818(entry) file-format-table.xml:826(entry)
+#: file-format-table.xml:828(entry) file-format-table.xml:829(entry)
+#: file-format-table.xml:837(entry) file-format-table.xml:838(entry)
+#: file-format-table.xml:839(entry) file-format-table.xml:840(entry)
+#: file-format-table.xml:848(entry) file-format-table.xml:849(entry)
+#: file-format-table.xml:850(entry) file-format-table.xml:851(entry)
+#: file-format-table.xml:859(entry) file-format-table.xml:860(entry)
+#: file-format-table.xml:861(entry) file-format-table.xml:862(entry)
+#: file-format-table.xml:869(entry) file-format-table.xml:870(entry)
+#: file-format-table.xml:872(entry) file-format-table.xml:873(entry)
+#: file-format-table.xml:881(entry) file-format-table.xml:883(entry)
+#: file-format-table.xml:884(entry) file-format-table.xml:892(entry)
+#: file-format-table.xml:893(entry) file-format-table.xml:894(entry)
+#: file-format-table.xml:895(entry) file-format-table.xml:903(entry)
+#: file-format-table.xml:906(entry) file-format-table.xml:914(entry)
+#: file-format-table.xml:925(entry) file-format-table.xml:926(entry)
+#: file-format-table.xml:927(entry) file-format-table.xml:928(entry)
+#: file-format-table.xml:936(entry) file-format-table.xml:937(entry)
+#: file-format-table.xml:938(entry) file-format-table.xml:939(entry)
+#: file-format-table.xml:947(entry) file-format-table.xml:948(entry)
+#: file-format-table.xml:949(entry) file-format-table.xml:950(entry)
+#: file-format-table.xml:958(entry) file-format-table.xml:959(entry)
+#: file-format-table.xml:960(entry) file-format-table.xml:961(entry)
+#: file-format-table.xml:969(entry) file-format-table.xml:970(entry)
+#: file-format-table.xml:971(entry) file-format-table.xml:972(entry)
+#: file-format-table.xml:980(entry) file-format-table.xml:981(entry)
+#: file-format-table.xml:982(entry) file-format-table.xml:983(entry)
+#: file-format-table.xml:991(entry) file-format-table.xml:992(entry)
+#: file-format-table.xml:993(entry) file-format-table.xml:994(entry)
+#: file-format-table.xml:1001(entry) file-format-table.xml:1002(entry)
+#: file-format-table.xml:1003(entry) file-format-table.xml:1004(entry)
+#: file-format-table.xml:1013(entry) file-format-table.xml:1015(entry)
+#: file-format-table.xml:1023(entry) file-format-table.xml:1026(entry)
+#: file-format-table.xml:1034(entry) file-format-table.xml:1035(entry)
+#: file-format-table.xml:1036(entry) file-format-table.xml:1037(entry)
+#: file-format-table.xml:1045(entry) file-format-table.xml:1046(entry)
+#: file-format-table.xml:1047(entry) file-format-table.xml:1048(entry)
+#: file-format-table.xml:1055(entry) file-format-table.xml:1056(entry)
+#: file-format-table.xml:1057(entry) file-format-table.xml:1058(entry)
+#: file-format-table.xml:1065(entry) file-format-table.xml:1066(entry)
+#: file-format-table.xml:1067(entry) file-format-table.xml:1069(entry)
+#: file-format-table.xml:1077(entry) file-format-table.xml:1078(entry)
+#: file-format-table.xml:1079(entry) file-format-table.xml:1080(entry)
+#: file-format-table.xml:1088(entry) file-format-table.xml:1089(entry)
+#: file-format-table.xml:1090(entry) file-format-table.xml:1091(entry)
+#: file-format-table.xml:1099(entry) file-format-table.xml:1101(entry)
+#: file-format-table.xml:1102(entry) file-format-table.xml:1110(entry)
+#: file-format-table.xml:1111(entry) file-format-table.xml:1112(entry)
+#: file-format-table.xml:1113(entry) file-format-table.xml:1121(entry)
+#: file-format-table.xml:1124(entry) file-format-table.xml:1132(entry)
+#: file-format-table.xml:1133(entry) file-format-table.xml:1134(entry)
+#: file-format-table.xml:1135(entry) file-format-table.xml:1142(entry)
+#: file-format-table.xml:1143(entry) file-format-table.xml:1144(entry)
+#: file-format-table.xml:1145(entry) file-format-table.xml:1153(entry)
+#: file-format-table.xml:1154(entry) file-format-table.xml:1155(entry)
+#: file-format-table.xml:1156(entry) file-format-table.xml:1164(entry)
+#: file-format-table.xml:1165(entry) file-format-table.xml:1166(entry)
+#: file-format-table.xml:1167(entry) file-format-table.xml:1176(entry)
+#: file-format-table.xml:1177(entry) file-format-table.xml:1178(entry)
+#: file-format-table.xml:1186(entry) file-format-table.xml:1187(entry)
+#: file-format-table.xml:1188(entry) file-format-table.xml:1189(entry)
+#: file-format-table.xml:1197(entry) file-format-table.xml:1198(entry)
+#: file-format-table.xml:1199(entry) file-format-table.xml:1200(entry)
+#: file-format-table.xml:1208(entry) file-format-table.xml:1209(entry)
+#: file-format-table.xml:1210(entry) file-format-table.xml:1211(entry)
+#: file-format-table.xml:1219(entry) file-format-table.xml:1220(entry)
+#: file-format-table.xml:1221(entry) file-format-table.xml:1222(entry)
+#: file-format-table.xml:1230(entry) file-format-table.xml:1231(entry)
+#: file-format-table.xml:1232(entry) file-format-table.xml:1241(entry)
+#: file-format-table.xml:1242(entry) file-format-table.xml:1243(entry)
+#: file-format-table.xml:1244(entry) file-format-table.xml:1252(entry)
+#: file-format-table.xml:1253(entry) file-format-table.xml:1254(entry)
+#: file-format-table.xml:1255(entry) file-format-table.xml:1263(entry)
+#: file-format-table.xml:1264(entry) file-format-table.xml:1265(entry)
+#: file-format-table.xml:1266(entry) file-format-table.xml:1274(entry)
+#: file-format-table.xml:1275(entry) file-format-table.xml:1276(entry)
+#: file-format-table.xml:1277(entry) file-format-table.xml:1284(entry)
+#: file-format-table.xml:1285(entry) file-format-table.xml:1286(entry)
+#: file-format-table.xml:1287(entry) file-format-table.xml:1295(entry)
+#: file-format-table.xml:1296(entry) file-format-table.xml:1297(entry)
+#: file-format-table.xml:1298(entry) file-format-table.xml:1306(entry)
+#: file-format-table.xml:1309(entry) file-format-table.xml:1317(entry)
+#: file-format-table.xml:1319(entry) file-format-table.xml:1320(entry)
+#: file-format-table.xml:1328(entry) file-format-table.xml:1330(entry)
+#: file-format-table.xml:1331(entry) file-format-table.xml:1339(entry)
+#: file-format-table.xml:1341(entry) file-format-table.xml:1342(entry)
+#: file-format-table.xml:1350(entry) file-format-table.xml:1351(entry)
+#: file-format-table.xml:1352(entry) file-format-table.xml:1353(entry)
+#: file-format-table.xml:1361(entry) file-format-table.xml:1362(entry)
+#: file-format-table.xml:1363(entry) file-format-table.xml:1364(entry)
+#: file-format-table.xml:1373(entry) file-format-table.xml:1374(entry)
+#: file-format-table.xml:1375(entry) file-format-table.xml:1382(entry)
+#: file-format-table.xml:1383(entry) file-format-table.xml:1384(entry)
+#: file-format-table.xml:1385(entry) file-format-table.xml:1393(entry)
+#: file-format-table.xml:1394(entry) file-format-table.xml:1395(entry)
+#: file-format-table.xml:1396(entry) file-format-table.xml:1404(entry)
+#: file-format-table.xml:1405(entry) file-format-table.xml:1406(entry)
+#: file-format-table.xml:1407(entry) file-format-table.xml:1415(entry)
+#: file-format-table.xml:1416(entry) file-format-table.xml:1417(entry)
+#: file-format-table.xml:1418(entry) file-format-table.xml:1426(entry)
+#: file-format-table.xml:1427(entry) file-format-table.xml:1428(entry)
+#: file-format-table.xml:1437(entry) file-format-table.xml:1438(entry)
+#: file-format-table.xml:1439(entry) file-format-table.xml:1440(entry)
+#: file-format-table.xml:1447(entry) file-format-table.xml:1448(entry)
+#: file-format-table.xml:1449(entry) file-format-table.xml:1450(entry)
+#: file-format-table.xml:1458(entry) file-format-table.xml:1459(entry)
+#: file-format-table.xml:1460(entry) file-format-table.xml:1461(entry)
+#: file-format-table.xml:1469(entry) file-format-table.xml:1470(entry)
+#: file-format-table.xml:1471(entry) file-format-table.xml:1472(entry)
+#: file-format-table.xml:1479(entry) file-format-table.xml:1480(entry)
+#: file-format-table.xml:1482(entry) file-format-table.xml:1483(entry)
+#: file-format-table.xml:1492(entry) file-format-table.xml:1493(entry)
+#: file-format-table.xml:1494(entry) file-format-table.xml:1502(entry)
+#: file-format-table.xml:1503(entry) file-format-table.xml:1504(entry)
+#: file-format-table.xml:1505(entry) file-format-table.xml:1513(entry)
+#: file-format-table.xml:1514(entry) file-format-table.xml:1515(entry)
+#: file-format-table.xml:1516(entry) file-format-table.xml:1524(entry)
+#: file-format-table.xml:1525(entry) file-format-table.xml:1526(entry)
+#: file-format-table.xml:1527(entry) file-format-table.xml:1535(entry)
+#: file-format-table.xml:1536(entry) file-format-table.xml:1537(entry)
+#: file-format-table.xml:1538(entry) file-format-table.xml:1546(entry)
+#: file-format-table.xml:1547(entry) file-format-table.xml:1548(entry)
+#: file-format-table.xml:1549(entry) file-format-table.xml:1557(entry)
+#: file-format-table.xml:1558(entry) file-format-table.xml:1559(entry)
+#: file-format-table.xml:1560(entry) file-format-table.xml:1568(entry)
+#: file-format-table.xml:1569(entry) file-format-table.xml:1570(entry)
+#: file-format-table.xml:1571(entry) file-format-table.xml:1579(entry)
+#: file-format-table.xml:1580(entry) file-format-table.xml:1581(entry)
+#: file-format-table.xml:1582(entry) file-format-table.xml:1589(entry)
+#: file-format-table.xml:1590(entry) file-format-table.xml:1591(entry)
+#: file-format-table.xml:1592(entry) file-format-table.xml:1600(entry)
+#: file-format-table.xml:1603(entry) file-format-table.xml:1611(entry)
+#: file-format-table.xml:1612(entry) file-format-table.xml:1613(entry)
+#: file-format-table.xml:1614(entry) file-format-table.xml:1621(entry)
+#: file-format-table.xml:1622(entry) file-format-table.xml:1623(entry)
+#: file-format-table.xml:1624(entry) file-format-table.xml:1632(entry)
+#: file-format-table.xml:1633(entry) file-format-table.xml:1634(entry)
+#: file-format-table.xml:1635(entry) file-format-table.xml:1643(entry)
+#: file-format-table.xml:1644(entry) file-format-table.xml:1645(entry)
+#: file-format-table.xml:1646(entry) file-format-table.xml:1654(entry)
+#: file-format-table.xml:1657(entry) file-format-table.xml:1665(entry)
+#: file-format-table.xml:1666(entry) file-format-table.xml:1667(entry)
+#: file-format-table.xml:1668(entry) file-format-table.xml:1676(entry)
+#: file-format-table.xml:1677(entry) file-format-table.xml:1678(entry)
+#: file-format-table.xml:1679(entry) file-format-table.xml:1687(entry)
+#: file-format-table.xml:1688(entry) file-format-table.xml:1689(entry)
+#: file-format-table.xml:1690(entry) file-format-table.xml:1698(entry)
+#: file-format-table.xml:1699(entry) file-format-table.xml:1700(entry)
+#: file-format-table.xml:1701(entry) file-format-table.xml:1710(entry)
+#: file-format-table.xml:1711(entry) file-format-table.xml:1712(entry)
+#: file-format-table.xml:1719(entry) file-format-table.xml:1720(entry)
+#: file-format-table.xml:1721(entry) file-format-table.xml:1722(entry)
+#: file-format-table.xml:1731(entry) file-format-table.xml:1732(entry)
+#: file-format-table.xml:1733(entry) file-format-table.xml:1734(entry)
+#: file-format-table.xml:1743(entry) file-format-table.xml:1744(entry)
+#: file-format-table.xml:1746(entry) file-format-table.xml:1754(entry)
+#: file-format-table.xml:1755(entry) file-format-table.xml:1756(entry)
+#: file-format-table.xml:1757(entry) file-format-table.xml:1765(entry)
+#: file-format-table.xml:1766(entry) file-format-table.xml:1767(entry)
+#: file-format-table.xml:1768(entry) file-format-table.xml:1776(entry)
+#: file-format-table.xml:1777(entry) file-format-table.xml:1778(entry)
+#: file-format-table.xml:1779(entry) file-format-table.xml:1788(entry)
+#: file-format-table.xml:1789(entry) file-format-table.xml:1790(entry)
+msgid "—"
+msgstr ""
+
+#: file-format-table.xml:38(entry)
+msgid "AFM Workshop spectroscopy"
+msgstr "Спектроскопия AFM Workshop"
+
+#: file-format-table.xml:39(entry) file-format-table.xml:1618(entry)
+msgid ".csv"
+msgstr ""
+
+#: file-format-table.xml:40(entry)
+msgid "afmw-spec"
+msgstr ""
+
+#: file-format-table.xml:49(entry)
+msgid "AIST-NT"
+msgstr ""
+
+#: file-format-table.xml:50(entry)
+msgid ".aist"
+msgstr ""
+
+#: file-format-table.xml:51(entry)
+msgid "aistfile"
+msgstr ""
+
+#: file-format-table.xml:60(entry)
+msgid "Alicona Imaging AL3D data"
+msgstr "Данные Alicona Imaging AL3D"
+
+#: file-format-table.xml:61(entry)
+msgid ".al3d"
+msgstr ""
+
+#: file-format-table.xml:62(entry)
+msgid "alicona"
+msgstr ""
+
+#: file-format-table.xml:71(entry)
+msgid "Ambios AMB"
+msgstr ""
+
+#: file-format-table.xml:72(entry)
+msgid ".amb"
+msgstr ""
+
+#: file-format-table.xml:73(entry)
+msgid "ambfile"
+msgstr ""
+
+#: file-format-table.xml:74(para)
+msgid ""
+"The import module is unfinished due to the lack of documentation, testing "
+"files and/or people willing to help with the testing. If you can help please "
+"contact us."
+msgstr ""
+"Модуль импорта не закончен вследствие отсутствия документации, тестовых "
+"файлов и/или людей, готовых помочь с тестированием. Если у вас есть "
+"возможность помочь, свяжитесь с нами."
+
+#: file-format-table.xml:74(entry) file-format-table.xml:403(entry)
+#: file-format-table.xml:968(entry) file-format-table.xml:1011(entry)
+#: file-format-table.xml:1012(entry) file-format-table.xml:1174(entry)
+#: file-format-table.xml:1175(entry) file-format-table.xml:1294(entry)
+msgid "Yes<placeholder-1/>"
+msgstr "Да<placeholder-1/>"
+
+#: file-format-table.xml:83(entry)
+msgid "Ambios 1D profilometry data"
+msgstr "Данные 1D профилометрии Ambios"
+
+#: file-format-table.xml:84(entry)
+msgid ".dat, .xml"
+msgstr ""
+
+#: file-format-table.xml:85(entry)
+msgid "ambprofile"
+msgstr ""
+
+#: file-format-table.xml:94(entry)
+msgid "Analysis Studio XML"
+msgstr ""
+
+#: file-format-table.xml:95(entry)
+msgid ".axd, .axz"
+msgstr ""
+
+#: file-format-table.xml:96(entry)
+msgid "anasys_xml"
+msgstr ""
+
+#: file-format-table.xml:105(entry)
+msgid "Anfor SIF"
+msgstr ""
+
+#: file-format-table.xml:106(entry)
+msgid ".sif"
+msgstr ""
+
+#: file-format-table.xml:107(entry)
+msgid "andorsif"
+msgstr ""
+
+#: file-format-table.xml:108(entry) file-format-table.xml:305(entry)
+#: file-format-table.xml:661(entry) file-format-table.xml:1251(entry)
+msgid "Yes<footnoteref linkend=\"table-file-formats-fn1\" label=\"a\"/>"
+msgstr "Да<footnoteref linkend=\"table-file-formats-fn1\" label=\"a\"/>"
+
+#: file-format-table.xml:116(entry)
+msgid "Anfatec"
+msgstr ""
+
+#: file-format-table.xml:117(entry)
+msgid ".par, .int"
+msgstr ""
+
+#: file-format-table.xml:118(entry)
+msgid "anfatec"
+msgstr ""
+
+#: file-format-table.xml:127(entry)
+msgid "A.P.E. Research DAX"
+msgstr ""
+
+#: file-format-table.xml:128(entry)
+msgid ".dax"
+msgstr ""
+
+#: file-format-table.xml:129(entry) file-format-table.xml:139(entry)
+msgid "apedaxfile"
+msgstr ""
+
+#: file-format-table.xml:137(entry)
+msgid "A.P.E. Research APDT"
+msgstr ""
+
+#: file-format-table.xml:138(entry)
+msgid ".apdt"
+msgstr ""
+
+#: file-format-table.xml:148(entry)
+msgid "A.P.E. Research DAT"
+msgstr ""
+
+#: file-format-table.xml:149(entry) file-format-table.xml:259(entry)
+#: file-format-table.xml:758(entry) file-format-table.xml:867(entry)
+#: file-format-table.xml:1423(entry) file-format-table.xml:1662(entry)
+#: file-format-table.xml:1684(entry) file-format-table.xml:1751(entry)
+msgid ".dat"
+msgstr ""
+
+#: file-format-table.xml:150(entry)
+msgid "apefile"
+msgstr ""
+
+#: file-format-table.xml:159(entry)
+msgid "Asylum Research ARDF"
+msgstr ""
+
+#: file-format-table.xml:160(entry)
+msgid ".ardf"
+msgstr ""
+
+#: file-format-table.xml:161(entry)
+msgid "ardf"
+msgstr ""
+
+#: file-format-table.xml:170(entry)
+msgid "Text matrix of data values"
+msgstr "Текстовая матрица значений данных"
+
+#: file-format-table.xml:172(entry)
+msgid "asciiexport"
+msgstr ""
+
+#: file-format-table.xml:181(entry)
+msgid "Assing AFM"
+msgstr ""
+
+#: file-format-table.xml:182(entry) file-format-table.xml:581(entry)
+#: file-format-table.xml:1260(entry)
+msgid ".afm"
+msgstr ""
+
+#: file-format-table.xml:183(entry)
+msgid "assing-afm"
+msgstr ""
+
+#: file-format-table.xml:192(entry)
+msgid "Attocube Systems ASC"
+msgstr ""
+
+#: file-format-table.xml:193(entry) file-format-table.xml:1139(entry)
+#: file-format-table.xml:1488(entry)
+msgid ".asc"
+msgstr ""
+
+#: file-format-table.xml:194(entry)
+msgid "attocube"
+msgstr ""
+
+#: file-format-table.xml:203(entry)
+msgid "Image Metrology BCR, BCRF"
+msgstr ""
+
+#: file-format-table.xml:204(entry)
+msgid ".bcr, .bcrf"
+msgstr ""
+
+#: file-format-table.xml:205(entry)
+msgid "bcrfile"
+msgstr ""
+
+#: file-format-table.xml:214(entry)
+msgid "Burleigh BII"
+msgstr ""
+
+#: file-format-table.xml:215(entry)
+msgid ".bii"
+msgstr ""
+
+#: file-format-table.xml:216(entry)
+msgid "burleigh_bii"
+msgstr ""
+
+#: file-format-table.xml:225(entry)
+msgid "Burleigh IMG v2.1"
+msgstr ""
+
+#: file-format-table.xml:226(entry) file-format-table.xml:335(entry)
+#: file-format-table.xml:357(entry) file-format-table.xml:1455(entry)
+msgid ".img"
+msgstr ""
+
+#: file-format-table.xml:227(entry)
+msgid "burleigh"
+msgstr ""
+
+#: file-format-table.xml:236(entry)
+msgid "Burleigh exported data"
+msgstr "Экспортированные данные Burleigh"
+
+#: file-format-table.xml:237(entry)
+msgid ".txt, .bin"
+msgstr ""
+
+#: file-format-table.xml:238(entry)
+msgid "burleigh_exp"
+msgstr ""
+
+#: file-format-table.xml:247(entry)
+msgid "Code V interferogram data"
+msgstr "Данные интерферограмм Code V"
+
+#: file-format-table.xml:248(entry)
+msgid ".int"
+msgstr ""
+
+#: file-format-table.xml:249(entry)
+msgid "codevfile"
+msgstr ""
+
+#: file-format-table.xml:258(entry)
+msgid "Createc DAT"
+msgstr ""
+
+#: file-format-table.xml:260(entry)
+msgid "createc"
+msgstr ""
+
+#: file-format-table.xml:269(entry)
+msgid "Benyuan CSM"
+msgstr ""
+
+#: file-format-table.xml:270(entry)
+msgid ".csm"
+msgstr ""
+
+#: file-format-table.xml:271(entry)
+msgid "csmfile"
+msgstr ""
+
+#: file-format-table.xml:280(entry)
+msgid "Dektak OPDx profilometry data"
+msgstr "Данные профилометрии Dektak OPDx"
+
+#: file-format-table.xml:281(entry)
+msgid ".OPDx"
+msgstr ""
+
+#: file-format-table.xml:282(entry)
+msgid "dektakvca"
+msgstr ""
+
+#: file-format-table.xml:291(entry)
+msgid "Dektak XML profilometry data"
+msgstr "Данные профилометрии Dektak XML"
+
+#: file-format-table.xml:292(entry) file-format-table.xml:368(entry)
+#: file-format-table.xml:889(entry) file-format-table.xml:1521(entry)
+msgid ".xml"
+msgstr ""
+
+#: file-format-table.xml:293(entry)
+msgid "dektakxml"
+msgstr ""
+
+#: file-format-table.xml:302(entry)
+msgid "Veeco Dimension 3100D"
+msgstr ""
+
+#: file-format-table.xml:303(entry) file-format-table.xml:922(entry)
+msgid ".001, .002, etc."
+msgstr ""
+
+#: file-format-table.xml:304(entry)
+msgid "dimensionfile"
+msgstr ""
+
+#: file-format-table.xml:313(entry)
+msgid "Digital Micrograph DM3 TEM data"
+msgstr "Данные TEM Digital Micrograph DM3"
+
+#: file-format-table.xml:314(entry)
+msgid ".dm3"
+msgstr ""
+
+#: file-format-table.xml:315(entry) file-format-table.xml:325(entry)
+msgid "dm3file"
+msgstr ""
+
+#: file-format-table.xml:323(entry)
+msgid "Digital Micrograph DM4 TEM data"
+msgstr "Данные TEM Digital Micrograph DM4"
+
+#: file-format-table.xml:324(entry)
+msgid ".dm4"
+msgstr ""
+
+#: file-format-table.xml:334(entry)
+msgid "DME Rasterscope"
+msgstr ""
+
+#: file-format-table.xml:336(entry)
+msgid "dmefile"
+msgstr ""
+
+#: file-format-table.xml:345(entry)
+msgid "Gwyddion dumb dump data"
+msgstr "Данные простых дампов Gwyddion"
+
+#: file-format-table.xml:346(entry)
+msgid ".dump"
+msgstr ""
+
+#: file-format-table.xml:347(entry)
+msgid "dumbfile"
+msgstr ""
+
+#: file-format-table.xml:356(entry)
+msgid "ECS"
+msgstr ""
+
+#: file-format-table.xml:358(entry)
+msgid "ecsfile"
+msgstr ""
+
+#: file-format-table.xml:367(entry)
+msgid "Evovis XML profilometry data"
+msgstr "Данные профилометрии Evovis XML"
+
+#: file-format-table.xml:369(entry)
+msgid "evovisxml"
+msgstr ""
+
+#: file-format-table.xml:378(entry)
+msgid "Nanosurf EZD, NID"
+msgstr ""
+
+#: file-format-table.xml:379(entry)
+msgid ".ezd, .nid"
+msgstr ""
+
+#: file-format-table.xml:380(entry)
+msgid "ezdfile"
+msgstr ""
+
+#: file-format-table.xml:389(entry)
+msgid "FemtoScan SPM"
+msgstr ""
+
+#: file-format-table.xml:390(entry) file-format-table.xml:637(entry)
+#: file-format-table.xml:933(entry) file-format-table.xml:944(entry)
+#: file-format-table.xml:1532(entry)
+msgid ".spm"
+msgstr ""
+
+#: file-format-table.xml:391(entry)
+msgid "femtoscan"
+msgstr ""
+
+#: file-format-table.xml:400(entry)
+msgid "FemtoScan text data"
+msgstr "Текстовые данные FemtoScan"
+
+#: file-format-table.xml:402(entry)
+msgid "femtoscan-txt"
+msgstr ""
+
+#: file-format-table.xml:403(para)
+msgid "Regular sampling in both X and Y direction is assumed."
+msgstr ""
+"Предполагается семплирование с регулярным интервалом в обоих направлениях (X "
+"и Y)."
+
+#: file-format-table.xml:412(entry)
+msgid "Flexible Image Transport System (FITS)"
+msgstr ""
+
+#: file-format-table.xml:413(entry)
+msgid ".fits, .fit"
+msgstr ""
+
+#: file-format-table.xml:414(entry)
+msgid "fitsfile"
+msgstr ""
+
+#: file-format-table.xml:423(entry)
+msgid "VTK structured grid file"
+msgstr "Файл структурной сетки VTK"
+
+#: file-format-table.xml:424(entry)
+msgid ".vtk"
+msgstr ""
+
+#: file-format-table.xml:425(entry) file-format-table.xml:435(entry)
+#: file-format-table.xml:445(entry) file-format-table.xml:455(entry)
+#: file-format-table.xml:465(entry) file-format-table.xml:475(entry)
+msgid "formats3d"
+msgstr ""
+
+#: file-format-table.xml:433(entry)
+msgid "PLY 3D Polygon File Format"
+msgstr ""
+
+#: file-format-table.xml:434(entry)
+msgid ".ply"
+msgstr ""
+
+#: file-format-table.xml:443(entry)
+msgid "Wavefront OBJ 3D geometry"
+msgstr "3D геометрия Wavefront OBJ"
+
+#: file-format-table.xml:444(entry)
+msgid ".obj"
+msgstr ""
+
+#: file-format-table.xml:453(entry)
+msgid "Object File Format 3D geometry"
+msgstr "3D геометрия Object File Format"
+
+#: file-format-table.xml:454(entry)
+msgid ".off"
+msgstr ""
+
+#: file-format-table.xml:463(entry)
+msgid "Stereolitography STL 3D geometry (binary)"
+msgstr "3D геометрия Stereolitography STL (бинарный)"
+
+#: file-format-table.xml:464(entry)
+msgid ".stl"
+msgstr ""
+
+#: file-format-table.xml:473(entry)
+msgid "XYZ data"
+msgstr "Данные XYZ"
+
+#: file-format-table.xml:474(entry)
+msgid ".xyz, .dat"
+msgstr ""
+
+#: file-format-table.xml:484(entry)
+msgid "DME GDEF"
+msgstr ""
+
+#: file-format-table.xml:485(entry)
+msgid ".gdf"
+msgstr ""
+
+#: file-format-table.xml:486(entry)
+msgid "gdeffile"
+msgstr ""
+
+#: file-format-table.xml:495(entry)
+msgid "Gwyddion Simple Field"
+msgstr "Простое поле Gwyddion"
+
+#: file-format-table.xml:496(entry)
+msgid ".gsf"
+msgstr ""
+
+#: file-format-table.xml:497(entry)
+msgid "gsffile"
+msgstr ""
+
+#: file-format-table.xml:506(entry)
+msgid "Gwyddion native data"
+msgstr "Родной формат Gwyddion"
+
+#: file-format-table.xml:507(entry)
+msgid ".gwy"
+msgstr ""
+
+#: file-format-table.xml:508(entry)
+msgid "gwyfile"
+msgstr ""
+
+#: file-format-table.xml:517(entry)
+msgid "Gwyddion XYZ data"
+msgstr "Данные Gwyddion XYZ"
+
+#: file-format-table.xml:518(entry)
+msgid ".gxyzf"
+msgstr ""
+
+#: file-format-table.xml:519(entry)
+msgid "gxyzffile"
+msgstr "gxyzffile"
+
+#: file-format-table.xml:528(entry)
+msgid "Psi HDF4"
+msgstr ""
+
+#: file-format-table.xml:529(entry)
+msgid ".hdf"
+msgstr ""
+
+#: file-format-table.xml:530(entry)
+msgid "hdf4file"
+msgstr ""
+
+#: file-format-table.xml:539(entry)
+msgid "Asylum Research Ergo HDF5"
+msgstr ""
+
+#: file-format-table.xml:540(entry) file-format-table.xml:550(entry)
+#: file-format-table.xml:560(entry)
+msgid ".h5"
+msgstr ""
+
+#: file-format-table.xml:541(entry) file-format-table.xml:551(entry)
+#: file-format-table.xml:561(entry) file-format-table.xml:571(entry)
+msgid "hdf5file"
+msgstr "hdf5file"
+
+#: file-format-table.xml:549(entry)
+msgid "Shilps Sciences Lucent HDF5"
+msgstr ""
+
+#: file-format-table.xml:559(entry)
+msgid "Generic HDF5 files"
+msgstr ""
+
+#: file-format-table.xml:569(entry)
+msgid "Matlab MAT 7.x files"
+msgstr ""
+
+#: file-format-table.xml:570(entry) file-format-table.xml:747(entry)
+msgid ".mat"
+msgstr ""
+
+#: file-format-table.xml:580(entry)
+msgid "Hitachi AFM"
+msgstr ""
+
+#: file-format-table.xml:582(entry)
+msgid "hitachi-afm"
+msgstr ""
+
+#: file-format-table.xml:591(entry)
+msgid "Hitachi S-3700 and S-4800 SEM data"
+msgstr "Данные SEM Hitachi S-3700 и S-4800"
+
+#: file-format-table.xml:592(entry)
+msgid ".txt + image"
+msgstr ""
+
+#: file-format-table.xml:593(entry)
+msgid "hitachi-sem"
+msgstr ""
+
+#: file-format-table.xml:602(entry)
+msgid "WaveMetrics IGOR binary wave v5"
+msgstr ""
+
+#: file-format-table.xml:603(entry)
+msgid ".ibw"
+msgstr ""
+
+#: file-format-table.xml:604(entry)
+msgid "igorfile"
+msgstr ""
+
+#: file-format-table.xml:614(entry)
+msgid "IntelliWave ESD"
+msgstr ""
+
+#: file-format-table.xml:615(entry)
+msgid ".esd"
+msgstr ""
+
+#: file-format-table.xml:616(entry)
+msgid "intelliwave"
+msgstr ""
+
+#: file-format-table.xml:625(entry)
+msgid "Intematix SDF"
+msgstr ""
+
+#: file-format-table.xml:626(entry) file-format-table.xml:1369(entry)
+msgid ".sdf"
+msgstr ""
+
+#: file-format-table.xml:627(entry)
+msgid "intematix"
+msgstr ""
+
+#: file-format-table.xml:636(entry)
+msgid "ISO 28600:2011 SPM data transfer format"
+msgstr "Формат передачи данных СЗМ ISO 28600:2011"
+
+#: file-format-table.xml:638(entry)
+msgid "iso28600"
+msgstr ""
+
+#: file-format-table.xml:641(para)
+msgid "Spectra curves are imported as graphs, positional information is lost."
+msgstr ""
+"Кривые спектров импортируются как графики, информация о позиции теряется."
+
+#: file-format-table.xml:641(entry)
+msgid "Limited<placeholder-1/>"
+msgstr "Ограничена<placeholder-1/>"
+
+#: file-format-table.xml:647(entry)
+msgid "JEOL"
+msgstr ""
+
+#: file-format-table.xml:648(entry) file-format-table.xml:659(entry)
+#: file-format-table.xml:681(entry) file-format-table.xml:725(entry)
+#: file-format-table.xml:1576(entry) file-format-table.xml:1728(entry)
+msgid ".tif"
+msgstr ""
+
+#: file-format-table.xml:649(entry)
+msgid "jeol"
+msgstr ""
+
+#: file-format-table.xml:658(entry)
+msgid "JEOL TEM image"
+msgstr "Изображение JEOL TEM"
+
+#: file-format-table.xml:660(entry)
+msgid "jeoltem"
+msgstr ""
+
+#: file-format-table.xml:669(entry)
+msgid "JPK Instruments"
+msgstr ""
+
+#: file-format-table.xml:670(entry)
+msgid ".jpk, .jpk-qi-image, .jpk-force, .jpk-force-map, .jpk-qi-data"
+msgstr ""
+
+#: file-format-table.xml:671(entry)
+msgid "jpkscan"
+msgstr ""
+
+#: file-format-table.xml:680(entry)
+msgid "JEOL JSPM"
+msgstr ""
+
+#: file-format-table.xml:682(entry)
+msgid "jspmfile"
+msgstr ""
+
+#: file-format-table.xml:691(entry)
+msgid "Keyence profilometry VK3, VK4, VK6, VK7"
+msgstr ""
+
+#: file-format-table.xml:692(entry)
+msgid ".vk3, .vk4, .vk6, .vk7"
+msgstr ""
+
+#: file-format-table.xml:693(entry)
+msgid "keyence"
+msgstr ""
+
+#: file-format-table.xml:702(entry)
+msgid "Leica LIF Data File"
+msgstr "Файл данных Leica LIF"
+
+#: file-format-table.xml:703(entry)
+msgid ".lif"
+msgstr ""
+
+#: file-format-table.xml:704(entry)
+msgid "leica"
+msgstr ""
+
+#: file-format-table.xml:713(entry)
+msgid "Olympus LEXT 4000"
+msgstr ""
+
+#: file-format-table.xml:714(entry)
+msgid ".lext"
+msgstr ""
+
+#: file-format-table.xml:715(entry)
+msgid "lextfile"
+msgstr ""
+
+#: file-format-table.xml:724(entry)
+msgid "FEI Magellan SEM images"
+msgstr "Изображения SEM FEI Magellan"
+
+#: file-format-table.xml:726(entry)
+msgid "magellan"
+msgstr ""
+
+#: file-format-table.xml:735(entry)
+msgid "MapVue"
+msgstr ""
+
+#: file-format-table.xml:736(entry)
+msgid ".map"
+msgstr ""
+
+#: file-format-table.xml:737(entry)
+msgid "mapvue"
+msgstr ""
+
+#: file-format-table.xml:746(entry)
+msgid "Matlab MAT 5 files"
+msgstr "Файлы Matlab MAT 5"
+
+#: file-format-table.xml:748(entry)
+msgid "matfile"
+msgstr "matfile"
+
+#: file-format-table.xml:757(entry)
+msgid "Zygo MetroPro DAT"
+msgstr ""
+
+#: file-format-table.xml:759(entry)
+msgid "metropro"
+msgstr ""
+
+#: file-format-table.xml:768(entry)
+msgid "MicroProf TXT"
+msgstr ""
+
+#: file-format-table.xml:770(entry) file-format-table.xml:780(entry)
+msgid "microprof"
+msgstr ""
+
+#: file-format-table.xml:778(entry)
+msgid "MicroProf FRT"
+msgstr ""
+
+#: file-format-table.xml:779(entry)
+msgid ".frt"
+msgstr ""
+
+#: file-format-table.xml:789(entry)
+msgid "DME MIF"
+msgstr ""
+
+#: file-format-table.xml:790(entry)
+msgid ".mif"
+msgstr ""
+
+#: file-format-table.xml:791(entry)
+msgid "miffile"
+msgstr ""
+
+#: file-format-table.xml:800(entry)
+msgid "Molecular Imaging MI"
+msgstr ""
+
+#: file-format-table.xml:801(entry)
+msgid ".mi"
+msgstr ""
+
+#: file-format-table.xml:802(entry)
+msgid "mifile"
+msgstr ""
+
+#: file-format-table.xml:805(entry) file-format-table.xml:915(entry)
+#: file-format-table.xml:1122(entry) file-format-table.xml:1318(entry)
+#: file-format-table.xml:1329(entry) file-format-table.xml:1340(entry)
+msgid "Limited<footnoteref linkend=\"table-file-formats-fn3\" label=\"c\"/>"
+msgstr ""
+"Ограничена<footnoteref linkend=\"table-file-formats-fn3\" label=\"c\"/>"
+
+#: file-format-table.xml:811(entry)
+msgid "Aarhus MUL"
+msgstr ""
+
+#: file-format-table.xml:812(entry)
+msgid ".mul"
+msgstr ""
+
+#: file-format-table.xml:813(entry)
+msgid "mulfile"
+msgstr ""
+
+#: file-format-table.xml:822(entry)
+msgid "Nanoeducator"
+msgstr ""
+
+#: file-format-table.xml:823(entry)
+msgid ".mspm, .stm, .spm"
+msgstr ""
+
+#: file-format-table.xml:824(entry)
+msgid "nanoeducator"
+msgstr ""
+
+#: file-format-table.xml:833(entry)
+msgid "Nanomagnetics NMI"
+msgstr ""
+
+#: file-format-table.xml:834(entry)
+msgid ".nmi"
+msgstr ""
+
+#: file-format-table.xml:835(entry)
+msgid "nanomagnetics"
+msgstr ""
+
+#: file-format-table.xml:844(entry)
+msgid "Nanonics NAN"
+msgstr ""
+
+#: file-format-table.xml:845(entry)
+msgid ".nan"
+msgstr ""
+
+#: file-format-table.xml:846(entry)
+msgid "nanonics"
+msgstr ""
+
+#: file-format-table.xml:855(entry)
+msgid "Nanonis SXM"
+msgstr ""
+
+#: file-format-table.xml:856(entry)
+msgid ".sxm"
+msgstr ""
+
+#: file-format-table.xml:857(entry)
+msgid "nanonis"
+msgstr ""
+
+#: file-format-table.xml:866(entry)
+msgid "Nanonis STS spectroscopy"
+msgstr "Спектроскопия Nanonis STS"
+
+#: file-format-table.xml:868(entry)
+msgid "nanonis-spec"
+msgstr ""
+
+#: file-format-table.xml:877(entry)
+msgid "Nano-Solution/NanoObserver"
+msgstr ""
+
+#: file-format-table.xml:878(entry)
+msgid ".nao"
+msgstr ""
+
+#: file-format-table.xml:879(entry)
+msgid "nanoobserver"
+msgstr ""
+
+#: file-format-table.xml:888(entry)
+msgid "Nanoscan XML"
+msgstr ""
+
+#: file-format-table.xml:890(entry)
+msgid "nanoscan"
+msgstr ""
+
+#: file-format-table.xml:899(entry)
+msgid "NanoScanTech"
+msgstr ""
+
+#: file-format-table.xml:900(entry)
+msgid ".nstdat"
+msgstr ""
+
+#: file-format-table.xml:901(entry)
+msgid "nanoscantech"
+msgstr ""
+
+#: file-format-table.xml:910(entry)
+msgid "Veeco Nanoscope III"
+msgstr ""
+
+#: file-format-table.xml:911(entry)
+msgid ".spm, .001, .002, etc."
+msgstr ".spm, .001, .002, и т.д."
+
+#: file-format-table.xml:912(entry)
+msgid "nanoscope"
+msgstr ""
+
+#: file-format-table.xml:921(entry)
+msgid "Veeco Nanoscope II"
+msgstr ""
+
+#: file-format-table.xml:923(entry)
+msgid "nanoscope-ii"
+msgstr ""
+
+#: file-format-table.xml:932(entry)
+msgid "NanoSystem profilometry"
+msgstr "Профилометрия NanoSystem"
+
+#: file-format-table.xml:934(entry)
+msgid "nanosystemz"
+msgstr ""
+
+#: file-format-table.xml:943(entry)
+msgid "Nanotop SPM"
+msgstr ""
+
+#: file-format-table.xml:945(entry)
+msgid "nanotop"
+msgstr ""
+
+#: file-format-table.xml:954(entry)
+msgid "GSXM NetCDF"
+msgstr ""
+
+#: file-format-table.xml:955(entry)
+msgid ".nc"
+msgstr ""
+
+#: file-format-table.xml:956(entry)
+msgid "netcdf"
+msgstr ""
+
+#: file-format-table.xml:965(entry)
+msgid "Nano Measuring Machine profile data"
+msgstr "Данные профилей Nano Measuring Machine"
+
+#: file-format-table.xml:966(entry)
+msgid ".dsc + .dat"
+msgstr ""
+
+#: file-format-table.xml:967(entry)
+msgid "nmmxyz"
+msgstr ""
+
+#: file-format-table.xml:968(para)
+msgid "XYZ data are interpolated to a regular grid upon import."
+msgstr "Данные XYZ интерполируются на правильную сетку при импорте."
+
+#: file-format-table.xml:976(entry)
+msgid "Nova ASCII"
+msgstr ""
+
+#: file-format-table.xml:978(entry)
+msgid "nova-asc"
+msgstr ""
+
+#: file-format-table.xml:987(entry)
+msgid "Numpy binary serialised array"
+msgstr "Последовательный двоичный массив numpy"
+
+#: file-format-table.xml:988(entry)
+msgid ".npy"
+msgstr ""
+
+#: file-format-table.xml:989(entry) file-format-table.xml:999(entry)
+msgid "npyfile"
+msgstr "npyfile"
+
+#: file-format-table.xml:997(entry)
+msgid "Multiple numpy binary serialised arrays"
+msgstr "Несколько последовательных двоичных массивов numpy"
+
+#: file-format-table.xml:998(entry)
+msgid ".npz"
+msgstr ""
+
+#: file-format-table.xml:1008(entry)
+msgid "Nearly raw raster data (NRRD)"
+msgstr ""
+
+#: file-format-table.xml:1009(entry)
+msgid ".nrrd"
+msgstr ""
+
+#: file-format-table.xml:1010(entry)
+msgid "nrrdfile"
+msgstr ""
+
+#: file-format-table.xml:1011(para)
+msgid "Not all variants are implemented."
+msgstr "Не все варианты реализованы."
+
+#: file-format-table.xml:1012(para)
+msgid "Data are exported in a fixed attached native-endian float point format."
+msgstr ""
+"Данные экспортируются в фиксированный присоединённый формат с плавающей "
+"точкой с родным порядком следования байтов для данной архитектуры."
+
+#: file-format-table.xml:1019(entry)
+msgid "NT-MDT"
+msgstr ""
+
+#: file-format-table.xml:1020(entry)
+msgid ".mdt"
+msgstr ""
+
+#: file-format-table.xml:1021(entry)
+msgid "nt-mdt"
+msgstr ""
+
+#: file-format-table.xml:1030(entry)
+msgid "EM4SYS NX II"
+msgstr ""
+
+#: file-format-table.xml:1031(entry)
+msgid ".bmp"
+msgstr ""
+
+#: file-format-table.xml:1032(entry)
+msgid "nxiifile"
+msgstr ""
+
+#: file-format-table.xml:1041(entry)
+msgid "Olympus OIR"
+msgstr ""
+
+#: file-format-table.xml:1042(entry)
+msgid ".oir"
+msgstr ""
+
+#: file-format-table.xml:1043(entry) file-format-table.xml:1053(entry)
+msgid "oirfile"
+msgstr ""
+
+#: file-format-table.xml:1051(entry)
+msgid "Olympus packed OIR"
+msgstr ""
+
+#: file-format-table.xml:1052(entry)
+msgid ".poir"
+msgstr ""
+
+#: file-format-table.xml:1062(entry)
+msgid "NT-MDT old MDA"
+msgstr "Старый формат MDA от NT-MDT"
+
+#: file-format-table.xml:1063(entry)
+msgid ".sxml + .dat"
+msgstr ""
+
+#: file-format-table.xml:1064(entry)
+msgid "oldmda"
+msgstr ""
+
+#: file-format-table.xml:1073(entry)
+msgid "Olympus LEXT 3000"
+msgstr ""
+
+#: file-format-table.xml:1074(entry)
+msgid ".ols"
+msgstr ""
+
+#: file-format-table.xml:1075(entry)
+msgid "ols"
+msgstr ""
+
+#: file-format-table.xml:1084(entry)
+msgid "Open Microscopy OME TIFF"
+msgstr ""
+
+#: file-format-table.xml:1085(entry)
+msgid ".ome.tiff, .ome.tif"
+msgstr ""
+
+#: file-format-table.xml:1086(entry)
+msgid "ometiff"
+msgstr ""
+
+#: file-format-table.xml:1095(entry)
+msgid "Omicron SCALA"
+msgstr ""
+
+#: file-format-table.xml:1096(entry)
+msgid ".par + .tf*, .tb*, .sf*, .sb*"
+msgstr ""
+
+#: file-format-table.xml:1097(entry)
+msgid "omicron"
+msgstr ""
+
+#: file-format-table.xml:1106(entry)
+msgid "Omicron flat format"
+msgstr "Формат Omicron flat"
+
+#: file-format-table.xml:1107(entry)
+msgid ".*_flat"
+msgstr ""
+
+#: file-format-table.xml:1108(entry)
+msgid "omicronflat"
+msgstr ""
+
+#: file-format-table.xml:1117(entry)
+msgid "Omicron MATRIX"
+msgstr ""
+
+#: file-format-table.xml:1118(entry)
+msgid ".mtrx"
+msgstr ""
+
+#: file-format-table.xml:1119(entry)
+msgid "omicronmatrix"
+msgstr ""
+
+#: file-format-table.xml:1128(entry)
+msgid "Wyko OPD"
+msgstr ""
+
+#: file-format-table.xml:1129(entry)
+msgid ".opd"
+msgstr ""
+
+#: file-format-table.xml:1130(entry) file-format-table.xml:1140(entry)
+msgid "opdfile"
+msgstr ""
+
+#: file-format-table.xml:1138(entry)
+msgid "Wyko ASCII"
+msgstr ""
+
+#: file-format-table.xml:1149(entry)
+msgid "OpenGPS X3P (ISO 5436-2)"
+msgstr ""
+
+#: file-format-table.xml:1150(entry)
+msgid ".x3p"
+msgstr ""
+
+#: file-format-table.xml:1151(entry)
+msgid "opengps"
+msgstr ""
+
+#: file-format-table.xml:1160(entry)
+msgid "NASA Phoenix Mars mission AFM data"
+msgstr "Данные АСМ миссии к Марсу NASA Phoenix"
+
+#: file-format-table.xml:1161(entry)
+msgid ".dat, .lbl + .tab"
+msgstr ""
+
+#: file-format-table.xml:1162(entry)
+msgid "phoenix"
+msgstr ""
+
+#: file-format-table.xml:1171(entry)
+msgid "Pixmap images"
+msgstr "Изображения"
+
+#: file-format-table.xml:1172(entry)
+msgid ".png, .jpeg, .tiff, .tga, .pnm, .bmp"
+msgstr ""
+
+#: file-format-table.xml:1173(entry)
+msgid "pixmap"
+msgstr ""
+
+#: file-format-table.xml:1174(para)
+msgid "Import support relies on Gdk-Pixbuf and hence may vary among systems."
+msgstr ""
+"Поддержка импорта основана на Gdk-Pixbuf и, следовательно, может меняться от "
+"системы к системе."
+
+#: file-format-table.xml:1175(para)
+msgid ""
+"Usually lossy, intended for presentational purposes. 16bit grayscale export "
+"is possible to PNG, TIFF and PNM."
+msgstr ""
+"Обычно с потерями, предназначено для демонстрационных целей. 16битный "
+"экспорт в градациях серого возможен в PNG, TIFF и PNM."
+
+#: file-format-table.xml:1182(entry)
+msgid "Nanosurf PLT"
+msgstr ""
+
+#: file-format-table.xml:1183(entry)
+msgid ".plt"
+msgstr ""
+
+#: file-format-table.xml:1184(entry)
+msgid "pltfile"
+msgstr ""
+
+#: file-format-table.xml:1193(entry)
+msgid "Pacific Nanotechnology PNI"
+msgstr ""
+
+#: file-format-table.xml:1194(entry)
+msgid ".pni"
+msgstr ""
+
+#: file-format-table.xml:1195(entry)
+msgid "pnifile"
+msgstr ""
+
+#: file-format-table.xml:1204(entry)
+msgid "Princeton Instruments camera SPE"
+msgstr "SPE камеры Princeton Instruments"
+
+#: file-format-table.xml:1205(entry)
+msgid ".spe"
+msgstr ""
+
+#: file-format-table.xml:1206(entry)
+msgid "princetonspe"
+msgstr ""
+
+#: file-format-table.xml:1215(entry)
+msgid "Park Systems"
+msgstr ""
+
+#: file-format-table.xml:1216(entry)
+msgid ".tiff, .tif"
+msgstr ""
+
+#: file-format-table.xml:1217(entry)
+msgid "psia"
+msgstr ""
+
+#: file-format-table.xml:1226(entry)
+msgid "Park Systems PS-PPT"
+msgstr ""
+
+#: file-format-table.xml:1227(entry)
+msgid ".ps-ppt"
+msgstr ""
+
+#: file-format-table.xml:1228(entry)
+msgid "psppt"
+msgstr ""
+
+#: file-format-table.xml:1237(entry)
+msgid "SymPhoTime TTTR v2.0 data"
+msgstr "Данные SymPhoTime TTTR v2.0"
+
+#: file-format-table.xml:1238(entry)
+msgid ".pt3"
+msgstr ""
+
+#: file-format-table.xml:1239(entry)
+msgid "pt3file"
+msgstr ""
+
+#: file-format-table.xml:1248(entry)
+msgid "Quazar NPIC"
+msgstr ""
+
+#: file-format-table.xml:1249(entry)
+msgid ".npic"
+msgstr ""
+
+#: file-format-table.xml:1250(entry)
+msgid "quazarnpic"
+msgstr ""
+
+#: file-format-table.xml:1259(entry)
+msgid "Quesant AFM"
+msgstr ""
+
+#: file-format-table.xml:1261(entry)
+msgid "quesant"
+msgstr ""
+
+#: file-format-table.xml:1270(entry)
+msgid "Raw text files"
+msgstr "Необработанные текстовые файлы"
+
+#: file-format-table.xml:1271(entry) file-format-table.xml:1281(entry)
+#: file-format-table.xml:1292(entry)
+msgid "any"
+msgstr ""
+
+#: file-format-table.xml:1272(entry) file-format-table.xml:1282(entry)
+msgid "rawfile"
+msgstr ""
+
+#: file-format-table.xml:1280(entry)
+msgid "Raw binary files"
+msgstr "Необработанные двоичные данные"
+
+#: file-format-table.xml:1291(entry)
+msgid "Graph text data (raw)"
+msgstr "Текстовые данные графиков (необработанные)"
+
+#: file-format-table.xml:1293(entry)
+msgid "rawgraph"
+msgstr ""
+
+#: file-format-table.xml:1294(para)
+msgid ""
+"At present, only simple two-column data, imported as graph curves, are "
+"supported."
+msgstr ""
+"В настоящее время поддерживаются только простые данные в две колонки, "
+"импортируемые как кривые графиков."
+
+#: file-format-table.xml:1302(entry)
+msgid "Renishaw WiRE Data File"
+msgstr "Файл данных Renishaw WiRE"
+
+#: file-format-table.xml:1303(entry)
+msgid ".wdf"
+msgstr ""
+
+#: file-format-table.xml:1304(entry)
+msgid "renishaw"
+msgstr ""
+
+#: file-format-table.xml:1313(entry)
+msgid "RHK Instruments SM3"
+msgstr ""
+
+#: file-format-table.xml:1314(entry)
+msgid ".sm3"
+msgstr ""
+
+#: file-format-table.xml:1315(entry)
+msgid "rhk-sm3"
+msgstr ""
+
+#: file-format-table.xml:1324(entry)
+msgid "RHK Instruments SM4"
+msgstr ""
+
+#: file-format-table.xml:1325(entry)
+msgid ".sm4"
+msgstr ""
+
+#: file-format-table.xml:1326(entry)
+msgid "rhk-sm4"
+msgstr ""
+
+#: file-format-table.xml:1335(entry)
+msgid "RHK Instruments SM2"
+msgstr ""
+
+#: file-format-table.xml:1336(entry)
+msgid ".sm2"
+msgstr ""
+
+#: file-format-table.xml:1337(entry)
+msgid "rhk-spm32"
+msgstr ""
+
+#: file-format-table.xml:1346(entry)
+msgid "Automation and Robotics Dual Lens Mapper"
+msgstr ""
+
+#: file-format-table.xml:1347(entry)
+msgid ".mcr, .mct, .mce"
+msgstr ""
+
+#: file-format-table.xml:1348(entry)
+msgid "robotics"
+msgstr ""
+
+#: file-format-table.xml:1357(entry)
+msgid "S94 STM files"
+msgstr "Файлы S94 STM"
+
+#: file-format-table.xml:1358(entry)
+msgid ".s94"
+msgstr ""
+
+#: file-format-table.xml:1359(entry)
+msgid "s94file"
+msgstr ""
+
+#: file-format-table.xml:1368(entry)
+msgid "Surfstand Surface Data File"
+msgstr "Файл данных поверхности Surfstand"
+
+#: file-format-table.xml:1370(entry) file-format-table.xml:1380(entry)
+msgid "sdfile"
+msgstr ""
+
+#: file-format-table.xml:1378(entry)
+msgid "Micromap SDFA"
+msgstr ""
+
+#: file-format-table.xml:1379(entry)
+msgid ".sdfa"
+msgstr ""
+
+#: file-format-table.xml:1389(entry)
+msgid "Seiko SII"
+msgstr ""
+
+#: file-format-table.xml:1390(entry)
+msgid ".xqb, .xqd, .xqt, .xqp, .xqj, .xqi"
+msgstr ""
+
+#: file-format-table.xml:1391(entry)
+msgid "seiko"
+msgstr ""
+
+#: file-format-table.xml:1400(entry)
+msgid "Sensofar PLu"
+msgstr "Sensofar PLu"
+
+#: file-format-table.xml:1401(entry)
+msgid ".plu, .apx"
+msgstr ""
+
+#: file-format-table.xml:1402(entry)
+msgid "sensofar"
+msgstr ""
+
+#: file-format-table.xml:1411(entry)
+msgid "Sensofar PLUx data"
+msgstr "Данные Sensofar PLUx"
+
+#: file-format-table.xml:1412(entry)
+msgid ".plux"
+msgstr ""
+
+#: file-format-table.xml:1413(entry)
+msgid "sensofarx"
+msgstr ""
+
+#: file-format-table.xml:1422(entry)
+msgid "Sensolytics DAT"
+msgstr ""
+
+#: file-format-table.xml:1424(entry)
+msgid "sensolytics"
+msgstr ""
+
+#: file-format-table.xml:1433(entry)
+msgid "Shimadzu"
+msgstr ""
+
+#: file-format-table.xml:1434(entry)
+msgid ".sph, .spp, .001, .002, etc."
+msgstr ".sph, .spp, .001, .002, и т.п."
+
+#: file-format-table.xml:1435(entry) file-format-table.xml:1445(entry)
+msgid "shimadzu"
+msgstr ""
+
+#: file-format-table.xml:1443(entry)
+msgid "Shimadzu ASCII"
+msgstr ""
+
+#: file-format-table.xml:1454(entry)
+msgid "IonScope SICM"
+msgstr ""
+
+#: file-format-table.xml:1456(entry)
+msgid "sicmfile"
+msgstr ""
+
+#: file-format-table.xml:1465(entry)
+msgid "Surface Imaging Systems"
+msgstr ""
+
+#: file-format-table.xml:1466(entry)
+msgid ".sis"
+msgstr ""
+
+#: file-format-table.xml:1467(entry)
+msgid "sis"
+msgstr ""
+
+#: file-format-table.xml:1476(entry)
+msgid "Thermo Fisher SPC File"
+msgstr "Файлы Thermo Fisher SPC"
+
+#: file-format-table.xml:1477(entry)
+msgid ".spc"
+msgstr ""
+
+#: file-format-table.xml:1478(entry)
+msgid "spcfile"
+msgstr "spcfile"
+
+#: file-format-table.xml:1487(entry)
+msgid "SPIP ASCII"
+msgstr ""
+
+#: file-format-table.xml:1489(entry)
+msgid "spip-asc"
+msgstr ""
+
+#: file-format-table.xml:1498(entry)
+msgid "Thermicroscopes SPMLab R4-R7"
+msgstr ""
+
+#: file-format-table.xml:1499(entry)
+msgid ".tfr, .ffr, etc."
+msgstr ""
+
+#: file-format-table.xml:1500(entry)
+msgid "spmlab"
+msgstr ""
+
+#: file-format-table.xml:1509(entry)
+msgid "Thermicroscopes SPMLab floating point"
+msgstr "Thermicroscopes SPMLab, данные с плавающей точкой"
+
+#: file-format-table.xml:1510(entry)
+msgid ".flt"
+msgstr ""
+
+#: file-format-table.xml:1511(entry)
+msgid "spmlabf"
+msgstr ""
+
+#: file-format-table.xml:1520(entry)
+msgid "SPML (Scanning Probe Microscopy Markup Language)"
+msgstr ""
+
+#: file-format-table.xml:1522(entry)
+msgid "spml"
+msgstr ""
+
+#: file-format-table.xml:1531(entry)
+msgid "ATC SPMxFormat data"
+msgstr "Данные ATC SPMxFormat"
+
+#: file-format-table.xml:1533(entry)
+msgid "spmxfile"
+msgstr ""
+
+#: file-format-table.xml:1542(entry)
+msgid "Omicron STMPRG"
+msgstr ""
+
+#: file-format-table.xml:1543(entry)
+msgid "tp*, ta*"
+msgstr ""
+
+#: file-format-table.xml:1544(entry)
+msgid "stmprg"
+msgstr ""
+
+#: file-format-table.xml:1553(entry)
+msgid "Molecular Imaging STP"
+msgstr ""
+
+#: file-format-table.xml:1554(entry)
+msgid ".stp"
+msgstr ""
+
+#: file-format-table.xml:1555(entry)
+msgid "stpfile"
+msgstr ""
+
+#: file-format-table.xml:1564(entry)
+msgid "Surf"
+msgstr ""
+
+#: file-format-table.xml:1565(entry)
+msgid ".sur"
+msgstr ""
+
+#: file-format-table.xml:1566(entry)
+msgid "surffile"
+msgstr ""
+
+#: file-format-table.xml:1575(entry)
+msgid "Tescan MIRA SEM images"
+msgstr "Изображения SEM Tescan MIRA"
+
+#: file-format-table.xml:1577(entry) file-format-table.xml:1587(entry)
+msgid "tescan"
+msgstr ""
+
+#: file-format-table.xml:1585(entry)
+msgid "Tescan LYRA SEM images"
+msgstr "Изображения SEM Tescan LYRA"
+
+#: file-format-table.xml:1586(entry)
+msgid ".hdr + .png"
+msgstr ""
+
+#: file-format-table.xml:1596(entry)
+msgid "FEI Tecnai imaging and analysis (former Emispec) data"
+msgstr "Данные FEI Tecnai imaging and analysis (бывший Emispec)"
+
+#: file-format-table.xml:1597(entry)
+msgid ".ser"
+msgstr ""
+
+#: file-format-table.xml:1598(entry)
+msgid "tiaser"
+msgstr ""
+
+#: file-format-table.xml:1607(entry)
+msgid "Corning Tropel UltraSort topograhpical data"
+msgstr "Данные топографии Corning Tropel UltraSort"
+
+#: file-format-table.xml:1608(entry)
+msgid ".ttf"
+msgstr ""
+
+#: file-format-table.xml:1609(entry) file-format-table.xml:1619(entry)
+msgid "ttffile"
+msgstr ""
+
+#: file-format-table.xml:1617(entry)
+msgid "Corning Tropel exported CSV data"
+msgstr "Экспортированные в CSV данные Corning Tropel"
+
+#: file-format-table.xml:1628(entry)
+msgid "Unisoku"
+msgstr ""
+
+#: file-format-table.xml:1629(entry)
+msgid ".hdr + .dat"
+msgstr ""
+
+#: file-format-table.xml:1630(entry)
+msgid "unisoku"
+msgstr ""
+
+#: file-format-table.xml:1639(entry)
+msgid "WinSTM data"
+msgstr "Данные WinSTM"
+
+#: file-format-table.xml:1640(entry)
+msgid ".stm"
+msgstr ""
+
+#: file-format-table.xml:1641(entry)
+msgid "win_stm"
+msgstr ""
+
+#: file-format-table.xml:1650(entry)
+msgid "WITec Project data"
+msgstr "Данные WITec Project"
+
+#: file-format-table.xml:1651(entry)
+msgid ".wip"
+msgstr ""
+
+#: file-format-table.xml:1652(entry)
+msgid "wipfile"
+msgstr ""
+
+#: file-format-table.xml:1661(entry)
+msgid "WITec ASCII export"
+msgstr "Экспорт в ASCII WITec"
+
+#: file-format-table.xml:1663(entry)
+msgid "witec-asc"
+msgstr ""
+
+#: file-format-table.xml:1672(entry)
+msgid "WITec"
+msgstr ""
+
+#: file-format-table.xml:1673(entry)
+msgid ".wit"
+msgstr ""
+
+#: file-format-table.xml:1674(entry)
+msgid "witfile"
+msgstr ""
+
+#: file-format-table.xml:1683(entry)
+msgid "Department of Nanometrology, WRUST"
+msgstr ""
+
+#: file-format-table.xml:1685(entry)
+msgid "wrustfile"
+msgstr ""
+
+#: file-format-table.xml:1694(entry)
+msgid "AFM Workshop data"
+msgstr "Данные AFM Workshop"
+
+#: file-format-table.xml:1695(entry)
+msgid ".wsf"
+msgstr ""
+
+#: file-format-table.xml:1696(entry)
+msgid "wsffile"
+msgstr ""
+
+#: file-format-table.xml:1705(entry)
+msgid "Nanotec WSxM"
+msgstr ""
+
+#: file-format-table.xml:1706(entry)
+msgid ".tom, .top, .stp"
+msgstr ""
+
+#: file-format-table.xml:1707(entry) file-format-table.xml:1717(entry)
+msgid "wsxmfile"
+msgstr ""
+
+#: file-format-table.xml:1715(entry)
+msgid "Nanotec WSxM curves"
+msgstr "Кривые Nanotec WSxM"
+
+#: file-format-table.xml:1716(entry)
+msgid ".cur"
+msgstr ""
+
+#: file-format-table.xml:1727(entry)
+msgid "Carl Zeiss SEM scans"
+msgstr "Сканы SEM Carl Zeiss"
+
+#: file-format-table.xml:1729(entry)
+msgid "zeiss"
+msgstr ""
+
+#: file-format-table.xml:1739(entry)
+msgid "Carl Zeiss CLSM images"
+msgstr "Изображения CLSM Carl Zeiss"
+
+#: file-format-table.xml:1740(entry)
+msgid ".lsm"
+msgstr ""
+
+#: file-format-table.xml:1741(entry)
+msgid "zeisslsm"
+msgstr ""
+
+#: file-format-table.xml:1750(entry)
+msgid "Zemax grid sag data"
+msgstr "Данные искривления сетки Zemax"
+
+#: file-format-table.xml:1752(entry)
+msgid "zemax"
+msgstr ""
+
+#: file-format-table.xml:1761(entry)
+msgid "KLA Zeta profilometry data"
+msgstr "Данные профилометрии KLA Zeta"
+
+#: file-format-table.xml:1762(entry)
+msgid ".zmg"
+msgstr ""
+
+#: file-format-table.xml:1763(entry)
+msgid "zmgfile"
+msgstr "zmgfile"
+
+#: file-format-table.xml:1772(entry)
+msgid "Keyence ZON data"
+msgstr "Данные Keyence ZON"
+
+#: file-format-table.xml:1773(entry)
+msgid ".zon"
+msgstr ""
+
+#: file-format-table.xml:1774(entry)
+msgid "zonfile"
+msgstr "zonfile"
+
+#: file-format-table.xml:1783(entry)
+msgid "OpenEXR images"
+msgstr "Изображения OpenEXR"
+
+#: file-format-table.xml:1784(entry)
+msgid ".exr"
+msgstr ""
+
+#: file-format-table.xml:1785(entry)
+msgid "hdrimage"
+msgstr ""
+
+#~ msgid "WSF ASCII data"
+#~ msgstr "Данные WSF ASCII"
+
+#~ msgid ".001, 002, etc."
+#~ msgstr ".001, 002, etc."
+
+#~ msgid "No"
+#~ msgstr "Нет"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

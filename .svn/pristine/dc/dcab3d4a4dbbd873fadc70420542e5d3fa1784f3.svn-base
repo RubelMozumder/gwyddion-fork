@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: text-data-export.xml 22939 2020-09-04 14:21:54Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="text-data-export">
+  <title>Экспорт текстовых данных</title>
+  <para>Экспорт данных в текстовый файл нередко может быть полезно для дальнейшей обработки в других программных пакетах поскольку текстовые файлы очень просто переносятся.</para>
+  <variablelist>
+    <varlistentry>
+      <indexterm>
+        <primary>экспорт текстовых данных</primary>
+        <secondary>изображения</secondary>
+      </indexterm>
+      <term>Данные изображения</term>
+      <listitem>
+        <para>Данные изображений можно экспортировать просто выбрав пункт меню <menuchoice><guimenu>Файл</guimenu><guimenuitem>Сохранить как</guimenuitem></menuchoice> и выбрав разрешение <filename>.txt</filename> в диалоговом окне экспорта или выбрав вариант <guilabel>Матрица данных ASCII (.txt)</guilabel> в <link linkend="file-saving">диалоговом окне сохранения файла</link>. При этом текущий канал данных записывается как матрица значений, каждая строка в файле соответствует одной строке изображения. Опционально экспорт всех каналов может быть склеен вместе и записан в один файл (разделённый пустыми строками).</para>
+        <para>Точно такой же метод можно применить для экспорта данных изображений в текстовые файлы с тремя колонками как данных в формате XYZ. Достаточно просто выбрать расширение имени файла <filename>.xyz</filename> или формат файла <guilabel>текстовые данные XYZ (.xyz)</guilabel>.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <indexterm>
+        <primary>экспорт текстовых данных</primary>
+        <secondary>графики</secondary>
+      </indexterm>
+      <term>Кривые графиков</term>
+      <listitem>
+        <para>Кривые графиков экспортируются из меню <link linkend="graph-export"><guimenuitem>Экспортировать текст</guimenuitem></link> либо из меню <guimenu>График</guimenu> либо из контекстного меню, которое открывается при щелчке правой кнопкой мыши по окну графика.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <indexterm>
+        <primary>экспорт текстовых данных</primary>
+        <secondary>объёмные данные</secondary>
+      </indexterm>
+      <term>Объёмные данные</term>
+      <listitem>
+        <para>Подобным же образом данные экспортируются используя подменю <link linkend="volume-export-text"><guimenuitem>Экспортировать текст</guimenuitem></link> из меню <guimenu>Объёмные данные</guimenu>.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <sect2 id="tabular-data-export">
+    <title>Табличные данные</title>
+    <indexterm>
+      <primary>экспорт текстовых данных</primary>
+      <secondary>табличные данные</secondary>
+    </indexterm>
+    <para>Большое число функций, которые рассчитывают список или набор значений предлагают их экспорт в виде табличных данных. На следующем рисунке показан пример на основе <link linkend="stat-quantities">инструмента расчёта статистических величин</link>.</para>
+    <informalfigure id="fig-tabular-data-export">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="tabular-data-export-controls.png" format="PNG"/>
+        </imageobject>
+        <caption>Элементы управления для экспорта табличных данных, слева направо: переключатель формата данных в научный формат, выбор формата данных, кнопки копирования в буфер обмена и сохранения в файл.</caption>
+      </mediaobject>
+    </informalfigure>
+    <para>Переключатель формата данных в научный управляет тем, будут ли данные записаны в машиночитаемом научном формате, с десятичной точкой (независимо от настроек языка и локали) и <literal>e</literal> для степеней 10. Когда он включен, данные записываются в основных системных единицах – например, метрах, а не микронах или километрах. В результате получается выходные данные вроде таких: <informalexample><programlisting><![CDATA[
+Minimum: 3.32e-9 m
+Maximum: 1.20e-9 m
+]]></programlisting></informalexample> С человекочитаемым форматом (научное представление выключено), те же данные будут выглядеть как: <informalexample><programlisting><![CDATA[
+Minimum: 3,32 nm
+Maximum: 1,20 nm
+]]></programlisting></informalexample> если Gwyddion запущен в окружении, где используется запятая в качестве разделителя дробной части числа.</para>
+    <para>Общий формат табличных данных контролируется переключателем формата данных, для которого доступны следующие варианты (не все могут присутствовать, если они не имеют смысла в данном месте):</para>
+    <variablelist>
+      <varlistentry>
+        <term><guilabel>Двоеточие:</guilabel></term>
+        <listitem>
+          <para>Более-менее свободный формат, предназначенный в основном быть читаемым человеком. Подписи данных отделены двоеточием, значение и единицы просто печатаются вместе и выровнены по вертикали: <informalexample><programlisting><![CDATA[
+Maximum peak height (Sp): 6.6754 nm
+Maximum pit depth (Sp):   6.1039 nm
+Maximum height (Sz):      12.7793 nm
+]]></programlisting></informalexample></para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>TAB</guilabel></term>
+        <listitem>
+          <para>Фиксированное число столбцов – обычно название, значение, погрешность (ошибка), единицы измерения – разделенные символом TAB (ASCII 9). Предыдущий пример будет выглядеть как: <informalexample><programlisting><![CDATA[
+Maximum peak height (Sp)↦6.6754↦↦nm
+Maximum pit depth (Sp)↦6.1039↦↦nm
+Maximum height (Sz)↦12.7793↦↦nm
+]]></programlisting></informalexample> где ↦ обозначает символ TAB (табуляции). Следует отметить пустой столбец погрешностей значений в данном примере. Если таблица может содержать ошибки при определённых обстоятельствах, что для статистических величин будет при наличии для данного поля данных <link linkend="caldata">погрешностей измерения</link>, соответствующий столбец будет всегда присутствовать, даже если эти данные будут пустыми. Это предотвращает несоответствие форматов в случае наличия и отсутствия погрешностей.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><guilabel>CSV</guilabel></term>
+        <listitem>
+          <para>Значения, разделенные запятыми, обычный (хотя и не стандартизированный) формат с фиксированным числом столбцов, разделенных запятыми. Иногда используются точки с запятой, несмотря на имя, но Gwyddion записывает файлы всегда с запятой в качестве разделителя. Предыдущий пример будет выглядеть как: <informalexample><programlisting><![CDATA[
+"Maximum peak height (Sp)","6.6754","","nm"
+"Maximum pit depth (Sp)","6.1039","","nm"
+"Maximum height (Sz)","12.7793","","nm"
+]]></programlisting></informalexample></para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

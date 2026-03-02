@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: fitting-3d-shapes.xml 22999 2020-12-07 13:59:04Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='fitting-3d-shapes'>
+  <title>Fitting 3D Shapes</title>
+  <para>
+    Many three-dimensional geometrical shapes  that can be fitted by the
+    <link linkend='fit-shape-image'>image</link>
+    and
+    <link linkend='fit-shape'>XYZ</link>
+    <guilabel>Fit Shape</guilabel> functions have common parameters.
+    Therefore, we first describe the shared parameters and only list the
+    specific parameters in the descriptions of individual fitable geometrical
+    shapes.
+  </para>
+  <sect2 id='fitting-3d-shapes-general'>
+    <title>General common parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href='eqi-x_0.xml'/></term>
+        <listitem>
+          <para>
+            Horizontal position of the feature centre, usually coinciding
+            with the apex (or the deepest point for negative-height features).
+            For periodic shapes it is offset of one of the infinitely many
+            features from the coordinate origin.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-y_0.xml'/></term>
+        <listitem>
+          <para>
+            Vertical position of the feature centre, usually coinciding
+            with the apex (or the deepest point for negative-height features).
+            For periodic shapes it is offset of one of the infinitely many
+            features from the coordinate origin.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-z_0.xml'/></term>
+        <listitem>
+          <para>
+            Height of the base plane (at the feature centre if the base plane
+            is inclined).  Note that this parameter may be 100% correlated with
+            other height-related parameters if a feature covers the entire
+            image and the base plane is not visible.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-h.xml'/></term>
+        <listitem>
+          <para>
+            Height of the feature with respect to the flat base plane.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-phi.xml'/></term>
+        <listitem>
+          <para>
+            Rotation in the positive direction with respect to the basic
+            orientation, which is usually with major axes of the shape aligned
+            horizontally and vertically.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='fitting-3d-shapes-bumps'>
+    <title>Common parameters for bumps</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href='eqi-b_x.xml'/></term>
+        <listitem>
+          <para>
+            Slope of the base plane in the horizontal direction.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-b_y.xml'/></term>
+        <listitem>
+          <para>
+            Slope of the base plane in the vertical direction.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-a.xml'/></term>
+        <listitem>
+          <para>
+            Anisotropy parameter.  It is equal to the ratio of the longer and
+            shorter sides (or half-axes or other measures of width) of the
+            feature.  Therefore, the one dimension is equal to the mean
+            dimension multiplied by <xi:include href='eqi-sqrt-a.xml'/>
+            and the other to the mean dimension divided by
+            <xi:include href='eqi-sqrt-a.xml'/>.
+            Fix <xi:include href='eqi-a.xml'/> to unity if the shape should not
+            be elongated in one direction and contracted in another.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Bump-type shapes include base plane parameters
+      <xi:include href='eqi-b_x.xml'/> and <xi:include href='eqi-b_y.xml'/>
+      and generally some parameter desribing the size of the shape at the
+      base.  If only the apex is present in the image, their values are
+      undefined or they cease to be independent.  This may cause the fit
+      to converge poorly or fail.  The parameter values need to be fixed in
+      such case.
+    </para>
+  </sect2>
+  <sect2 id='fitting-3d-shapes-smooth-bumps'>
+    <title>Common parameters for smooth bumps</title>
+    <para>
+      The Gaussian-smoothed bumps – cone and pyramids – have the following two
+      common parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href='eqi-R.xml'/></term>
+        <listitem>
+          <para>
+            Radius of curvature at the apex.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-alpha.xml'/></term>
+        <listitem>
+          <para>
+            Tangent of the slope of the side.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='fitting-3d-shapes-steps'>
+    <title>Common parameters for steps</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href='eqi-h.xml'/></term>
+        <listitem>
+          <para>
+            Height of the step above the base plane.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-delta.xml'/></term>
+        <listitem>
+          <para>
+            Smoothness, defining the width of error function-shaped edge
+            between lower and upper planes.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='fitting-3d-shapes-periodic'>
+    <title>Common parameters for periodic shapes</title>
+    <variablelist>
+      <varlistentry>
+        <term><xi:include href='eqi-L.xml'/></term>
+        <listitem>
+          <para>
+            Period, i.e. the distance after which the structure starts
+            repeating.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><xi:include href='eqi-p.xml'/></term>
+        <listitem>
+          <para>
+            Coverage, i.e. the portion of the plane where there is some
+            feature, as opposed to the base plane.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='fitting-3d-shapes-specific'>
+    <title>Specific parameters</title>
+    <para>
+      <guilabel>Grating (simple)</guilabel>
+      has only a single additional parameter controlling the shape,
+      <xi:include href='eqi-c.xml'/>.  The ridge has the form of truncated
+      hyperbolic cosine, with small <xi:include href='eqi-c.xml'/>
+      corresponding to a parabolic cross-section while large
+      <xi:include href='eqi-c.xml'/> corresponding to sharp, almost rectangular
+      cross-section.
+    </para>
+    <para>
+      <guilabel>Grating (3-level)</guilabel>
+      has a cross-section of three trapezoids stacked on top of another.
+      The corresponding three height parameters
+      <xi:include href='eqi-h_1.xml'/>,
+      <xi:include href='eqi-h_2.xml'/> and
+      <xi:include href='eqi-h_3.xml'/>
+      determine the heights of the individual trapezoids.  The corresponding
+      width reduction parameters
+      <xi:include href='eqi-q_1.xml'/>,
+      <xi:include href='eqi-q_2.xml'/> and
+      <xi:include href='eqi-q_3.xml'/>
+      determine how much the upper base of the corresponding trapezoid is
+      reduced with respect to the lower base (by the factor
+      <xi:include href='eqi-1-over-1-plus-q_i.xml'/>).
+      It is often useful to look at the corresponding derived quantities
+      <xi:include href='eqi-L_0.xml'/>,
+      <xi:include href='eqi-L_1.xml'/>,
+      <xi:include href='eqi-L_2.xml'/> and
+      <xi:include href='eqi-L_3.xml'/>
+      that are directly equal to the widths and derived quantity
+      <xi:include href='eqi-h.xml'/> equal to the total height.
+    </para>
+    <informalfigure id='fig-grating-3-level'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='grating-3-level.pdf' format='PDF'/>
+        </imageobject>
+        <imageobject>
+          <imagedata fileref='grating-3-level.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Widths and heights of the trapezoids forming the 3-level grating
+          profile.  Note that the widths are derived quantities, not direct
+          fitting parameters.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      <guilabel>Holes</guilabel>
+      have parameters <xi:include href='eqi-s.xml'/> which controls the
+      tapering of the hole due to sloped sides and
+      <xi:include href='eqi-r.xml'/> which controls the radius of the rounder
+      corners.  For both parameters zeros correspond to an ideal rectangular
+      shape.
+    </para>
+    <para>
+      <guilabel>Parabolic ring</guilabel>
+      is a three-dimensional rotationally symmetric version of the
+      <guilabel>Parabolic step</guilabel> fitting function and has exactly
+      the same shape parameters.
+    </para>
+    <para>
+      <guilabel>Sphere</guilabel>
+      has only one shape parameter
+      <xi:include href='eqi-C.xml'/> defining its curvature.  The radius is
+      available as a derived quantity.
+    </para>
+    <para>
+      <guilabel>Cylinder (lying)</guilabel>
+      also has a curvature parameter <xi:include href='eqi-C.xml'/>.  In
+      addition it has a inclination parameter
+      <xi:include href='eqi-b_parallel.xml'/> determining the base plane
+      inclination along the cylinder length.
+    </para>
+    <para>
+      <guilabel>Gaussian</guilabel>
+      width is controlled by the mean rms parameter
+      <xi:include href='eqi-sigma_mean.xml'/>.
+      For anisotropic Gaussians it is equal to the geometric mean of the
+      two widths in the orthogonal directions that are available as derived
+      quantities.
+    </para>
+    <para>
+      <guilabel>Lorentzian</guilabel>
+      mean half width at half maximum is <xi:include href='eqi-beta_mean.xml'/>.
+      For anisotropic Lorentzian it is equal to the geometric mean of the
+      two widths in the orthogonal directions that are available as derived
+      quantities.
+    </para>
+    <para>
+      <guilabel>Cone</guilabel>
+      parameter <xi:include href='eqi-R.xml'/> determines the cone radius
+      at base.
+    </para>
+    <para>
+      <guilabel>Pyramid (diamond)</guilabel>
+      and
+      <guilabel>Pyramid (3-sided)</guilabel>
+      parameter <xi:include href='eqi-L.xml'/> determines the pyramid side
+      at base.  Since the basic orientation of this pyramid is diagonal
+      all four sides still have the same length even when the anisotropy
+      parameter <xi:include href='eqi-a.xml'/> is not unity.
+    </para>
+    <para>
+      <guilabel>Step (two-sided)</guilabel>
+      has parameter <xi:include href='eqi-w.xml'/> defining the step width.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

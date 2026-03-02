@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: installation-ms-windows.xml 26296 2024-04-30 09:04:42Z dn2010 $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="installation-ms-windows">
+  <title>Сборки для MS Windows</title>
+  <para>Пакеты для MS Windows, собранные разработчиками, доступны на <ulink url="http://gwyddion.net/download.php">странице загрузки</ulink> проекта. В настоящее время доступны версии как для 32-битных, так и для 64-битных систем. Большинству новых пользователей скорее всего нужна 64-битная версия. Однако, 32-битные версии также могут найти своё применение.</para>
+  <note>MS Windows будет предупреждать, что программа исходит от неизвестного издателя, небезопасна, не заслуживает доверия или что-то в этом роде (формулировка зависит от версии ОС). Это связано с тем, что для того, чтобы избежать предупреждения, нам пришлось бы регулярно платить сотни евро какой-либо сертификационной компании. Если вы загрузили установщик с SourceForge, это официальный установщик Gwyddion, и нет варианта, которому можно доверять сильнее. Вам просто нужно продолжать, несмотря на попытки MS Windows отговорить вас.</note>
+  <note>Формат поставки исполняемых файлов MS Windows был сильно изменён в версии 2.23. Если вы обновляетесь с версии до 2.23 на версию 2.23 или более новую, прочтите <ulink url="http://gwyddion.net/switch-to-mingw32.php">описание изменений</ulink>.</note>
+  <para>Если <application>Gwyddion</application> уже установлен, программа установки спросит, хотите ли вы заменить предыдущую версию.</para>
+  <informalfigure id="fig-win32-installer-upgrade-screenshot">
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="win32-installer-upgrade.png" format="PNG"/>
+      </imageobject>
+      <textobject>
+        <phrase>Снимок экрана программы установки для MS Windows с вопросом об обновлении</phrase>
+      </textobject>
+      <caption>Вопрос о том, что делать с предыдущей версией <application>Gwyddion</application>.</caption>
+    </mediaobject>
+  </informalfigure>
+  <para>Есть три возможных варианта:</para>
+  <variablelist>
+    <varlistentry>
+      <term>Да (заменить)</term>
+      <listitem>Уже установленная версия будет заменена. Это обычный метод обновления.</listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Нет (оставить)</term>
+      <listitem>Уже установленная версия будет проигнорирована и установка пойдёт как новая. В общем случае, это плохая идея, т.к. обе версии будут использовать общие настройки и пути реестра, и если вы удалите одну из них, другая также будет задета. более того, при этом не удаляются никакие файлы из уже имеющейся версии - и они могут мешать работать новой. Хотя в некоторых случаях этот вариант может оказаться полезным.</listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Отмена</term>
+      <listitem>Установка будет отменена и старая версия останется нетронутой.</listitem>
+    </varlistentry>
+  </variablelist>
+  <para>На следующих шагах программа установки напоминает о включенных в состав пакета программных компонентах и их лицензиях (что они все являются свободным программным обеспечением), дают поменять каталог установки и предлагают выбрать язык, используемый для отображения интерфейса пользователя.</para>
+  <sect2 id="installation-ms-windows-uninstall">
+    <title>Отмена установки</title>
+    <para>Если вы хотите удалить Gwyddion, перейдите в <menuchoice><guimenu>Пуск</guimenu><guisubmenu>Панель управления</guisubmenu><guimenuitem>Установка и удаление программ</guimenuitem></menuchoice> (<menuchoice><guimenu>Пуск</guimenu><guisubmenu>Панель управления</guisubmenu><guimenuitem>Программы и компоненты</guimenuitem></menuchoice> в некоторых версиях Windows) и выберите <application>Gwyddion</application>. Этот путь может отличаться в других версиях Windows.</para>
+  </sect2>
+  <sect2 id="installation-ms-windows-registry">
+    <title>Ключи реестра</title>
+    <para>Программа установки создаёт следующие нужные ключи в ветке реестра <literal>HKEY_LOCAL_MACHINE\Software\Gwyddion\2.0</literal>:</para>
+    <variablelist>
+      <varlistentry>
+        <term><literal>InstallDir</literal></term>
+        <listitem>Каталог установки, т.е. <filename>C:\Program Files\Gwyddion</filename>. Чтение этого ключа может быть полезным чтобы определить, куда ставить дополнения.</listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><literal>Version</literal></term>
+        <listitem>Полная версия Gwyddion как строка.</listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><literal>Locale</literal></term>
+        <listitem>Язык интерфейса пользователя Gwyddion, выбранный при установке (точнее, задание локали, которое в том числе определяет и язык). Можно изменить его используя <command>regedit</command> чтобы выбрать другой язык как описано ниже.</listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Список доступных языков и соответствующих значений <literal>Locale</literal> включает в себя:</para>
+    <para>
+      <informaltable id="table-locales">
+        <tgroup cols="2">
+          <?dblatex ll?>
+          <thead>
+            <row>
+              <entry><literal>Locale</literal></entry>
+              <entry>Язык</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><literal>cs_CZ.UTF-8</literal></entry>
+              <entry>Чешский (Чехия)</entry>
+            </row>
+            <row>
+              <entry><literal>en_US.UTF-8</literal></entry>
+              <entry>Английский (США)</entry>
+            </row>
+            <row>
+              <entry><literal>en_GB.UTF-8</literal></entry>
+              <entry>Английский (Соединённое королевство)</entry>
+            </row>
+            <row>
+              <entry><literal>fr_FR.UTF-8</literal></entry>
+              <entry>Французский (Франция)</entry>
+            </row>
+            <row>
+              <entry><literal>de_DE.UTF-8</literal></entry>
+              <entry>Немецкий (Германия)</entry>
+            </row>
+            <row>
+              <entry><literal>it_IT.UTF-8</literal></entry>
+              <entry>Итальянский (Италия)</entry>
+            </row>
+            <row>
+              <entry><literal>ko_KR.UTF-8</literal></entry>
+              <entry>Корейский (Южная Корея)</entry>
+            </row>
+            <row>
+              <entry><literal>ru_RU.UTF-8</literal></entry>
+              <entry>Русский (Россия)</entry>
+            </row>
+            <row>
+              <entry><literal>pt_BR.UTF-8</literal></entry>
+              <entry>Португальский (Бразилия)</entry>
+            </row>
+            <row>
+              <entry><literal>es_ES.UTF-8</literal></entry>
+              <entry>Испанский (Испания)</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+     </para>
+  </sect2>
+  <sect2 id="installation-ms-windows-missing">
+    <title>Отсутствующие возможности</title>
+    <para>Gwyddion поддерживает большое число опциональных возможностей, которые зависят от наличия сторонних библиотек. Бинарные сборки под MS Windows содержат большую часть из них, но некоторые не включены в настоящее время:</para>
+    <itemizedlist>
+      <listitem>Импорт файлов Flexible Image Transport System (FITS).</listitem>
+      <listitem>Поддержка Pygwy в 64битных сборках (оно поддерживается только в 32битных сборках).</listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2 id="installation-ms-windows-pygwy">
+    <title>Включение pygwy</title>
+    <para>Интерфейс написания скриптов на Python, pygwy, включен в инсталятор. Однако, необходимо отдельно установить Python и PyGTK2 чтобы заработали скрипты на Python. Это можно сделать как до установки Gwyddion, так и в любое время после. Если отсутствуют Python и PyGTK2, pygwy просто не будет регистрировать себя при запуске Gwyddion.</para>
+    <para>Пакет установки Python для MS Windows можно загрузить по адресу <ulink url="https://www.python.org/downloads/">https://www.python.org/downloads/</ulink>. Поскольку pygwy требует Python второй версии, установите пакет Python 2.7, который более не поддерживается. Последняя версия <filename>python-2.7.16.msi</filename> зеркалируется на странице <ulink url="https://sourceforge.net/projects/gwyddion/files/pygtk-win32/">Gwyddion сайта SourceForge</ulink> на случай, если возникают проблемы найти или скачать её в других местах.</para>
+    <para>Для PyGTK2 нужны три пакета: PyGTK, PyCairo и PyGObject. Для загрузки этих модулей необходимо перейти по соответствующим ссылкам на странице <ulink url="http://www.pygtk.org/downloads.html">http://www.pygtk.org/downloads.html</ulink> чтобы получить пакеты установки для <filename>pygobject-2.28.3.win32-py2.7.msi</filename>, <filename>pycairo-1.8.10.win32-py2.7.msi</filename> и <filename>pygtk-2.24.0.win32-py2.7.msi</filename> или, возможно, более новых версий, если они станут доступны. Также их зеркало доступно на <ulink url="https://sourceforge.net/projects/gwyddion/files/pygtk-win32/">странице Gwyddion на SourceForge</ulink> в том случае, если с их поиском и загрузкой возникнут проблемы.</para>
+    <para>Также сообщалось, что можно успешно установить пакет "всё-в-одном" <filename>pygtk-all-in-one-2.24.2.win32-py2.7.msi</filename>, который содержит всё, что нужно. Однако, использование этого пакета установки означает, что весь Gtk+ будет установлен дважды (в различные места файловой системы). Который из них будет использоваться pygwy трудно сказать, поэтому этот метод не рекомендуется использовать.</para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

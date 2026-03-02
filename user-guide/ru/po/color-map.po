@@ -1,0 +1,398 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2017-09-04 20:52+0400\n"
+"PO-Revision-Date: 2017-09-04 20:55+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: color-map.xml:6(title)
+msgid "False Color Mapping"
+msgstr "Наложение псевдоцвета"
+
+#: color-map.xml:8(primary)
+msgid "color"
+msgstr "цвет"
+
+#: color-map.xml:9(secondary)
+msgid "mapping"
+msgstr "наложение"
+
+#: color-map.xml:11(para)
+msgid ""
+"False color mapping is the basic two-dimensional data visualization method. "
+"The color gradient (also called palette) to use can be selected after "
+"clicking on the false color map part of a data window with right mouse "
+"button."
+msgstr ""
+"Наложение псевдоцвета – основной метод визуализации двумерных данных. "
+"Используемый цветовой градиент (также называемый палитрой)  может быть "
+"выбран с помощью щелчка правой кнопкой мыши на ту часть окна данных, где "
+"отображается карта псевдоцвета."
+
+#: color-map.xml:17(para)
+msgid ""
+"This quick selection pop-up menu offers the list of preferred color "
+"gradients. In addition it allows to invoke the full color gradient list by "
+"selecting <menuchoice><guimenuitem>More</guimenuitem></menuchoice>. "
+"Preferred gradients can be chosen by checking the corresponding check "
+"buttons in the full list or in the <link linkend=\"color-gradient-editor"
+"\">gradient editor</link> list. Selecting a row in the full list changes the "
+"gradient to the selected one, double-clicking (or pressing <keycap>Enter</"
+"keycap>) also finishes selection and closes the list window. Gradients of "
+"known names can be quickly accessed by starting to type their name. The "
+"default color gradient to use (when none is specified in the file) can be "
+"also set in the <link linkend=\"color-gradient-editor\">gradient editor</"
+"link>."
+msgstr ""
+"Выпадающее меню быстрого выбора предлагает список предпочитаемых градиентов "
+"псевдоцвета. Кроме того, оно позволяет вызвать полный список градиентов с "
+"помощью пункта меню <menuchoice><guimenuitem>Дополнительно</guimenuitem></"
+"menuchoice>. Предпочитаемые градиенты могут быть выбраны с помощью флажков в "
+"полном списке или в списке <link linkend=\"color-gradient-editor\">редактора "
+"градиентов</link>. Выбор строки в полном списке меняет градиент на "
+"выбранный, двойной щелчок (или нажатие <keycap>Enter</keycap>) также "
+"заканчивает выбор и закрывает окно списка. Градиенты с известными именами "
+"могут быть быстро выбраны набором начальных букв названия. Градиент по "
+"умолчанию (если он не указан в файле) также может быть задан в <link linkend="
+"\"color-gradient-editor\">редакторе градиентов</link>."
+
+#: color-map.xml:31(para)
+msgid ""
+"More control over the way values are mapped to colors is possible with <link "
+"linkend=\"color-range\">Color range</link> tool."
+msgstr ""
+"Дополнительный контроль над тем, как значения отображаются на шкалу цвета "
+"возможен с помощью инструмента <link linkend=\"color-range\">Цветовой "
+"диапазон</link>"
+
+#: color-map.xml:41(phrase)
+msgid "Comparison of step and edge detection methods on several images"
+msgstr ""
+"Сравнение методов обнаружения края и ступени на нескольких изображениях"
+
+#: color-map.xml:45(caption)
+msgid ""
+"A data window with the right-click color gradient pop up menu and the full "
+"color gradient list."
+msgstr ""
+"Окно данных с выпадающим по щелчку правой кнопкой мыши меню градиентов и "
+"полным списком градиентов псевдоцвета."
+
+#: color-map.xml:52(title)
+msgid "Color Range Tool <gwy:icon name=\"color_range\"/>"
+msgstr "Инструмент диапазон псевдоцвета <gwy:icon name=\"color_range\"/>"
+
+#: color-map.xml:56(para)
+msgid ""
+"The <link linkend=\"tool-color-range\">Color range tool</link> is a special "
+"tool whose purpose is not to analyse or modify data, but to control the way "
+"values are mapped to colors. It offers four basic color mapping types:"
+msgstr ""
+"Инструмент <link linkend=\"tool-color-range\">диапазон цвета</link> — "
+"специальный инструмент, назначением которого является не анализ или "
+"модификация данных, а контроль над тем, как значения данных отображаются на "
+"шкалу псевдоцвета. Он предлагает четыре основных способа отображения "
+"значений данных на шкалу цвета:"
+
+#: color-map.xml:64(term)
+msgid "Full <gwy:icon name=\"color_range_full\"/>"
+msgstr "Полный <gwy:icon name=\"color_range_full\"/>"
+
+#: color-map.xml:68(para)
+msgid ""
+"Data values are mapped to colors linearly, the full data range corresponds "
+"to the full color range. This is the default type (unless you have changed "
+"the default)."
+msgstr ""
+"Значения данных линейно масштабируются на шкалу псевдоцвета, полный диапазон "
+"значений данных соответствует полному диапазону значений псевдоцвета. Этот "
+"тип включен по умолчанию (если вы не меняли настройки по умолчанию)."
+
+#: color-map.xml:76(term)
+msgid "Fixed <gwy:icon name=\"color_range_fixed\"/>"
+msgstr "Фиксированный <gwy:icon name=\"color_range_fixed\"/>"
+
+#: color-map.xml:80(para)
+msgid ""
+"Data values are mapped to colors linearly, a user-specified data range "
+"(which can be smaller or greater than the full range) maps onto the full "
+"color range. Values outside this range are displayed with the edge colors. "
+"The range can be set by several means:"
+msgstr ""
+"Значения данных отображаются на значения цвета линейно, заданный "
+"пользователем диапазон данных (который может быть как меньше, так и больше "
+"полного) отображается на полный диапазон цвета. Данные вне диапазона "
+"отображаются цветом его краёв. Диапазон может быть задан несколькими "
+"способами:"
+
+#: color-map.xml:88(listitem)
+msgid "by entering desired values numerically in the tool window,"
+msgstr "вводом нужных значений численно в окне инструмента,"
+
+#: color-map.xml:91(listitem)
+msgid ""
+"by selecting a range on the height distribution graph in the tool window,"
+msgstr "выбором диапазона на графике распределения высот в окне инструмента,"
+
+#: color-map.xml:95(listitem)
+msgid ""
+"by selecting an area on the data window, the range is then set from the "
+"minimum to maximum of the data in this area only,"
+msgstr ""
+"выбором области в окне данных, диапазон затем устанавливается по "
+"минимальному и максимальному значениям только внутри этой области,"
+
+#: color-map.xml:100(guibutton)
+msgid "Set to Masked"
+msgstr "Под маской"
+
+#: color-map.xml:101(guibutton)
+msgid "Set to Unmasked"
+msgstr "Не под маской"
+
+#: color-map.xml:99(listitem)
+msgid ""
+"by pressing buttons <placeholder-1/> or <placeholder-2/> that set the range "
+"to the range of values that are under or not under the mask, respectively, or"
+msgstr ""
+"нажатием кнопок <placeholder-1/> или <placeholder-2/>, которые устанавливают "
+"диапазон равным диапазону значений под маской или не под маской "
+"соответственно или"
+
+#: color-map.xml:106(guibutton)
+msgid "Invert Mapping"
+msgstr "Инвертировать шкалу"
+
+#: color-map.xml:105(listitem)
+msgid ""
+"by pressing button <placeholder-1/> which exchanges the upper and lower "
+"limit of the color mapping range."
+msgstr ""
+"нажатием кнопки <placeholder-1/>, которая меняет верхний и нижний предел "
+"диапазона отображения цвета"
+
+#: color-map.xml:110(para)
+msgid ""
+"If no range is manually set, fixed range type behaves identically to full "
+"range."
+msgstr ""
+"Если диапазон не задан вручную, фиксированный диапазон ведёт себя подобно "
+"полному."
+
+#: color-map.xml:114(para)
+msgid ""
+"Note data processing operations often modify the value range – and as the "
+"fixed range remains fixed as you set it, it can result for instance in "
+"completely black data display. You may wish or have to update the range "
+"manually then, or to switch to another mapping type."
+msgstr ""
+"Следует заметить, что операции обработки данных нередко изменяют диапазон "
+"значений — и поскольку фиксированный диапазон остаётся таким, каким он был "
+"задан, это может привести, например, к полностью чёрному окну данных. В "
+"таком случае можно обновить диапазон вручную или переключиться на другой тип "
+"отображения."
+
+#: color-map.xml:124(term)
+msgid "Automatic <gwy:icon name=\"color_range_auto\"/>"
+msgstr "Автоматический <gwy:icon name=\"color_range_auto\"/>"
+
+#: color-map.xml:128(para)
+msgid ""
+"Data values are mapped to colors linearly, a heuristically determined "
+"subinterval of the full value range maps onto the full color range. Values "
+"outside this subrange are again displayed with the edge colors."
+msgstr ""
+"Значения данных отображаются на цветовой диапазон линейно, эвристически "
+"определённый под-интервал полного диапазона данных отображается на полный "
+"диапазон цвета. Значения вне этого под-интервала отображаются цветом на "
+"границе диапазона."
+
+#: color-map.xml:137(term)
+msgid "Adaptive <gwy:icon name=\"color_range_adaptive\"/>"
+msgstr "Адаптивный <gwy:icon name=\"color_range_adaptive\"/>"
+
+#: color-map.xml:141(para)
+msgid ""
+"The full data range corresponds to the full color range, however data values "
+"are mapped to colors non-linearly. The mapping function is based on inverse "
+"cumulative height distribution, therefore flat areas generally get bigger "
+"slice of the color gradient and smaller value variations can be seen on them "
+"than normally."
+msgstr ""
+"Полный диапазон данных соответствует полному диапазону цвета, однако, "
+"значения данных отображаются на значения цвета нелинейно. Функция "
+"отображения основана на инверсной интегральной функции распределения высоты, "
+"следовательно плоские области в среднем получают большую часть цветового "
+"градиента, и меньшие изменения значения видны на них лучше, чем обычно."
+
+#: color-map.xml:149(para)
+msgid ""
+"The false color map ruler on the right side of <link linkend=\"data-windows"
+"\">data windows</link> does not display any ticks in this mode, only the "
+"minimum and maximum value."
+msgstr ""
+"Полоса градиента псевдоцвета с правой стороны от <link linkend=\"data-windows"
+"\">окон данных</link> в этом режиме не отображает никаких значений, кроме "
+"минимума и максимума."
+
+#: color-map.xml:157(para)
+msgid ""
+"A mapping type can be set to be default by checking the <guilabel>Default</"
+"guilabel> check button when it is active. Newly displayed data windows then "
+"use this type, unless some other type is explicitly specified."
+msgstr ""
+"Тип отображения может быть установлен для использования по умолчанию с "
+"помощью флажка <guilabel>По умолчанию</guilabel> когда он активен. Новые "
+"окна данных затем будут использовать этот тип, если в них не будет явно "
+"задан другой тип."
+
+#: color-map.xml:163(para)
+msgid ""
+"Saving data to <filename>.gwy</filename> file also saves all color mapping "
+"settings: mapping type, range and gradient. Gradient is however not "
+"physically stored in the file, only referenced by name. In other words, "
+"color gradients of the same name are shared among files."
+msgstr ""
+"Сохранение данных в файл <filename>.gwy</filename> также сохраняет все "
+"настройки отображения псевдоцвета: тип отображения, диапазон и градиент. "
+"Градиент, однако, не сохраняется в файл, а только ссылается по имени. "
+"Другими словами, одноимённые градиенты являются общими для разных файлов."
+
+#: color-map.xml:171(title)
+msgid "Color Gradient Editor"
+msgstr "Редактор цветовых градиентов"
+
+#: color-map.xml:173(primary) color-map.xml:177(primary)
+msgid "color map"
+msgstr "карта цвета"
+
+#: color-map.xml:174(secondary)
+msgid "editing"
+msgstr "редактирование"
+
+#: color-map.xml:178(secondary)
+msgid "choosing default"
+msgstr "выбор умолчаний"
+
+#: color-map.xml:180(para)
+msgid ""
+"Color gradient editor can be invoked with <menuchoice><guimenu>Edit</"
+"guimenu><guimenuitem>Color Gradients</guimenuitem></menuchoice>. It consists "
+"of a gradient list similar to the full gradient selector, with an additional "
+"button panel, and the actual editor that can be invoked by double-clicking "
+"on a gradient you wish to edit or by activating the <guilabel>Edit</"
+"guilabel> button. Renaming is possible. Only user-created color gradients "
+"can be edited or deleted, system gradients installed with Gwyddion are "
+"immutable."
+msgstr ""
+"Редактор цветовых градиентов может быть вызван с помощью пункта меню "
+"<menuchoice><guimenu>Правка</guimenu><guimenuitem>Цветовые градиенты</"
+"guimenuitem></menuchoice>. Он содержит список градиентов, подобный окну "
+"выбора градиента из полного набора, с дополнительной панелью кнопок, и "
+"настоящий редактор, который может быть вызван двойным щелчком по градиенту, "
+"который нужно изменить, или при нажатии кнопки <guilabel>Редактировать</"
+"guilabel>. Также можно переименовать градиент. Для редактирования и удаления "
+"доступны только градиенты, созданные пользователем, системные, которые были "
+"установлены вместе с Gwyddion, являются неизменяемыми."
+
+#: color-map.xml:193(para)
+msgid ""
+"The last button in the gradient list control panel makes the currently "
+"selected gradient the default. It will be used for all newly displayed data "
+"that do not specify any particular color gradient."
+msgstr ""
+"Последняя кнопка в панели управления списком градиентов делает текущий "
+"выбранный градиент градиентом по умолчанию. Он будет использоваться для всех "
+"новых отображаемых данных, для которых не указан определённый градиент."
+
+#: color-map.xml:202(term)
+msgid "Points"
+msgstr "Точки"
+
+#: color-map.xml:204(para)
+msgid ""
+"The color gradient is defined by a set of points and their associated "
+"colors. The points are represented by triangular markers on the gradient "
+"displayed in the lower part of the editor window. Moving these markers moves "
+"the points, new points can be added by clicking into an empty space, "
+"existing points can be removed by dragging them away from the gradient."
+msgstr ""
+"Цветовой градиент определяется набором точек и заданными в них цветами. "
+"Точки представлены треугольными маркерами на градиенте, отображаемом в "
+"нижней части окна редактора. Перемещение этих маркеров перемещает точки, "
+"новые точки могут быть добавлены щелчком по пустому месту, существующие "
+"точки могут быть удалены утаскиванием их с градиента."
+
+#: color-map.xml:215(term)
+msgid "Curve"
+msgstr "Кривая"
+
+#: color-map.xml:217(para)
+msgid ""
+"The color gradient is defined by red, green and blue curves. The curves are "
+"again segmented, but the segments of individual curves do not need to "
+"coincide."
+msgstr ""
+"Цветовой градиент определяется кривыми красного, зелёного и синего. Кривые "
+"также разделены на сегменты, но эти сегменты для каждой из кривых не "
+"обязательно должны совпадать. "
+
+#: color-map.xml:198(para)
+msgid "Two editing modes are available: <placeholder-1/>"
+msgstr "Доступны два режима редактирования: <placeholder-1/>"
+
+#~ msgid ""
+#~ "Color Range Tool <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_color_range-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Инструмент <quote>диапазон цвета</quote> "
+#~ "<guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Full <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range_full-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Полный <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range_full-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Fixed <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range_fixed-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Фиксированный <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range_fixed-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Automatic <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range_auto-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Автоматический <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_color_range_auto-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Adaptive <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range_adaptive-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Адаптивный <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_color_range_adaptive-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

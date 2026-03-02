@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eq-mfm-current-line.xml 23151 2021-02-13 09:13:08Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<informalequation id='eq-mfm-current-line'>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref='eq-mfm-current-line.svg' format='SVG'/>
+    </imageobject>
+    <textobject role='tex'>
+      <phrase>
+<![CDATA[
+\begin{array}{r@{{}={}}l}
+\displaystyle
+B_x(x,z)
+  & \displaystyle
+    \frac{\mu_0 I}{2\pi w} \atan\frac{wz}{z^2+x^2-w^2/4} \\
+\noalign{\smallskip}
+\displaystyle
+B_z(x,z)
+  & \displaystyle
+    \frac{\mu_0 I}{4\pi w} \ln\frac{(x-w/2)^2+z^2}{(x+w/2)^2+z^2}\\
+\end{array}
+]]>
+      </phrase>
+    </textobject>
+  </mediaobject>
+</informalequation>
+<!-- vim: set ts=2 sw=2 et : -->

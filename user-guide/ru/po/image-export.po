@@ -1,0 +1,798 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2021-01-02 23:06+0400\n"
+"PO-Revision-Date: 2021-01-02 23:31+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: image-export.xml:6(title)
+msgid "Image Export"
+msgstr "Экспорт изображения"
+
+#: image-export.xml:7(para)
+msgid ""
+"Microscopy data often need to be rendered into image formats, usually for "
+"presentation purposes, occasionally to open them in programs that do not "
+"support any SPM data format. Both is achieved the same way in "
+"<application>Gwyddion</application>: by selecting <menuchoice><guimenu>File</"
+"guimenu><guimenuitem>Save As</guimenuitem></menuchoice> and choosing a file "
+"name corresponding to an image format, e.g. <filename>channel.png</filename> "
+"or <filename>channel.tiff</filename>. The reference section <link linkend="
+"\"pixmap-image-keys\">High-Depth Image Formats</link> describes the export "
+"of data as high-depth greyscale images that should be still usable as "
+"quantitative data. For supported formats you can enable it using the "
+"<guilabel>Export as 16 bit greyscale</guilabel> check-box at the top of the "
+"image export dialogue. The rest of this section discusses the creation of "
+"nice images for publications and presentations."
+msgstr ""
+"Данные микроскопии нередко требуется представить в виде изображения, обычно "
+"это нужно для их презентации, иногда для того, чтобы открыть их в программе, "
+"которая не поддерживает ни одного из форматов данных СЗМ. Оба варианта "
+"реализуются в <application>Gwyddion</application> одинаково: выбором пункта "
+"меню <menuchoice><guimenu>Файл</guimenu><guimenuitem>Сохранить как</"
+"guimenuitem></menuchoice> и заданием имени файла, соответствующему формату "
+"изображения, например, <filename>channel.png</filename> или "
+"<filename>channel.tiff</filename>. Раздел справочного руководства <link "
+"linkend=\"pixmap-image-keys\">Форматы изображений с большой глубиной цвета</"
+"link> описывает экспорт данных как изображений в оттенках серого с большой "
+"глубиной цвета, которые ещё можно использовать как количественные данные. "
+"Для поддерживаемых форматов эту опцию можно включить переключателем "
+"<guilabel>Экспортировать как 16битное серое</guilabel> в верхней части "
+"диалогового окна экспорта изображений. Остальная часть этого раздела "
+"описывает создание красивых изображений для публикаций и презентаций."
+
+#: image-export.xml:26(para)
+msgid ""
+"<application>Gwyddion</application> can render images into a number of "
+"formats, including for instance PNG, PDF, SVG, EPS, TIFF, WebP, BMP, PPM, "
+"TARGA and JPEG. Depending on the intent, some may be more suitable than "
+"others. Generally, the following choices can be recommended:"
+msgstr ""
+"<application>Gwyddion</application> может отрисовывать изображения в "
+"несколько различных форматов, включая, например, PNG, PDF, SVG, EPS, TIFF, "
+"WebP, BMP, PPM, TARGA и JPEG. В зависимости от того, чего хочется достичь, "
+"некоторые из них подходят лучше других. В общем случае могут быть "
+"рекомендованы следующие настройки:"
+
+#: image-export.xml:34(ulink)
+msgid "PDF (Portable Document Format)"
+msgstr "PDF (Portable Document Format)"
+
+#: image-export.xml:33(listitem)
+msgid ""
+"<placeholder-1/> for high-quality rendering suitable for printing, with all "
+"text and lines perfectly sharp and clean at any scale. Gwyddion also "
+"supports output to EPS (Encapsulated PostScript) for the same purpose, "
+"however, some features currently seem to work better in the PDF output."
+msgstr ""
+"<placeholder-1/> для отрисовки высокого качества, подходящей для печати, где "
+"все надписи и линии будут идеально контрастными и резкими при любом "
+"масштабе. Gwyddion также поддерживает вывод в EPS (Encapsulated PostScript) "
+"для тех же целей, однако, некоторые вещи работают несколько лучше при "
+"экспорте в PDF."
+
+#: image-export.xml:41(ulink)
+msgid "PNG (Portable Network Graphics)"
+msgstr "PNG (Portable Network Graphics)"
+
+#: image-export.xml:40(listitem)
+msgid ""
+"<placeholder-1/> for web pages, low-resolution previews, thumbnails and "
+"icons, and also if you have to use a raster image format because it is the "
+"only option. PNG is a modern and widely supported raster image format with "
+"good loseless compression and a number of nifty features, including full "
+"transparency support."
+msgstr ""
+"<placeholder-1/> для веб-страниц, изображений предпросмотра низкого "
+"разрешения, иконок, миниатюр, и в том случае, если нужно использовать "
+"растровый формат как единственный доступный вариант. PNG это современный и "
+"широко поддерживаемый формат для растровых изображений с хорошим сжатием без "
+"потерь и поддержкой модных опций, включая полную поддержку прозрачности."
+
+#: image-export.xml:49(ulink)
+msgid "SVG (Scalable Vector Graphics)"
+msgstr "SVG (Scalable Vector Graphics)"
+
+#: image-export.xml:52(ulink)
+msgid "Inkscape"
+msgstr "Inkscape"
+
+#: image-export.xml:48(listitem)
+msgid ""
+"<placeholder-1/> for subsequent editing and processing. SVG is a modern "
+"vector graphics format. You can open in a vector image editor such as "
+"<placeholder-2/> and modify it or combine with other images – keeping all "
+"text and lines perfectly sharp and clean."
+msgstr ""
+"<placeholder-1/> для последующего редактирования и обработки.  SVG это "
+"современный формат векторной графики. Его можно открыть в редакторе "
+"векторной графики, например, в <placeholder-2/> и изменить или "
+"скомбинировать с другими изображениями – сохраняя весь текст и линии "
+"идеально ровными и чистыми."
+
+#: image-export.xml:63(guilabel) image-export.xml:73(title)
+msgid "Basic"
+msgstr "Основные"
+
+#: image-export.xml:62(caption)
+msgid ""
+"Image export dialogue screenshot showing the <placeholder-1/> options page."
+msgstr ""
+"Снимок экрана окна экспорта изображений, показывающий страницу настроек "
+"<quote><placeholder-1/></quote>."
+
+#: image-export.xml:68(para)
+msgid ""
+"The image export options are divided into several groups, as seen in the "
+"above screenshot."
+msgstr ""
+"Настройки экспорта изображений поделены на несколько групп, как показано на "
+"рисунке выше."
+
+#: image-export.xml:74(para)
+msgid ""
+"<guilabel>Basic</guilabel> options specify various overall sizes and scales. "
+"The <guilabel>Physical Dimensions</guilabel> part differs for raster and "
+"vector images. For raster images the physical dimensions are specified as "
+"follows:"
+msgstr ""
+"<guilabel>Основные</guilabel> настройки задают различные общие размеры и "
+"масштабы. Часть <guilabel>Физические размеры</guilabel>отличается для "
+"растровых и векторных изображений. Для растровых изображений физические "
+"размеры задаются в следующем виде:"
+
+#: image-export.xml:82(guilabel)
+msgid "Zoom"
+msgstr "Увеличение"
+
+#: image-export.xml:84(para)
+msgid ""
+"Scaling of data pixels to image pixels. The default zoom of 1 means data "
+"pixels correspond exactly to image pixels. Upscaling is possible with zoom "
+"larger than 1, and downscaling with zoom smaller than 1. For data with non-"
+"square pixels displayed with <link linkend=\"physical-aspect-ratio"
+"\">physical aspect ratio</link>, the zoom is applied to the shorter side of "
+"the pixel, whichever it is."
+msgstr ""
+"Масштабирование пикселей данных в пиксели изображения. Установленный по "
+"умолчанию масштаб 1 означает что точкам данных точно соответствуют пиксели "
+"изображения. Увеличение возможно с масштабом больше 1 и уменьшение с "
+"масштабом меньше 1. Для данных с неквадратными пикселями, показываемыми в "
+"режиме <link linkend=\"physical-aspect-ratio\">физического соотношения "
+"сторон</link>, масштабирование применяется к более короткой стороне пикселя, "
+"независимо от того, какой она будет."
+
+#: image-export.xml:96(guilabel) image-export.xml:136(guilabel)
+msgid "Width"
+msgstr "Ширина"
+
+#: image-export.xml:98(para)
+msgid ""
+"Width of the rectangle corresponding to data in the exported image (not "
+"width of the entire image), in pixels."
+msgstr ""
+"Ширина прямоугольника, соответствующего данным в экспортированном "
+"изображении (не ширина изображения целиком), в пикселях."
+
+#: image-export.xml:105(guilabel) image-export.xml:145(guilabel)
+msgid "Height"
+msgstr "Высота"
+
+#: image-export.xml:107(para)
+msgid ""
+"Height of the rectangle corresponding to data in the exported image (not "
+"height of the entire image), in pixels."
+msgstr ""
+"Высота прямоугольника, соответствующего данным в экспортированном "
+"изображении (не высота изображения целиком), в пикселях."
+
+#: image-export.xml:114(para)
+msgid ""
+"Vector images do not have finite pixel resolution, therefore, the physical "
+"dimensions can be instead given as follows:"
+msgstr ""
+"Векторные изображения не имеют конечного пиксельного разрешения, поэтому, "
+"физические размеры могут быть заданы следующим образом:"
+
+#: image-export.xml:120(guilabel)
+msgid "Pixel size"
+msgstr "Размер пикселя"
+
+#: image-export.xml:122(para)
+msgid "Size of one data pixel in millimetres."
+msgstr "размер одного пикселя данных в миллиметрах."
+
+#: image-export.xml:128(guilabel)
+msgid "Pixels per inch"
+msgstr "Пикселей на дюйм"
+
+#: image-export.xml:130(para)
+msgid "Number of data pixels per one inch."
+msgstr "Число пикселей данных на один дюйм."
+
+#: image-export.xml:138(para)
+msgid ""
+"Width of the rectangle corresponding to data in the exported image (not "
+"width of the entire image), in millimetres."
+msgstr ""
+"Ширина прямоугольника, соответствующего данным в экспортируемом изображении "
+"(не ширина изображения в целом), в миллиметрах."
+
+#: image-export.xml:147(para)
+msgid ""
+"Height of the rectangle corresponding to data in the exported image (not "
+"height of the entire image), in millimetres."
+msgstr ""
+"Высота прямоугольника, соответствующего данным в экспортируемом изображении "
+"(не высота изображения в целом), в миллиметрах."
+
+#: image-export.xml:162(caption)
+msgid "Illustration of the basic size parameters."
+msgstr "Иллюстрация основных параметров размеров."
+
+#: image-export.xml:167(para)
+msgid ""
+"The remaining size and scale parameters, denoted <guilabel>Parameters</"
+"guilabel>, are common to both image types. However, for raster images the "
+"values are in pixels while for vector images they are in typographical "
+"points. More precisely, this is true if they are given as absolute, i.e. the "
+"option <guilabel>Tie sizes to data pixels</guilabel> is not selected. If "
+"this option is selected all sizes are relative to data pixels, i.e. they "
+"scale together with the image data when the physical dimensions change. The "
+"parameters, illustrated in the figure above, include:"
+msgstr ""
+"Остальные параметры размеров и масштабов, обозначенные как "
+"<guilabel>Параметры</guilabel>, являются общими для обоих типов изображений. "
+"Однако, для растровых изображений, значения представлены в пикселях, в то "
+"время, как для векторных они измеряются в типографских точках. Более точно, "
+"это будет так если они заданы как абсолютные, т.е. опция <guilabel>Привязать "
+"размеры к пикселям данных</guilabel> не выбрана. При выборе этой опции все "
+"размеры измеряются в относительных величинах к пикселям данных, т.е. они "
+"масштабируются вместе с данными изображения при изменении физических "
+"размеров. Параметры, проиллюстрированные на картинке выше, включают в себя:"
+
+#: image-export.xml:180(guilabel)
+msgid "Font"
+msgstr "Шрифт"
+
+#: image-export.xml:182(para)
+msgid "The font used to draw all labels."
+msgstr "Шрифт, используемый для отрисовки всех меток."
+
+#: image-export.xml:188(guilabel)
+msgid "Font size"
+msgstr "Размер шрифта"
+
+#: image-export.xml:190(para)
+msgid "Font size, in pixels or typographical points as described above."
+msgstr "Размер шрифта, в пикселях или типографских точках как описано выше."
+
+#: image-export.xml:196(guilabel)
+msgid "Line thickness"
+msgstr "Толщина линии"
+
+#: image-export.xml:198(para)
+msgid "Thickness of lines: borders, ticks, inset scale bar and selections."
+msgstr ""
+"Толщина линий: границы, засечки, вложенный масштабный отрезок и выделенные "
+"элементы."
+
+#: image-export.xml:204(guilabel)
+msgid "Outline thickness"
+msgstr "Толщина контура"
+
+#: image-export.xml:206(para)
+msgid ""
+"Thickness of outlines that can be drawn around the inset scale bar and "
+"selections."
+msgstr ""
+"Толщина контуров, которые могут быть нарисованы вокруг вложенного "
+"масштабного отрезка и выделенных элементов."
+
+#: image-export.xml:213(guilabel)
+msgid "Border width"
+msgstr "Ширина границы"
+
+#: image-export.xml:215(para)
+msgid "Width of empty border around the entire image."
+msgstr "Ширина пустой границы вокруг всего изображения."
+
+#: image-export.xml:221(guilabel)
+msgid "Tick length"
+msgstr "Длина засечек"
+
+#: image-export.xml:223(para)
+msgid ""
+"Length of ruler and false colour map ticks. This setting also controls the "
+"inset scale bar ticks and crosses drawn for the point-like selection."
+msgstr ""
+"Длина засечек на шкалах линейных размеров и псевдоцвета. Эта опция также "
+"управляет длиной засечек на масштабном отрезке и крестиков, рисуемых для "
+"выбранных точек."
+
+#: image-export.xml:231(para)
+msgid ""
+"Option <guilabel>Decimal separator is comma</guilabel> permits controlling "
+"the format of numbers. By default, decimal dots are used even if your locale "
+"setup specifies commas. Enabling this options replaces the dots with commas, "
+"again independently on the actual locale."
+msgstr ""
+"Настройка <guilabel>запятая как десятичный разделитель</guilabel> позволяет "
+"управлять форматом чисел. По умолчанию используются десятичные точки, даже "
+"если настройки локали задают запятые. Включение этой опции меняет точки на "
+"запятые, снова независимо от настроек локали."
+
+#: image-export.xml:237(para)
+msgid ""
+"Finally, <guilabel>Colour</guilabel> options permit controlling common "
+"colours. <guilabel>Line and text colour</guilabel> controls the colour of "
+"all lines and labels drawn outside the image area, that is over the "
+"background. The background can be transparent (enabled with "
+"<guilabel>Transparent background</guilabel> check-box) if the target image "
+"format supports it – this currently includes PNG, WebP and all vector "
+"formats. Otherwise the background is solid colour can be changed using the "
+"<guilabel>Background colour</guilabel> control."
+msgstr ""
+"И, наконец, настройки в меню <guilabel>Цвет</guilabel> позволяют управлять "
+"общими цветами изображения. <guilabel>Цвет линий и текста</guilabel> "
+"управляет цветом всех линий и меток, рисуемых вне области изображения, "
+"поверх фона. Фон может быть прозрачным (включается с помощью переключателя "
+"<guilabel>Прозрачный фон</guilabel>) если формат изображения, в который "
+"сохраняется, поддерживает эту возможность — на данный момент это "
+"поддерживается в PNG, WebP и во всех векторных форматах. В противном случае "
+"фон рисуется сплошным цветом, который можно поменять с помощью элемента "
+"управления <guilabel>Цвет фона</guilabel>."
+
+#: image-export.xml:249(title)
+msgid "Lateral Scale"
+msgstr "Горизонтальный масштаб"
+
+#: image-export.xml:250(para)
+msgid ""
+"Settings in the <guilabel>Lateral Scale</guilabel> page control how the "
+"lateral dimensions are visualised. There are two basic choices displayed in "
+"the figure below, rulers and an inset scale bar. The lateral scale can be "
+"also disabled entirely. The inset scale bar has the following settings:"
+msgstr ""
+"Настройки на вкладке <guilabel>Латеральные размеры</guilabel> управляют "
+"отображением горизонтальных размеров и единиц измерения. Два основных "
+"варианта представлены на рисунке снизу: это линейки и вложенный масштабный "
+"отрезок. Также можно полностью выключить отображение горизонтальных "
+"размеров. Для вложенного масштабного отрезка доступны следующие настройки:"
+
+#: image-export.xml:259(guilabel)
+msgid "Length"
+msgstr "Длина"
+
+#: image-export.xml:261(para)
+msgid ""
+"The bar length can be set manually to an arbitrary value which does not "
+"result in a too short or too long bar. Press <keycap>Enter</keycap> to "
+"update the preview when you modify the length. Button <guibutton>Auto</"
+"guibutton> selects a suitable length automaticaly (this is also done when "
+"the manually entered length is not found reasonable)."
+msgstr ""
+"Длина отрезка может быть выставлена вручную на произвольное значение, "
+"которое не сделает его слишком коротким или слишком длинным. Нажмите "
+"<keycap>Enter</keycap> чтобы обновить изображение предпросмотра после "
+"изменения длины. Кнопка <guibutton>Авто</guibutton> выбирает подходящую "
+"длину автоматически (это же происходит если введённая вручную длина не "
+"подходит для данного изображения)."
+
+#: image-export.xml:272(guilabel)
+msgid "Placement"
+msgstr "Размещение"
+
+#: image-export.xml:274(para)
+msgid ""
+"The bar can be placed along the upper or lower edge and aligned to either "
+"side or centered."
+msgstr ""
+"Отрезок может быть помещён вдоль верхнего или нижнего края и быть выровнен "
+"влево или вправо либо центрирован."
+
+#: image-export.xml:281(guilabel)
+msgid "Horizontal gap"
+msgstr "Горизонтальный _зазор:"
+
+#: image-export.xml:283(para)
+msgid ""
+"Horizontal gap between the bar and the closer vertical edge of the data area "
+"(meaningful only if the bar is not centered)."
+msgstr ""
+"Горизонтальный зазор между отрезком и ближайшей вертикальной стороной "
+"области данных (имеет смысл только если отрезок не центрирован)."
+
+#: image-export.xml:290(guilabel)
+msgid "Vertical gap"
+msgstr "Вертикальный зазор"
+
+#: image-export.xml:292(para)
+msgid ""
+"Horizontal gap between the bar and the closer horizontal edge of the data "
+"area."
+msgstr ""
+"Вертикальный зазор между отрезком и ближайшей горизонтальной стороной "
+"области данных."
+
+#: image-export.xml:299(guilabel) image-export.xml:508(guilabel)
+msgid "Colour"
+msgstr "Цвет"
+
+#: image-export.xml:301(para)
+msgid ""
+"Colour with which the bar is drawn. Buttons <guibutton>Black</guibutton> and "
+"<guibutton>White</guibutton> allow choosing quickly the basic colours."
+msgstr ""
+"Цвет, которым будет нарисован отрезок. Кнопки <guibutton>Чёрный</guibutton> "
+"и <guibutton>Белый</guibutton> позволяют быстро выбрать основные цвета."
+
+#: image-export.xml:309(guilabel) image-export.xml:518(guilabel)
+msgid "Outline colour"
+msgstr "Цвет контура"
+
+#: image-export.xml:311(para) image-export.xml:520(para)
+msgid ""
+"Colour of the outlines. Note if the outline width is zero (the default), no "
+"outlines are drawn, hence changing the colour has no effect."
+msgstr ""
+"Цвет контуров. При нулевой толщине контура, установленной по умолчанию, "
+"контура не рисуются, следовательно изменение этого цвета никак не влияет на "
+"изображение."
+
+#: image-export.xml:319(guilabel) image-export.xml:528(guilabel)
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+#: image-export.xml:321(para)
+msgid ""
+"Opacity with which the inset scale bar is drawn. This setting permits "
+"drawing the bar as semi-transparent."
+msgstr ""
+"Прозрачность масштабного отрезка. Этот параметр позволяет рисовать "
+"масштабный отрезок полупрозрачным."
+
+#: image-export.xml:328(guilabel)
+msgid "Draw ticks"
+msgstr "Рисовать засечки"
+
+#: image-export.xml:330(para)
+msgid ""
+"If enabled, the bar has vertical ticks at its ends. When disabled, the bar "
+"is just a line."
+msgstr ""
+"При включенной опции у отрезка рисуются вертикальные засечки на концах. При "
+"отключенной он рисуется простой линией."
+
+#: image-export.xml:337(guilabel)
+msgid "Draw label"
+msgstr "Рисовать подпись"
+
+#: image-export.xml:339(para)
+msgid "If enabled, the bar length is displayed under or above the bar."
+msgstr "При включенной опции над или под отрезком рисуется его длина."
+
+#: image-export.xml:345(guilabel)
+msgid "Draw text above scalebar"
+msgstr "Текст сверху от отрезка"
+
+#: image-export.xml:347(para)
+msgid ""
+"If enabled, the bar length is displayed above scalebar, otherwise below."
+msgstr ""
+"При включенной опции длина отрезка рисуется над ним, при выключенной под ним."
+
+#: image-export.xml:362(caption)
+msgid "Lateral scale visualisation types."
+msgstr "Типы визуализации латеральных размеров."
+
+#: image-export.xml:369(title)
+msgid "Value"
+msgstr "Значение"
+
+#: image-export.xml:370(para)
+msgid ""
+"Settings in the <guilabel>Value</guilabel> page control the rendering of "
+"values and false colour mapping. Two basic settings control the rendering of "
+"field data:"
+msgstr ""
+"Настройки на вкладке <guilabel>Значения</guilabel> управляет отрисовкой "
+"значений и шкалы псевдоцвета. Две основные настройки управляют отрисовкой "
+"поля данных:"
+
+#: image-export.xml:377(guilabel)
+msgid "Interpolation"
+msgstr "Интерполяция"
+
+#: image-export.xml:379(para)
+msgid ""
+"The interpolation type can be noticeable particularly for large zooms. In "
+"the case of vector image formats, the final rendering is done when then the "
+"image is viewed or printed. Hence the available interpolations are limited "
+"to two types. Round, in which each data pixel is drawn as a sharp rectangle, "
+"and Linear, in which values in the rendered image are linearly interpolated "
+"between original data pixels. In the case of raster images, you can choose "
+"from the full set of <link linkend=\"interpolation\">interpolations</link> "
+"supported by Gwyddion because the interpolation is done during the export."
+msgstr ""
+"Тип интерполяции может стать заметным, в частности, при больших увеличениях. "
+"В случае векторных изображений, финальная отрисовка происходит при просмотре "
+"или печати изображения. Следовательно, доступные виды интерполяции "
+"ограничены двумя вариантами: интерполяцией округлением, при которой каждый "
+"пиксель данных отображается резким прямоугольником, и линейной, при которой "
+"значения данных интерполируются линейно между оригинальными пикселями. В "
+"случае растровых данных, можно выбирать из полного набора  <link linkend="
+"\"interpolation\">интерполяций</link>, поддерживаемых в Gwyddion."
+
+#: image-export.xml:394(guilabel)
+msgid "Draw mask"
+msgstr "Рисовать маску"
+
+#: image-export.xml:396(para)
+msgid ""
+"If enabled, the <link linkend=\"masks-introduction\">mask</link> is drawn on "
+"top the data using the same colour as in the data window."
+msgstr ""
+"если включено, <link linkend=\"masks-introduction\">маска</link> рисуется "
+"поверх данных тем же цветом, что и в окне данных."
+
+#: image-export.xml:403(para)
+msgid ""
+"When a mask is present and shown then optionally a mask legend can be added "
+"below the image as illustrated in the following figure if <guilabel>Draw "
+"mask legend</guilabel> is enabled. The label can be specified arbitrarily "
+"using the <guilabel>Label</guilabel> entry and the spacing is controlled by "
+"<guilabel>Vertical gap</guilabel>."
+msgstr ""
+"Если есть маска и она показывается, то можно опционально добавить легенду к "
+"маске под изображением как показано на следующем рисунке, если включена "
+"опция <guilabel>Рисовать легенду маски</guilabel>. Подпись может быть задана "
+"произвольно с помощью опции <guilabel>Подпись</guilabel> и зазор "
+"контролируется опцией <guilabel>Вертикальный зазор</guilabel>."
+
+#: image-export.xml:418(caption)
+msgid ""
+"Illustration of the mask label placed below the image and parameters "
+"controlling it."
+msgstr ""
+"Иллюстрация подписи к маске, размещённой под изображением и контролирующих "
+"её параметров."
+
+#: image-export.xml:424(para)
+msgid ""
+"The value scale can be rendered as a false colour ruler or disabled. The "
+"ruler is drawn somewhat differently depending on the <link linkend=\"color-"
+"map\">false colour mapping</link> type, as illustrated in the following "
+"figure."
+msgstr ""
+"Масштаб значений может быть либо отрисован в виде шкалы псевдоцвета, либо "
+"отключен. Шкала рисуется несколько по разному в зависимости от выбранного "
+"типа <link linkend=\"color-map\">отображения шкалы псевдоцвета</link>, как "
+"показано на следующем рисунке."
+
+#: image-export.xml:445(link)
+msgid "presentation"
+msgstr "презентация"
+
+#: image-export.xml:438(caption)
+msgid ""
+"Rendering of the false colour map scale depending on the mapping type. For "
+"the standard linear mapping, whether full or fixed range, ticks with values "
+"are drawn. For an adaptive mapping the colour gradient is drawn the same, "
+"but tick positions correspond to the adaptive mapping and interior ticks are "
+"drawn without labels (to avoid overlapping labels). If a <placeholder-1/> is "
+"shown, the values are considered arbitrarily scaled thus no values and "
+"interior ticks are displayed."
+msgstr ""
+"Отрисовка шкалы псевдоцвета зависит от типа отображения. Для обычного "
+"линейного отображения, либо с полным, либо с фиксированным диапазоном, "
+"рисуются засечки со значениями. Для адаптивной шкалы цветовой градиент "
+"рисуется таким же, но положения засечек соответствуют адаптивному "
+"отображению и внутренние засечки рисуются без подписей (чтобы избежать их "
+"наложения друг на друга). Если показывается <placeholder-1/>, значения "
+"считаются масштабированными произвольно и, следовательно, не показывается ни "
+"подписанных значений, ни внутренних засечек."
+
+#: image-export.xml:451(para)
+msgid ""
+"It is possible to set the number of decimal places for the tick marks by "
+"enabling <guilabel>Fixed precision</guilabel> and specifying the number. "
+"Otherwise a suitable precision is determined automatically."
+msgstr ""
+"Можно задать число знаков в десятичном представлении значений по осям путём "
+"включения опции <guilabel>фиксированная точность</guilabel> и задания "
+"нужного числа. В противном случае нужная точность определяется автоматически."
+
+#: image-export.xml:456(para)
+msgid ""
+"The automatic choice of units for the false colour map scale can be adjusted "
+"using <guilabel>Fixed kilo threshold</guilabel>. It gives the threshold for "
+"switching to the next power of 10³, e.g. from nm to µm or from pA to nA. For "
+"instance, setting it to 400 means that if the maximum absolute height is "
+"399 nm it will be displayed as 399 nm, whereas if it is 401 nm it will be "
+"displayed as 0.401 µm. The threshold applies to all powers of 10³ so for the "
+"same setting the units would switch from mV to V at 400 mV or from pA to nA "
+"at 400 pA."
+msgstr ""
+"Автоматический выбор единиц измерения для масштаба шкалы псевдоцвета может "
+"быть настроен с помощью опции <guilabel>Фиксированный порог префиксов</"
+"guilabel>. Она задаёт порог переключения на следующую степень 10³, т.е. с нм "
+"на мкм или от пА к нА. Например, если задать этот параметр равным 400, то "
+"максимальная абсолютная высота в 399 нм будет отображаться как 399 нм, в то "
+"время, как высота в 401 нм будет отображаться как 0,401 мкм. Порог "
+"применяется ко всем степеням 10³, поэтому такая же настройка единиц "
+"измерения будет переключать с мВ на В при 400 мВ и с пА на нА при 400 пА."
+
+#: image-export.xml:466(para)
+msgid ""
+"The image title can be optionally added to the top of the image or along the "
+"false colour ruler. Using the check-box <guilabel>Put units to title</"
+"guilabel>, the placement of value units can be chosen between the title and "
+"false colour ruler. Note if the no title is drawn then placing units to the "
+"title disables them entirely."
+msgstr ""
+"Заголовок изображения может быть добавлен при необходимости либо сверху "
+"изображения, либо вдоль шкалы псевдоцвета. Используя флаг "
+"<guilabel>Поместить единицы измерения в заголовок</guilabel>, можно выбрать "
+"между размещением единиц измерения значений в заголовке или на шкале "
+"псевдоцвета. Если заголовок не рисуется, то при выбранном этом флаге единицы "
+"измерения вообще не отображаются."
+
+#: image-export.xml:474(para)
+msgid ""
+"Settings <guilabel>Horizontal gap</guilabel> for the false colour ruler and "
+"<guilabel>Gap</guilabel> for the title control the gaps between them and the "
+"corresponding image edges as shown in the following figure. If the title is "
+"drawn along the false colour ruler the gap can be negative, moving the title "
+"a bit inside the ruler. For titles along the top edge, negative gap values "
+"are ignored."
+msgstr ""
+"Настройки <guilabel>Горизонтальный зазор</guilabel> для шкалы псевдоцвета и "
+"<guilabel>Зазор</guilabel> для заголовка управляют зазорами между ними и "
+"соответствующими границами изображения, как показано на следующем рисунке. "
+"Если заголовок канала рисуется вдоль шкалы псевдоцвета, зазор может быть "
+"отрицательным, перемещая заголовок чуть-чуть внутрь шкалы. Для заголовков "
+"вдоль верхнего края отрицательные значения зазора игнорируются."
+
+#: image-export.xml:490(caption)
+msgid ""
+"Illustration of the various gap settings (for image title, in the position "
+"at the top)."
+msgstr ""
+"Иллюстрация различных настроек зазоров (для заголовка канала, расположенного "
+"сверху)."
+
+#: image-export.xml:498(title)
+msgid "Selection"
+msgstr "Выделение"
+
+#: image-export.xml:499(para)
+msgid ""
+"Any kind of <link linkend=\"selections\">selection</link> stored with the "
+"data can be also shown in the image. If the check-box <guilabel>Draw "
+"selection</guilabel> is enabled you can choose the selection to draw from "
+"the list below. The colours are specified in the same manner as for the "
+"inset scale bar:"
+msgstr ""
+"Любая разновидность <link linkend=\"selections\">выделенных элементов</"
+"link>, сохранённых вместе с данными, может быть также показана на "
+"изображении. Если выбран флаг <guilabel>Рисовать выделенные элементы</"
+"guilabel>, то можно выбирать элементы для отображения из списка ниже. Цвета "
+"задаются тем же образом, что и для вложенного масштабного отрезка."
+
+#: image-export.xml:510(para)
+msgid ""
+"Colour with which the selection is drawn. Buttons <guibutton>Black</"
+"guibutton> and <guibutton>White</guibutton> allow choosing quickly the basic "
+"colours."
+msgstr ""
+"Цвет отрисовки выделенных элементов. Кнопки <guibutton>Чёрный</guibutton> и "
+"<guibutton>Белый</guibutton> позволяют быстро выбрать основные цвета."
+
+#: image-export.xml:530(para)
+msgid ""
+"Opacity with which the selection is drawn. This setting permits drawing the "
+"selection as semi-transparent."
+msgstr ""
+"Прозрачность выделенных элементов. Эта опция позволяет рисовать их "
+"полупрозрачными."
+
+#: image-export.xml:537(para)
+msgid ""
+"Beside the colours, some selection types have further options, for instance "
+"whether individual shapes are numbered. If you are using a <link linkend="
+"\"tools\">tool</link> that has some shapes selected on the data, the kind of "
+"the selection to draw and the specific options are preset to match the "
+"current tool. This is usually the most convenient way to get the selection "
+"drawn as you intend. However, any existing selection can be drawn and the "
+"options adjusted manually if you wish."
+msgstr ""
+"Помимо цветов, некоторые виды выделенных объектов имеют дополнительные "
+"настройки, например, нужно ли нумеровать отдельные элементы. При "
+"использовании <link linkend=\"tools\">инструментов</link>, которые выделяют "
+"некоторые элементы на изображении, вид отображаемых выделенных элементов и "
+"специфичные настройки устанавливаются в соответствие с текущим инструментом. "
+"Обычно это наиболее простой способ отобразить выделенное как было задумано. "
+"Однако, можно рисовать любые выделенные элементы из имеющихся и настраивать "
+"их опции вручную при желании."
+
+#: image-export.xml:548(title)
+msgid "Presets"
+msgstr "Предустановки"
+
+#: image-export.xml:549(para)
+msgid ""
+"Different sets of image rendering options are useful on different occasions. "
+"A set of options can be saved as a preset and recalled later. The list in "
+"the <guilabel>Presets</guilabel> page shows all saved presets that can be "
+"managed using the buttons below:"
+msgstr ""
+"Различные наборы настроек отрисовки изображений будут полезными в разных "
+"случаях. Наборы настроек можно сохранить и использовать позднее. Список во "
+"вкладке <guilabel>Предустановки</guilabel> показывает все сохранённые наборы "
+"настроек, которыми можно управлять с помощью кнопок ниже:"
+
+#: image-export.xml:557(guibutton)
+msgid "Load"
+msgstr "Загрузить"
+
+#: image-export.xml:559(para)
+msgid ""
+"Loads the currently selected preset, i.e. sets the image rendering options "
+"according to the preset. The inset scale bar length can be set to the "
+"automatic value if the stored length is not found reasonable. Also the "
+"selection type and its options are kept intact, only the colours are set "
+"according to the preset."
+msgstr ""
+"Загружает выбранный набор настроек, т.е. устанавливает настройки отображения "
+"в соответствии с предустановками. Длина вложенного масштабного отрезка может "
+"быть установлена автоматически, если хранящаяся в файле предустановок будет "
+"признана неподходящей. Кроме того, выбор выделенных объектов и их настройки "
+"будут сохраняться неизменными, будут установлены только цвета в соответствии "
+"с предустановками."
+
+#: image-export.xml:569(guibutton)
+msgid "Store"
+msgstr "Сохранить"
+
+#: image-export.xml:571(para)
+msgid ""
+"Stores the current options under the name given as <guilabel>Preset name</"
+"guilabel>. The name also serves as a file name so it is advisable to avoid "
+"odd characters in the preset name. If a preset of the same name already "
+"exists, it is overwritten."
+msgstr ""
+"Сохраняет текущие настройки под именем, заданным как <guilabel>Название "
+"набора настроек</guilabel>. Это название также служит именем файла, поэтому "
+"рекомендуется избегать непечатных символов в данных названиях. Если набор "
+"настроек с таким именем уже существует, он будет перезаписан."
+
+#: image-export.xml:581(guibutton)
+msgid "Rename"
+msgstr "Переименовать"
+
+#: image-export.xml:583(para)
+msgid ""
+"Renames the currently selected preset to the name given as <guilabel>Preset "
+"name</guilabel>. The preset does not have to be loaded for renaming. It is "
+"not possible to overwrite an existing preset by renaming."
+msgstr ""
+"Переименовывает текущий выбранный набор настроек в значение, заданное как "
+"<guilabel>Название набора настроек</guilabel>. Набор настроек не требуется "
+"загружать для переименования. Невозможно перезаписать уже имеющийся набор "
+"настроек с помощью переименования."
+
+#: image-export.xml:592(guibutton)
+msgid "Delete"
+msgstr "Удалить"
+
+#: image-export.xml:594(para)
+msgid "Deletes the currently selected preset."
+msgstr "Удаляет текущий выбранный набор настроек."

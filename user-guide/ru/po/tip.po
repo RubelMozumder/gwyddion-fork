@@ -1,0 +1,546 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2023-05-05 09:01+0400\n"
+"PO-Revision-Date: 2023-05-05 09:13+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: tip.xml:6(title)
+msgid "Tip Convolution Artefacts"
+msgstr "Артефакты взаимодействия с зондом"
+
+#: tip.xml:7(para)
+msgid ""
+"Tip convolution artefact is one of the most important error sources in SPM. "
+"As the SPM tip is never ideal (like delta function) we often observe a "
+"certain degree of image distortion due to this effect. We can even see some "
+"SPM tips imaged on the surface scan while sharp features are present on the "
+"surface."
+msgstr ""
+"Артефакты взаимодействия с зондом являются одним из главных источников "
+"ошибок в СЗМ. Поскольку зонд никогда не является идеальным (подобно дельта-"
+"функции), мы нередко наблюдаем искажения изображения, связанные с этим "
+"явлением. Можно даже увидеть изображение зонда на скане поверхности, если на "
+"поверхности присутствуют острые выступы."
+
+#: tip.xml:19(caption)
+msgid ""
+"Images of ZnSe surface measured with four different SPM tips (more or less "
+"broken ones)."
+msgstr ""
+"Изображения поверхности ZnSe, измеренной четырьмя разными зондами (более или "
+"менее испорченными)."
+
+#: tip.xml:25(para)
+msgid ""
+"We can fortunately simulate and/or correct the tip effects using algorithms "
+"of dilation and/or erosion, respectively. These algorithms were published by "
+"Villarubia (see [<link linkend=\"tip-convolution-artefacts-ref-1\">1</"
+"link>])."
+msgstr ""
+"Мы, к счастью, можем смоделировать и/или исправить влияние зонда используя "
+"алгоритмы расширения и/или эрозии, соответственно. Эти алгоритмы были "
+"опубликованы Вильярубия (see [<link linkend=\"tip-convolution-artefacts-"
+"ref-1\">1</link>])."
+
+#: tip.xml:32(title)
+msgid "Obtaining the Tip Geometry"
+msgstr "Получение геометрии зонда"
+
+#: tip.xml:34(primary) tip.xml:233(primary) tip.xml:238(secondary)
+#: tip.xml:309(primary)
+msgid "tip"
+msgstr "зонд"
+
+#: tip.xml:35(secondary)
+msgid "modelling"
+msgstr "моделирование"
+
+#: tip.xml:37(para)
+msgid ""
+"For studying the tip influence on the data we need to know tip geometry "
+"first. In general, the geometry of the SPM tip can be determined in several "
+"ways:"
+msgstr ""
+"Для исследования влияния зонда на данные мы должны прежде знать его "
+"геометрию. В общем случае, геометрия зонда может быть получена несколькими "
+"способами:"
+
+#: tip.xml:43(listitem)
+msgid ""
+"Use manufacturer's specifications (tip geometry, apex radius and angle)."
+msgstr ""
+"используя спецификации поставщика (геометрию зонда, радиус острия и угол)."
+
+#: tip.xml:47(listitem)
+msgid ""
+"Use scanning electron microscope of other independent technique to determine "
+"tip properties."
+msgstr ""
+"используя сканирующую электронную микроскопию или другую независимую "
+"методику измерения свойств зонда."
+
+#: tip.xml:51(listitem)
+msgid "Use known tip characterizer sample (with steep edges)."
+msgstr ""
+"используя известный образец для характеризации зондов (с острыми кромками)"
+
+#: tip.xml:54(listitem)
+msgid ""
+"Use blind tip estimation algorithm together with tip characterizers or other "
+"suitable samples."
+msgstr ""
+"используя алгоритм слепой оценки зонда с использованием образцов для "
+"тестирования зондов или других подходящих"
+
+#: tip.xml:60(title)
+msgid "Tip Modelling <gwy:icon name=\"tip_model\"/>"
+msgstr "Моделирование зонда <gwy:icon name=\"tip_model\"/>"
+
+#: tip.xml:66(guimenu) tip.xml:152(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: tip.xml:67(guisubmenu) tip.xml:153(guisubmenu)
+msgid "Tip and Indentation"
+msgstr "Зонд и индентация"
+
+#: tip.xml:68(guimenuitem)
+msgid "Model Tip"
+msgstr "Модель зонда"
+
+#: tip.xml:71(para)
+msgid ""
+"Tip modelling implements the first approach. Using tip modelling most of the "
+"tips with simple geometries can be simulated. This way of tip geometry "
+"specification can be very efficient namely when we need to check only "
+"certainty map of perform tip convolution simulation."
+msgstr ""
+"Моделирование зонда реализует первый подход. Используя моделирование зонда "
+"можно промоделировать большую часть зондов с простой геометрией. Этот тип "
+"задания геометрии зонда может быть очень эффективным, например, если нам "
+"нужно просто проверить карту достоверности или провести моделирование "
+"свёртки с зондом."
+
+#: tip.xml:77(para)
+msgid ""
+"The function offers several usual model shapes such as pyramids, cones or "
+"paraboloids. Each is described by a subset of the following parameters:"
+msgstr ""
+"Данная функция предлагает несколько модельных функций, таких, как пирамиды, "
+"конусы и параболоиды. Каждая описывается подмножеством следующих параметров:"
+
+#: tip.xml:84(guilabel)
+msgid "Number of sides"
+msgstr "Число сторон"
+
+#: tip.xml:87(para)
+msgid ""
+"The number of pyramid sides applies to pyramidal tips (which do not have a "
+"fixed number of sides by definition)."
+msgstr ""
+"Количество сторон пирамиды применимо к пирамидальным зондам (которые не "
+"имеют некоторого наперёд заданного числа сторон по определению)."
+
+#: tip.xml:95(guilabel)
+msgid "Tip slope"
+msgstr "Угол зонда"
+
+#: tip.xml:98(para)
+msgid ""
+"Angle of the pyramid side, measured from the vertical plane. Small angles "
+"mean shallow tips and large angles means sharp tips."
+msgstr ""
+"Угол стороны пирамиды, измеренный относительно вертикальной плоскости. Малые "
+"углы означают невысокие зонды, большие углы острые зонды."
+
+#: tip.xml:106(guilabel)
+msgid "Tip rotation"
+msgstr "Поворот зонда"
+
+#: tip.xml:109(para)
+msgid ""
+"Rotation with respect to a base orientation, measured anti-clockwise. It "
+"applies to tips which are not rotationally symmetric."
+msgstr ""
+"Поворот относительно базовой ориентации, измеряемый против часовой. "
+"Применимо к тем зондам, которые не симметричны относительно вращения."
+
+#: tip.xml:117(guilabel)
+msgid "Tip apex radius"
+msgstr "Радиус острия зонда"
+
+#: tip.xml:120(para)
+msgid ""
+"Mean radius of curvature at the tip apex (applies to all tip shapes, except "
+"the delta-function). If the tip is not anisotropic, this is simply the "
+"radius of curvature in all directions."
+msgstr ""
+"Средний радиус кривизны острия зонда (применяется для всех форм зонда кроме "
+"дельта-функции). Если зонд не анизотропен, то это просто радиус кривизны во "
+"всех направлениях."
+
+#: tip.xml:129(guilabel)
+msgid "Tip anisotropy"
+msgstr "Анизотропия зонда"
+
+#: tip.xml:132(para)
+msgid ""
+"Ratio expressing how much the tip is squashed along one of the two "
+"orthogonal directions with respect to the other. Only the elliptic parabola "
+"model has an anisotropy parameter."
+msgstr ""
+"Соотношение, определяющее насколько зонд сжат по одному из двух "
+"ортогональных направлений по сравнению с другим. Только модель эллиптической "
+"параболы имеет параметр анизотропии."
+
+#: tip.xml:140(para)
+msgid ""
+"The tip image dimensions are determined automatically using the source data "
+"to cover the data <xi:include href=\"eqi-z.xml\"/>-range."
+msgstr ""
+"Размеры изображения зонда определяются автоматически используя исходные "
+"данные для того, чтобы перекрыть диапазон значений <xi:include href=\"eqi-z."
+"xml\"/> данных."
+
+#: tip.xml:146(title)
+msgid "Blind Estimation of Tip Shape <gwy:icon name=\"tip_estimation\"/>"
+msgstr "Слепая оценка формы зонда <gwy:icon name=\"tip_estimation\"/>"
+
+#: tip.xml:154(guimenuitem)
+msgid "Blind Estimation"
+msgstr "Слепая оценка"
+
+#: tip.xml:157(para)
+msgid ""
+"To obtain more detailed (and more realistic) tip structure blind tip "
+"estimation algorithm can be used. Blind tip estimation algorithm is an "
+"extension of the well-known fact that on some surface data we can see images "
+"of certain parts of tip directly. The algorithm iterates over all the "
+"surface data and at each point tries to refine each tip point according to "
+"steepest slope in the direction between concrete tip point and tip apex."
+msgstr ""
+"Чтобы получить более детальную (и более реалистичную) структуру зонда можно "
+"использовать алгоритм слепой оценки формы зонда. Слепая оценка зонда "
+"основана на применении хорошо известного факта. что на некоторых данных о "
+"поверхности мы можем непосредственно увидеть изображения отдельных деталей "
+"зонда. Алгоритм перебирает все точки данных поверхности и в каждой точке "
+"пытается уточнить каждую точку зонда в соответствии с наибольшим наклоном в "
+"направлении между заданной точкой зонда и его острием."
+
+#: tip.xml:166(para)
+msgid ""
+"We can use two modification of this algorithm within Gwyddion: "
+"<emphasis>partial</emphasis> tip estimation that uses only limited number of "
+"highest points on the image and <emphasis>full</emphasis> tip estimation "
+"that uses full image (and is much slower therefore). Within Gwyddion tip "
+"estimation module we can use also partial tip estimation results as starting "
+"point for full estimation. This improves the speed of full tip estimation."
+msgstr ""
+"В Gwyddion можно использовать две модификации вышеприведённого алгоритма: "
+"<emphasis>частичная</emphasis> оценка зонда, которая использует только "
+"ограниченное число наиболее высоких точек изображения и  <emphasis>полная</"
+"emphasis> оценка, которая использует изображение целиком (и, вследствие "
+"этого, гораздо медленнее). В модуле оценки зонда Gwyddion можно также "
+"использовать частичную оценку как начальную точку для полной оценки. Это "
+"должно улучшить скорость работы полной оценки."
+
+#: tip.xml:175(para)
+msgid "The typical procedure is"
+msgstr "Типичной процедурой будет"
+
+#: tip.xml:180(guibutton)
+msgid "Reset Tip"
+msgstr "Сброс зонда"
+
+#: tip.xml:179(listitem)
+msgid ""
+"Use <placeholder-1/> to start afresh, for instance after changing parameters."
+msgstr ""
+"Использовать <placeholder-1/> чтобы начать заново, например, после изменения "
+"параметров."
+
+#: tip.xml:184(guibutton)
+msgid "Run Partial"
+msgstr "Выполнить частично"
+
+#: tip.xml:183(listitem)
+msgid "Run the partial estimation using <placeholder-1/>."
+msgstr "Запустить частичную оценку используя <placeholder-1/>."
+
+#: tip.xml:187(guibutton)
+msgid "Run Full"
+msgstr "Выполнить полностью"
+
+#: tip.xml:186(listitem)
+msgid "Run the full estimation using <placeholder-1/>."
+msgstr "Запустить полную оценку используя <placeholder-1/>."
+
+#: tip.xml:190(para)
+msgid ""
+"It is possible – and often useful – to run the full estimate with several "
+"topographical images in sequence. This can be achieved by selecting "
+"successively the images as <guilabel>Related data</guilabel> and running the "
+"estimation."
+msgstr ""
+"Возможно - и нередко полезно - запустить полную оценку с несколькими "
+"изображениями топографии последовательно. Это можно сделать выбирая "
+"последовательно изображения как <guilabel>Связанные данные</guilabel> и "
+"запуская оценку."
+
+#: tip.xml:203(link)
+msgid "previous figure"
+msgstr "предыдущего рисунка"
+
+#: tip.xml:201(caption)
+msgid ""
+"SPM tips obtained from data of <placeholder-1/> using blind estimation "
+"algorithm."
+msgstr ""
+"изображения зондов СЗМ, полученные из данных <placeholder-1/> используя "
+"алгоритм слепой оценки."
+
+#: tip.xml:208(para)
+msgid ""
+"The tip shape can change during the scanning. Therefore, it is sometimes "
+"useful to inspect how its blind estimation evolves with the scan lines. Of "
+"course, estimation from a single scan line is impossible. Hence, the image "
+"is split to horizontal stripes and the tip is estimated for each stripe."
+msgstr ""
+"Форма зонда может меняться в процессе сканирования. Следовательно, иногда "
+"может оказаться полезным посмотреть как слепая оценка меняется в зависимости "
+"от линии сканирования. Естественно, оценка на основе одной линии "
+"сканирования будет невозможна. Следовательно, изображение разбивается на "
+"горизонтальные полосы и зонд оценивается для каждой из этих полос."
+
+#: tip.xml:215(para)
+msgid ""
+"The stripe-wise processing is enabled by <guilabel>Split to stripes</"
+"guilabel>, which also controls the number of stripes. You can choose which "
+"tip is displayed using <guilabel>Preview stripe</guilabel>. A tip radius "
+"graph is displayed below the preview – and can be created as output when "
+"<guilabel>Plot size graph</guilabel> is enabled. The function can also "
+"produce the full sequence of estimated tip images, which is enabled by "
+"<guilabel>Create tip images</guilabel>."
+msgstr ""
+"Обработка отдельных полос включается с помощью опции <guilabel>Разбить на "
+"полосы</guilabel>, которая также управляет количеством таких полос. Можно "
+"выбрать, какой зонд будет отображаться используя опцию "
+"<guilabel>Предпросмотр полосы</guilabel>. График радиуса закругления зонда "
+"показывается под изображением предпросмотра и может быть создан отдельно как "
+"результат работы модуля если включена опция <guilabel>Строить график "
+"размеров</guilabel>. Функция также может создавать полную последовательность "
+"изображений слепой оценки формы зонда, это включается с помощью опции "
+"<guilabel>Создать изображения зонда</guilabel>."
+
+#: tip.xml:227(title)
+msgid ""
+"Tip Convolution and Surface Reconstruction <gwy:icon name=\"tip_dilation\"/"
+"><gwy:icon name=\"tip_erosion\"/>"
+msgstr ""
+"Свёртка с зондом и восстановление поверхности <gwy:icon name=\"tip_dilation"
+"\"/><gwy:icon name=\"tip_erosion\"/>"
+
+#: tip.xml:234(secondary)
+msgid "convolution"
+msgstr "свёртка"
+
+#: tip.xml:237(primary)
+msgid "dilation"
+msgstr "расширение"
+
+#: tip.xml:240(para)
+msgid ""
+"When we know tip geometry, we can use tip convolution (dilation) algorithm "
+"to simulate data acquisition process. For doing this use Dilation module "
+"(<menuchoice><guimenu>Data Process</guimenu><guisubmenu>Tip and Indentation</"
+"guisubmenu><guimenuitem>Dilation</guimenuitem></menuchoice>). This can be in "
+"particular useful when working with data being result of some numerical "
+"modelling (see e.g. [<link linkend=\"tip-convolution-artefacts-ref-2\">2</"
+"link>])."
+msgstr ""
+"Когда нам известна геометрия зонда, мы можем использовать алгоритм свёртки "
+"зонда с поверхностью (расширение поверхности) для моделирования процесса "
+"получения данных. Для этого используется модуль расширения "
+"(<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Зонд и "
+"индентация</guisubmenu><guimenuitem>Расширение</guimenuitem></menuchoice>). "
+"Это, например, может быть полезно при работе с данными, полученными в "
+"результате численного моделирования (см., например, [<link linkend=\"tip-"
+"convolution-artefacts-ref-2\">2</link>])."
+
+#: tip.xml:253(para)
+msgid ""
+"Note this algorithm (as well as the following two) requires compatible scan "
+"and tip data, i.e. the physical dimensions of a scan pixel and of a tip "
+"image pixels have to be equal. This relation is automatically guaranteed for "
+"tips obtained by blind estimate when used on the same data (or data with an "
+"identical measure). If you obtained the tip image by other means, you may "
+"need to resample it."
+msgstr ""
+"Следует заметить, что этот алгоритм (также, как и следующие два) требует "
+"совместимых данных о скане и о зонде, т.е. физические величины размера точек "
+"скана и точек изображения зонда должны быть одинаковыми. Это соотношение "
+"автоматически гарантируется для моделей зонда, полученных методом слепой "
+"оценки на том же наборе данных (или на данных с похожей размерностью). Если "
+"изображение получено другим путём, возможно придётся его пересчитать в "
+"нужное разрешение."
+
+#: tip.xml:266(caption)
+msgid ""
+"Simulated fractal surface before (left) and after (right) tip convolution."
+msgstr ""
+"Модель фрактальной поверхности до (слева) и после (справа) свёртки с зондом."
+
+#: tip.xml:272(para)
+msgid ""
+"<indexterm><primary>tip</primary><secondary>deconvolution</secondary></"
+"indexterm><indexterm><primary>erosion</primary><secondary>tip</secondary></"
+"indexterm> The opposite of the tip convolution is surface reconstruction "
+"(erosion) that can be used to correct partially the tip influence on image "
+"data. For doing this, use Surface Reconstruction function "
+"(<menuchoice><guimenu>Data Process</guimenu><guisubmenu>Tip and Indentation</"
+"guisubmenu><guimenuitem>Surface Reconstruction</guimenuitem></menuchoice>). "
+"Of course, the data corresponding to points in image not touched by tip (e. "
+"g. pores) cannot be reconstructed as there is no information about these "
+"points."
+msgstr ""
+"<indexterm><primary>зонд</primary><secondary>деконволюция</secondary></"
+"indexterm><indexterm><primary>эрозия</primary><secondary>зонд</secondary></"
+"indexterm> Обратной операцией к свёртке является восстановление поверхности "
+"(эрозия), которая позволяет частично исправить влияние геометрии зонда на "
+"данные изображения. Для этого используйте функцию восстановления поверхности "
+"(<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Зонд и "
+"индентация</guisubmenu><guimenuitem>Восстановление поверхности</"
+"guimenuitem></menuchoice>). Конечно, те данные, которые соответствуют "
+"точкам, где зонд не касался поверхности (т.е. поры) не могут быть "
+"восстановлены, так как об этих точках нет достаточной информации."
+
+#: tip.xml:298(caption)
+msgid "Original and reconstructed image of ZnSe imaged by broken SPM tip."
+msgstr ""
+"Исходное и восстановленное изображение ZnSe полученное испорченным зондом "
+"СЗМ."
+
+#: tip.xml:305(title)
+msgid "Certainty Map <gwy:icon name=\"tip_map\"/>"
+msgstr "Карта достоверности <gwy:icon name=\"tip_map\"/>"
+
+#: tip.xml:310(secondary)
+msgid "certainty map"
+msgstr "карта достоверности"
+
+#: tip.xml:312(para)
+msgid ""
+"As it can be seen, the most problematic parts of SPM image are data points "
+"where tip did not touch the surface in a single point, but in multiple "
+"points. There is a loss of information in these points. Certainty map "
+"algorithm can mark points where surface was probably touched in a single "
+"point."
+msgstr ""
+"Как видно, наиболее проблемными участками изображения СЗМ являются точки, "
+"где зонд касался поверхности не в одной точке, а в нескольких. В этих точках "
+"наблюдается потеря информации. Алгоритм построения карты достоверности может "
+"отметить те точки, где зонд вероятно касался поверхности только в одной "
+"точке."
+
+#: tip.xml:324(caption)
+msgid ""
+"Certainty map obtained from standard grating. Note that the modelled tip "
+"parameters were taken from datasheet here for illustration purposes. "
+"(left) – sample, (right) – sample with marked certainty map."
+msgstr ""
+"Карта достоверности. полученная со стандартной решетки. Следует отметить, "
+"что параметры модели зонда были взяты с технического описания для "
+"демонстрационных целей . Слева образец, справа – он же с картой "
+"достоверности."
+
+#: tip.xml:332(para)
+msgid ""
+"Certainty map algorithm can be therefore used to mark data in the SPM image "
+"that are corrupted by tip convolution in an irreversible way. For SPM data "
+"analysis on surfaces with large slopes it is important to check always "
+"presence of these points. Within Gwyddion you can use Certainty Map function "
+"for creating these maps (<menuchoice><guimenu>Data Process</"
+"guimenu><guisubmenu>Tip and Indentation</guisubmenu><guimenuitem>Certainty "
+"Map</guimenuitem></menuchoice>)."
+msgstr ""
+"Следовательно, для выделения на изображении СЗМ данных, повреждённых в "
+"результате взаимодействия с зондом необратимым образом может использоваться "
+"аогоритм карты достоверности. Для анализа данных СЗМ на изображениях с "
+"большими уклонами всегда важно проверять наличие подобных точек. В Gwyddion "
+"можно использовать функцию карты достоверности для создания таких карт "
+"(<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Зонд и "
+"индентация</guisubmenu><guimenuitem>Карта достоверности</guimenuitem></"
+"menuchoice>)."
+
+#: tip.xml:346(title)
+msgid "References"
+msgstr "Источники"
+
+#: tip.xml:347(para)
+msgid ""
+"[1] J. S. Villarrubia: Algorithms for Scanned Probe Microscope Image "
+"Simulation, Surface Reconstruction, and Tip Estimation. J. Res. Natl. Inst. "
+"Stand. Technol. 102 (1997) 425, <ulink url=\"http://dx.doi.org/10.6028/"
+"jres.102.030\">doi:10.6028/jres.102.030</ulink>"
+msgstr ""
+"[1] J. S. Villarrubia: Algorithms for Scanned Probe Microscope Image "
+"Simulation, Surface Reconstruction, and Tip Estimation. J. Res. Natl. Inst. "
+"Stand. Technol. 102 (1997) 425, <ulink url=\"http://dx.doi.org/10.6028/"
+"jres.102.030\">doi:10.6028/jres.102.030</ulink>"
+
+#: tip.xml:353(para)
+msgid ""
+"[2] P. Klapetek, I. Ohlídal: Theoretical analysis of the atomic force "
+"microscopy characterization of columnar thin films. Ultramicroscopy 94 "
+"(2003) 19–29, <ulink url=\"http://dx.doi.org/10.1016/"
+"S0304-3991(02)00159-6\">doi:10.1016/S0304-3991(02)00159-6</ulink>"
+msgstr ""
+"[2] P. Klapetek, I. Ohlídal: Theoretical analysis of the atomic force "
+"microscopy characterization of columnar thin films. Ultramicroscopy 94 "
+"(2003) 19–29, <ulink url=\"http://dx.doi.org/10.1016/"
+"S0304-3991(02)00159-6\">doi:10.1016/S0304-3991(02)00159-6</ulink>"
+
+#~ msgid ""
+#~ "Obtaining the Tip Geometry <gwy:icon name=\"tip_estimation\"/><gwy:icon "
+#~ "name=\"tip_model\"/>"
+#~ msgstr ""
+#~ "Получение геометрии зонда <gwy:icon name=\"tip_estimation\"/><gwy:icon "
+#~ "name=\"tip_model\"/>"
+
+#~ msgid ""
+#~ "To obtain more detailed (and more realistic) tip structure blind tip "
+#~ "estimation algorithm can be used (<menuchoice><guimenu>Data Process</"
+#~ "guimenu><guisubmenu>Tip and Indentation</guisubmenu><guimenuitem>Blind "
+#~ "Estimation</guimenuitem></menuchoice>)."
+#~ msgstr ""
+#~ "Чтобы получить более детальную (и более приближенную к реальности) модель "
+#~ "структуры зонда можно использовать алгоритм слепой оценки "
+#~ "(<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Зонд и "
+#~ "индентация</guisubmenu><guimenuitem>Слепая оценка</guimenuitem></"
+#~ "menuchoice>)."
+
+#~ msgid ""
+#~ "[1] J. S. Villarubia, J. Res. Natl. Inst. Stand. Technol. 102 (1997) 425."
+#~ msgstr ""
+#~ "[1] J. S. Villarubia, J. Res. Natl. Inst. Stand. Technol. 102 (1997) 425."
+
+#~ msgid ""
+#~ "[2] <ulink url=\"http://klapetek.cz/download.html\">P. Klapetek, I. "
+#~ "Ohlídal, Ultramicroscopy, 94 (19-29), 2003</ulink>"
+#~ msgstr ""
+#~ "[2] <ulink url=\"http://klapetek.cz/download.html\">P. Klapetek, I. "
+#~ "Ohlídal, Ultramicroscopy, 94 (19-29), 2003</ulink>"
+
+#~ msgid "Tip Convolution and Surface Reconstruction"
+#~ msgstr "Свёртка зонда и восстановление поверхности"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

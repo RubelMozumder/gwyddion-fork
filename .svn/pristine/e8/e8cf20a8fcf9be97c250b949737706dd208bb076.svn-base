@@ -1,0 +1,280 @@
+VERSION = @PACKAGE_VERSION@
+BASENAME = @PACKAGE_TARNAME@
+PACKAGE = @PACKAGE_SHORTNAME@
+DISTNAME = $(BASENAME)-$(VERSION)
+DISTDIR = $(abs_top_builddir)/$(DISTNAME)
+LANGDISTDIR = $(DISTDIR)/$(LANGUAGE)
+XHTMLDISTNAME = $(BASENAME)-xhtml-$(LANGUAGE)-$(VERSION)
+PDFDISTNAME = $(BASENAME)-$(LANGUAGE)-$(VERSION).pdf
+
+# Workaround for annoying Inkscape bug (crashing when run in parallel):
+# https://gitlab.com/inkscape/inkscape/-/issues/4716
+# Slow is better than crashing. We have to put the main targer there because
+# we need to build the images themselves in parallel (not their prerequisites).
+.NOTPARALLEL: xhtml.stamp $(PACKAGE).pdf
+
+XHTML_ENABLE = @XHTML_ENABLE@
+PDF_ENABLE = @PDF_ENABLE@
+MAN_ENABLE = @MAN_ENABLE@
+PNG_ENABLE = @PNG_ENABLE@
+SVG_ENABLE = @SVG_ENABLE@
+
+BASH = @BASH@
+GMAKE = @GMAKE@
+GSED = @GSED@
+PYTHON = @PYTHON@
+MSGMERGE = @MSGMERGE@
+MSGGREP = @MSGGREP@
+HIGHLIGHT_PROGRAM = @HIGHLIGHT_PROGRAM@
+DBLATEX_CMD = @DBLATEX@ --input-format=xml -P 'filename.as.url=0' --texinputs=$(abspath $(COMMON)) --fig-path=$(abspath images) --xslt="@XSLTPROC@" --debug
+INKSCAPE_EXPORT = $(BASH) $(COMMON)/inkscape-export.sh
+XML_EXTRACT = $(PYTHON) $(COMMON)/xml-extract.py
+XML_UNFOLD = $(PYTHON) $(COMMON)/xmlunfold.py
+XHTML_HIGHLIGHT = $(PYTHON) $(COMMON)/xhtml-highlight.py
+RENDER = $(BASH) $(COMMON)/render.sh
+
+MAN_PAGES = gwyddion.1 gwyddion-thumbnailer.1
+
+ALL_TARGETS = $(XHTML_ENABLE) $(PDF_ENABLE) $(MAN_ENABLE)
+
+XML_FORMULAS := $(wildcard $(COMMON)/formulas/*.xml) $(wildcard formulas/*.xml)
+FORMULA_SUPPORT := $(patsubst %,$(COMMON)/%,prologue.tex epilogue.tex gwydefs.tex pngsize svgscale.py render.sh)
+
+XML_SOURCES := $(wildcard xml/*.xml)
+XML_SOURCES_ALL := $(XML_SOURCES) $(XML_FORMULAS)
+MAIN_XML_SOURCE := xml/$(PACKAGE).xml
+UNFOLDED_XML_SOURCE := $(PACKAGE).xml
+
+TRANSLATABLE_SVGS = \
+	boundary-length \
+	fitfunc-boltzmann-bent-step \
+	fitfunc-exponential \
+	fitfunc-exponential-acf \
+	fitfunc-exponential-hhcf \
+	fitfunc-exponential-psdf \
+	fitfunc-exponential-rpsdf \
+	fitfunc-gaussian \
+	fitfunc-gaussian-acf \
+	fitfunc-gaussian-hhcf \
+	fitfunc-gaussian-psdf \
+	fitfunc-gaussian-rpsdf \
+	fitfunc-lorentzian \
+	fitfunc-parabolic-step \
+	fitfunc-power \
+	fitfunc-sinc \
+	fitfunc-smooth-bent-step \
+	fitfunc-smooth-slanted-step \
+	fitfunc-square-wave \
+	fitfunc-two-gaussians-psdf \
+	gaussian-acf \
+	gaussian-hhcf \
+	gaussian-psdf \
+	imgexport-dimensions \
+	imgexport-fmscales \
+	imgexport-gaps \
+	imgexport-lateral \
+	indentation-pileup \
+	profile-interpolation \
+	step-edge \
+	unrotate-symmetries \
+	voids-connectivity \
+	waveform \
+	wavelet-daubechies20 \
+	wavelet-daubechies4 \
+	wavelet-haar
+
+TRANSLATED_SVGS = $(patsubst %,images/%.svg,$(TRANSLATABLE_SVGS))
+IMAGES_EXTRA = PNG:images/stacked5.png
+IMAGES := $(shell $(XML_UNFOLD) $(MAIN_XML_SOURCE) >unfolded.tmp; $(XML_EXTRACT) imageinfo unfolded.tmp; rm -f unfolded.tmp) $(IMAGES_EXTRA)
+
+IMAGES_PNG := $(patsubst PNG:%,%,$(filter PNG:%,$(IMAGES)))
+IMAGES_SVG := $(patsubst SVG:%,%,$(filter SVG:%,$(IMAGES)))
+IMAGES_XHTML := $(IMAGES_PNG) $(IMAGES_SVG)
+IMAGES_PDF := $(patsubst PDF:%,%,$(filter PDF:%,$(IMAGES)))
+IMAGES_PNG_PDF := $(patsubst %.pdf,%.png,$(IMAGES_PDF))
+IMAGES_DBLATEX := $(IMAGES_PDF) $(filter-out $(IMAGES_PNG_PDF),$(IMAGES_PNG))
+
+##### Base ##################################################################
+all: $(ALL_TARGETS)
+
+# Since $(COMMON)/Makefile effectively *is* out Makefile pretend we depend on
+# it physically.
+Makefile: Makefile.in $(COMMON)/Makefile ../config.status
+	cd .. && ./config.status $(LANGUAGE)/Makefile
+
+$(COMMON)/Makefile: $(COMMON)/Makefile.in ../config.status
+	cd .. && ./config.status common/Makefile
+
+$(UNFOLDED_XML_SOURCE): $(XML_SOURCES_ALL)
+	$(XML_UNFOLD) $(MAIN_XML_SOURCE) >$@
+
+images.stamp:
+	test -d images || mkdir images 2>/dev/null || test -d images
+	touch images.stamp
+
+$(PACKAGE).iss: $(COMMON)/$(PACKAGE).iss
+	sed 's/@LANGUAGE@/$(LANGUAGE_LONG)/' <$< >$@
+
+##### Translations ##########################################################
+# Only initial creation!
+po-create:
+	cd $(COMMON)/srcimages && $(BASH) $(abs_top_builddir)/common/xmlpo.sh extract $(patsubst %,%.svg,$(TRANSLATABLE_SVGS)) >$(abs_top_builddir)/$(LANGUAGE)/svg.po
+	$(GSED) -i 's/PACKAGE VERSION/Gwyddion-user-guide/' svg.po
+
+# xml2po update mode is really idiotic, run msgmerge manually
+po-update:
+	cd $(COMMON)/srcimages && $(BASH) $(abs_top_builddir)/common/xmlpo.sh extract $(patsubst %,%.svg,$(TRANSLATABLE_SVGS)) >$(abs_top_builddir)/$(LANGUAGE)/svg.pot.tmp
+	$(MSGMERGE) svg.po svg.pot.tmp >svg.po.tmp
+	$(MSGGREP) --invert --msgid --regexp='^[-.0-9]\+$$\|[Gg][Nn][Uu][Pp][Ll][Oo][Tt]' svg.po.tmp >svg.po
+	rm -f svg.pot.tmp svg.po.tmp
+
+##### HTML ##################################################################
+xhtml: xhtml.stamp
+
+ifeq ($(XHTML_ENABLE),xhtml)
+xhtml.stamp: $(UNFOLDED_XML_SOURCE) $(TRANSLATED_SVGS) $(IMAGES_XHTML) $(COMMON)/xhtml.xsl images.stamp
+	rm -rf xhtml
+	mkdir xhtml
+	@XSLTPROC@ --stringparam base.dir xhtml/ $(COMMON)/xhtml.xsl $<
+	$(GSED) -i -e 's#<html xmlns="[^"]*">#<html>#' xhtml/*.html
+	$(XHTML_HIGHLIGHT) --language=python --highlight-program=$(HIGHLIGHT_PROGRAM) xhtml/pygwy.html
+	@cp $(IMAGES_XHTML) xhtml/
+	cp $(COMMON)/$(PACKAGE).css xhtml
+	touch $@
+endif
+
+##### PDF ###################################################################
+pdf: $(PACKAGE).pdf
+
+ifeq ($(PDF_ENABLE),pdf)
+$(PACKAGE).pdf: $(UNFOLDED_XML_SOURCE) $(TRANSLATED_SVGS) $(IMAGES_DBLATEX) $(COMMON)/dblatex.xsl $(COMMON)/dblatex-postfix.py $(COMMON)/user-guide.sty images.stamp
+	rm -rf pdf
+	mkdir pdf
+	$(DBLATEX_CMD) --tmpdir=pdf --pdf --xsl-user=$(COMMON)/dblatex.xsl --texpost=$(COMMON)/dblatex-postfix.py --output=$@ $<
+endif
+
+##### Various methods to get images ########################################
+# Translated SVG, use explicit build rules to override implicit
+define TRANSLATABLE_SVG_template
+images/$(1).svg: $(COMMON)/srcimages/$(1).svg svg.po images.stamp
+	$(BASH) $(abs_top_builddir)/common/xmlpo.sh translate "$$<" svg.po >"$$@"
+	$(GSED) -i 's+\(xlink:href="\)\([^#][^"]*\.png"\)+\1../../common/srcimages/\2+g' "$$@"
+
+images/$(1).png: images/$(1).svg images.stamp
+	$(INKSCAPE_EXPORT) png "$$<" "$$@"
+
+images/$(1).pdf: images/$(1).svg images.stamp
+	$(INKSCAPE_EXPORT) pdf "$$<" "$$@"
+
+endef
+
+# From language-specific formulas
+images/eq-%.svg: formulas/eq-%.xml $(FORMULA_SUPPORT) images.stamp
+	cd images && $(RENDER) "eq-$*" $(abspath $<)
+
+# From common formulas
+images/eq-%.svg: $(COMMON)/formulas/eq-%.xml $(FORMULA_SUPPORT) images.stamp
+	cd images && $(RENDER) "eq-$*" $(abspath $<)
+
+# From SVG
+ifeq ($(SVG_ENABLE),svg)
+$(foreach img,$(TRANSLATABLE_SVGS),$(eval $(call TRANSLATABLE_SVG_template,$(img))))
+
+# Per-language SVG (unlikely)
+images/%.png: srcimages/%.svg images.stamp
+	$(INKSCAPE_EXPORT) png "$<" "$@"
+
+images/%.pdf: srcimages/%.svg images.stamp
+	$(INKSCAPE_EXPORT) pdf "$<" "$@"
+
+# Common SVG
+images/%.png: $(COMMON)/srcimages/%.svg images.stamp
+	$(INKSCAPE_EXPORT) png "$<" "$@"
+
+images/%.pdf: $(COMMON)/srcimages/%.svg images.stamp
+	$(INKSCAPE_EXPORT) pdf "$<" "$@"
+endif
+
+# From language-specific images in the same format
+images/%.png: srcimages/%.png images.stamp
+	cp $< $@
+
+# From common images in the same format
+images/%.png: $(COMMON)/srcimages/%.png images.stamp
+	cp $< $@
+
+##### Manual pages #########################################################
+man: $(MAN_PAGES)
+
+ifeq ($(MAN_ENABLE),man)
+%.1: xml/%.xml
+	@XSLTPROC@ --xinclude $(COMMON)/man.xsl $<
+endif
+
+##### Administrative #######################################################
+clean:
+	-rm -rf xhtml pdf images
+	-rm -f $(UNFOLDED_XML_SOURCE) $(PACKAGE).pdf $(MAN_PAGES) *~ */*~ *.tmp *.stamp config.log $(PACKAGE).iss
+
+distclean: clean
+	-rm -rf Makefile
+
+# Cannot be run standalone, fail early if $(DISTDIR) does not exist
+dist: po-update
+	test -d $(DISTDIR)
+	mkdir $(LANGDISTDIR) $(LANGDISTDIR)/formulas $(LANGDISTDIR)/srcimages $(LANGDISTDIR)/xml
+	cp Makefile.in svg.po $(LANGDISTDIR)/
+	cp xml/*.xml $(LANGDISTDIR)/xml/
+	-cp formulas/*.xml $(LANGDISTDIR)/formulas/
+	-cp srcimages/*.svg srcimages/*.png $(LANGDISTDIR)/srcimages/
+
+dist-xhtml: xhtml $(PACKAGE).iss
+	rm -rf $(XHTMLDISTNAME)
+	mkdir $(XHTMLDISTNAME)
+	chmod 755 $(XHTMLDISTNAME)
+	cp xhtml/* $(PACKAGE).iss $(XHTMLDISTNAME)/
+	chmod 644 $(XHTMLDISTNAME)/*
+	tar -zcf $(XHTMLDISTNAME).tar.gz $(XHTMLDISTNAME)
+	rm -rf $(XHTMLDISTNAME)
+
+dist-pdf: pdf
+	cp -f user-guide.pdf $(PDFDISTNAME)
+
+version:
+	d=`date --iso`; \
+	$(GSED) -i 's/\<[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\>/'"$$d/" $(MAIN_XML_SOURCE)
+
+help:
+	@echo "all           Compile User guide to all available formats ($(ALL_TARGETS))"
+ifeq ($(XHTML_ENABLE),xhtml)
+	@echo "xhtml         Compile User guide to XHTML"
+else
+	@echo "xhtml         Compile User guide to XHTML (not available)"
+endif
+ifeq ($(PDF_ENABLE),pdf)
+	@echo "pdf           Compile User guide to PDF"
+else
+	@echo "pdf           Compile User guide to PDF (not available)"
+endif
+ifeq ($(MAN_ENABLE),man)
+	@echo "man           Compile Unix manual pages for commands"
+else
+	@echo "man           Compile Unix manual pages for commands (not available)"
+endif
+	@echo "dist-xhtml    Create tarball with ready to read XHTML User guide"
+	@echo "dist-pdf      Create nicely named User guide PDF"
+ifeq ($(SVG_ENABLE),svg)
+	@echo "po-update     Merge changes in translatable SVGs into svg.po"
+else
+	@echo "po-update     Merge changes in translatable SVGs into svg.po (not available)"
+endif
+	@echo "version      Update version number to current date"
+
+.PHONY: \
+	all help version clean distclean \
+	dist dist-xhtml dist-pdf \
+	xhtml pdf man
+
+.PRECIOUS: Makefile
+
+# vim: set ts=4 sw=4 noet :

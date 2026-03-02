@@ -1,0 +1,304 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2024 David Necas (Yeti).
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Cyber technologies SCAN data
+ * .scan
+ * Read
+ **/
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-cyber-scan-profilometry">
+ *   <comment>Cyber technologies SCAN profilometry data</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="&lt;scandocument version=" />
+ *   </magic>
+ *   <glob pattern="*.scan"/>
+ *   <glob pattern="*.scan"/>
+ * </mime-type>
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyutils.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwymoduleutils-file.h>
+#include <app/data-browser.h>
+#include "err.h"
+
+#define SCAN_MAGIC "<scandocument version="
+#define SCAN_MAGIC_SIZE (sizeof(SCAN_MAGIC)-1)
+#define SCAN_EXTENSION ".scan"
+
+#define BLOODY_UTF8_BOM "\xef\xbb\xbf"
+#define BLOODY_UTF8_BOM_LEN 3
+
+#define RASTER_PREFIX "/scandocument/scanfile/header/raster/"
+
+typedef struct {
+    GString *path;
+    GString *str;
+    GHashTable *hash;
+    gsize size;
+    guchar *data;
+} SCANFile;
+
+static gboolean      module_register(void);
+static gint          scan_detect    (const GwyFileDetectInfo *fileinfo,
+                                     gboolean only_name);
+static GwyContainer* scan_load      (const gchar *filename,
+                                     GwyRunType mode,
+                                     GError **error);
+static gboolean      scan_parse_xml (SCANFile *scanfile,
+                                     const gchar *buffer,
+                                     GError **error);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Reads Cyber technologies SCAN files."),
+    "Yeti <yeti@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti)",
+    "2024",
+};
+
+GWY_MODULE_QUERY2(module_info, scanfile)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("scanfile",
+                           N_("Cyber technologies SCAN data (.scan)"),
+                           (GwyFileDetectFunc)&scan_detect,
+                           (GwyFileLoadFunc)&scan_load,
+                           NULL,
+                           NULL);
+
+    return TRUE;
+}
+
+static gint
+scan_detect(const GwyFileDetectInfo *fileinfo,
+            gboolean only_name)
+{
+    const gchar *tags[] = { "<scanfile", "<header", "<raster" };
+    gint score = 0;
+    gchar *p;
+    guint i, len;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, SCAN_EXTENSION) ? 20 : 0;
+
+    if (fileinfo->buffer_len <= SCAN_MAGIC_SIZE + BLOODY_UTF8_BOM_LEN
+        || (memcmp(fileinfo->head, SCAN_MAGIC, SCAN_MAGIC_SIZE) != 0
+            && (memcmp(fileinfo->head, BLOODY_UTF8_BOM, BLOODY_UTF8_BOM_LEN) != 0
+                || memcmp(fileinfo->head + 3, SCAN_MAGIC, SCAN_MAGIC_SIZE) != 0)))
+        return 0;
+    gwy_debug("found %s", SCAN_MAGIC);
+
+    score = 40;
+    for (i = 0; i < G_N_ELEMENTS(tags); i++) {
+        if ((p = strstr(fileinfo->head + SCAN_MAGIC_SIZE, tags[i]))) {
+            len = strlen(tags[i]);
+            if (p[len] == '>' || g_ascii_isspace(p[len])) {
+                gwy_debug("found %s", tags[i]);
+                score += 20;
+            }
+        }
+    }
+
+    return score;
+}
+
+static GwyContainer*
+scan_load(const gchar *filename,
+          G_GNUC_UNUSED GwyRunType mode,
+          GError **error)
+{
+    GwyContainer *container = NULL;
+    SCANFile scanfile;
+    GwyDataField *field, *mask;
+    GError *err = NULL;
+    guchar *buffer = NULL;
+    gsize size, expected_size;
+    GString *str;
+    gdouble xreal, yreal;
+    guint xres, yres;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, error)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+
+    gwy_clear(&scanfile, 1);
+    scanfile.hash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    scanfile.path = g_string_new(NULL);
+    scanfile.str = str = g_string_new(NULL);
+
+    if (!scan_parse_xml(&scanfile, buffer, error))
+        goto fail;
+
+    xres = atol(g_hash_table_lookup(scanfile.hash, RASTER_PREFIX "rows"));     /* sic */
+    yres = atol(g_hash_table_lookup(scanfile.hash, RASTER_PREFIX "columns"));  /* sic */
+
+    expected_size = xres*yres*sizeof(gfloat);
+    if (err_SIZE_MISMATCH(error, expected_size, scanfile.size, TRUE))
+        goto fail;
+    gwy_debug("extra data: %ld", (glong)scanfile.size - (glong)expected_size);
+
+    xreal = 1e-3*g_ascii_strtod(g_hash_table_lookup(scanfile.hash, RASTER_PREFIX "height"), NULL);
+    yreal = 1e-3*g_ascii_strtod(g_hash_table_lookup(scanfile.hash, RASTER_PREFIX "width"), NULL);
+    field = gwy_data_field_new(xres, yres, xreal, yreal, FALSE);
+    gwy_convert_raw_data(scanfile.data, xres*yres, 1, GWY_RAW_DATA_FLOAT, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                         gwy_data_field_get_data(field), 1e-3, 0.0);
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(field), "m");
+    gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(field), "m");
+
+    container = gwy_container_new();
+    if ((mask = gwy_app_channel_mask_of_nans(field, TRUE)))
+        gwy_container_pass_object(container, gwy_app_get_mask_key_for_id(0), mask);
+    gwy_container_pass_object(container, gwy_app_get_data_key_for_id(0), field);
+    gwy_app_channel_title_fall_back(container, 0);
+
+fail:
+    g_free(scanfile.data);
+    g_hash_table_destroy(scanfile.hash);
+    g_string_free(scanfile.path, TRUE);
+    g_string_free(scanfile.str, TRUE);
+    gwy_file_abandon_contents(buffer, size, NULL);
+
+    return container;
+}
+
+static void
+scan_start_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                   const gchar *element_name,
+                   G_GNUC_UNUSED const gchar **attribute_names,
+                   G_GNUC_UNUSED const gchar **attribute_values,
+                   gpointer user_data,
+                   G_GNUC_UNUSED GError **error)
+{
+    SCANFile *scanfile = (SCANFile*)user_data;
+    GString *path = scanfile->path, *str = scanfile->str;
+    gint i, len;
+
+    g_string_append_c(path, '/');
+    g_string_append(path, element_name);
+
+    len = path->len;
+    g_string_append_c(path, '/');
+    for (i = 0; attribute_names[i]; i++) {
+        g_string_append(path, attribute_names[i]);
+        g_string_assign(str, attribute_values[i]);
+        g_strstrip(str->str);
+        if (*(str->str)) {
+            gwy_debug("%s = <%s>", path->str, str->str);
+            g_hash_table_replace(scanfile->hash, g_strdup(path->str), g_strdup(str->str));
+        }
+        g_string_truncate(path, len+1);
+    }
+    g_string_truncate(path, len);
+}
+
+static void
+scan_end_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                 const gchar *element_name,
+                 gpointer user_data,
+                 G_GNUC_UNUSED GError **error)
+{
+    SCANFile *scanfile = (SCANFile*)user_data;
+    GString *path = scanfile->path;
+    guint n;
+
+    n = strlen(element_name);
+    g_return_if_fail(g_str_has_suffix(path->str, element_name));
+    g_return_if_fail(path->len > n);
+    g_return_if_fail(path->str[path->len-1 - n] == '/');
+    //gwy_debug("%s", pathstr);
+
+    g_string_set_size(path, path->len-1 - n);
+}
+
+static void
+scan_text(G_GNUC_UNUSED GMarkupParseContext *context,
+          const gchar *text,
+          G_GNUC_UNUSED gsize text_len,
+          gpointer user_data,
+          G_GNUC_UNUSED GError **error)
+{
+    SCANFile *scanfile = (SCANFile*)user_data;
+    GString *path = scanfile->path, *str = scanfile->str;
+
+    if (!gwy_strequal(path->str, "/scandocument/scanfile/datapoints")) {
+        g_string_assign(str, text);
+        g_strstrip(str->str);
+        if (*(str->str))
+            g_warning("Text found unexpectedly in %s", path->str);
+        return;
+    }
+
+    /* TODO: Check for multiple occurences! */
+    if (scanfile->data) {
+        g_warning("Multiple <datapoints>");
+        return;
+    }
+    scanfile->data = g_base64_decode(text, &scanfile->size);
+    gwy_debug("found data (%lu bytes)", (gulong)scanfile->size);
+}
+
+static gboolean
+scan_parse_xml(SCANFile *scanfile, const gchar *buffer, GError **error)
+{
+    GMarkupParser parser = {
+        &scan_start_element, &scan_end_element, &scan_text, NULL, NULL,
+    };
+    GMarkupParseContext *context = NULL;
+    gboolean ok = FALSE;
+    GError *err = NULL;
+
+    context = g_markup_parse_context_new(&parser, 0, scanfile, NULL);
+    if (!g_markup_parse_context_parse(context, buffer, -1, &err) || !g_markup_parse_context_end_parse(context, &err)) {
+        err_XML(error, &err);
+        goto end;
+    }
+
+    if (!scanfile->data) {
+        err_NO_DATA(error);
+        goto end;
+    }
+
+    if (!require_keys(scanfile->hash, error,
+                      RASTER_PREFIX "columns", RASTER_PREFIX "rows",
+                      RASTER_PREFIX "width", RASTER_PREFIX "height",
+                      NULL))
+        goto end;
+
+    ok = TRUE;
+
+end:
+    g_markup_parse_context_free(context);
+
+    return ok;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

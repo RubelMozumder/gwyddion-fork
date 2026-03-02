@@ -1,0 +1,736 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: edit-extended.xml 26077 2024-01-02 13:46:31Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='edit-extended' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Global Distortions</title>
+  <para>
+     This section presents extended functions for correction (or creation)
+     of global errors, such as low frequencies modulated on the data or drift
+     in the slow scanning axis.  Most of the functions described below
+     deal with distortion purely in the
+     <xi:include href="eqi-xy.xml"/> plane – for instance
+     <link linkend='drift-compensation'>Drift Compensation</link>
+     or <link linkend='straighten-path'>Straighten Path</link>.
+     Some modify the value distribution (<link linkend='coerce'>Coerce</link>)
+     or perform complex operations involving both coordinates and values.
+  </para>
+  <sect2 id='drift-compensation'>
+    <title>
+      Drift Compensation <gwy:icon name='drift'/>
+    </title>
+    <indexterm><primary>drift compensation</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Compensate Drift</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Compensate Drift calculates and/or corrects drift in the fast scanning
+      axis (horizontal).  This adverse effect can be caused by thermal
+      effects or insufficient mechanical rigidity of the measuring device.
+    </para>
+    <para>
+      The drift graph, which is one of possible outputs,
+      represents the horizontal shift of individual rows compared to
+      a reference row (which could be in principle chosen arbitrarily, in
+      practice the zero shift is chosen to minimize the amount of data
+      sticking out of the image after compensation), with the row
+      <xi:include href="eqi-y.xml"/>-coordinate on the abscissa.
+    </para>
+    <para>
+      The drift is determined in two steps:
+      <orderedlist>
+        <listitem>
+          A mutual horizontal offset is estimated for each couple of rows not
+          more distant than <guilabel>Search range</guilabel>.  It is
+          estimated as the offset value giving the maximum mutual correlation
+          of the two rows.  Thus a set of local row drift estimations is
+          obtained (together with the maximum correlation scores providing
+          an estimate of their actual similarity).
+        </listitem>
+        <listitem>
+          Global offsets are calculated from the local ones.  At present the
+          method is very simple as it seems sufficient in most cases: local
+          drift derivatives are fitted for each row onto the local drift
+          estimations and the global drift is then obtained by integration
+          (i.e. summing the local drifts).
+        </listitem>
+      </orderedlist>
+    </para>
+    <para>
+      Option <guilabel>Exclude linear skew</guilabel> subtracts the linear
+      term from the calculated drift, it can be useful when the image is
+      anisotropic and its features are supposed to be oriented in a direction
+      not paralled to the image sides.
+    </para>
+    <informalfigure id='fig-drift-correction'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='drift-corrected-graph.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Drift correction example:
+          (a) original data exhibiting strong drift in the fast scan axis,
+          (b) corrected data,
+          (c) calculated drift graph.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='correct-affine'>
+    <title>
+      Affine Distortion <gwy:icon name='correct_affine'/>
+    </title>
+    <indexterm>
+       <primary>distortion in xy plane</primary>
+       <secondary>affine</secondary>
+     </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Affine</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Affine distortion in the horizontal plane caused by thermal drift is
+      common for instance in STM.  If the image contains a regular structure,
+      for instance an atomic lattice of known parameters, the distortion can
+      be easily corrected using this function.
+    </para>
+    <para>
+      The affine distortion correction requires to first select the distorted
+      lattice in the image.  This is done by moving the lattice selection on
+      the preview with mouse until it matches the regular features present in
+      the image.  For images of periodic lattices, it is usually easier to
+      select the lattice in the autocorrelation function image
+      (<guilabel>2D ACF</guilabel>).
+      Also, only a rough match needs to be found manually in this case.  Button
+      <guibutton>Refine</guibutton> refines the selected lattice vectors to the
+      nearest maxima in autocorrelation function with subpixel precision.
+    </para>
+    <para>
+      If scan lines contain lots of high-frequency noise the horizontal ACF
+      (middle row in the ACF image) can be also quite noisy.  In such case
+      it is better to interpolate it from the surrounding rows by enabling
+      the option <guilabel>Interpolate horizontal ACF</guilabel>.
+    </para>
+    <para>
+      The correct lengths of the lattice vectors
+      <xi:include href="eqi-a_1.xml"/> and <xi:include href="eqi-a_2.xml"/>
+      and the angle <xi:include href="eqi-phi.xml"/> between them, entered to
+      the dialogue, determine the affine transformation to perform.  A few common
+      lattice types (such as HOPG surface) are offered predefined, but it is
+      possible to enter arbitrary lengths and angle.
+    </para>
+    <informalfigure id='fig-affine-correction'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='correct-affine.pdf' format='PDF'/>
+        </imageobject>
+        <imageobject>
+          <imagedata fileref='correct-affine.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Affine correction example:
+          (a) original image exhibiting an affine distortion,
+          (b) correction dialogue with the lattice selected on the
+              two-dimensional autocorrelation,
+          (c) corrected image.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      It should be noted that the correction method described above causes all
+      lateral scale information in the image to be lost because the new lateral
+      scale is fully determined by the correct lattice vectors.  This is
+      usually the best option for STM images of known atomic lattices, however,
+      for a general skew or affine correction it can be impractical.
+      Therefore, the dialogue offers three different scaling choices:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Exactly as specified</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Lattice vectors in the corrected image will have the specified
+            lengths and angle between them.  Scale information of the original
+            image is discarded completely.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Preserve area</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Lattice vectors in the corrected image will have the specified
+            ratio of lengths and angle between them.  However, the overall
+            scale is calculated as to make the affine transformation
+            area-preserving.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Preserve X scale</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Lattice vectors in the corrected image will have the specified
+            ratio of lengths and angle between them.  However, the overall
+            scale is calculated as to make the affine transformation
+            preserve the original <xi:include href="eqi-x.xml"/>-axis scale.
+            This is somewhat analogous to the scale treatment in
+            <link linkend='drift-compensation'>Drift compensation</link>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The function can also correct one image using the ACF calculated from
+      another image (presumably a different channel in the same measurement) or
+      apply the correction to all images in the file.  The former is
+      accomplished by selecting a different image as <guilabel>Image for
+      ACF</guilabel> in the options.  Affine transformation of all images in
+      the file is enabled by <guilabel>Apply to all compatible
+      images</guilabel>.  Both options requite the other images to be
+      compatible with the current one, i.e. having the same pixel and real
+      dimensions.
+    </para>
+  </sect2>
+  <sect2 id='correct-perspective'>
+    <title>
+      Perspective Distortion
+    </title>
+    <indexterm>
+       <primary>distortion in xy plane</primary>
+       <secondary>perspective</secondary>
+     </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Perspective</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Perspective distortion is unusual in scanning probe microscopy, but
+      relatively common in other types of image data.  The perspective
+      distortion module can correct such distortion if the image contains
+      features which are known to be in fact rectangular.
+    </para>
+    <para>
+      To apply the correction, a perspective rectangle is selected on the image
+      by moving its four corners.  The selected region is then transformed and
+      extracted to the result.  The preview can be switched between original
+      and corrected data.
+    </para>
+    <para>
+      The module sets the pixel and physical dimensions of the result to
+      estimated reasonable values, based on the assumption the distortion is
+      not large.  The dimensions then more or less correspond to the dimensions
+      of the selected distorted rectangle in the original image.  However,
+      it is just an estimate.  If the dimensions of the extracted rectangle can
+      be determined more precisely, for instance using markings in the image,
+      they should be set using
+      <link linkend='dimensions-and-units'>Dimensions and Units</link>.
+    </para>
+    <informalfigure id='fig-perspective-correction'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='correct-perspective.pdf' format='PDF'/>
+        </imageobject>
+        <imageobject>
+          <imagedata fileref='correct-perspective.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Perspective correction example.
+          Left: original image exhibiting an perspective distortion.
+          Centre: correction dialogue with the rectangle selected in the
+              image.
+          Right: corrected image.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      Option <guilabel>Create new image</guilabel> controls whether the image
+      is replaced with corrected or a new image created. The function can also
+      apply the correction to all compatible images in the file.
+    </para>
+  </sect2>
+  <sect2 id='polynomial-distort'>
+    <title>
+      Polynomial Distortion <gwy:icon name='poly_distort'/>
+    </title>
+    <indexterm>
+       <primary>distortion in xy plane</primary>
+       <secondary>polynomial</secondary>
+     </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Polynomial</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      General distortion in the horizontal plane can be compensated, or
+      created, with Polynomial distortion.  It performs transforms that
+      can be expressed as
+    </para>
+    <xi:include href="eq-polynomial-distortion.xml"/>
+    <para>
+      where <xi:include href="eqi-P_x.xml"/> and
+      <xi:include href="eqi-P_y.xml"/> are polynomials up to the third total
+      degree with user-defined coefficients.  Note the direction of the
+      coordinate transform – the reverse direction would not guarantee an
+      unambiguous mapping.
+    </para>
+    <para>
+      The polynomial coefficients are entered as scale-free, i.e.
+      as if the coordinate ranges were always [0, 1].  If
+      <guilabel>Instant updates</guilabel> are enabled, pressing
+      <keycap>Enter</keycap> in a coefficient entry (or just leaving moving
+      keyboard focus elsewhere) updates the preview.
+    </para>
+  </sect2>
+  <sect2 id='straighten-path'>
+    <title>
+      Straighten Path <gwy:icon name='straighten_path'/>
+    </title>
+    <indexterm>
+       <primary>distortion in xy plane</primary>
+       <secondary>along path</secondary>
+     </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Straighten Path</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Extraction of data along circular features, curved step edges and other
+      arbitrarily shaped smooth paths can be a useful preprocessing step for
+      further analysis.  Function <guimenuitem>Straighten Path</guimenuitem>
+      creates a new image by <quote>straightening</quote> the input image
+      along a spline path specified using a set of points on the image.
+    </para>
+    <para>
+      The points defining the path can be defined on the preview image.
+      Each control point can be moved with mouse.  Clicking into the empty
+      space adds a new point, connected to the closer end of the path.
+      Individual points can be deleted by selecting them in the point list in
+      the left part of the dialogue and pressing <keycap>Delete</keycap>.
+    </para>
+    <para>
+      The shape of the extracted area is controlled by the following
+      parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Thickness</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The width of the extracted image, denoted by the perpendicular
+            marks on the path.  This is the full width, i.e. the distance to
+            each side of the path is half of the thickness.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Slackness</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Parameter influencing the shape of the path between the control
+            points.  It can be visualised as the slackness of a string
+            connecting the control points.  For zero slackness the string is
+            taut and the path is formed by straight segments.  Increasing
+            slackness means decreasing tensile stress in the string, up to
+            slackness of unity for which the string is stress-free.  Values
+            larger than unity mean there is an excess string length, leading to
+            compressive stress.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Closed curve</guilabel>
+        </term>
+        <listitem>
+          <para>
+            If this option is enabled the path is closed, allowing the
+            extraction of ring-shaped areas (for instance).  Otherwise the
+            path has two free ends.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Pressing <guibutton>Update</guibutton> computes a preview of the extracted image
+      and shows it to the right of the input image.  The preview is displayed vertically,
+      with top edge corresponding to the path beginning and bottom edge to its end.
+      The extracted image can be either oriented the same way or horizontally (from left
+      to right), depending on <guilabel>Output orientation</guilabel>.
+    </para>
+    <para>
+      For certain combinations of path shape and thickness the resulting image
+      can contain regions that lie outside the original image.  Such regions
+      are masked in the output and filled with a neutral value.
+    </para>
+    <informalfigure id='fig-straighten-path'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='straighten-path.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Straighten Path example, showing extraction of data along a closed
+          circular path.  The left part of the dialogue contains coordinates of
+          the path-defining points and function options, the middle part shows
+          the selected circular path (with perpendicular markers denoting the
+          thickness), and the right part is a preview of the extracted
+          straightened data.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='extract-path-selection'>
+    <title>
+      Extract Path Selection <gwy:icon name='extract_path'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Extract Path Selection</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Function <link linkend='straighten-path'>Straighten Path</link> stores
+      the selected path with the data so that it can be recalled later.  If you
+      need the coordinates and/or directions corresponding to the straightened
+      image for further processing you can use
+      <guimenuitem>Extract Path Selection</guimenuitem>.
+    </para>
+    <para>
+      The function plots the real coordinates or tangents to the path,
+      i.e. the direction cosines and sines, as graphs.  Coordinates are
+      selected as <guilabel>X position</guilabel> and
+      <guilabel>Y position</guilabel>; directions are selected as
+      <guilabel>X tangent</guilabel> and <guilabel>Y tangent</guilabel>.
+      The number of points of each graph curve is the same as the number of
+      rows of the straightened image created by
+      <link linkend='straighten-path'>Straighten Path</link>
+      and there is one-to-one correspondence between the rows and graph curve
+      points.
+    </para>
+  </sect2>
+  <!-- FIXME: This one now does not really belong here, but it does not really
+       belong anywhere and this is the closest... -->
+  <sect2 id='unrotate'>
+    <title>
+      Unrotate <gwy:icon name='unrotate'/>
+    </title>
+    <indexterm><primary>rotation correction</primary></indexterm>
+    <indexterm><primary>unrotate</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Unrotate</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Unrotate can automatically make principal directions in an image
+      parallel with horizontal and/or vertical image edges.  For that to work,
+      the data need to have some principal directions, therefore it is most
+      useful for scans of artificial and possibly crystalline structures.
+    </para>
+    <para>
+      The rotation necessary to straighten the image – displayed
+      as <guilabel>Correction</guilabel> – is calculated from peaks
+      in angular <link linkend='slope-distribution'>slope distribution</link>
+      assuming a prevalent type of structure, or symmetry.
+      The symmetry can be estimated automatically too, but it is possible to
+      select a particular symmetry type manually and let the module calculate
+      only corresponding rotation correction.  Note if you assume a
+      structure type that does not match the actual structure, the calculated
+      rotation is rarely meaningful.
+    </para>
+    <para>
+      It is recommended to level (or
+      <link linkend='facet-level'>facet-level</link>) the data
+      first as overall slope can skew the calculated rotations.
+    </para>
+    <informalfigure id='fig-unrotate-directions'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='unrotate-symmetries.pdf' format='PDF'/>
+        </imageobject>
+        <imageobject>
+          <imagedata fileref='unrotate-symmetries.png' format='PNG'/>
+        </imageobject>
+        <textobject>
+          <phrase>Unrotate symmetries scheme</phrase>
+        </textobject>
+        <caption>
+          Orientations of prevalent directions corresponding to Unrotate
+          symmetry types.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      The assumed structure type can be set with <guilabel>Assume</guilabel>
+      selector.  Following choices are possible:
+      <variablelist>
+        <varlistentry>
+          <term>
+            Detected
+          </term>
+          <listitem>
+            <para>
+              Automatically detected symmetry type, displayed above as
+              <guilabel>Detected</guilabel>.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            Parallel
+          </term>
+          <listitem>
+            <para>
+              Parallel lines, one prevalent direction.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            Triangular
+          </term>
+          <listitem>
+            <para>
+              Triangular symmetry, three prevalent directions (unilateral) by
+              120 degrees.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            Square
+          </term>
+          <listitem>
+            <para>
+              Square symmetry, two prevalent directions oriented
+              approximately along image sides.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            Rhombic
+          </term>
+          <listitem>
+            <para>
+              Rhombic symmetry, two prevalent directions oriented approximately
+              along diagonals.  The only difference from Square is the
+              preferred diagonal orientation (as opposed to parallel with
+              sides).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            Hexagonal
+          </term>
+          <listitem>
+            <para>
+              Hexagonal symmetry, three prevalent directions (bilateral) by 120
+              degrees.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </para>
+  </sect2>
+  <sect2 id='displacement-field'>
+    <title>
+      Displacement Field
+    </title>
+    <para>
+      Displacement field is a general method of image distortion in the
+      <xi:include href="eqi-xy.xml"/> plane.  A vector is assigned to each
+      point in the output image.  This vector determines how far and in which
+      direction to move from this point.  The value found at the shifted
+      position in the source image becomes the value of the pixel in the output
+      image:
+    </para>
+    <xi:include href="eq-displacement-field-transform.xml"/>
+    <para>
+      where <xi:include href='eqi-vec-v.xml'/> is the displacement vector.
+    </para>
+    <para>
+      The displacement field can be generated or obtained by several methods:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Gaussian (scan lines)</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The vectors have only the
+            <xi:include href="eqi-x.xml"/> component.
+            The displacement is one-dimensional, along scan lines
+            (image rows). It is a random Gaussian image, similar to Gaussian
+            images generated by <link linkend='spectral-synthesis'>Spectral
+            Synthesis</link>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Gaussian (two-dimensional)</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The vectors have both
+            <xi:include href="eqi-x.xml"/> and
+            <xi:include href="eqi-y.xml"/> components, so the displacement
+            is two-dimensional.
+            It is again a random Gaussian image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Tear scan lines</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The vectors have only the
+            <xi:include href="eqi-x.xml"/> component.
+            The displacement is one-dimensional, along scan lines
+            (image rows). It is generated to tear segments of neighbour
+            rows by shifting one to the left and another to the right.  In the
+            rest of the image the displacement is smooth (and close to zero)
+            so continuity is preserved outside the tear.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Image (scan lines)</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The vectors have only the
+            <xi:include href="eqi-x.xml"/> component.
+            The displacement is one-dimensional, along scan lines
+            (image rows), and given by another image (selected as
+            <guilabel>X displacement</guilabel>).  The values of the image
+            are directly used as the displacement vectors and must have the
+            same units as lateral coordinates of the deformed image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Image (two-dimensional)</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The vectors have both
+            <xi:include href="eqi-x.xml"/> and
+            <xi:include href="eqi-y.xml"/> components, so the displacement
+            is two-dimensional.
+            They are given by another images (selected as <guilabel>X
+            displacement</guilabel> and <guilabel>Y displacement</guilabel>).
+            The values of the images are directly used as the displacement
+            vectors and must have the same units as lateral coordinates of the
+            deformed image.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='coerce'>
+    <title>
+      Coerce <gwy:icon name='enforce_distribution'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Coerce</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The module transforms the values in a height field to enforce certain
+      prescribed statistical properties.  The distribution of values can be
+      transformed to Gaussian, with mean value and rms roughness preserved,
+      or uniform, with minimum and maximum value preserved.  It is also
+      possible to enforce the same distribution as another height field
+      selected as <guilabel>Template</guilabel>.
+    </para>
+    <para>
+      The transformation preserves the ordering of the values, i.e. if one
+      point is higher than another before the transformation it will be also
+      higher after the transformation.  Option <guilabel>Data
+      processing</guilabel> controls whether the transformation is applied
+      to the image as a whole (<guilabel>Entire image</guilabel>) or
+      each row separately, with the same distribution
+      (<guilabel>By row (identically)</guilabel>).  Note that in the latter
+      case if a template is selected each row of the transformed image will
+      have the same value distribution (approximately) as the template.
+    </para>
+    <para>
+      In addition, a different kind of transformation can be performed,
+      discretisation of the values into given number of levels.  This operation
+      is selected with <guilabel>Discrete levels</guilabel>.  There are two
+      different discretisations available, either the height levels are
+      equidistant from minimum to maximum value (<guilabel>Uniform</guilabel>)
+      or they are calculated so that after the transformation each level
+      will consist of approximately the same number of pixels
+      (<guilabel>Same area</guilabel>).
+    </para>
+  </sect2>
+  <sect2 id='radial-smoothing'>
+    <title>
+      Radial Smoothing
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Distortion</guisubmenu>
+        <guimenuitem>Radial Smoothing</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Radial smoothing processes the image with a Gaussian smoothing filter,
+      but in polar coordinates.  This function is useful for images which
+      should be relatively smooth and exhibit radial symmetry.
+    </para>
+    <para>
+      The image can be smoothed either along radial profiles – with Gaussian
+      filter width controlled by <guilabel>Radius</guilabel> – or angularly
+      along arcs of constant radius from the centre – with width controlled
+      by <guilabel>Angle</guilabel>. The transformation to polar coordinates
+      and back does not preserve the image perfectly.  Subtle (and occasionally
+      less subtle) artefacts can occur, in particular close to the centre,
+      even with no actual smoothing.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

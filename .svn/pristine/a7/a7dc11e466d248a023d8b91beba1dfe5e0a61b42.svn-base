@@ -1,0 +1,497 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2019-09-29 11:45+0400\n"
+"PO-Revision-Date: 2019-09-29 11:59+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: fourier-transform.xml:6(title)
+msgid "Fourier Transform <gwy:icon name=\"fft\"/>"
+msgstr "Преобразование Фурье <gwy:icon name=\"fft\"/>"
+
+#: fourier-transform.xml:9(primary) fourier-transform.xml:182(primary)
+#: fourier-transform.xml:214(primary) fourier-transform.xml:240(primary)
+#: fourier-transform.xml:244(primary)
+msgid "Fourier transform"
+msgstr "преобразование Фурье"
+
+#: fourier-transform.xml:10(para)
+msgid ""
+"Two-dimensional Fourier transform can be accessed using "
+"<menuchoice><guimenu>Data Process</guimenu><guisubmenu>Integral Transforms</"
+"guisubmenu><guimenuitem>2D FFT</guimenuitem></menuchoice> which implements "
+"the Fast Fourier Transform (FFT). Fourier transform decomposes signal into "
+"its harmonic components, it is therefore useful while studying spectral "
+"frequencies present in the SPM data."
+msgstr ""
+"Двумерное преобразование Фурье доступно в меню "
+"<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Интегральные "
+"преобразования</guisubmenu><guimenuitem>2D БПФ</guimenuitem></menuchoice>, "
+"где реализовано быстрое преобразование Фурье (БПФ, FFT). Преобразование "
+"Фурье раскладывает сигнал на его гармонические составляющие, и, таким "
+"образом, его можно использовать при изучении спектральных частот, "
+"присутствующих в данных СЗМ."
+
+#: fourier-transform.xml:24(listitem)
+msgid ""
+"Modulus – absolute value of the complex Fourier coefficient, proportional to "
+"the square root of the power spectrum density function (PSDF)."
+msgstr ""
+"Модуль — абсолютное значение комплексного коэффициента Фурье, "
+"пропорциональное квадратному корню функции спектральной плотности мощности "
+"(ФСПМ)."
+
+#: fourier-transform.xml:29(listitem)
+msgid "Phase – phase of the complex coefficient (rarely used)."
+msgstr "Фаза — фаза комплексного коэффициента (используется редко)."
+
+#: fourier-transform.xml:32(listitem)
+msgid "Real – real part of the complex coefficient."
+msgstr "Действительное — действительная часть комплексного коэффициента."
+
+#: fourier-transform.xml:35(listitem)
+msgid "Imaginary – imaginary part of the complex coefficient."
+msgstr "Мнимое — мнимая часть комплексного коэффициента."
+
+#: fourier-transform.xml:21(para)
+msgid ""
+"The <guilabel>2D FFT</guilabel> module provides several types of output: "
+"<placeholder-1/> and some of their combinations for convenience."
+msgstr ""
+"Модуль <guilabel>2D БПФ</guilabel> предлагает несколько вариантов вывода "
+"данных: <placeholder-1/> и некоторые их сочетания для удобства."
+
+#: fourier-transform.xml:41(para)
+msgid ""
+"Radial sections of the two-dimensional PSDF can be conveniently obtained "
+"with <link linkend=\"psdf2d\">2D PSDF</link>. Several other functions "
+"producing spectral densities are described in section <link linkend=\"power-"
+"spectral-density-1d\">Statistical Analysis</link>. It is also possible to "
+"filter images in the frequency domain using <link linkend=\"fft-filter-1d"
+"\">one-dimensional</link> and <link linkend=\"fft-filter-2d\">two-"
+"dimensional</link> FFT filters or simple <link linkend=\"frequency-split"
+"\">frequency splitting</link>."
+msgstr ""
+"Радиальные сечения двумерной ФСПМ можно удобно получить с помощью операции "
+"<link linkend=\"psdf2d\">2D PSDF</link>. Несколько других функций, "
+"рассчитывающих спектральные плотности описаны в разделе <link linkend="
+"\"power-spectral-density-1d\">Статистический анализ</link>. Также возможно "
+"фильтровать изображения в частотном представлении (Фурье-пространстве) "
+"используя <link linkend=\"fft-filter-1d\">одномерный</link> или <link "
+"linkend=\"fft-filter-2d\">двумерный</link> фильтры на основе быстрого "
+"преобразования Фурье (БПФ) или простое <link linkend=\"frequency-split"
+"\">разделение частот</link>."
+
+#: fourier-transform.xml:52(para)
+msgid ""
+"<indexterm><primary>power spectral density function</primary><secondary>log-"
+"phi</secondary></indexterm> For scale and rotation-independent texture "
+"comparison it is useful to transform the PSDF from Cartesian frequency "
+"coordinates to coordinates consisting of logarithm of the spatial frequency "
+"and its direction. Scaling and rotation then become mere shifts in the new "
+"coordinates. The function <menuchoice><guimenu>Data Process</"
+"guimenu><guisubmenu>Statistics</guisubmenu><guimenuitem>Log-Phi PSDF</"
+"guimenuitem></menuchoice> calculates directly the transformed PSDF. The "
+"dimensionless horizontal coordinate is the angle (from 0 to <include href="
+"\"eqi-2-pi.xml\"/>) the vertical is the frequency logarithm. It is possible "
+"to smooth the PSDF using a Gaussian filter of given width before the "
+"transformation."
+msgstr ""
+"<indexterm><primary>функция спектральной плотности мощности</"
+"primary><secondary>log-phi</secondary></indexterm> Для не зависящего от "
+"масштаба и поворота сравнения текстур может оказаться полезным преобразовать "
+"ФСПМ из декартовых координат частот в координаты, состоящие из логарифма "
+"пространственной частоты и её направления. Масштабирование и поворот в новых "
+"координатах становятся простыми смещениями. Функция "
+"<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Статистика</"
+"guisubmenu><guimenuitem>Log-Phi ФСПМ</guimenuitem></menuchoice> "
+"непосредственно расчитывает преобразованную ФСПМ. Безразмерная "
+"горизонтальная координата это угол (от 0 до <include href=\"eqi-2-pi.xml\"/"
+">), вертикальная это логарифм частоты. Также возможно сгладить ФСПМ "
+"гауссовым фильтром заданной ширины перед преобразованием."
+
+#: fourier-transform.xml:72(para)
+msgid ""
+"Note that the Fourier transform treats data as being infinite, thus implying "
+"some cyclic boundary conditions. As the real data do not have these "
+"properties, it is necessary to use some windowing function to suppress the "
+"data at the edgest of the image. If you do not do this, FFT treats data as "
+"being windowed by rectangular windowing function which has really bad "
+"Fourier image thus leading to corruption of the Fourier spectrum."
+msgstr ""
+"Следует отметить, что преобразование Фурье считает данные бесконечно "
+"протяженными, и, следовательно, накладывает некоторые периодические "
+"граничные условия. Поскольку реальные данные не обладают этими свойствами, "
+"необходимо использовать некоторую оконную функцию для подавления данных на "
+"границах изображения. Если вы этого не сделаете, БПФ будет считать данные "
+"обработанными прямоугольной функцией окна, которая имеет действительно "
+"скверный Фурье-образ, что приводит к искажению Фурье-спектра."
+
+#: fourier-transform.xml:81(para)
+msgid ""
+"Gwyddion offers several windowing functions. Most of them are formed by some "
+"sine and cosine functions that damp data correctly at the edges. In the "
+"following windowing formula table the independent variable <include href="
+"\"eqi-x.xml\"/> is from interval <include href=\"eqi-interval-0-1.xml\"/> "
+"which corresponds to the normalized abscissa; for simplicity variable "
+"<include href=\"eqi-xi-is-2pi-x.xml\"/> is used in some formulas. The "
+"available windowing types include:"
+msgstr ""
+"Gwyddion предлагает на выбор несколько функций окна. Большинство из них "
+"образовано набором синусов и косинусов, которые корректно приглушают данные "
+"на краях. В следующей таблице формул для функций окна независимая переменная "
+"<include href=\"eqi-x.xml\"/> лежит в диапазоне <include href=\"eqi-"
+"interval-0-1.xml\"/>, что соответствует нормализации абсциссы; для простоты "
+"переменная <include href=\"eqi-xi-is-2pi-x.xml\"/> используется в ряде "
+"формул. Доступные виды оконных функций включают в себя:"
+
+#: fourier-transform.xml:96(entry)
+msgid "Name"
+msgstr "Название"
+
+#: fourier-transform.xml:97(entry)
+msgid "Formula"
+msgstr "Формула"
+
+#: fourier-transform.xml:102(entry)
+msgid "None"
+msgstr "Нет"
+
+#: fourier-transform.xml:103(entry)
+msgid "1"
+msgstr "1"
+
+#: fourier-transform.xml:106(entry)
+msgid "Rect"
+msgstr "Прямоугольное"
+
+#: fourier-transform.xml:107(entry)
+msgid "0.5 at edge points, 1 everywhere else"
+msgstr "0.5 в граничных точках, 1 во всех остальных"
+
+#: fourier-transform.xml:110(entry)
+msgid "Hann"
+msgstr "Ханн"
+
+#: fourier-transform.xml:114(entry)
+msgid "Hamming"
+msgstr "Хэмминг"
+
+#: fourier-transform.xml:118(entry)
+msgid "Blackmann"
+msgstr "Блэкмен"
+
+#: fourier-transform.xml:122(entry)
+msgid "Lanczos"
+msgstr "Ланцош"
+
+#: fourier-transform.xml:126(entry)
+msgid "Welch"
+msgstr "Велч"
+
+#: fourier-transform.xml:130(entry)
+msgid "Nutall"
+msgstr "Наттолл"
+
+#: fourier-transform.xml:134(entry)
+msgid "Flat-top"
+msgstr "Плоская вершина"
+
+#: fourier-transform.xml:138(entry)
+msgid "Kaiser <include href=\"eqi-alpha.xml\"/>"
+msgstr "Кайзер <include href=\"eqi-alpha.xml\"/>"
+
+#: fourier-transform.xml:139(entry)
+msgid ""
+"<include href=\"eq-windowing-kaiser.xml\"/>, where <include href=\"eqi-"
+"BesselI0.xml\"/> is the modified Bessel function of zeroth order and "
+"<include href=\"eqi-alpha.xml\"/> is a parameter"
+msgstr ""
+"<include href=\"eq-windowing-kaiser.xml\"/>, где <include href=\"eqi-"
+"BesselI0.xml\"/> — модифицированная функция Бесселя нулевого порядка и "
+"<include href=\"eqi-alpha.xml\"/> — параметр."
+
+#: fourier-transform.xml:157(caption)
+msgid ""
+"Windowing functions: Hann, Hamming, Blackmann, Lanczos, Welch, Nutall, Flat-"
+"top, Kaiser 2.5."
+msgstr ""
+"Оконные функции: Ханна, Хэмминга, Блэкмена, Ланцоша, Велча, Наттола, с "
+"плоской вершиной, Кайзера 2,5."
+
+#: fourier-transform.xml:171(caption)
+msgid ""
+"Envelopes of windowing functions frequency responses: Hann, Hamming, "
+"Blackmann, Lanczos, Welch, Nutall, Flat-top, Kaiser 2.5."
+msgstr ""
+"Огибающие частотного отклика оконных функций: Ханна, Хэмминга, Блэкмена, "
+"Ланцоша, Велча, Наттола, с плоской вершиной, Кайзера 2,5."
+
+#: fourier-transform.xml:178(title)
+msgid "1D FFT Filter <gwy:icon name=\"fft_filter_1d\"/>"
+msgstr "Одномерная фильтрация БПФ <gwy:icon name=\"fft_filter_1d\"/>"
+
+#: fourier-transform.xml:183(secondary)
+msgid "1D filtering"
+msgstr "одномерная фильтрация"
+
+#: fourier-transform.xml:187(guimenu) fourier-transform.xml:219(guimenu)
+#: fourier-transform.xml:249(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: fourier-transform.xml:188(guisubmenu) fourier-transform.xml:220(guisubmenu)
+msgid "Correct Data"
+msgstr "Исправить данные"
+
+#: fourier-transform.xml:189(guimenuitem)
+msgid "1D FFT Filtering"
+msgstr "Одномерная фильтрация БПФ"
+
+#: fourier-transform.xml:192(para)
+msgid ""
+"One excellent way of removing frequency based of noise from an image is to "
+"use Fourier filtering. First, the Fourier transform of the image is "
+"calculated. Next, a filter is applied to this transform. Finally, the "
+"inverse transform is applied to obtain a filtered image. Gwyddion uses the "
+"Fast Fourier Transform (or FFT) to make this intensive calculation much "
+"faster."
+msgstr ""
+"Одним из наиболее удачных способов удаления шума на определённых частотах из "
+"изображения является Фурье-фильтрация. Сначала вычисляется прямое "
+"преобразование Фурье изображения. Затем к результату преобразования "
+"применяется фильтр. После этого обратное преобразование используется для "
+"получения отфильтрованного изображения. Gwyddion использует быстрое "
+"преобразование Фурье (БПФ или FFT) для существенного ускорения этого "
+"большого расчёта."
+
+#: fourier-transform.xml:200(para)
+msgid ""
+"Within the 1D FFT filter the frequencies that should be removed from "
+"spectrum (suppress type: null) or suppressed to value of neighbouring "
+"frequencies (suppress type: suppress) can be selected by marking appropriate "
+"areas in the power spectrum graph. The selection can be inverted easily "
+"using the Filter type choice. 1D FFT filter can be used both for horizontal "
+"and vertical direction."
+msgstr ""
+"При использовании одномерного фильтра БПФ частоты, которые должны быть "
+"удалены со спектра (тип подавления: убрать) или подавлены до значения "
+"соседних частот (тип подавления: выровнять), могут быть выбраны отметкой "
+"нужных областей на графике спектра мощности. Выбранная область может быть "
+"легко инвертирована использованием опции \"тип фильтра\". Одномерная "
+"фильтрация БПФ может использоваться как для горизонтального, так и для "
+"вертикального направления."
+
+#: fourier-transform.xml:210(title)
+msgid "2D FFT Filter <gwy:icon name=\"fft_filter_2d\"/>"
+msgstr "Двумерная фильтрация БПФ <gwy:icon name=\"fft_filter_2d\"/>"
+
+#: fourier-transform.xml:215(secondary)
+msgid "2D filtering"
+msgstr "двумерная фильтрация"
+
+#: fourier-transform.xml:221(guimenuitem)
+msgid "2D FFT Filtering"
+msgstr "Двумерный фильтр БПФ"
+
+#: fourier-transform.xml:224(para)
+msgid ""
+"2D FFT filter acts similarly as the 1D variant (see above) but using 2D FFT "
+"transform. Therefore, the spatial frequencies that should be filtered must "
+"be selected in 2D using mask editor. As the frequencies are related to "
+"center of the image (corresponding to zero frequency), the mask can be "
+"snapped to the center (coordinate system origin) while being edited. There "
+"are also different display and output modes that are self-explanatory – "
+"image or FFT coefficients can be outputted by module (or both)."
+msgstr ""
+"Двумерная фильтрация БПФ работает подобно одномерному варианту (см. выше), "
+"но использует двумерное преобразование Фурье. Следовательно, "
+"пространственные частоты, которые нужно отфильтровать должны быть выбраны в "
+"двумерном пространстве с использованием редактора маски. Поскольку частоты "
+"измеряются относительно центра изображения (который соответствует нулевой "
+"частоте), маску можно прикрепить к центру (началу координат) в процессе "
+"редактирования. Также доступны различные режимы отображения и вывода "
+"результата, которые не требуют разъяснений – модуль может выводить "
+"изображение или коэффициенты БПФ (или оба)."
+
+#: fourier-transform.xml:236(title)
+msgid "Frequency Split <gwy:icon name=\"frequency_split\"/>"
+msgstr "Разделение частот <gwy:icon name=\"frequency_split\"/>"
+
+#: fourier-transform.xml:241(secondary)
+msgid "high-pass filter"
+msgstr "фильтр верхних частот"
+
+#: fourier-transform.xml:245(secondary)
+msgid "low-pass filter"
+msgstr "фильтр нижних частот"
+
+#: fourier-transform.xml:250(guisubmenu)
+msgid "Level"
+msgstr "Выравнивание"
+
+#: fourier-transform.xml:251(guimenuitem)
+msgid "Frequency Split"
+msgstr "Разделение частот"
+
+#: fourier-transform.xml:254(para)
+msgid ""
+"A simple alternative to <link linkend=\"fft-filter-2d\">2D FFT filtering</"
+"link> is the separation of low and high spatial frequencies in the image "
+"using a simple low-pass and/or high-pass filter. The frequency split module "
+"can create either the low-frequency or high-frequency image or both, "
+"depending on the selected <guilabel>Output type</guilabel>."
+msgstr ""
+"Простой альтернативой <link linkend=\"fft-filter-2d\">двумерной фильтрации с "
+"помощью БПФ</link> будет разделение изображение на составляющие с низкими и "
+"высокими пространственными частотами используя простые фильтры нижних и "
+"верхних частот. В зависимости от выбранной опции <guilabel>тип вывода</"
+"guilabel> модуль разделения частот может создавать либо низкочастотное, либо "
+"высокочастотное изображение, либо оба"
+
+#: fourier-transform.xml:262(para)
+msgid ""
+"<guilabel>Cut-off</guilabel> selects the spatial frequency cut off, which is "
+"displayed as relative fraction of the Nyquist frequency and also as the "
+"corresponding spatial wavelength. If <guilabel>Edge width</guilabel> (again "
+"given as relative to Nyquist frequency) is zero the filter has sharp edge. "
+"For non-zero values the transition has the shape of error function, with "
+"specified width."
+msgstr ""
+"<guilabel>Порог</guilabel> задаёт пространственную частоту, которая "
+"показывается как относительная доля частоты Найквиста и также как "
+"соответствующая пространственная длина волны. Если <guilabel>Ширина "
+"пороговой функции</guilabel> задаётся нулевой, фильтр будет иметь узкий "
+"порог частоты. Для ненулевых значений переход будет иметь форму функции "
+"ошибки erf с заданной шириной."
+
+#: fourier-transform.xml:270(para)
+msgid ""
+"Frequency domain filtering can lead to artefacts close to image boundaries. "
+"Therefore, several boundary handling options are provided, aside from "
+"<guilabel>None</guilabel> which is mostly useful for periodic data (or "
+"otherwise continuous across edges). <guilabel>Laplace</guilabel> and "
+"<guilabel>Mirror</guilabel> extend the image by Laplace's equation method "
+"and mirroring, respectively, exactly as the <link linkend=\"extend\">Extend</"
+"link> function. <guilabel>Smooth connect</guilabel> applies to rows and "
+"column the one-dimensional smooth extension method used in <link linkend="
+"\"roughness-iso\">Roughness tool</link> to suppress edge artefacts."
+msgstr ""
+"Фильтрация в частотной области может приводить к артефактам вдоль границ "
+"изображения. Вследствие этого модуль предлагает несколько вариантов работы с "
+"граничной областью помимо варианта <guilabel>Нет</guilabel>, который годится "
+"только для периодических данных (или другим способом непрерывных при "
+"переходе через границу изображения). <guilabel>По Лапласу</guilabel> и "
+"<guilabel>Зеркально</guilabel> расширяют изображение решением уравнения "
+"Лапласа или зеркальным отображением, соответственно, точно таким же "
+"способом, как и функция <link linkend=\"extend\">Расширить</link>. "
+"<guilabel>Гладкий переход</guilabel> применяет к строкам и колонкам "
+"изображения одномерный гладкий метод расширения, который используется в "
+"<link linkend=\"roughness-iso\">инструменте измерения шероховатости</link> "
+"для подавления артефактов на границе."
+
+#~ msgid ""
+#~ "Fourier transforms of data with sizes that are not factorable into small "
+#~ "prime factors can be very slow – and many programs only implement FFT of "
+#~ "arrays with dimensions that are powers of two."
+#~ msgstr ""
+#~ "Преобразования Фурье данных с размерами, которые не раскладываются на "
+#~ "малые простые числа могут быть очень медленными – и многие программы "
+#~ "реализуют БПФ только для массивов, размер которых кратен степени двух."
+
+#~ msgid ""
+#~ "In <application>Gwyddion</application>, however, the Fourier transform "
+#~ "can be applied to data fields and lines of arbitrary dimensions, with no "
+#~ "data resampling involved (at least since version 2.8). Fourier transforms "
+#~ "are calculated either using the famous <link linkend=\"dependency-fftw"
+#~ "\">FFTW library</link> or, if it is not available, using Gwyddion built-"
+#~ "in routines that are slower but can also handle transforms of arbitrary "
+#~ "size."
+#~ msgstr ""
+#~ "В <application>Gwyddion</application>, тем не менее, преобразование Фурье "
+#~ "может использоваться к полям данных и линиям произвольного размера, без "
+#~ "использования передискретизации данных (по крайней мере начиная с версии "
+#~ "2.8). Преобразования Фурье рассчитываются либо с использованием "
+#~ "знаменитой библиотеки <link linkend=\"dependency-fftw\">FFTW</link>, "
+#~ "либо, если она недоступна, используя встроенные в Gwyddion функции, "
+#~ "которые работают медленнее, но также могут работать с данными "
+#~ "произвольной длины."
+
+#~ msgid ""
+#~ "Nevertheless, if the data size is not factorable into small prime factors "
+#~ "the transform is still considerably slower. Hence it is preferable to "
+#~ "transform data fields of <quote>nice</quote> sizes."
+#~ msgstr ""
+#~ "Тем не менее, если размер данных не раскладывается на малые простые "
+#~ "числа, преобразование работает заметно медленнее. Следовательно, "
+#~ "желательно преобразовывать поля данных с <quote>правильными</quote> "
+#~ "размерами."
+
+#~ msgid "Fourier Transform"
+#~ msgstr "Преобразование Фурье"
+
+#~ msgid ""
+#~ "The <guilabel>2D FFT</guilabel> module provides several types of output: "
+#~ "<itemizedlist><listitem> Modulus – absolute value of the complex Fourier "
+#~ "coefficient, proportional to the square root of the power spectrum "
+#~ "density function (PSDF). </listitem><listitem> Phase – phase of the "
+#~ "complex coefficient (rarely used). </listitem><listitem> Real – real part "
+#~ "of the complex coefficient. </listitem><listitem> Imaginary – imaginary "
+#~ "part of the complex coefficient. </listitem></itemizedlist> and some "
+#~ "their combinations for convenience."
+#~ msgstr ""
+#~ "Модуль <guilabel>2D FFT</guilabel> предоставляет несколько типов вывода: "
+#~ "<itemizedlist><listitem> Абсолютное значение – одноимённая величина "
+#~ "комплексного коэффициента Фурье, пропорциональная квадратному корню "
+#~ "функции спектральной плотности мощности (ФСПМ, PSDF). </"
+#~ "listitem><listitem> Фаза – фаза комплексного коэффициента (используется "
+#~ "редко). </listitem><listitem> Действительная часть – действительная часть "
+#~ "комплексного коэффициента. </listitem><listitem> Мнимая часть – мнимая "
+#~ "часть комплексного коэффициента. </listitem></itemizedlist> и некоторые "
+#~ "их комбинации для удобства."
+
+#~ msgid ""
+#~ "Kaiser  <inlineequation><mathphrase>α</mathphrase><alt>\\alpha</alt></"
+#~ "inlineequation>"
+#~ msgstr ""
+#~ "Кайзер  <inlineequation><mathphrase>α</mathphrase><alt>\\alpha</alt></"
+#~ "inlineequation>"
+
+#~ msgid ""
+#~ "<inlineequation id=\"eq-windowing-kaiser"
+#~ "\"><inlinemediaobject><imageobject><imagedata fileref=\"eq-windowing-"
+#~ "kaiser.png\" format=\"PNG\"/></imageobject><textobject role=\"tex"
+#~ "\"><phrase><![CDATA[\n"
+#~ "\\displaystyle\n"
+#~ "w_{\\rm Kaiser,\\alpha}(x) = {\\BesselI0\\bigl(\\pi\\alpha\\sqrt{4x(1-"
+#~ "x)}\\bigr)\n"
+#~ "                          \\over\\BesselI0(\\pi\\alpha)}\n"
+#~ "]]></phrase></textobject></inlinemediaobject></inlineequation> where "
+#~ "<inlineequation><mathphrase>I<subscript>0</subscript></mathphrase><alt>"
+#~ "\\BesselI0</alt></inlineequation> is the modified Bessel function of "
+#~ "zeroth order and <inlineequation><mathphrase>α</mathphrase><alt>\\alpha</"
+#~ "alt></inlineequation> is a parameter"
+#~ msgstr ""
+#~ "<inlineequation id=\"eq-windowing-kaiser"
+#~ "\"><inlinemediaobject><imageobject><imagedata fileref=\"eq-windowing-"
+#~ "kaiser.png\" format=\"PNG\"/></imageobject><textobject role=\"tex"
+#~ "\"><phrase><![CDATA[\n"
+#~ "\\displaystyle\n"
+#~ "w_{\\rm Kaiser,\\alpha}(x) = \n"
+#~ "{ \\BesselI0\\bigl(\\pi\\alpha\\sqrt{4x(1-x)}\\bigr)\n"
+#~ "                          \\over\\BesselI0(\\pi\\alpha)}\n"
+#~ "]]></phrase></textobject></inlinemediaobject></inlineequation> where "
+#~ "<inlineequation><mathphrase>I<subscript>0</subscript></mathphrase><alt>"
+#~ "\\BesselI0</alt></inlineequation> is the modified Bessel function of "
+#~ "zeroth order and <inlineequation><mathphrase>α</mathphrase><alt>\\alpha</"
+#~ "alt></inlineequation> is a parameter"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

@@ -1,0 +1,158 @@
+/*
+ *  $Id: preview.h 25604 2023-08-28 15:42:38Z yeti-dn $
+ *  Copyright (C) 2015-2017 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
+ */
+
+#ifndef __GWY_PROCESS_PREVIEW_H__
+#define __GWY_PROCESS_PREVIEW_H__
+
+#include <string.h>
+#include <libgwydgets/gwycolorbutton.h>
+#include <libgwydgets/gwydataview.h>
+#include <libgwydgets/gwylayer-basic.h>
+#include <libgwydgets/gwylayer-mask.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwyradiobuttons.h>
+#include <libgwydgets/gwydgetutils.h>
+#include <app/menu.h>
+#include <app/gwymoduleutils.h>
+#include <app/data-browser.h>
+
+enum {
+    /* Standard preview size. */
+    PREVIEW_SIZE = 480,
+    /* For slow synth modules or if there are lots of other things to fit. */
+    PREVIEW_SMALL_SIZE = 360,
+    /* When we need to fit two preview-sized areas. */
+    PREVIEW_HALF_SIZE = 240,
+};
+
+enum {
+    RESPONSE_RESET     = 101,
+    RESPONSE_PREVIEW   = 102,
+    RESPONSE_ESTIMATE  = 105,
+    RESPONSE_REFINE    = 106,
+    RESPONSE_CALCULATE = 107,
+    RESPONSE_LOAD      = 108,
+    RESPONSE_SAVE      = 109,
+    RESPONSE_COPY      = 110,
+};
+
+typedef struct {
+    GwyGraphModel *gmodel;
+    GwyDataChooserFilterFunc filter;
+    gpointer filter_data;
+} TargetGraphFilterData;
+
+G_GNUC_UNUSED
+static void
+ensure_mask_color(GwyContainer *data, gint id)
+{
+    const gchar *key = g_quark_to_string(gwy_app_get_mask_key_for_id(id));
+    GwyRGBA rgba;
+
+    if (!gwy_rgba_get_from_container(&rgba, data, key)) {
+        gwy_rgba_get_from_container(&rgba, gwy_app_settings_get(), "/mask");
+        gwy_rgba_store_to_container(&rgba, data, key);
+    }
+}
+
+G_GNUC_UNUSED
+static void
+load_mask_color_to_button(GtkWidget *color_button,
+                          GwyContainer *data,
+                          gint id)
+{
+    const gchar *key = g_quark_to_string(gwy_app_get_mask_key_for_id(id));
+    GwyRGBA rgba;
+
+    ensure_mask_color(data, id);
+    gwy_rgba_get_from_container(&rgba, data, key);
+    gwy_color_button_set_color(GWY_COLOR_BUTTON(color_button), &rgba);
+}
+
+G_GNUC_UNUSED
+static void
+mask_color_changed(GtkWidget *color_button)
+{
+    GObject *object = G_OBJECT(color_button);
+    GtkWindow *dialog;
+    GwyContainer *data;
+    GQuark quark;
+    gint id;
+
+    data = GWY_CONTAINER(g_object_get_data(object, "data"));
+    dialog = GTK_WINDOW(g_object_get_data(object, "dialog"));
+    id = GPOINTER_TO_INT(g_object_get_data(object, "id"));
+    quark = gwy_app_get_mask_key_for_id(id);
+    gwy_mask_color_selector_run(NULL, dialog,
+                                GWY_COLOR_BUTTON(color_button), data,
+                                g_quark_to_string(quark));
+    load_mask_color_to_button(color_button, data, id);
+}
+
+G_GNUC_UNUSED
+static GtkWidget*
+create_mask_color_button(GwyContainer *data, GtkWidget *dialog, gint id)
+{
+    GtkWidget *color_button;
+    GObject *object;
+
+    color_button = gwy_color_button_new();
+    object = G_OBJECT(color_button);
+    g_object_set_data(object, "data", data);
+    g_object_set_data(object, "dialog", dialog);
+    g_object_set_data(object, "id", GINT_TO_POINTER(id));
+
+    gwy_color_button_set_use_alpha(GWY_COLOR_BUTTON(color_button), TRUE);
+    load_mask_color_to_button(color_button, data, id);
+    g_signal_connect(color_button, "clicked",
+                     G_CALLBACK(mask_color_changed), NULL);
+
+    return color_button;
+}
+
+G_GNUC_UNUSED
+static void
+set_widget_as_error_message(GtkWidget *widget)
+{
+    GdkColor gdkcolor_bad = { 0, 51118, 0, 0 };
+
+    gtk_widget_modify_fg(widget, GTK_STATE_NORMAL, &gdkcolor_bad);
+}
+
+G_GNUC_UNUSED
+static void
+set_widget_as_warning_message(GtkWidget *widget)
+{
+    GdkColor gdkcolor_warning = { 0, 45056, 20480, 0 };
+
+    gtk_widget_modify_fg(widget, GTK_STATE_NORMAL, &gdkcolor_warning);
+}
+
+G_GNUC_UNUSED
+static void
+set_widget_as_ok_message(GtkWidget *widget)
+{
+    gtk_widget_modify_fg(widget, GTK_STATE_NORMAL, NULL);
+}
+
+#endif
+
+/* vim: set cin et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

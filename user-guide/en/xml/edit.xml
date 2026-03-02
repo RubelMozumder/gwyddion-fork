@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: edit.xml 22636 2019-10-30 14:30:58Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='editing-correction' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Local Defects</title>
+  <indexterm>
+    <primary>defect correction</primary>
+    <secondary>local defects</secondary>
+  </indexterm>
+  <para>
+    Several modules enable direct or indirect editing of the SPM data.
+    Even though most data processing changes the data in one way or another,
+    this section describes functions and tools designed specifically for
+    correction of local defects.  They remove <quote>bad</quote> data from an
+    image, and replace them using some interpolation method.
+  </para>
+  <para>
+    See also section
+    <link linkend='scan-line-defects'>Scan Line Artefacts</link>
+    for methods that deal with defects related to scanning.
+  </para>
+  <sect2 id='remove-spots'>
+    <indexterm>
+      <primary>Laplace's equation</primary>
+    </indexterm>
+    <title>
+      Remove Spots Tool <gwy:icon name='spot_remove'/>
+    </title>
+    <para>
+      The <link linkend='tool-remove-spots'>Remove Spots tool</link> can be
+      used for removing very small parts of the image that are considered
+      a scanning error, dust particle or anything else that should not be
+      present in the data. Note that doing so can dramatically alter the
+      resulting statistical parameters of the surface, so be sure not to
+      remove things that are really present on the surface.
+    </para>
+    <para>
+      While using this tool you can pick up position of the spot to magnify
+      its neighbourhood in the tool window. Then, in the tool window, select
+      a rectangle or ellipse (depending on chosen <guilabel>Shape</guilabel>)
+      around the area that should be removed. You can then select
+      one of several interpolation methods for creating data in place of the
+      former <quote>spot</quote>:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <guilabel>Hyperbolic flatten</guilabel> uses information from outer
+        boundary pixels of the selected area to interpolate the information
+        inside area.
+      </listitem>
+      <listitem>
+        <guilabel>Laplace solver</guilabel> solves Laplace's equation to
+        calculate data inside area; the outer boundary is treated as virtual
+        source.
+      </listitem>
+      <listitem>
+        <guilabel>Pseudo-Laplace</guilabel> is a faster approximation of true
+        Laplace equation solution.  For small areas one can always use the
+        true solver.
+      </listitem>
+      <listitem>
+        <guilabel>Fractal correction</guilabel> uses whole image to determine
+        fractal dimension. Then tries to create randomly rough data that have
+        the same fractal dimension and put them into the area.
+      </listitem>
+      <listitem>
+        <guilabel>Fractal-Laplace blend</guilabel> is a weighted average of
+        fractal interpolation and Laplace solver.  The interior is given by
+        fractal interpolation, but close to region edges the Laplace
+        interpolation is mixed in to provide a smoother continuation to the
+        exterior.
+      </listitem>
+      <listitem>
+        <guilabel>Zero</guilabel> simply fills the area with zeros.
+      </listitem>
+    </itemizedlist>
+    <para>
+      Clicking <guibutton>Apply</guibutton> will execute the selected algorithm.
+    </para>
+    <para>
+      <note>
+      Spot removal will only work for regions of size 80 × 80 pixels or
+      smaller. To remove larger regions, create a mask using the
+      <link linkend='mask-editor'>Mask Editor</link> tool, then use
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem><link linkend='remove-data-under-mask'>Interpolate Data Under Mask</link></guimenuitem>
+      </menuchoice>.
+      </note>
+    </para>
+  </sect2>
+  <sect2 id='remove-grains'>
+    <title>
+      Remove Grains Tool <gwy:icon name='grains_remove'/>
+    </title>
+    <para>
+      The simple <link linkend='tool-remove-grains'>Remove Grains tool</link>
+      removes manually selected connected parts of mask
+      or interpolates the data under them, or possibly both.  The part of
+      mask to remove is selected by clicking on it with left mouse button.
+    </para>
+    <para>
+      The data available interpolation methods are a subset of those offered by
+      <link linkend='remove-spots'>Remove Spots</link> tool, in particular
+      Zero, Laplace's equation solution, Fractal correction and their blend.
+    </para>
+  </sect2>
+  <sect2 id='remove-data-under-mask'>
+    <indexterm>
+      <primary>interpolation</primary>
+      <secondary>of data under mask</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>Laplace's equation</primary>
+    </indexterm>
+    <title>
+      Interpolate Data Under Mask <gwy:icon name='remove_under_mask'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Interpolate Data Under Mask</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      This function substitutes data under the mask by the solution of
+      solving the Laplace's equation. The data values around the masked areas
+      define the boundary conditions.  The solution is calculated iteratively
+      and it can take some time to converge.
+    </para>
+  </sect2>
+  <sect2 id='zero-data-under-mask'>
+    <title>Zero Data Under Mask</title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Zero Data Under Mask</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      This function simply fills masked data with zeros, which is sometimes
+      less distracting than interpolation.
+    </para>
+  </sect2>
+  <sect2 id='fractal-correction'>
+    <title>
+      Fractal Correction <gwy:icon name='fractal_correction'/>
+    </title>
+    <indexterm><primary>fractal interpolation</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Fractal Correction</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The Fractal Correction module, like the
+      <link linkend='remove-data-under-mask'>Interpolate Data Under Mask</link>
+      module, replaces data under the mask. However, it uses
+      a different algorithm to come up with the new data: The fractal dimension
+      of the whole image is first computed, and then the areas under the mask
+      are substituted by a randomly rough surface having the same fractal
+      dimension.
+      The root mean square value of the height irregularities (roughness)
+      is not changed by using this module.
+    </para>
+    <note>This calculation can take some time, so please be patient.</note>
+    <warning>
+      Running this module on data that do not have fractal properties can cause
+      really unrealistic results and is strictly not recommended.
+    </warning>
+  </sect2>
+  <sect2 id='mask-of-outliers'>
+    <title>
+      Mask of Outliers <gwy:icon name='mark_outliers'/>
+    </title>
+    <indexterm>
+      <primary>outliers</primary>
+      <secondary>global</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Mask of Outliers</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      This module creates mask of areas in the data that not pass the
+      <xi:include href="eqi-3sigma.xml"/> criterion. All the values above and
+      below this confidence interval are marked in mask and can be edited or
+      processed by other modules afterwards, for instance
+      <link linkend='remove-data-under-mask'>Interpolate Data Under Mask</link>.
+      This outlier marking method is useful for global outliers with values
+      very far from the rest of the data.
+    </para>
+  </sect2>
+  <sect2 id='mark-disconnected'>
+    <title>
+      Mask of Disconnected <gwy:icon name='disconnected'/>
+    </title>
+    <indexterm>
+      <primary>outliers</primary>
+      <secondary>local</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Mask of Disconnected</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Local outliers are values that stick out from their neighbourhood.
+      Function <guimenuitem>Mask of Disconnected</guimenuitem> marks data that
+      do not seem to belong in the distribution of surrounding values.
+    </para>
+    <para>
+      The outlier type to mark can be selected as
+      <guilabel>Positive</guilabel>, <guilabel>Negative</guilabel> or
+      <guilabel>Both</guilabel> for values much larger than their neighbours,
+      much smaller and both types simultaneously, respectively.  Note that
+      selecting <guilabel>Both</guilabel> can mark different areas than if
+      positive and negative outliers were marked separately and the results
+      combined.
+    </para>
+    <para>
+      The marking proceeds by subtracting a local background from the image and
+      then marking global outliers in the resulting flattened image.
+      Specifically, the local background is obtained by an opening (minimum),
+      closing (maximum) or a median filter of given radius.  The radius of the
+      filter is controlled with <guilabel>Defect radius</guilabel>.  It
+      determines the maximum size of defect that can be found and marked.
+      However, it is often useful to use larger radius than the actual maximum
+      defect size.
+    </para>
+    <para>
+      Defect marking sensitivity is controlled with option
+      <guilabel>Threshold</guilabel>.  Smaller values mean more conservative
+      marking, i.e. less values marked as outliers.  Larger value means more
+      values marked as outliers.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,453 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2019-01-05 21:44+0400\n"
+"PO-Revision-Date: 2019-01-05 21:46+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: simple-xyz-format.xml:6(title)
+msgid "Simple XYZ Files"
+msgstr "Простые файлы XYZ"
+
+#: simple-xyz-format.xml:7(para)
+msgid ""
+"Although Gwyddion does work with general XYZ data and <link linkend=\"raw-"
+"xyz-import\">raw XYZ data</link> are interpolated to a grid upon import, "
+"need has arisen for a file format similar in spirit to <link linkend=\"gsf"
+"\">Gwyddion simple field (.gsf)</link> but representing the data in XYZ "
+"format. Such file format, called Gwyddion XYZ Field (<filename>.gxyzf</"
+"filename>), is described in this section."
+msgstr ""
+"Хотя Gwyddion не работает с произвольными данными в формате XYZ и <link "
+"linkend=\"raw-xyz-import\">необработанные данные XYZ </link> при импорте "
+"интерполируются на регулярную сетку, возникла необходимость создать файловый "
+"формат, подобный по духу <link linkend=\"gsf\">формату простого поля "
+"Gwyddion (.gsf)</link>, но представляющий данные в формате XYZ. Такой "
+"файловый формат, названный Gwyddion XYZ Field (<filename>.gxyzf</filename>), "
+"описывается в данном разделе."
+
+#: simple-xyz-format.xml:15(para)
+msgid ""
+"It should be noted that Z simply stands for the ordinate here. Z values in "
+"the file may be actual Z coordinates (heights) but they may also be "
+"currents, voltages, etc."
+msgstr ""
+"Следует отметить, что Z просто оболзначает в данном случае ординату. "
+"Значения Z в файле могут быть в действительности реальными координатами по Z "
+"(высотами), но также могут быть токами, напряжениеями и т.п."
+
+#: simple-xyz-format.xml:20(para)
+msgid ""
+"GXYZF can be written by Gwyddion version 2.31 or later. They can also be "
+"read since this version, although the regularisation to a grid may be "
+"somewhat crude."
+msgstr ""
+"Файлы GXYZF могут быть записаны Gwyddion версии 2.31 или более поздней. Они "
+"также могут читаться начиная с этой версии, хотя выравнивание по сетке может "
+"быть достаточно грубым."
+
+#: simple-xyz-format.xml:26(title)
+msgid "Overall structure"
+msgstr "Общая структура"
+
+#: simple-xyz-format.xml:27(para)
+msgid "A GXYZF file consists of four parts, in the following order:"
+msgstr "Файл GXYZF состоит из четырёх частей в следующем порядке:"
+
+#: simple-xyz-format.xml:33(link)
+msgid "magic line"
+msgstr "магическая строка"
+
+#: simple-xyz-format.xml:36(para)
+msgid "Files begin with a <quote>magic line</quote> identifying the file type."
+msgstr ""
+"Файлы начинаются с <quote>магической строки</quote>, определяющей тип файла."
+
+#: simple-xyz-format.xml:44(link)
+msgid "text header"
+msgstr "текстовый заголовок"
+
+#: simple-xyz-format.xml:47(para)
+msgid ""
+"The header consists of lines of the form "
+"<informalexample><programlisting><replaceable>name</replaceable> = "
+"<replaceable>value</replaceable></programlisting></informalexample> defining "
+"individual parameters."
+msgstr ""
+"Заголовок состоит из строк в формате "
+"<informalexample><programlisting><replaceable>имя</replaceable> = "
+"<replaceable>значение</replaceable></programlisting></informalexample>, "
+"определяющих отдельные параметры."
+
+#: simple-xyz-format.xml:58(link) simple-xyz-format.xml:227(title)
+msgid "NUL padding"
+msgstr "выравнивание с помощью NUL"
+
+#: simple-xyz-format.xml:61(para)
+msgid ""
+"The header is terminated by one to eight NUL bytes, aligning the data start "
+"to a multiple of 8."
+msgstr ""
+"Заголовок заканчивается NUL-байтами от одного до восьми, выравнивающими "
+"начало данных на смещение, кратное 8."
+
+#: simple-xyz-format.xml:69(link)
+msgid "binary data"
+msgstr "двоичные данные"
+
+#: simple-xyz-format.xml:72(para)
+msgid "Binary data is in 64bit floating-point format."
+msgstr "Двоичные данные записываются в 64битном формате с плавающей точкой."
+
+#: simple-xyz-format.xml:80(title)
+msgid "Magic line"
+msgstr "Магическая строка"
+
+#: simple-xyz-format.xml:81(para)
+msgid ""
+"gxyzf files start with the line <informalexample><programlisting>Gwyddion "
+"XYZ Field 1.0</programlisting></informalexample> terminated by a linefeed "
+"character (<literal>\\n</literal>, ASCII 0x0a)."
+msgstr ""
+"Файлы gxyzf начинаются со строки <informalexample><programlisting>Gwyddion "
+"XYZ Field 1.0</programlisting></informalexample>которая заканчивается "
+"символом перевода строки (<literal>\\n</literal>, ASCII 0x0a)."
+
+#: simple-xyz-format.xml:90(title)
+msgid "Text header"
+msgstr "Текстовый заголовок"
+
+#: simple-xyz-format.xml:91(para)
+msgid ""
+"Each header line has the form <programlisting><replaceable>name</"
+"replaceable> = <replaceable>value</replaceable></programlisting> where any "
+"whitespace before the name, around the equal sign and at the end of value is "
+"ignored. Field names are case-sensitive and follow the usual rules for "
+"identifiers in programming languages."
+msgstr ""
+"Каждая строка заголовка имеет формат <programlisting><replaceable>имя</"
+"replaceable> = <replaceable>значение</replaceable></programlisting>, где "
+"любой пробельный символ перед именем, вокруг знака равенства и в конце "
+"значения игнорируется. Имена полей чувствительны к регистру и следуют "
+"обычным правилам для идентификаторов в языках программирования."
+
+#: simple-xyz-format.xml:98(para)
+msgid ""
+"Similarly to the magic line, the lines in the text header are terminated by "
+"a linefeed character as is usual on Unix. This means the header must be read "
+"and written in binary mode to ensure preservation of end-of-line characters "
+"on other systems (and not changing the header size e.g. by LF → CRLF "
+"transformation)."
+msgstr ""
+"Подобно магической строке, строки в текстовом заголовке заканчиваются "
+"символом перевода строки, как принято в Unix. Это означает, что заголовок "
+"должен читаться и писаться в двоичном режиме для сохранения символов "
+"перевода строки на других системах (и неизменности размера заголовка, "
+"например при преобразовании LF → CRLF)."
+
+#: simple-xyz-format.xml:105(para)
+msgid ""
+"Any non-ASCII characters, that can occur for example in channel titles, are "
+"represented in UTF-8 encoding. The NUL character may not occur in the header."
+msgstr ""
+"Любые символы, не входящие в ASCII, которые могут встречаться, например, в "
+"названиях каналов, представлены в кодировке UTF-8. Символ NUL не может "
+"встречаться в заголовке."
+
+#: simple-xyz-format.xml:110(para)
+msgid "Header fields:"
+msgstr "Поля заголовка:"
+
+#: simple-xyz-format.xml:118(entry)
+msgid "Name"
+msgstr "Название"
+
+#: simple-xyz-format.xml:119(entry)
+msgid "Type"
+msgstr "Тип"
+
+#: simple-xyz-format.xml:120(entry)
+msgid "Value"
+msgstr "Значение"
+
+#: simple-xyz-format.xml:125(literal) simple-xyz-format.xml:130(literal)
+#: simple-xyz-format.xml:161(literal) simple-xyz-format.xml:172(literal)
+msgid "NChannels"
+msgstr "NChannels"
+
+#: simple-xyz-format.xml:126(entry) simple-xyz-format.xml:135(entry)
+msgid "Mandatory"
+msgstr "Обязательно"
+
+#: simple-xyz-format.xml:127(entry)
+msgid ""
+"Number of value (Z) channels, a positive integer. The values stored for each "
+"point include also coordinates X and Y but they are not counted into "
+"<placeholder-1/>."
+msgstr ""
+"Число каналов значений (Z), положительное целое. Данные, сохраняемые для "
+"каждой точки также включают в себя координаты X и Y, но они не учитываются в "
+"<placeholder-1/>."
+
+#: simple-xyz-format.xml:134(literal)
+msgid "NPoints"
+msgstr "NPoints"
+
+#: simple-xyz-format.xml:136(entry)
+msgid "Number data points in the file."
+msgstr "Число точек данных в файле."
+
+#: simple-xyz-format.xml:141(literal) simple-xyz-format.xml:149(literal)
+#: simple-xyz-format.xml:162(literal)
+msgid "XYUnits"
+msgstr "XYUnits"
+
+#: simple-xyz-format.xml:142(entry) simple-xyz-format.xml:158(entry)
+#: simple-xyz-format.xml:169(entry) simple-xyz-format.xml:179(entry)
+#: simple-xyz-format.xml:189(entry)
+msgid "Optional"
+msgstr "Опционально"
+
+#: simple-xyz-format.xml:145(literal) simple-xyz-format.xml:150(literal)
+msgid "m"
+msgstr "m"
+
+#: simple-xyz-format.xml:146(literal)
+msgid "A"
+msgstr "A"
+
+#: simple-xyz-format.xml:143(entry)
+msgid ""
+"Lateral units, i.e. units of X and Y values. They must be given as base "
+"units, that is <placeholder-1/> or <placeholder-2/> with no power-of-10 "
+"prefix (Gwyddion could deal with it but it might present a problem for other "
+"software). The default is no units. This means in SPM data, you normally "
+"wish to specify <placeholder-3/> as <placeholder-4/> because the lateral "
+"dimensions are in metres."
+msgstr ""
+"Пространственные единицы измерения, т.е. единицы для значений X и Y. Должны "
+"быть заданы как основные единицы измерения, такие  как <placeholder-1/> или "
+"<placeholder-2/> без десятичных префиксов (Gwyddion может разрешить эту "
+"ситуацию, но это может вызывать проблемы с другим программным обеспечением). "
+"По умолчанию единиц измерения нет. Это означает, что для данных СЗМ вы "
+"наверное захотите задать <placeholder-3/> как <placeholder-4/> поскольку "
+"латеральные размеры измеряются в метрах."
+
+#: simple-xyz-format.xml:156(literal)
+msgid "ZUnits1"
+msgstr "ZUnits1"
+
+#: simple-xyz-format.xml:156(literal)
+msgid "ZUnits2"
+msgstr "ZUnits2"
+
+#: simple-xyz-format.xml:155(entry) simple-xyz-format.xml:166(entry)
+msgid "<placeholder-1/>, <placeholder-2/>, …"
+msgstr "<placeholder-1/>, <placeholder-2/>, …"
+
+#: simple-xyz-format.xml:159(entry)
+msgid ""
+"Value units, i.e. units of data values for individual channels. Channels are "
+"numbered from 1 to <placeholder-1/>. See <placeholder-2/> above for details."
+msgstr ""
+"Единицы измерения значений, т.е. единицы значений данных для индивидуальных "
+"каналов. Каналы нумеруются от 1 до <placeholder-1/>. См. <placeholder-2/> "
+"выше для дополнительной информации."
+
+#: simple-xyz-format.xml:167(literal)
+msgid "Title1"
+msgstr "Title1"
+
+#: simple-xyz-format.xml:167(literal)
+msgid "Title2"
+msgstr "Title2"
+
+#: simple-xyz-format.xml:170(entry)
+msgid ""
+"Titles of individual channels. Channels are numbered from 1 to "
+"<placeholder-1/>. Titles have no default, applications might display "
+"‘Unknown’ or something similar if not given."
+msgstr ""
+"Названия отдельных каналов. Каналы нумеруются от 1 до <placeholder-1/>. У "
+"названий нет значения по умолчанию, пприложения могут показывать ‘Unknown’ "
+"или что-то подобное если название не задано."
+
+#: simple-xyz-format.xml:178(literal)
+msgid "XRes"
+msgstr "XRes"
+
+#: simple-xyz-format.xml:180(entry)
+msgid ""
+"Hint specifying the preferred horizontal size in pixels if the data are "
+"regularised to a grid, a positive integer. Readers are not required to "
+"honour it and may interpolate data to grids of different dimensions."
+msgstr ""
+"Подсказка, указывающая предпочитаемый горизонтальный размер в пикселях если "
+"данные интерполируются на сетку, положительное целое. Программы чтения "
+"данных могут не учитывать её и интерполировать данные на сетку иного "
+"разрешения."
+
+#: simple-xyz-format.xml:188(literal)
+msgid "YRes"
+msgstr "YRes"
+
+#: simple-xyz-format.xml:190(entry)
+msgid ""
+"Hint specifying the preferred vertical size in pixels if the data are "
+"regularised to a grid, a positive integer. Readers are not required to "
+"honour it and may interpolate data to grids of different dimensions."
+msgstr ""
+"Подсказка, указывающая предпочитаемый горизонтальный размер в пикселях, если "
+"данные интерполируются на сетку, положительное целое. Программы чтения "
+"данных могут не учитывать её и интерполировать данные на сетку с другим "
+"разрешением."
+
+#: simple-xyz-format.xml:200(para)
+msgid ""
+"The header may contain other fields beside those listed above. Gwyddion will "
+"load them into <link linkend=\"metadata\">metadata</link>. Common "
+"informational fields can include <literal>Comment</literal>, <literal>Date</"
+"literal> or <literal>Direction</literal>."
+msgstr ""
+"Заголовок может содержать другие поля помимо описанных выше. Gwyddion "
+"загрузит их в <link linkend=\"metadata\">метаданные</link>. Общие "
+"информационные поля могут включать <literal>Комментарий</literal>, "
+"<literal>Дату</literal> или <literal>Направление</literal>."
+
+#: simple-xyz-format.xml:206(para)
+msgid ""
+"Fields may occur in any order, nevertheless, it is recommended to start with "
+"mandatory fields, continue with optional fields and put custom fields last."
+msgstr ""
+"Поля могут идти в любом порядке, тем не менее, рекомендуется начинать с "
+"обязательных полей, затем привести опциональные и закончить нестандартными."
+
+#: simple-xyz-format.xml:211(para)
+msgid ""
+"A simple header example of a two-channel file (also including the magic "
+"line):"
+msgstr ""
+"Простой образец заголовка файла с двумя каналами (также включает в себя "
+"магисческую строку):"
+
+#: simple-xyz-format.xml:216(programlisting)
+msgid ""
+"Gwyddion XYZ Field 1.0 NChannels = 2 NPoints = 457884 XYUnits = m ZUnits1 = "
+"m ZUnits2 = V Title1 = Height Title2 = ADC2"
+msgstr ""
+"Gwyddion XYZ Field 1.0 NChannels = 2 NPoints = 457884 XYUnits = m ZUnits1 = "
+"m ZUnits2 = V Title1 = Height Title2 = ADC2"
+
+#: simple-xyz-format.xml:228(para)
+msgid ""
+"The text header is followed by one to eight NUL (<literal>\\0</literal>, "
+"ASCII 0x00) bytes that (a) terminate it and (b) align the data start to an "
+"offset from the begining of file that is a multiple of 8. More precisely, "
+"denoting <xi:include href=\"eqi-N.xml\"/> the total length of the magic line "
+"and the text header, the data starts at the nearest multiple of 8 larger "
+"than <xi:include href=\"eqi-N.xml\"/>."
+msgstr ""
+"Текстовый заголовок заканчивается NUL-байтами (<literal>\\0</literal>, ASCII "
+"0x00) в количестве от одного до восьми, которые (a) завершают его и (b) "
+"выравнивают смещение начала данных в файле на величину, кратную 8. Точнее, "
+"обозначив <xi:include href=\"eqi-N.xml\"/> общую длину магической строки и "
+"текстового заголовка, данные начинаются с ближайшего числа, кратного 8, "
+"которое больше чем <xi:include href=\"eqi-N.xml\"/>."
+
+#: simple-xyz-format.xml:236(para)
+msgid ""
+"This padding to a multiple of 8 ensures aligned memory access when mapping "
+"the file directly to memory. The number of NUL bytes is uniquely determined "
+"by the remainder of the length modulo eight (<xi:include href=\"eqi-N-mod-8."
+"xml\"/>):"
+msgstr ""
+"Дополнение до кратного 8 обеспечивает выравнивание данных при доступе к "
+"памяти при прямом отображении файла в память. Число нулевых байтов "
+"однозначно определяется остатком после деления длины заголовка на 8  (<xi:"
+"include href=\"eqi-N-mod-8.xml\"/>):"
+
+#: simple-xyz-format.xml:246(entry)
+msgid "Remainder"
+msgstr "Остаток"
+
+#: simple-xyz-format.xml:247(entry)
+msgid "Number of padding NULs"
+msgstr "Число выравнивающих символов NUL"
+
+#: simple-xyz-format.xml:251(entry)
+msgid "0"
+msgstr "0"
+
+#: simple-xyz-format.xml:251(entry)
+msgid "8"
+msgstr "8"
+
+#: simple-xyz-format.xml:252(entry) simple-xyz-format.xml:258(entry)
+msgid "1"
+msgstr "1"
+
+#: simple-xyz-format.xml:252(entry) simple-xyz-format.xml:258(entry)
+msgid "7"
+msgstr "7"
+
+#: simple-xyz-format.xml:253(entry) simple-xyz-format.xml:257(entry)
+msgid "2"
+msgstr "2"
+
+#: simple-xyz-format.xml:253(entry) simple-xyz-format.xml:257(entry)
+msgid "6"
+msgstr "6"
+
+#: simple-xyz-format.xml:254(entry) simple-xyz-format.xml:256(entry)
+msgid "3"
+msgstr "3"
+
+#: simple-xyz-format.xml:254(entry) simple-xyz-format.xml:256(entry)
+msgid "5"
+msgstr "5"
+
+#: simple-xyz-format.xml:255(entry)
+msgid "4"
+msgstr "4"
+
+#: simple-xyz-format.xml:264(title)
+msgid "Binary data"
+msgstr "Двоичные данные"
+
+#: simple-xyz-format.xml:265(para)
+msgid ""
+"Data values are stored as IEEE 64bit double-precision floating point "
+"numbers, in little-endian (LSB, or Intel) byte order. Points are stored in "
+"arbitrary order. Each point is stored as a block of <literal>NChannels+2</"
+"literal> values: X, Y and then all ordinate values, in the channel order."
+msgstr ""
+"Значения данных хранятся как 64битные числа с плавающей точкой двойной "
+"точности стандарта IEEE, порядок байтов от младшего к старшему (little-"
+"endian, LSB или Intel). Точки хранятся в произвольном порядке. Каждая точка "
+"хранится как блок  <literal>NChannels+2</literal> значений: X, Y и затем все "
+"значения ординат в порядке следования каналов."
+
+#: simple-xyz-format.xml:272(para)
+msgid ""
+"The physical units of the values are given by <literal>XYUnits</literal> for "
+"X and Y and then <literal>ZUnits1</literal>, <literal>ZUnits2</literal>, … "
+"for the ordinate values."
+msgstr ""
+"Физические единицы измерения значений задаются <literal>XYUnits</literal> "
+"для X и Y и затем <literal>ZUnits1</literal>, <literal>ZUnits2</literal>, … "
+"для значений ординат."
+
+#: simple-xyz-format.xml:277(para)
+msgid ""
+"The size of the data is exactly <literal>8*NPoints*(NChannels+2)</literal> "
+"bytes and there is no data after it in the file."
+msgstr ""
+"Размер данных ровно <literal>8*NPoints*(NChannels+2)</literal> байт и после "
+"них в файле не должно быть данных."

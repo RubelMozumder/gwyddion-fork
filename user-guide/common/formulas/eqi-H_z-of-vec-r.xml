@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-H_z-of-vec-r.xml 19642 2017-04-20 12:56:11Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase><phrase role='mathvar'>H<subscript>z</subscript></phrase>(<phrase role='vector'>r</phrase>)</mathphrase>
+  <alt>H_z(\vec{r})</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

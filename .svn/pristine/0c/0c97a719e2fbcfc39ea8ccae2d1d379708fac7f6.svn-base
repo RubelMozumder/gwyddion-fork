@@ -1,0 +1,395 @@
+# vim: set ts=30 :
+accurexii-txt	managing-files
+acf2d	statistical-analysis	acf2d
+afmw-spec	managing-files
+aistfile	managing-files
+alicona	managing-files
+ambfile	managing-files
+ambprofile	managing-files
+anasys_xml	managing-files
+andorsif	managing-files
+anfatec	managing-files
+angle_dist	statistical-analysis	angle-distribution
+anneal_synth	synthetic	annealing-synthesis
+apedaxfile	managing-files
+apefile	managing-files
+arc-revolve	leveling-and-background	revolve-arc
+ardf	managing-files
+arithmetic	multidata	data-arithmetic
+asciiexport	managing-files
+asdfile	managing-files
+assing-afm	managing-files
+attocube	managing-files
+axis	selections
+basicops	basic-operations
+bcrfile	managing-files
+bdep_synth	synthetic	ballistic-synthesis
+binning	basic-operations	binning
+blockstep	scan-line-defects	line-correction-block
+burleigh_bii	managing-files
+burleigh_exp	managing-files
+burleigh	managing-files
+calcoefs_load	caldata
+calcoefs_new	caldata
+calcoefs_simple	caldata
+calcoefs_view	caldata
+calibrate	basic-operations	dimensions-and-units
+cmap_align	curve-maps-data-processing	cmap-align
+cmap_basicops	curve-maps-data-processing
+cmap_crop	curve-maps-data-processing	cmap-crop
+cmap_cutter	curve-maps-data-processing	cmap-cut-to-segments
+cmap_extractcurve	curve-maps-data-processing	cmap-extract-curves
+cmap_fztofd	curve-maps-fd	cmap-fztofd
+cmap_polylevel	curve-maps-fd	cmap-remove-polynomial-background
+cmap_simplemech	curve-maps-fd	cmap-nanomechanical-fit
+cmap_sinebg	curve-maps-fd	cmap-remove-sine-background
+codevfile	managing-files
+coerce	edit-extended	coerce
+col_synth	synthetic	columnar-synthesis
+convolution_filter	filters	convolution-filter
+convolve	convolution-deconvolution	convolve
+correct_affine	edit-extended	correct-affine
+correct_perspective	edit-extended	correct-perspective
+corrlen	statistical-analysis	correlation-length
+cpde_synth	synthetic	cpde-synthesis
+cprofile	basic-operations	profile-cross
+createc	managing-files
+crop	basic-operations	crop
+crosscor	multidata	cross-correlation
+cross	selections
+csmfile	managing-files
+curvature	feature-measurement	curvature
+cwt	wavelet-transform	cwt
+deconvolve	convolution-deconvolution	deconvolve
+dektakvca	managing-files
+dektakxml	managing-files
+deposit_synth	synthetic	particle-synthesis
+diff_synth	synthetic	diffusion-synthesis
+dimensionfile	managing-files
+disc_synth	synthetic	discs-synthesis
+displfield	edit-extended	displacement-field
+distance	basic-operations	distance
+dm3file	managing-files
+dmefile	managing-files
+domain_synth	synthetic	domain-synthesis
+drift	edit-extended	drift-compensation
+dumbfile	managing-files
+dune_synth	synthetic	dunes-synthesis
+dwtanisotropy	wavelet-transform	dwt
+dwt	wavelet-transform	dwt
+ecsfile	managing-files
+edge	presentations	edge
+ellipse	selections
+entropy	statistical-analysis	entropy
+evovisxml	managing-files
+extend	basic-operations	extend
+extract_path	edit-extended	extract-path-selection
+ezdfile	managing-files
+facet_analysis	feature-measurement	facet-analysis
+facet-level	leveling-and-background	facet-level
+facet_measure	feature-measurement	facet-measurement
+fbm_synth	synthetic	brownian-synthesis
+femtoscan	managing-files
+femtoscan-txt	managing-files
+fft_filter_1d	fourier-transform	fft-filter-1d
+fft_filter_2d	fourier-transform	fft-filter-2d
+fft	fourier-transform
+fft_synth	synthetic	spectral-synthesis
+fibre_synth	synthetic	fibre-synthesis
+filter	filters	basic-filters
+fitsfile	managing-files
+fit-shape	xyz-data-processing	fit-shape
+flatten_base	leveling-and-background	flatten-base
+formats3d	specific-data-import	raw-xyz-import
+fraccor	editing-correction	fractal-correction
+fractal	fractal-analysis	fractal-dimension
+freq_split	fourier-transform	frequency-split
+gaussian_step	presentations	gaussian-step
+gdeffile	managing-files
+good_profile	scan-line-defects	mean-good-profile
+gradient	presentations	gradient
+grain_cross	grain-analysis	grain-correlation
+grain_dist	grain-analysis	grain-distributions
+grain_edge	grain-analysis	grain-edge
+grain_filter	grain-analysis	grain-filter
+grain_makesel	grain-analysis	grain-makesel
+grain_mark	grain-analysis	grain-threshold
+grainmeasure	grain-analysis	grain-measure
+grainremover	editing-correction	remove-grains
+grain_stat	grain-analysis	grain-analysis-statistics
+grain_summary	grain-analysis	grain-summary
+grain_wshed	grain-analysis	grain-watershed
+graph_align	graph-processing	graph-align
+graph_cd	graph-processing	graph-critical-dimension
+graph_cut	graph-processing	graph-cut
+graph_dos_spectrum	graph-processing	graph-dos-spectrum
+graph_export_ascii	graph-processing	graph-export
+graph_export_bitmap	graph-processing	graph-export
+graph_export_vector	graph-processing	graph-export
+graph_fdfit	graph-processing
+graph_filter	graph-processing
+graph_fit	graph-processing	graph-fit
+graph_flip	graph-processing	graph-flip
+graph_invert	graph-processing	graph-invert
+graph_level	graph-processing	graph-level
+graph_logscale	graph-processing	graph-logscale
+graph_measure_period	graph-processing	graph-measure-period
+graph_merge	graph-processing	graph-merge
+graph_peaks	graph-processing	graph-peaks
+graph_sfuncs	graph-processing	graph-sfuncs
+graph_stats	graph-processing	graph-stats
+graph_terraces	graph-processing	graph-terraces
+gsffile	gsf
+gwyfile	managing-files
+gxyzffile	managing-files
+hdf4file	managing-files
+hdf5file	managing-files
+hdrimage	managing-files
+hitachi-afm	managing-files
+hitachi-sem	managing-files
+icolorange	color-map	color-range
+igorfile	managing-files
+imgexport	image-export
+immerse	multidata	immerse
+indent_analyze	force_indentation	indentanalyze
+intelliwave	managing-files
+intematix	managing-files
+iso28600	managing-files
+jeol	managing-files
+jeoltem	managing-files
+jpkscan	managing-files
+jspmfile	managing-files
+keyence	managing-files
+laplace	editing-correction	remove-data-under-mask
+lat_synth	synthetic	lattice-synthesis
+lattice	selections
+leica	managing-files
+level3	leveling-and-background	three-point-level
+level_grains	grain-analysis	grain-level
+level	leveling-and-background	plane-level
+lextfile	managing-files
+linecorrect	scan-line-defects	line-correction
+linematch	scan-line-defects	line-correction-step
+line	selections
+linestats	statistical-analysis	line-stats
+lno_synth	synthetic	line-noise-synthesis
+local_contrast	presentations	local-contrast
+logistic	grain-analysis	grain-logistic
+magellan	managing-files
+mapvue	managing-files
+mark_disconn	editing-correction	mark-disconnected
+mark_with	masks	mark-with
+maskcor	multidata	mask-by-correlation
+mask_distribute	masks	mask-distribute
+maskedit	masks	mask-editor
+mask_edt	masks	mask-edt
+mask_morph	masks	maskmorph
+mask_noisify	masks	mask-noisify
+maskops	masks	maskops
+mask_shift	masks	mask-shift
+matfile	managing-files
+mcrop	multidata	mutual-crop
+measure_lattice	feature-measurement	measure-lattice
+median-bg	leveling-and-background	median-level
+merge	multidata	merge
+metropro	managing-files
+mfm_current	mfm	mfm-field-simulation
+mfm_field	mfm	mfm-field-simulation
+mfm_findshift	mfm	mfm-field-find-shift
+mfm_parallel	mfm	mfm-field-simulation
+mfm_recalc	mfm	mfm-data-conversion
+mfm_shift	mfm	mfm-field-shift
+microprof	managing-files
+miffile	managing-files
+mifile	managing-files
+mulfile	managing-files
+multiprofile	multidata	multiprofile
+nanoeducator	managing-files
+nanomagnetics	managing-files
+nanonics	managing-files
+nanonis	managing-files
+nanonis-spec	managing-files
+nanoobserver	managing-files
+nanoscan	managing-files
+nanoscantech	managing-files
+nanoscope-ii	managing-files
+nanoscope	managing-files
+nanosystemz	managing-files
+nanotop	managing-files
+netcdf	managing-files
+neural	multidata	neural-network
+nmmxyz	specific-data-import	nmm-xyz-import
+noise_synth	synthetic	noise-synthesis
+nova-asc	managing-files
+npyfile	managing-files
+nrrdfile	managing-files
+nt-mdt	managing-files
+nxiifile	managing-files
+obj_synth	synthetic	object-synthesis
+oirfile	managing-files
+oldmda	managing-files
+ols	managing-files
+ometiff	managing-files
+omicronflat	managing-files
+omicron	managing-files
+omicronmatrix	managing-files
+opdfile	managing-files
+opengps	managing-files
+otsu_threshold	grain-analysis	grain-threshold-otsu
+outliers	editing-correction	mask-of-outliers
+pathlevel	scan-line-defects	path-level
+path	selections
+pat_synth	synthetic	pattern-synthesis
+phase_synth	synthetic	phases-synthesis
+phoenix	managing-files
+pileup_synth	synthetic	pileup-synthesis
+pixmap	specific-data-import	pixmap-file-import
+plateau_synth	synthetic	plateaus-synthesis
+pltfile	managing-files
+plugin-proxy	plugins
+pnifile	managing-files
+point	selections
+polydistort	edit-extended	polynomial-distort
+polylevel	leveling-and-background	polynomial-level
+presentationops	presentations	presentationops
+princetonspe	managing-files
+profile	basic-operations	profile
+projective	selections
+psdf2d	statistical-analysis	psdf2d
+psdf_logphi	fourier-transform	psdf-log-phi
+psf	convolution-deconvolution	transfer-function-guess
+psf-fit	convolution-deconvolution	transfer-function-fit
+psia	managing-files
+psppt	managing-files
+pt3file	managing-files
+pygwy	pygwy
+quazarnpic	managing-files
+quesant	managing-files
+rank_filter	leveling-and-background	kth-rank-filter
+rank	presentations	rank
+raveraging	edit-extended	radial-smoothing
+rawfile	raw-file-import
+rawgraph	specific-data-import	graph-curve-import
+readvalue	basic-operations	read-value
+rectangle	selections
+relate	multidata	relate
+renishaw	managing-files
+resample	basic-operations	resample
+rhk-sm3	managing-files
+rhk-sm4	managing-files
+rhk-spm32	managing-files
+robotics	managing-files
+roddeposit_synth	synthetic	rod-synthesis
+rotate	basic-operations	rotate
+roughness	roughness-iso
+rprofile	basic-operations	profile-radial
+s94file	managing-files
+scafile	managing-files
+scale	basic-operations	scale
+scanfile	managing-files
+scars	scan-line-defects	mark-scars
+scnxfile	managing-files
+sdfile	managing-files
+seiko	managing-files
+selectionmanager	selections	selection-manager
+semsim	presentations	semsim
+sensofar	managing-files
+sensofarx	managing-files
+sensolytics	managing-files
+sfunctions	statistical-analysis	sfunctions
+shade	presentations	shade
+shimadzu	managing-files
+sicmfile	managing-files
+sis	managing-files
+slope_dist	statistical-analysis	slope-distribution
+smm_apply	smm	smm-apply
+smm	smm	smm-calibration
+spcfile	managing-files
+spectro	single-point-spectra
+sphere-revolve	leveling-and-background	revolve-sphere
+spip-asc	managing-files
+spmlabf	managing-files
+spmlab	managing-files
+spml	managing-files
+spmxfile	managing-files
+spotremove	editing-correction	remove-spots
+stats	statistical-analysis	stat-quantities
+stitch	multidata	stitch
+stmprg	managing-files
+stpfile	managing-files
+straighten_path	edit-extended	straighten-path
+surffile	managing-files
+terracefit	feature-measurement	measure-terraces
+tescan	managing-files
+threshold	basic-operations	limit-range
+tiaser	managing-files
+tilt	leveling-and-background
+tip_blind	tip-convolution-artefacts	tip-blind-estimate
+tip_model	tip-convolution-artefacts	tip-model
+tipops	tip-convolution-artefacts	tip-operations
+trimmed-mean	leveling-and-background	trimmed-mean
+ttffile	managing-files
+unisoku	managing-files
+volume_1dfft	image-stacks-processing	volume-1dfft-filtering
+volume_arithmetic	volume-data-processing	volume-arithmetic
+volume_asciiexport	volume-data-processing	volume-export-text
+volume_calibrate	volume-data-processing	volume-calibrate
+volume_drift	image-stacks-processing	volume-drift
+volume_extract	volume-data-processing
+volume_facetlevel	image-stacks-processing	volume-facet-level
+volume_fdfit	volume-data-processing
+volume_flattenbase	image-stacks-processing	volume-flatten-base
+volume_invert	volume-data-processing	volume-invert
+volume_kmeans	volume-data-processing	volume-clustering
+volume_kmedians	volume-data-processing	volume-clustering
+volume_linestat	volume-data-processing	volume-linestat
+volume_localdetect	image-stacks-processing	volume-localisation-merge
+volume_meanplanelevel	image-stacks-processing	volume-mean-plane-level
+volume_mfmrecalc	volume-data-processing	volume-mfm-data-conversion
+volumeops	volume-data-processing	basic-volume-operations
+volume_outliers	image-stacks-processing	volume-outliers
+volume_planelevel	image-stacks-processing	volume-plane-level
+volume_planestat	volume-data-processing	volume-planestat
+volume_psf	volume-data-processing	volume-transfer-function-guess
+volume_scars	image-stacks-processing	volume-scars
+volume_slice	volume-data-processing	volume-slice
+volume_stepline	image-stacks-processing	volume-step-line
+volume_strayfield	volume-data-processing	volume-stray-field
+volume_swaxes	volume-data-processing	volume-swap-axes
+volume_xystitch	image-stacks-processing	image-stitch
+volume_zcal	volume-data-processing	volume-zcalibration
+volumize	basic-operations	volumize
+volumize_layers	basic-operations	volumize-layers
+wave_synth	synthetic	wave-synthesis
+wfr_synth	synthetic	wetting-synthesis
+win_stm	managing-files
+wipfile	managing-files
+witec-asc	managing-files
+witfile	managing-files
+wpour_mark	grain-analysis
+wrapvalue	basic-operations	wrap
+wrustfile	managing-files
+wsffile	managing-files
+wsxmfile	managing-files
+xydenoise	scan-line-defects	xy-denoise
+xyz_channels	basic-operations	xyz-from-channels
+xyzexport	managing-files
+xyzize	basic-operations	xyzize
+xyz_level	xyz-data-processing	xyz-level
+xyzops	xyz-data-processing	xyzops
+xyz_raster	xyz-data-processing	xyz-rasterize
+zeisslsm	managing-files
+zeiss	managing-files
+zemax	managing-files
+zero_crossing	presentations	edge-zero-crossing
+zmgfile	managing-files
+zonfile	managing-files
+cmap::cmap_calibrate	curve-maps-data-processing	cmap-dimensions-and-units
+cmap::cmap_flip_horizontally	curve-maps-data-processing	cmap-flip
+cmap::cmap_flip_vertically	curve-maps-data-processing	cmap-flip
+cmap::cmap_rotate_180	curve-maps-data-processing	cmap-flip
+cmap::cmap_rotate_90_cw	curve-maps-data-processing	cmap-rotate-90
+cmap::cmap_rotate_90_ccw	curve-maps-data-processing	cmap-rotate-90
+cmap::cmap_remove_segments	curve-maps-data-processing	cmap-remove-segments
+proc::unrotate	edit-extended	unrotate
+proc::fit_shape	feature-measurement	fit-shape-image

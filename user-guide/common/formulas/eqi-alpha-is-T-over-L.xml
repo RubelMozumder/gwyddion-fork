@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-alpha-is-T-over-L.xml 22866 2020-06-29 16:16:19Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase><phrase role='mathvar'>α</phrase> = <phrase role='mathvar'>T</phrase>/<phrase role='mathvar'>L</phrase></mathphrase>
+  <alt>\alpha = T/L</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

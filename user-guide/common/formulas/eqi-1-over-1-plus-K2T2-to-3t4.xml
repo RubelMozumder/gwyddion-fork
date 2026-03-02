@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-1-over-1-plus-K2T2-to-3t4.xml 14708 2013-02-26 09:18:54Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase>1/(1 + <phrase role='mathvar'>k</phrase><superscript>2</superscript><phrase role='mathvar'>T</phrase><superscript>2</superscript>)<superscript>3/4</superscript></mathphrase>
+  <alt>1/(1+k^2T^2)^{3/4}</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->
+

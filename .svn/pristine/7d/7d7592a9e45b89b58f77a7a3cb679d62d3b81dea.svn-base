@@ -1,0 +1,1041 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2023-10-14 14:02+0400\n"
+"PO-Revision-Date: 2023-10-14 14:07+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 3.4\n"
+
+#: graph.xml:6(title)
+msgid "Graph Processing"
+msgstr "Обработка графиков"
+
+#: graph.xml:7(para)
+msgid ""
+"Many of the Gwyddion data processing modules produce graph as an output. "
+"Graphs can be exported into text files or further analysed within Gwyddion "
+"by several graph processing modules. These modules can be found in the Graph "
+"menu in the Gwyddion main window. Note that the number of graph modules is "
+"quite limited now and consists of basic modules for doing things that are "
+"very frequent within SPM data analysis. For more analytical tools you can "
+"use your favourite graph processing program."
+msgstr ""
+"Многие из модулей обработки данных создают графики в результате своей "
+"работы. Графики можно экспортировать в текстовый файл или продолжать "
+"анализировать их в Gwyddion с помощью нескольких модулей обработки графиков. "
+"Эти модули доступны в меню График основного окна Gwyddion. Следует заметить, "
+"что число модулей обработки графиков на данный момент невелико, и они "
+"состоят в основном из простейших модулей для операций, которые часто "
+"встречаются при анализе данных СЗМ. Для более сложных аналитических операций "
+"лучше использовать вашу любимую программу для обработки графиков."
+
+#: graph.xml:16(para)
+msgid ""
+"In this section the graph modules present in Gwyddion are briefly presented."
+msgstr ""
+"В этой секции кратко описываются имеющиеся в Gwyddion модули обработки "
+"графиков."
+
+#: graph.xml:21(title)
+msgid ""
+"Basic Operations <gwy:icon name=\"graph_zoom_in\"/><gwy:icon name="
+"\"logscale_horizontal\"/>"
+msgstr ""
+"Базовые операции <gwy:icon name=\"graph_zoom_in\"/><gwy:icon name="
+"\"logscale_horizontal\"/>"
+
+#: graph.xml:26(para)
+msgid ""
+"First of all zooming and data reading functions are available directly in "
+"the graph window:"
+msgstr ""
+"Прежде всего, функции масштабирования и чтения данных доступны "
+"непосредственно в окне графика:"
+
+#: graph.xml:31(listitem)
+msgid ""
+"Logarithmic axes – horizontal and vertical axes can be switched between "
+"linear and logarithmic using the logscale buttons. Switching to logarithmic "
+"scale is possible only for positive values (either on abscissa or ordinate)."
+msgstr ""
+"Логарифмический масштаб осей – горизонтальные и вертикальные оси могут "
+"переключаться между линейным и логарифмическим режимом с использованием "
+"кнопок логарифмического масштаба. Переключение на логарифмический масштаб "
+"доступно только для положительных значений (либо по абсциссе, либо по "
+"ординате)."
+
+#: graph.xml:37(listitem)
+msgid ""
+"Zoom in and zoom out – after selecting zoom in simply draw the area that "
+"should be zoomed by mouse. Zoom out restores the state where all data can be "
+"seen."
+msgstr ""
+"Увеличение и уменьшение масштаба – после выбора режима приближения можно "
+"нарисовать мышью область, которую нужно увеличить. Уменьшение "
+"восстанавливает тот масштаб, при котором видны все данные."
+
+#: graph.xml:42(listitem)
+msgid ""
+"Measure distances – enables user to select several points within the graph "
+"and displays their distances and angles between them."
+msgstr ""
+"Измерение расстояний – позволяет выбрать несколько точек на графике и "
+"показать расстояния и углы между ними."
+
+#: graph.xml:49(title)
+msgid "Graph Flip"
+msgstr "Перевернуть график"
+
+#: graph.xml:52(para)
+msgid ""
+"<guilabel>Graph Flip</guilabel> flips the graph vertically. In other words "
+"the ordinate is inverted, whereas the abscissa is kept untouched. The "
+"functions directly modifies the curve data; it does not just change the "
+"presentation."
+msgstr ""
+"<guilabel>Перевернуть график</guilabel> переворачивает график вертикально. "
+"Другими словами, ордината инвертируется, при этом абсцисса остаётся "
+"нетронутой. Функция непосредственно меняет данные кривой, она не затрагивает "
+"только презентацию данных."
+
+#: graph.xml:60(title)
+msgid "Graph Invert"
+msgstr "Инвертировать график"
+
+#: graph.xml:63(para)
+msgid ""
+"<guilabel>Graph Invert</guilabel> flips the graph horizontally. In other "
+"words the abscissa is inverted, whereas the ordinate is kept untouched. The "
+"functions directly modifies the curve data; it does not just change the "
+"presentation."
+msgstr ""
+"<guilabel>Инвертировать график</guilabel> переворачивает график "
+"горизонтально. Другими словами, абсцисса инвертируется, при этом ордината "
+"остаётся нетронутой. Функция непосредственно меняет данные кривой, она не "
+"затрагивает только презентацию данных."
+
+#: graph.xml:71(title)
+msgid "Graph Cut <gwy:icon name=\"graph_cut\"/>"
+msgstr "Обрезать график <gwy:icon name=\"graph_cut\"/>"
+
+#: graph.xml:74(para)
+msgid ""
+"<guilabel>Graph Cut</guilabel> is a very simple module that cuts graph "
+"curves to the selected range (either given numerically or on the graph with "
+"mouse) and creates a new graph. If <guilabel>Cut all curves</guilabel> all "
+"curves are cut and put to the new graph; otherwise just the one chosen curve."
+msgstr ""
+"Обрезать график – очень простой модуль, который обрезает кривые графиков до "
+"выбранного диапазона (либо заданного численно, либо выбранного на графике с "
+"помощью мыши) и создаёт новый график. Если выбрано <guilabel>Обрезать все "
+"кривые</guilabel>, все кривые обрезаются и переносятся на новый график, в "
+"противном случае операция применяется только к выбранной кривой."
+
+#: graph.xml:83(title)
+msgid "Graph Level <gwy:icon name=\"graph_level\"/>"
+msgstr "Выравнивание графиков <gwy:icon name=\"graph_level\"/>"
+
+#: graph.xml:86(para)
+msgid ""
+"Graph level is also a simple module that currently performs linear fit of "
+"each graph curve and subtracts the fitted linear functions from them."
+msgstr ""
+"Выравнивание графика – очень простой модуль, который на данный момент "
+"производит линейную аппроксимацию каждой из кривых графика и вычитает "
+"аппроксимирующую линейную функцию из них."
+
+#: graph.xml:92(title)
+msgid "Graph Align <gwy:icon name=\"graph_align\"/>"
+msgstr "Подровнять <gwy:icon name=\"graph_align\"/>"
+
+#: graph.xml:95(para)
+msgid ""
+"Graph align shifts the graphs curves horizontally to maximise their mutual "
+"correlations, i.e. match common features in the curves. This is useful in "
+"particular for comparison of profiles taken in different locations."
+msgstr ""
+"Функция подровнять сдвигает кривые графиков горизонтально таким образом, "
+"чтобы максимизировать их взаимные корреляции, т.е. чтобы общие особенности "
+"кривых соответствовали друг другу. Это может быть полезным, например, для "
+"сравнения профилей, снятых в разных местах образца."
+
+#: graph.xml:103(title)
+msgid "Graph Merge and Average"
+msgstr "Объединение и усреднение графиков"
+
+#: graph.xml:106(para)
+msgid ""
+"Two simple functions combine data of all curves to one, which is added to "
+"the plot. They differ slightly by data averaging approach."
+msgstr ""
+"Две простые функции комбинируют данные всех кривых в одну, которая "
+"добавляется к построенному графику. Они немного отличаются подходом к "
+"усреднению данных."
+
+#: graph.xml:113(guimenuitem)
+msgid "Merge Curves"
+msgstr "Объединить кривые"
+
+#: graph.xml:115(listitem)
+msgid ""
+"simply collects the data from all curves. It only merges two data points if "
+"the abscssae are the same, averaging the ordinates. The resulting curve thus "
+"usually oscillates between points belonging to the input curves if they are "
+"slightly vertically shifted."
+msgstr ""
+"Просто собирает данные со всех кривых. Она объединяет две точки данных если "
+"абсциссы их совпадают, усредняя ординаты. Результирующая кривая вследствие "
+"этого обычно колеблется между точками, принадлежащим входным кривым если они "
+"слегка смещены друг относительно друга по вертикали."
+
+#: graph.xml:124(guimenuitem)
+msgid "Average Curves"
+msgstr "Усреднить кривые"
+
+#: graph.xml:126(listitem)
+msgid ""
+"attempts to combine close points, averaging both ordinates and abscissae. "
+"Usually the resulting curve has a similar (or somewhat larger) number of "
+"points to one input curve, not all of them together. It should be also much "
+"smoother than for the simple merge, although sometimes there can be still "
+"visible oscillations."
+msgstr ""
+"пытается объединить близкие точки, усредняя как ординаты, так и абсциссы. "
+"Обычно получаемая в результате кривая имеет то же (или слегка большее) число "
+"точек, что и входная кривая, не все они вместе. Она также должна быть "
+"заметно более гладкой по сравнению с кривой, получаемой в результате "
+"объединения, хотя иногда и на ней могут оставаться заметные колебания."
+
+#: graph.xml:136(title)
+msgid "Logscale Transform"
+msgstr "Логарифмический масштаб"
+
+#: graph.xml:137(para)
+msgid ""
+"The graph window controls allow switching between linear and logarithmic "
+"axes. However, for the fitting of power-law-like dependencies it is often "
+"useful to physically transform the data by taking logarithms of the values. "
+"The logscale transform graph function performs such transformation. You can "
+"choose which axis to transform (<xi:include href=\"eqi-x.xml\"/>, <xi:"
+"include href=\"eqi-y.xml\"/> or both), what to do with non-positive values "
+"if they occur and the logarithm base. A new graph is then created, with all "
+"curves transformed as requested."
+msgstr ""
+"Элементы управления окном графика позволяют переключаться между линейным и "
+"логарифмическим масштабом осей. Однако, для аппроксимации зависимостей "
+"наподобие степенных может оказаться полезно физически преобразовать данные "
+"взятием логарифма от значений. Функция преобразования графика в "
+"логарифмический масштаб осуществляет такое преобразование. Можно выбрать, "
+"какую из осей нужно преобразовать (<xi:include href=\"eqi-x.xml\"/>, <xi:"
+"include href=\"eqi-y.xml\"/> или обе), что делать с неположительными "
+"значениями, если они появляются, и выбрать основание логарифма. После этого "
+"создаётся новый график и все кривые преобразуются заданным образом."
+
+#: graph.xml:149(title)
+msgid ""
+"Exporting Graph Curves <gwy:icon name=\"graph_export_ascii\"/><gwy:icon name="
+"\"graph_export_png\"/><gwy:icon name=\"graph_export_vector\"/>"
+msgstr ""
+"Экспорт графиков кривых <gwy:icon name=\"graph_export_ascii\"/><gwy:icon "
+"name=\"graph_export_png\"/><gwy:icon name=\"graph_export_vector\"/>"
+
+#: graph.xml:156(primary)
+msgid "text export"
+msgstr "экспорт текстовых данных"
+
+#: graph.xml:157(secondary) graph.xml:226(secondary) graph.xml:332(secondary)
+#: graph.xml:336(secondary) graph.xml:340(secondary) graph.xml:344(secondary)
+#: graph.xml:348(secondary)
+msgid "graphs"
+msgstr "графики"
+
+#: graph.xml:159(para)
+msgid ""
+"Graph curve data can be exported to text files using <guimenuitem>Export "
+"Text</guimenuitem>. The export dialogue allows choosing several style "
+"variations that particular other software may find easier to read. Options "
+"<guilabel>Export labels</guilabel>, <guilabel>Export units</guilabel> and "
+"<guilabel>Export metadata</guilabel> allow adding informational lines before "
+"the actual data. This can be very useful for reminding what the file "
+"contains, but may cause problems when the file is read in other software."
+msgstr ""
+"Данные графиков кривых могут быть экспортированы в текстовые файлы с "
+"использованием меню <guimenuitem>Экспортировать текст</guimenuitem>. "
+"Диалоговое окно экспорта позволяет выбрать между несколькими вариантами "
+"стилей, которые потом проще импортировать в другие пакеты программного "
+"обеспечения. Опции <guilabel>Экспорт меток</guilabel>, <guilabel>Экспорт "
+"единиц измерения</guilabel> и <guilabel>Экспорт метаданных</guilabel> "
+"позволяют добавить строки с дополнительной информацией перед блоком числовых "
+"данных. Это может оказаться полезным как напоминание, какие данные содержал "
+"исходный файл, но может вызывать проблемы при чтении файла другим "
+"программным обеспечением."
+
+#: graph.xml:171(para)
+msgid ""
+"Option <guilabel>POSIX number format</guilabel> enforces standard machine-"
+"readable scientific number format with decimal dot. Otherwise the values are "
+"written according to locale settings (office-style software may like that; "
+"scientific software generally does not)."
+msgstr ""
+"Опция <guilabel>Формат чисел POSIX</guilabel> принудительно заставляет "
+"использовать стандартное машиночитаемое научное представление чисел с "
+"десятичной точкой. В противном случае значения записываются в соответствии с "
+"настройками текущей локали (офисное программное обеспечение может более "
+"охотно читать такой формат, научное программное обеспечение обычно "
+"поддерживает его хуже)."
+
+#: graph.xml:177(para)
+msgid ""
+"The other important option that influences the structure of the entire file "
+"is <guilabel>Single merged abscissa</guilabel>. By default individual curves "
+"are written to the file sequentially, separated by empty lines. When this "
+"checkbox is enabled the curve export writes one multi-column table with data "
+"of all curves and a single abscissa in the first column. If the curves are "
+"not sampled identically, some rows will of course contain values only for "
+"some curves. Exported file with two separated curves can look like "
+"<informalexample><programlisting><![CDATA[\n"
+"0.1 3.32e6\n"
+"0.2 3.80e6\n"
+"0.4 4.15e6\n"
+"\n"
+"0.0 11.1\n"
+"0.3 9.66\n"
+"0.4 9.70\n"
+"]]></programlisting></informalexample> while with single merged abscissa the "
+"same data would be saved <informalexample><programlisting><![CDATA[\n"
+"0.0 --- 11.1\n"
+"0.1 3.32e6 ---\n"
+"0.2 3.80e6 ---\n"
+"0.3 --- 9.66\n"
+"0.4 4.15e6 9.70\n"
+"]]></programlisting></informalexample>"
+msgstr ""
+"Другой важной опцией, которая влияет на структуру всего файла является "
+"<guilabel>Общая объединённая абсцисса</guilabel>. По умолчанию отдельные "
+"кривые записываются в файл последовательно, разделённые пустыми строками. "
+"Если эта опция включена, экспорт кривых записывает единую таблицу с "
+"несколькими столбцами, представляющими данные всех кривых, и общую абсциссу "
+"первым столбцом. Если кривые не были дискретизированы одинаково, некоторые "
+"строки будут естественно содержать значения только для части кривых, где они "
+"определены. Экспортируемый файл с двумя отдельными кривыми может выглядеть "
+"следующим образом: <informalexample><programlisting><![CDATA[\n"
+"0.1 3.32e6\n"
+"0.2 3.80e6\n"
+"0.4 4.15e6\n"
+"\n"
+"0.0 11.1\n"
+"0.3 9.66\n"
+"0.4 9.70\n"
+"]]></programlisting></informalexample> в то время, как с общей объединённой "
+"осью абсцисс те же данные будут сохранены как: "
+"<informalexample><programlisting><![CDATA[\n"
+"0.0 --- 11.1\n"
+"0.1 3.32e6 ---\n"
+"0.2 3.80e6 ---\n"
+"0.3 --- 9.66\n"
+"0.4 4.15e6 9.70\n"
+"]]></programlisting></informalexample>"
+
+#: graph.xml:208(para)
+msgid ""
+"It is also possible to export a vector (EPS) or bitmap (PNG) rendering of "
+"the graph using <guimenuitem>Export PostScript</guimenuitem> or "
+"<guimenuitem>Export Bitmap</guimenuitem>. However, these options are rather "
+"rudimentary. Gwyddion is not a dedicated plotting software and if you want "
+"nice graphs use one instead – for instance <ulink url=\"http://www.gnuplot."
+"info/\">gnuplot</ulink> or <ulink url=\"http://matplotlib.org/\">matplotlib</"
+"ulink>."
+msgstr ""
+"Также можно экспортировать векторное (EPS) или растровое (PNG) графическое "
+"представление графика используя пункты меню <guimenuitem>Экспортировать "
+"PostScript</guimenuitem> или <guimenuitem>Экспортировать растр</"
+"guimenuitem>. Однако, эти опции предоставляют достаточно ограниченные "
+"возможности. Gwyddion не является специальным программным обеспечением для "
+"построения графиков, и если вам нужны красивые графики, лучше использовать "
+"то, которое является – например, <ulink url=\"http://www.gnuplot.info/"
+"\">gnuplot</ulink> или <ulink url=\"http://matplotlib.org/\">matplotlib</"
+"ulink>."
+
+#: graph.xml:220(title)
+msgid "Statistics <gwy:icon name=\"graph_statistics\"/>"
+msgstr "Статистика <gwy:icon name=\"graph_statistics\"/>"
+
+#: graph.xml:225(primary)
+msgid "statistics"
+msgstr "статистика"
+
+#: graph.xml:229(primary)
+msgid "mean"
+msgstr "среднее"
+
+#: graph.xml:230(secondary) graph.xml:234(secondary) graph.xml:238(secondary)
+#: graph.xml:242(secondary) graph.xml:246(secondary) graph.xml:250(secondary)
+msgid "of a graph curve"
+msgstr "кривой графика"
+
+#: graph.xml:233(primary)
+msgid "rms"
+msgstr "ср. квадр."
+
+#: graph.xml:237(primary)
+msgid "minimum"
+msgstr "минимум"
+
+#: graph.xml:241(primary)
+msgid "maximum"
+msgstr "максимум"
+
+#: graph.xml:245(primary)
+msgid "median"
+msgstr "срединное"
+
+#: graph.xml:249(primary)
+msgid "integral"
+msgstr "интеграл"
+
+#: graph.xml:252(para)
+msgid ""
+"Graph statistics display summary information about entire graph curves or "
+"selected ranges. The dialogue shows two main groups of quantities that are "
+"calculated differently."
+msgstr ""
+"Модуль статистики графика показывает сводную информацию о полной кривой "
+"графика или о выбранных диапазонах. Диалоговое окно показывает две основные "
+"группы величин, которые вычисляются различным способом."
+
+#: graph.xml:257(para)
+msgid ""
+"<guilabel>Simple Parameters</guilabel> are calculated from the set of "
+"ordinate values, without any regard to abscissae. This is important to keep "
+"in mind when the curve is sampled non-uniformly, i.e. the intervals between "
+"abscissae differ, possibly a lot. A part of the curve which is sampled more "
+"densely contains relatively more points and thus also influences the result "
+"more. The available parameters include elementary characteristics with the "
+"same meaning as for <link linkend=\"stat-quantities\">two-dimensional data</"
+"link>. Several of them also coincide with basic roughness parameters "
+"calculated by the <link linkend=\"roughness-iso\">Roughness</link> tool."
+msgstr ""
+"<guilabel>Простые параметры</guilabel> рассчитываются из набора значений "
+"ординат, никак не учитывая абсциссы. Это важно иметь в виду в том случае, "
+"когда кривая дискретизирована неравномерно, т.е. расстояние между значениями "
+"по оси абсцисс меняется, возможно сильно. Часть кривой, в которой точки "
+"дискретизации идут более плотно, будет оказывать более сильное влияние на "
+"результат. Доступные параметры включают в себя базовые характеристики с тем "
+"же значением, что и для <link linkend=\"stat-quantities\">двумерных данных</"
+"link>. Некоторые из них также совпадают с основными параметрами "
+"шероховатости, которые рассчитываются инструментом <link linkend=\"roughness-"
+"iso\">Шероховатость</link>."
+
+#: graph.xml:269(para)
+msgid ""
+"On the other hand, <guilabel>Integrals</guilabel> are obtained by "
+"integration, utilising the trapezoid rule (or a similar approximation). "
+"Therefore, longer intervals contribute more to the results. Available "
+"quantities include:"
+msgstr ""
+"С другой стороны <guilabel>Интегралы</guilabel> получаются интеграцией по "
+"правилу трапеций (или с помощью похожей аппроксимации). Следовательно, более "
+"длинные интервалы вносят больший вклад в результат. Доступные величины "
+"включают в себя:"
+
+#: graph.xml:277(guilabel)
+msgid "Projected length"
+msgstr "Длина проекции"
+
+#: graph.xml:278(listitem)
+msgid ""
+"The length of the selected interval (or the entire abscissa range if no "
+"interval is selected)."
+msgstr ""
+"Длина выбранного диапазона (или полный диапазон значений по оси абсцисс, "
+"если диапазон не выбран)."
+
+#: graph.xml:284(guilabel)
+msgid "Developed length"
+msgstr "Длина полного профиля"
+
+#: graph.xml:285(listitem)
+msgid "Sum of lengths of linear segments connecting curve points."
+msgstr "Сумма длин линейных сегментов, соединяющих точки кривой."
+
+#: graph.xml:290(guilabel)
+msgid "Variation"
+msgstr "Вариация"
+
+#: graph.xml:291(listitem)
+msgid ""
+"Integral of absolute value of the derivative – calculated as the sum of "
+"absolute values of ordinate differences."
+msgstr ""
+"Интеграл модуля производной - рассчитывается как сумма модулей попарных "
+"разностей значений ординаты."
+
+#: graph.xml:297(guilabel)
+msgid "Average value"
+msgstr "Среднее значение"
+
+#: graph.xml:298(listitem)
+msgid "Area under the curve divided by the projected length."
+msgstr "Площадь под кривой делённая на длину проекции."
+
+#: graph.xml:303(guilabel)
+msgid "Area under curve"
+msgstr "Площадь под кривой"
+
+#: graph.xml:304(listitem)
+msgid "The total integral (sum of positive and negative area)."
+msgstr "Полный интеграл (сумма положительной и отрицательной площади)."
+
+#: graph.xml:309(guilabel)
+msgid "Positive area"
+msgstr "Положительная площадь"
+
+#: graph.xml:310(listitem)
+msgid "Integral of portions of the curve where it is positive."
+msgstr "Интеграл под отрезками кривой, где она положительна."
+
+#: graph.xml:315(guilabel)
+msgid "Negative area"
+msgstr "Отрицательная площадь"
+
+#: graph.xml:316(listitem)
+msgid "Integral of portions of the curve where it is negative."
+msgstr "Интеграл под отрезками кривой, где она отрицательна."
+
+#: graph.xml:321(guilabel)
+msgid "Root mean square"
+msgstr "Среднеквадратичное"
+
+#: graph.xml:322(listitem)
+msgid "Integral of squared values divided by the projected length."
+msgstr ""
+"Интеграл возведённых в квадрат значений делённый на длину проекции кривой."
+
+#: graph.xml:329(title)
+msgid "Statistical Functions"
+msgstr "Статистические функции"
+
+#: graph.xml:331(primary)
+msgid "autocorrelation function"
+msgstr "функция автокорреляции"
+
+#: graph.xml:335(primary)
+msgid "height-height correlation function"
+msgstr "функция корреляции высота-высота"
+
+#: graph.xml:339(primary)
+msgid "power spectral density function"
+msgstr "функция спектральной плотности мощности"
+
+#: graph.xml:343(primary)
+msgid "height distribution"
+msgstr "распределение высоты"
+
+#: graph.xml:347(primary)
+msgid "angle distribution"
+msgstr "распределение углов"
+
+#: graph.xml:350(para)
+msgid ""
+"One-dimensional statistical functions are calculated for graphs using the "
+"same definitions as for images. They are described in the <link linkend="
+"\"sfunctions\">Statistical Functions tool</link> documentation. The "
+"available functions include <link linkend=\"height-angle-distribution"
+"\">height and angle distributions</link>, <link linkend=\"autocorrelation-1d"
+"\">autocorrelation function</link>, <link linkend=\"height-height-"
+"correlation-1d\">height-height correlation function</link> and <link linkend="
+"\"power-spectral-density-1d\">spectral density</link>. They can be "
+"calculated for the selected curve or for all curves at once if <guilabel>All "
+"curves</guilabel> is enabled."
+msgstr ""
+"Одномерные статистические функции рассчитываются для графиков используя те "
+"же самые определения, что и для изображений. Они подробно описаны в разделе "
+"<link linkend=\"sfunctions\">Инструмент статистические функции</link>. "
+"Доступные функции включают в себя <link linkend=\"height-angle-distribution"
+"\">распределения высот и углов</link>, <link linkend=\"autocorrelation-1d"
+"\">функцию автокорреляции</link>, <link linkend=\"height-height-"
+"correlation-1d\">функцию корреляции высота-высота</link> и <link linkend="
+"\"power-spectral-density-1d\">функцию спектральной плотности мощности</"
+"link>. Они могут быть расчитаны для выбранной кривой или для всех кривых "
+"сразу если включена опция <guilabel>Все кривые</guilabel>."
+
+#: graph.xml:364(para)
+msgid ""
+"A major difference between images and graphs is that graph curves do not "
+"need to have uniformly spaced abscissa values (uniform sampling). In such "
+"case the curve is resampled within the calculation of the statistical "
+"functions to uniform sampling. The default sampling step is such that the "
+"number of points is preserved. However, it can be modified by "
+"<guilabel>Oversampling</guilabel> which gives how many more points the "
+"resampled curve should have compared to the graph curve. Occasionally it may "
+"be useful to use oversampling larger than 1 even for regularly sampled graph "
+"curves."
+msgstr ""
+"Главное различие между изображениями и графиками состоит в том, что кривые "
+"графика не обязательно должны иметь равномерные интервалы между значениями "
+"абсцисс (равномерную дискретизацию). В этом случае кривая будет заново "
+"дискретизирована при расчёте статистических функций на равномерно "
+"распределенные интервалы. Шаг между отсчётами по умолчанию берётся таким, "
+"чтобы сохранить количество точек. Однако, это можно изменить используя "
+"опцию  <guilabel>Избыточная дискретизация</guilabel>, которая задаёт "
+"насколько больше точек новая кривая должна иметь по сравнению с "
+"оригинальной. Иногда может быть полезно использовать избыточную "
+"дискретизацию больше 1 даже для кривых графиков с правильными интервалами "
+"между точками."
+
+#: graph.xml:377(title)
+msgid "Function Fitting <gwy:icon name=\"graph_function\"/>"
+msgstr "Аппроксимировать функцией <gwy:icon name=\"graph_function\"/>"
+
+#: graph.xml:381(primary) graph.xml:423(primary)
+msgid "fitting"
+msgstr "аппроксимация"
+
+#: graph.xml:382(secondary)
+msgid "functions to graph"
+msgstr "функции, которые можно построить"
+
+#: graph.xml:384(para)
+msgid ""
+"The curve fitting is designed namely for fitting of statistical functions "
+"used in roughness parameters evaluation. Therefore most of the available "
+"functions are currently various statistical functions of surfaces with "
+"Gaussian or exponential autocorrelation functions. Nevertheless it also "
+"offers a handful of common general-purpose functions. See the <link linkend="
+"\"fitting-functions\">list of fitting functions</link>."
+msgstr ""
+"Аппроксимация функцией разрабатывалась для аппроксимации данных "
+"статистическими функциями, используемыми при оценке параметров "
+"шероховатости. Следовательно, большая часть доступных здесь функций является "
+"статистическими функциями поверхностей с гауссовой или экспоненциальной "
+"функцией автокорреляции. Тем не менее, здесь доступно несколько "
+"распространённых функций общего назначения. Подробнее они описаны в <link "
+"linkend=\"fitting-functions\">списке аппроксимирующих функций</link>."
+
+#: graph.xml:393(para)
+msgid ""
+"Within the fitting module you can select the area that should be fitted "
+"(with mouse or numerically), try some initial parameters, or let the module "
+"to guess them, and then fit the data using Marquardt-Levenberg algorithm."
+msgstr ""
+"В модуле аппроксимации можно задать область, на которой будет производиться "
+"аппроксимация (с помощью мыши или численно), сначала надо задать начальные "
+"параметры или дать модулю самому угадать их, и, затем, можно "
+"аппроксимировать данные используя алгоритм Левенберга – Маркардта."
+
+#: graph.xml:399(para)
+msgid ""
+"As the result you obtain the fitted curve and the set of its parameters. The "
+"fit report can be saved into a file using <guibutton>Save</guibutton> "
+"button. Pressing <guibutton>OK</guibutton> button adds the fitted curve to "
+"the graph, if this is not desirable, quit the dialogue with "
+"<guibutton>Cancel</guibutton>."
+msgstr ""
+"В результате получается аппроксимированная кривая и набор её параметров. "
+"Отчёт об аппроксимации можно сохранить в файл используя кнопку "
+"<guibutton>Сохранить</guibutton>. Нажатие кнопки <guibutton>OK</guibutton> "
+"добавляет аппроксимирующую кривую к графику, если это нежелательно, закройте "
+"диалоговое окно с помощью кнопки <guibutton>Отмена</guibutton>."
+
+#: graph.xml:412(caption)
+msgid "Curve fitting module dialogue"
+msgstr "Диалоговое окно аппроксимации кривой"
+
+#: graph.xml:419(title)
+msgid "Force-Distance Curve Fitting <gwy:icon name=\"graph_fd\"/>"
+msgstr "Аппроксимировать кривую сила-расстояние <gwy:icon name=\"graph_fd\"/>"
+
+#: graph.xml:424(secondary)
+msgid "force-distance curves"
+msgstr "кривые сила-расстояние"
+
+#: graph.xml:426(para)
+msgid ""
+"The module for fitting of force-distance curves is very similar to the "
+"general curve fitting module, it is just specialized for force-distance "
+"curves. Currently, the module serves for fitting jump-in part of force-"
+"distance curve (representing attractive forces) using different models:"
+msgstr ""
+"Модуль аппроксимации кривых сила-расстояния весьма похож на модуль "
+"аппроксимации любых кривых, он просто специально сделан для данного типа "
+"кривых. На настоящий момент модуль может использоваться для аппроксимации "
+"части со скачком на кривой сила-расстояния (которая показывает силы "
+"притяжения) используя различные модели:"
+
+#: graph.xml:434(listitem)
+msgid "van der Waals force between semisphere and half-space"
+msgstr "силу Ван-дер-Ваальса между полусферой и полупространством"
+
+#: graph.xml:437(listitem)
+msgid "van der Waals force between pyramid and half-space"
+msgstr "силу Ван-дер-Ваальса между пирамидой и полупространством"
+
+#: graph.xml:440(listitem)
+msgid "van der Waals force between truncated pyramid and half-space"
+msgstr "силу Ван-дер-Ваальса между усечённой пирамидой и полупространством"
+
+#: graph.xml:443(listitem)
+msgid "van der Waals force between sphere and half-space"
+msgstr "силу Ван-дер-Ваальса между сферой и полупространством"
+
+#: graph.xml:446(listitem)
+msgid "van der Waals force between two spheres"
+msgstr "силу Ван-дер-Ваальса между двумя сферами"
+
+#: graph.xml:449(listitem)
+msgid "van der Waals force between cone and half-space"
+msgstr "силу Ван-дер-Ваальса между конусом и полупространством"
+
+#: graph.xml:452(listitem)
+msgid "van der Waals force between cylinder and half-space"
+msgstr "силу Ван-дер-Ваальса между цилиндром и полупространством"
+
+#: graph.xml:455(listitem)
+msgid "van der Waals force between paraboloid and half-space"
+msgstr "силу Ван-дер-Ваальса между параболоидом и полупространством"
+
+#: graph.xml:459(para)
+msgid ""
+"Note that the curve being fitted must be a real force-distance curve, not a "
+"displacement-distance or sensor-distance curve. Recalculation of cantilever "
+"deflection into force should be done before calling this module."
+msgstr ""
+"Следует отметить, что аппроксимируемая кривая должна быть именно кривой сила-"
+"расстояние, а не смещение-расстояние или сигнал датчика-расстояние. Пересчёт "
+"отклонения кантелевера в силу должен быть сделан до вызова этого модуля."
+
+#: graph.xml:465(para)
+msgid ""
+"Also note that for small cantilever spring constants the amount of usable "
+"data in attractive region is limited by effect of jumping into contact."
+msgstr ""
+"Также следует отметить, что для кантелеверов с малой постоянной упругости "
+"количество полезных данных в области притяжения ограничено эффектом "
+"перескока в состояние контакта."
+
+#: graph.xml:471(title)
+msgid "Critical Dimension <gwy:icon name=\"graph_measure\"/>"
+msgstr "Габаритный размер <gwy:icon name=\"graph_measure\"/>"
+
+#: graph.xml:474(primary)
+msgid "critical dimension"
+msgstr "габаритный размер"
+
+#: graph.xml:475(para)
+msgid ""
+"Critical dimension module can be used to fit some <quote>typical</quote> "
+"objects that are often found while analysing profiles extracted from "
+"microchips and related surfaces. These objects are located in the graph and "
+"their properties are evaluated."
+msgstr ""
+"Модуль определения габаритных размеров можно использовать для аппроксимации "
+"некоторых <quote>типичных</quote> объектов, которые можно встретить на "
+"профилях полученных с микросхем и похожих на них объектов. Эти объекты "
+"обнаруживаются на графике, после чего рассчитываются их свойства."
+
+#: graph.xml:481(para)
+msgid ""
+"The user interface of this module is practically the same as of the graph "
+"fit module."
+msgstr ""
+"Интерфейс модуля практически ничем не отличается от модуля аппроксимации "
+"функциями."
+
+#: graph.xml:490(caption)
+msgid "Critical dimension module dialogue."
+msgstr "Диалоговое окно модуля определения габаритных размеров."
+
+#: graph.xml:497(title)
+msgid "DOS Spectrum <gwy:icon name=\"graph_dos\"/>"
+msgstr "Спектр плотности состояний <gwy:icon name=\"graph_dos\"/>"
+
+#: graph.xml:500(primary)
+msgid "DOS spectrum"
+msgstr "Спектр плотности состояний"
+
+#: graph.xml:501(para)
+msgid ""
+"DOS spectrum module intended to obtain Density-of-States spectra from I-V "
+"STM spectroscopy. It calculates <xi:include href=\"eq-graph-dos.xml\"/> and "
+"plots it as graph."
+msgstr ""
+"Модуль расчёта спектра плотности состояний предназначен для расчёта этих "
+"спектров из ВАХ туннельного контакта между СТМ-зондом и локальной точкой "
+"поверхности. Он рассчитывает <xi:include href=\"eq-graph-dos.xml\"/> и "
+"строит полученную функцию в виде графика."
+
+#: graph.xml:508(title)
+msgid "Find Peaks <gwy:icon name=\"find_peaks\"/>"
+msgstr "Найти пики <gwy:icon name=\"find_peaks\"/>"
+
+#: graph.xml:511(primary)
+msgid "peaks"
+msgstr "пики"
+
+#: graph.xml:512(para)
+msgid ""
+"The most prominent peaks in graph curves can be automatically located with "
+"subsample precision. You can specify the number of most prominent peaks as "
+"<guilabel>Number of peaks</guilabel> and the function will mark them on the "
+"graph. Peak prominence depends on its height, area and distance from other "
+"peaks. Usually the function's idea what are the most prominent peaks agrees "
+"quite well with human assessment. If you disagree with the choice you can "
+"ask for more peaks and ignore those you do not like. It is also possible for "
+"locate negative peaks, i.e. valleys, by enabling option <guilabel>Invert "
+"(find valleys)</guilabel>."
+msgstr ""
+"Наиболее выделяющиеся пики на кривых графиков можно автоматически выделять с "
+"точностью, превышающей точность дискретизации. Можно задать число наиболее "
+"выделяющихся пиков как <guilabel>Количество пиков</guilabel> и функция "
+"выделит их на графике. Выделение пиков зависит от их высоты, площади и "
+"расстояний до других пиков. Обычно представление данной функции о наиболее "
+"выделяющихся пиках неплохо совпадает с ручным выбором. Если вам не нравится "
+"текущий выбор, можно увеличить количество пиков и игнорировать ненужные. "
+"Также возможно искать отрицательные пики, т.е. впадины, включив опцию "
+"<guilabel>Инвертировать (найти впадины)</guilabel>."
+
+#: graph.xml:524(para)
+msgid ""
+"A table of all the peaks is displayed in the left part, sorted according to "
+"<guilabel>Order peaks by</guilabel>. Ordering by position means peaks are "
+"listed as they are displayed on the graph from left to right. Prominence "
+"order means more significant peaks are listed first."
+msgstr ""
+"Таблица всех пиков показывается в левой части отсортированной в соответствии "
+"с выбором опции <guilabel>Упорядочить пики по...</guilabel>. Сортировка по "
+"положению означает что пики будут перечислены в том же порядке, как они "
+"показаны на графике слева направо. Сортировка по выдающести означает, что "
+"наиболее выделяющиеся пики будут показаны первыми."
+
+#: graph.xml:530(para)
+msgid ""
+"Several basic characteristics are displayed for each peak: position "
+"(abscissa) <xi:include href=\"eqi-x.xml\"/>, height <xi:include href=\"eqi-h."
+"xml\"/>, area <xi:include href=\"eqi-A.xml\"/>, and width (or variance) <xi:"
+"include href=\"eqi-w.xml\"/>. The position is calculated by quadratic "
+"subpixel refinement of the peak maximum. The remaining quantities depend on "
+"how the peak background is defined. Possible choices include <guilabel>Zero</"
+"guilabel> meaning peaks base is always considered to be zero, and "
+"<guilabel>Bilateral minimum</guilabel> meaning the peak background is a step "
+"function passing through the nearest curve minima on the left and right side "
+"of the peak."
+msgstr ""
+"Для каждого пика показывается несколько его основных характеристик: "
+"положение (абсцисса) <xi:include href=\"eqi-x.xml\"/>, высота <xi:include "
+"href=\"eqi-h.xml\"/>, площадь <xi:include href=\"eqi-A.xml\"/> и ширина (или "
+"отклонение) <xi:include href=\"eqi-w.xml\"/>. Положение определяется по "
+"квадратичному субпиксельному уточнению максимума пика. Остальные значения "
+"зависят от того, как определён фон у пика. Возможные варианты включают в "
+"себя <guilabel>Нуль</guilabel>, означающий что за основание пика всегда "
+"будет браться уровень нуля, и <guilabel>Двусторонний минимум</guilabel>, что "
+"означает что фоном пика будет функция гладкой ступени проходящая через "
+"ближайшие минимумы кривой слева и справа от пика."
+
+#: graph.xml:549(caption)
+msgid ""
+"Screenshot of automated graph peak location for a height distribution plot."
+msgstr ""
+"Снимок экрана для автоматического определения пиков на графике для кривой "
+"распределения высоты."
+
+#: graph.xml:557(title)
+msgid "Period/pitch <gwy:icon name=\"graph_period_measure\"/>"
+msgstr "Период/шаг <gwy:icon name=\"graph_period_measure\"/>"
+
+#: graph.xml:561(primary)
+msgid "pitch measurement"
+msgstr "измерения шага"
+
+#: graph.xml:562(secondary)
+msgid "one-dimensional"
+msgstr "одномерный"
+
+#: graph.xml:564(para)
+msgid ""
+"Many methods for measurement of the period/pitch of periodic profiles such "
+"as gratings have been proposed. The graph period measurment module "
+"implements several of them (see reference [<link linkend=\"graph-ref-1\">1</"
+"link>] for their description). For reasonably well measured gratings all the "
+"good methods"
+msgstr ""
+"Существует много методов измерения периода/шага периодических профилей, "
+"таких как решетки. Модуль измерения периода на графиках реализует несколько "
+"из них (см. ссылку [<link linkend=\"graph-ref-1\">1</link>] для их "
+"описания). Лоя достаточно хорошо измеренной решетки все хорошие методы"
+
+#: graph.xml:572(listitem)
+msgid "Refined Fourier transform"
+msgstr "Уточненное преобразование Фурье"
+
+#: graph.xml:573(listitem)
+msgid "Multi-peak ACF"
+msgstr "Многопиковая АКФ"
+
+#: graph.xml:574(listitem)
+msgid "Zero crossings"
+msgstr "Пересечение нуля"
+
+#: graph.xml:575(listitem)
+msgid "Gravity centres"
+msgstr "Центры притяжения"
+
+#: graph.xml:577(para)
+msgid ""
+"should give comparable results, although they differ in sensitivity to "
+"various artefacts in the data. Refined Fourier transform is the most robust "
+"for odd shapes of the repeating unit. However, it does not provide any error "
+"estimate."
+msgstr ""
+"должны давать сравнимые результаты, но при этом они отличаются "
+"чувствительностью к различным артефактам в данных. Уточненное преобразование "
+"Фурье это наиболее устойчивый метод для нечетных форм повторяющихся "
+"элементов. Однако, он не предоставляет никакой оценки ошибок."
+
+#: graph.xml:583(para)
+msgid ""
+"Two elementary methods are also included, simple Fourier transform and "
+"simple ACF, which just find the position of the main peak in the power "
+"spectrum or ACF. They should not be used for evaluation and are present "
+"mainly for completness."
+msgstr ""
+"Два базовых метода также включены, простое преобразование Фурье и простая "
+"АКФ, которые просто находят положение основного пика на спектре мощности или "
+"АКФ. Они не должны использоваться для оценки и представлены в основном для "
+"полноты."
+
+#: graph.xml:589(para)
+msgid ""
+"If the profile has been already correctly levelled and the zero line "
+"selected, the function can evaluate the profile without any preprocessing. "
+"Otherwise, <guilabel>Subtract background</guilabel> should be checked to "
+"enabled background removal based on a robust procedure (see again [<link "
+"linkend=\"graph-ref-1\">1</link>]). In such case <guilabel>Show levelled "
+"curve</guilabel> can be used to display the preprocessed profile alongside "
+"with the unmodified data."
+msgstr ""
+"Если профиль был уже правильно выровнен и выбрана нулевая линия, функция "
+"может рассчитать данные для профиля без всякой предобработки. В противном "
+"случае, нужно включить опцию <guilabel>Вычесть фон</guilabel> чтобы убрать "
+"фон на основе хорошо определенной процедуры (см. снова [<link linkend="
+"\"graph-ref-1\">1</link>]). В этом случае опция <guilabel>Показать "
+"выровненную кривую</guilabel> может использоваться чтобы показать "
+"обработанный профиль наряду с не модифицированными данными."
+
+#: graph.xml:603(caption)
+msgid "Measurement of grating pitch."
+msgstr "Измерение периода решетки."
+
+#: graph.xml:610(title)
+msgid "Terraces <gwy:icon name=\"graph_terrace_measure\"/>"
+msgstr "Террасы <gwy:icon name=\"graph_terrace_measure\"/>"
+
+#: graph.xml:613(primary)
+msgid "terrace measurement"
+msgstr "измерение террасы"
+
+#: graph.xml:614(primary)
+msgid "amphitheatre measurement"
+msgstr "измерения амфитеатра"
+
+#: graph.xml:615(para)
+msgid ""
+"Terrace or amphitheatre-like structures can be measured using one-"
+"dimensional profiles, similarly as they are measured from image data in "
+"<link linkend=\"measure-terraces\">Terraces</link>. The graph and image "
+"modules are almost identical. Therefore, the following only highlights the "
+"main differences:"
+msgstr ""
+"Террасы или структуры по типу амфитеатров могут быть измерены используя "
+"одномерные профили так же, как они измеряются по данным изображения в модуле "
+"<link linkend=\"measure-terraces\">Террасы</link>. Модули для графиков и для "
+"изображений почти идентичны. Следовательно, дальнейшее описывает только "
+"основные различия:"
+
+#: graph.xml:624(para)
+msgid ""
+"Step detection kernel and broadening are one-dimensional. They are still "
+"measured in pixels – which correspond to average spacing between curve "
+"points. Minimum terrace area is replaced by minimum length, measured as the "
+"fraction of the total abscissa range."
+msgstr ""
+"Ядро поиска ступени и уширение будут одномерными. Они по прежнему измеряются "
+"в пикселях, что соответствует среднему расстоянию между точками кривой. "
+"Минимальная площадь террасы заменяется минимальной длиной, измеренной как "
+"доля всего диапазона абсцисс."
+
+#: graph.xml:632(para)
+msgid ""
+"There is no masking option. Instead, terraces can be marked manually on the "
+"graph using mouse when <guilabel>Select regions manually</guilabel> is "
+"enabled."
+msgstr ""
+"Отсутствует опция использования маски. Вместо этого, террасы могут быть "
+"выделены вручную на графике с помощью мыши если опция <guilabel>Выбрать "
+"области вручную</guilabel> включена."
+
+#: graph.xml:639(para)
+msgid ""
+"There is an additional choice in <guilabel>Display</guilabel> menu, "
+"<guilabel>Step detection</guilabel>. It shows the results of the edge "
+"detection filters and marks the selected threshold using a dashed red line. "
+"This is one of the most useful graphs for parameter tuning."
+msgstr ""
+"Присутствует дополнительный выбор в меню <guilabel>Показать</guilabel>, "
+"<guilabel>Детекция ступеней</guilabel>. Он показывает результат работы "
+"фильтра поиска краёв и показывает выбранный порог используя красную "
+"пунктирную линию. Это один из наиболее полезных графиков при настройке "
+"параметров."
+
+#: graph.xml:648(para)
+msgid ""
+"Pixel area <xi:include href=\"eqi-A_px.xml\"/> is replaced with <xi:include "
+"href=\"eqi-N_px.xml\"/>, the number of curve points the terrace consists of."
+msgstr ""
+"Площадь в пикселях <xi:include href=\"eqi-A_px.xml\"/> заменяется на <xi:"
+"include href=\"eqi-N_px.xml\"/>, количество точек кривой, из которых состоит "
+"терраса."
+
+#: graph.xml:660(caption)
+msgid ""
+"Terrace measurement from a profile, showing marked terraces for an "
+"amphitheatre structure formed by atomic steps on silicon."
+msgstr ""
+"Измерение террасы из профиля высоты, демонстрирует помеченные террасы для "
+"структуры амфитеатра сформированной атомарными ступенями кремния."
+
+#: graph.xml:668(title)
+msgid "References"
+msgstr "Источники"
+
+#: graph.xml:669(para)
+msgid ""
+"[1] D. Nečas, A. Yacoot, M. Valtr, P. Klapetek: Demystifying data evaluation "
+"in the measurement of periodic structures. Measurement Science and "
+"Technology 34 (2023) 055015, <ulink url=\"http://dx.doi."
+"org/10.1088/1361-6501/acbab3\">10.1088/1361-6501/acbab3</ulink>"
+msgstr ""
+"[1] D. Nečas, A. Yacoot, M. Valtr, P. Klapetek: Demystifying data evaluation "
+"in the measurement of periodic structures. Measurement Science and "
+"Technology 34 (2023) 055015, <ulink url=\"http://dx.doi."
+"org/10.1088/1361-6501/acbab3\">10.1088/1361-6501/acbab3</ulink>"
+
+#~ msgid "Basic Operations"
+#~ msgstr "Основные операции"
+
+#~ msgid "Function Fitting"
+#~ msgstr "Аппроксимировать функцией"
+
+#~ msgid "Critical Dimension"
+#~ msgstr "Габаритный размер"
+
+#~ msgid "Find peaks"
+#~ msgstr "Найти пики"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

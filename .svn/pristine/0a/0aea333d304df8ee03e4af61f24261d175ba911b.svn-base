@@ -1,0 +1,383 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2016-11-13 19:41+0300\n"
+"PO-Revision-Date: 2016-11-13 19:44+0300\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.8.11\n"
+
+#: gwyddion-thumbnailer.xml:7(productname)
+msgid "gwyddion"
+msgstr "gwyddion"
+
+#: gwyddion-thumbnailer.xml:8(othername)
+msgid "Yeti"
+msgstr "Yeti"
+
+#: gwyddion-thumbnailer.xml:11(refentrytitle)
+#: gwyddion-thumbnailer.xml:17(refname) gwyddion-thumbnailer.xml:24(command)
+#: gwyddion-thumbnailer.xml:31(command) gwyddion-thumbnailer.xml:112(command)
+#: gwyddion-thumbnailer.xml:142(command) gwyddion-thumbnailer.xml:180(command)
+#: gwyddion-thumbnailer.xml:201(command)
+msgid "gwyddion-thumbnailer"
+msgstr "gwyddion-thumbnailer"
+
+#: gwyddion-thumbnailer.xml:12(manvolnum)
+msgid "1"
+msgstr "1"
+
+#: gwyddion-thumbnailer.xml:13(refmiscinfo)
+msgid "Gwyddion"
+msgstr "Gwyddion"
+
+#: gwyddion-thumbnailer.xml:18(refpurpose)
+msgid "Creates thumbnails of SPM data files"
+msgstr "Создаёт миниатюры для файлов данных СЗМ"
+
+#: gwyddion-thumbnailer.xml:22(title)
+msgid "Synopsis"
+msgstr "Краткая справка"
+
+#: gwyddion-thumbnailer.xml:26(arg) gwyddion-thumbnailer.xml:73(option)
+msgid "--version"
+msgstr "--version"
+
+#: gwyddion-thumbnailer.xml:27(arg) gwyddion-thumbnailer.xml:63(option)
+msgid "--help"
+msgstr "--help"
+
+#: gwyddion-thumbnailer.xml:32(replaceable)
+#: gwyddion-thumbnailer.xml:113(replaceable)
+#: gwyddion-thumbnailer.xml:143(replaceable)
+msgid "OPTION"
+msgstr "ОПЦИЯ"
+
+#: gwyddion-thumbnailer.xml:33(replaceable)
+msgid "MODE"
+msgstr "РЕЖИМ"
+
+#: gwyddion-thumbnailer.xml:34(replaceable)
+msgid "ARGUMENT"
+msgstr "АРГУМЕНТ"
+
+#: gwyddion-thumbnailer.xml:39(title)
+msgid "Description"
+msgstr "Описание"
+
+#: gwyddion-thumbnailer.xml:40(para)
+msgid ""
+"Gwyddion-thumbnailer creates thumbnails of SPM (Scanning Probe Microscope) "
+"image files. Depending on the mode of operation, described below, the "
+"thumbnails are written to conform to various desktop standards so that they "
+"can be displayed in <citerefentry><refentrytitle>nautilus</"
+"refentrytitle><manvolnum>1</manvolnum></citerefentry>, "
+"<citerefentry><refentrytitle>thunar</refentrytitle><manvolnum>1</manvolnum></"
+"citerefentry> and similar file managers."
+msgstr ""
+"Gwyddion-thumbnailer создаёт миниатюрные изображения для файлов данных СЗМ "
+"(Сканирующей Зондовой Микроскопии). В зависимости от режима работы, "
+"описанного ниже, миниатюры записываются чтобы соответствовать различным "
+"стандартам рабочего стола, таким образом, что они могут отображаться в "
+"<citerefentry><refentrytitle>nautilus</refentrytitle><manvolnum>1</"
+"manvolnum></citerefentry>, <citerefentry><refentrytitle>thunar</"
+"refentrytitle><manvolnum>1</manvolnum></citerefentry> и подобных менеджерах "
+"файлов."
+
+#: gwyddion-thumbnailer.xml:49(para)
+msgid ""
+"Gwyddion-thumbnailer loads and renders files using "
+"<citerefentry><refentrytitle>gwyddion</refentrytitle><manvolnum>1</"
+"manvolnum></citerefentry>, libraries and modules, therefore, it can create "
+"thumbnails of all file formats supported by your Gwyddion installation. This "
+"also means it inherits Gwyddion settings, e.g. the default false color "
+"gradient, and that it is influenced by the same environment variables as "
+"Gwyddion."
+msgstr ""
+"Gwyddion-thumbnailer загружает и отображает файлы используя  библиотеки и "
+"модули <citerefentry><refentrytitle>gwyddion</refentrytitle><manvolnum>1</"
+"manvolnum></citerefentry>, следовательно. он создаёт миниатюры для всех "
+"форматов файлов. поддерживаемые установленной версией Gwyddion. Также это "
+"означает использование настроек Gwyddion, т.е. градиента псевдоцвета "
+"используемого в Gwyddion и также на него оказывают влияние те же переменные "
+"окружения, что и на Gwyddion."
+
+#: gwyddion-thumbnailer.xml:59(title)
+msgid "Informative Options"
+msgstr "Информационные опции"
+
+#: gwyddion-thumbnailer.xml:66(para)
+msgid "Prints a brief help and terminates."
+msgstr "Печатает краткую справку и завершает работу."
+
+#: gwyddion-thumbnailer.xml:76(para)
+msgid "Prints version information and terminates."
+msgstr "Печатает информацию о версии и завершает работу."
+
+#: gwyddion-thumbnailer.xml:84(title)
+msgid "Thumbnailing Options"
+msgstr "Опции создания миниатюр"
+
+#: gwyddion-thumbnailer.xml:88(option)
+msgid "--update"
+msgstr "--update"
+
+#: gwyddion-thumbnailer.xml:91(para)
+msgid ""
+"Writes the thumbnail only if it does not exist yet or does not seem to be up-"
+"to-date. By default, gwyddion-thumbnailer overwrites existing thumbnails "
+"with fresh ones even if they seem up to date."
+msgstr ""
+"Записывает миниатюры только если они ещё не созданы или кажутся устаревшими. "
+"По умолчанию, gwyddion-thumbnailer переписывает существующие миниатюры даже "
+"если они кажутся не устаревшими."
+
+#: gwyddion-thumbnailer.xml:102(title)
+msgid "Mode"
+msgstr "Режим"
+
+#: gwyddion-thumbnailer.xml:103(para)
+msgid ""
+"Three thumbnailing modes are available: <option>gnome2</option>, "
+"<option>tms</option> and <option>kde4</option>; and one special mode: "
+"<option>check</option>. They are described below."
+msgstr ""
+"Доступно три режима создания миниатюр: <option>gnome2</option>, <option>tms</"
+"option> и <option>kde4</option>; и один специальный режим: <option>check</"
+"option>. Они описаны ниже."
+
+#: gwyddion-thumbnailer.xml:110(title)
+msgid "Gnome 2"
+msgstr "Gnome 2"
+
+#: gwyddion-thumbnailer.xml:114(arg)
+msgid "gnome2"
+msgstr "gnome2"
+
+#: gwyddion-thumbnailer.xml:115(replaceable)
+#: gwyddion-thumbnailer.xml:145(replaceable)
+#: gwyddion-thumbnailer.xml:182(replaceable)
+msgid "MAX-SIZE"
+msgstr "MAX-SIZE"
+
+#: gwyddion-thumbnailer.xml:116(replaceable)
+#: gwyddion-thumbnailer.xml:146(replaceable)
+#: gwyddion-thumbnailer.xml:183(replaceable)
+#: gwyddion-thumbnailer.xml:203(replaceable)
+#: gwyddion-thumbnailer.xml:218(replaceable)
+#: gwyddion-thumbnailer.xml:219(replaceable)
+msgid "INPUT-FILE"
+msgstr "INPUT-FILE"
+
+#: gwyddion-thumbnailer.xml:117(replaceable)
+msgid "OUTPUT-FILE"
+msgstr "OUTPUT-FILE"
+
+#: gwyddion-thumbnailer.xml:119(para)
+msgid ""
+"In <option>gnome2</option> mode, gwyddion-thumbnailer creates PNG thumbnails "
+"according to the Gnome thumbnailer specification. Using the convention from "
+"this specification, it should be run"
+msgstr ""
+"В режиме <option>gnome2</option>, gwyddion-thumbnailer создаёт миниатюрные "
+"изображения в PNG в соответствии со спецификациями на миниатюры Gnome. "
+"Используя соглашения из этих спецификаций, он должен запускаться как"
+
+#: gwyddion-thumbnailer.xml:125(programlisting)
+msgid "gwyddion-thumbnailer gnome2 %s %i %o"
+msgstr "gwyddion-thumbnailer gnome2 %s %i %o"
+
+#: gwyddion-thumbnailer.xml:127(para)
+msgid ""
+"Gwyddion installs the corresponding GConf schemas and enables thumbnailers "
+"for all file types it supports by default, so usually this should Just Work "
+"and should not need to be set up manually."
+msgstr ""
+"Gwyddion устанавливает соответствующие схемы GConf и включает создание "
+"миниатюр для всех типов фалов, которые он поддерживает по умолчанию, так что "
+"обычно это должно просто работать и ничего не нужно настраивать вручную."
+
+#: gwyddion-thumbnailer.xml:132(para)
+msgid ""
+"The thumbnails created in <option>gnome2</option> mode are identical as in "
+"<option>tms</option> mode, including all the PNG auxiliary chunks (provided "
+"that the same <replaceable>MAX-SIZE</replaceable> as in <option>tms</option> "
+"mode is specified, of course)."
+msgstr ""
+"Миниатюры, созданные в режиме <option>gnome2</option> идентичны миниатюрам "
+"созданным в режиме <option>tms</option>, включая все дополнительные блоки "
+"PNG (в том случае, если указан тот же <replaceable>MAX-SIZE</replaceable>, "
+"что и в режиме <option>tms</option>, конечно)."
+
+#: gwyddion-thumbnailer.xml:140(title)
+msgid "TMS"
+msgstr "TMS"
+
+#: gwyddion-thumbnailer.xml:144(arg)
+msgid "tms"
+msgstr "tms"
+
+#: gwyddion-thumbnailer.xml:148(para)
+msgid ""
+"In <option>tms</option> mode, gwyddion-thumbnailer creates PNG thumbnails "
+"according to the Thumbnail Managing Standard. Argument <replaceable>MAX-"
+"SIZE</replaceable> must be <option>128</option> or <option>normal</option> "
+"(both meaning 128 pixels) or <option>256</option> or <option>large</option> "
+"(both meaning 256 pixels)."
+msgstr ""
+"В режиме <option>tms</option> gwyddion-thumbnailer создаёт миниатюры в "
+"соответствии с Thumbnail Managing Standard (стандартом управления "
+"миниатюрами). Аргумент <replaceable>MAX-SIZE</replaceable> должен быть равен "
+"<option>128</option> или <option>normal</option> (оба означают 128 точек) "
+"или <option>256</option> или <option>large</option> (обаз означают 256 "
+"пикселей)."
+
+#: gwyddion-thumbnailer.xml:156(para)
+msgid ""
+"Output file name is not given as it is prescribed by the TMS. The thumbnail "
+"is placed to the directory for normal or large thumbnails according to given "
+"<replaceable>MAX-SIZE</replaceable>."
+msgstr ""
+"Имя выходного файла не задаётся, поскольку оно описано в TMS. миниатюры "
+"помещаются в каталоги для нормальных (normal) или больших (large) в "
+"соответствии с заданным <replaceable>MAX-SIZE</replaceable>."
+
+#: gwyddion-thumbnailer.xml:161(para)
+msgid ""
+"This mode can also be useful for manual batch-creation of thumbnails. For "
+"instance, to create them for all <filename>*.afm</filename> files in "
+"directory <filename>scans</filename> and its subdirectories, you can run"
+msgstr ""
+"Этот режим также может быть полезен для создания партии миниатюр вручную. "
+"Например, чтобы создать их для всех файлов <filename>*.afm</filename> в "
+"каталоге <filename>scans</filename> и его подкаталогах можно запустить"
+
+#: gwyddion-thumbnailer.xml:173(para)
+msgid "And then go make yourself a coffee because this will take some time."
+msgstr "После этого можно сделать кофе, поскольку это займёт некоторое время."
+
+#: gwyddion-thumbnailer.xml:178(title)
+msgid "KDE 4"
+msgstr "KDE 4"
+
+#: gwyddion-thumbnailer.xml:181(arg)
+msgid "kde4"
+msgstr "kde4"
+
+#: gwyddion-thumbnailer.xml:185(para)
+msgid ""
+"In <option>kde4</option> mode, gwyddion-thumbnailer creates PNG thumbnails "
+"that are intended to be consumed by gwythumbcreator KDE module. The "
+"thumbnail, again identical as in the other modes, is written to the standard "
+"output."
+msgstr ""
+"В режиме <option>kde4</option>, gwyddion-thumbnailer создаёт PNG-миниатюры "
+"которые затем передаются модулю KDE gwythumbcreator. миниатюры, снова те же "
+"самые, что и в других режимах, записываются в стандартный вывод."
+
+#: gwyddion-thumbnailer.xml:191(para)
+msgid ""
+"Do <emphasis>not</emphasis> use this mode from the command line. It is "
+"documented for completeness, however, the protocol between gwythumbcreator "
+"and gwyddion-thumbnailer must be considered private and it can change at any "
+"time."
+msgstr ""
+"<emphasis>НЕ</emphasis> используйте этот режим из командной строки. Он "
+"документирован для полноты, однако, протокол обмена между gwythumbcreator и "
+"gwyddion-thumbnailer следует считать закрытым и он может поменяться в любое "
+"время."
+
+#: gwyddion-thumbnailer.xml:199(title)
+msgid "Check"
+msgstr "Check"
+
+#: gwyddion-thumbnailer.xml:202(arg)
+msgid "check"
+msgstr "check"
+
+#: gwyddion-thumbnailer.xml:205(para)
+msgid ""
+"The <option>check</option> mode does not serve for thumbnail creation. "
+"Instead, gwyddion-thumbnailer prints information about available thumbnails "
+"of <replaceable>INPUT-FILE</replaceable> and cached failures to produce a "
+"thumbnail by individual applications, as described by the TMS."
+msgstr ""
+"Режим <option>check</option> не предназначен для создания миниатюр. Вместо "
+"этого gwyddion-thumbnailer выводит информацию о доступных миниатюрах для "
+"<replaceable>INPUT-FILE</replaceable> и кешированных ошибках создания "
+"миниатюр отдельными приложениями, как описано в TMS."
+
+#: gwyddion-thumbnailer.xml:212(para)
+msgid ""
+"If the normal-sized thumbnail exists and is up to date, the large version "
+"does not exist and there is one cached failure from gnome-thumbnail-factory, "
+"the output can be for instance:"
+msgstr ""
+"Например, если миниатюра нормального размера есть и она не устарела, большой "
+"миниатюры не существует и была одна кешированная ошибка gnome-thumbnail-"
+"factory, вывод будет следующим:"
+
+#: gwyddion-thumbnailer.xml:220(replaceable)
+#: gwyddion-thumbnailer.xml:222(replaceable)
+#: gwyddion-thumbnailer.xml:224(replaceable)
+msgid "MD5"
+msgstr "MD5"
+
+#: gwyddion-thumbnailer.xml:218(computeroutput)
+msgid ""
+"File: <placeholder-1/> URI: file:///home/me/Pictures/naughty/broken-tip3/"
+"<placeholder-2/> Normal: /home/me/.thumbnails/normal/<placeholder-3/>.png "
+"status: OK Large: /home/me/.thumbnails/large/<placeholder-4/>.png status: "
+"Thumbnail does not exist or stat() fails on it. Failed: /home/me/.thumbnails/"
+"fail/gnome-thumbnail-factory/<placeholder-5/>.png"
+msgstr ""
+"File:   <placeholder-1/>\n"
+"URI:    file:///home/me/Pictures/naughty/broken-tip3/<placeholder-2/>\n"
+"Normal: /home/me/.thumbnails/normal/<placeholder-3/>.png\n"
+"        status: OK\n"
+"Large:  /home/me/.thumbnails/large/<placeholder-4/>.png\n"
+"        status: Thumbnail does not exist or stat() fails on it.\n"
+"Failed: /home/me/.thumbnails/fail/gnome-thumbnail-factory/<placeholder-5/>."
+"png"
+
+#: gwyddion-thumbnailer.xml:226(para)
+msgid ""
+"URI is the canonical URI of the input file, <replaceable>MD5</replaceable> "
+"stands for the hex representation of MD5 sum of the URI, as described by the "
+"TMS. If there are no cached failures, no Failed lines are printed."
+msgstr ""
+"URI - канонический URI входного файла, <replaceable>MD5</replaceable> - "
+"шестнадцатиричное представление контрольной суммы MD5 URI, как предписывает "
+"TMS. Если не было кешированных ошибок, строки Failed не печатаются."
+
+#: gwyddion-thumbnailer.xml:232(para)
+msgid ""
+"This function can be used to check thumbnails of any kind, not necessarily "
+"created by gwyddion or gwyddion-thumbnailer. In future, it might be reported "
+"as an error if the thumbnail does not contain Gwyddion-specific information "
+"though."
+msgstr ""
+"Эта функция может использоваться для проверки миниатюр любого типа, не "
+"обязательно созданных gwyddion или gwyddion-thumbnailer. В будущем, однако, "
+"может выводится ошибка если миниатюра не содержит специфичной для Gwyddion "
+"информации."
+
+#: gwyddion-thumbnailer.xml:240(title)
+msgid "See also"
+msgstr "См. также"
+
+#: gwyddion-thumbnailer.xml:241(para)
+msgid ""
+"<citerefentry><refentrytitle>gwyddion</refentrytitle><manvolnum>1</"
+"manvolnum></citerefentry>,"
+msgstr ""
+"<citerefentry><refentrytitle>gwyddion</refentrytitle><manvolnum>1</"
+"manvolnum></citerefentry>,"
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов."

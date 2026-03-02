@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: data-browser.xml 24341 2021-10-12 12:02:34Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='data-browser'>
+  <title>Data Browser</title>
+  <indexterm><primary>data browser</primary></indexterm>
+  <para>
+    Data browser is a window that displays the structure of currently focused
+    file.  It shows the content as represented in Gwyddion which may differ
+    somewhat from the organization in the original software.
+  </para>
+  <para>
+    Gwyddion supports an arbitrary number of two-dimensional data fields per
+    file.  Depending on the context, they are also often called images or
+    height fields in this guide (individual images are also occasionally called
+    channels although other, non-image data types consist of channels as well).
+    The dimensions of images in one file may
+    differ and also the physical dimensions and values can be arbitrary
+    physical quantities.
+  </para>
+  <para>
+    In addition, one-dimensional data, represented as graphs, and single-point
+    spectra can be present in the same file.  The data browser is a tool for
+    browsing and managing all the available data in the file.
+  </para>
+  <informalfigure id='fig-data-browser'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='data_browser.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Data browser displaying several images.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <sect2 id='data-browser-operating'>
+    <title>Controlling the Browser</title>
+    <para>
+      Since the data browser always displays the structure of currently
+      focused file, its contents change as you switch between different
+      windows, possibly showing data from different files.  There is no
+      difference between native Gwyddion files (<filename>.gwy</filename>)
+      and other files.  Once a file is loaded its structure is shown as if it
+      was a Gwyddion file.
+    </para>
+    <para>
+      The data browser has several tabs, one for each type of data that can
+      be present in the file:
+      <itemizedlist>
+        <listitem><guilabel>Images</guilabel></listitem>
+        <listitem><guilabel>Graphs</guilabel></listitem>
+        <listitem><guilabel>Spectra</guilabel></listitem>
+        <listitem><guilabel>Volume</guilabel></listitem>
+        <listitem><guilabel>XYZ</guilabel></listitem>
+        <listitem><guilabel>Curve Maps</guilabel></listitem>
+      </itemizedlist>
+      Each list shows names of the data objects and some additional properties
+      that depend on the specific data type.  The names can be edited after
+      double-clicking on them.
+    </para>
+    <para>
+      Individual images, graphs, spectra, volume, XYZ or curve map data can be deleted,
+      duplicated or extracted to new Gwyddion native file using the buttons
+      at the bottom of the browser. It is also possible to copy them to
+      another file by dragging a data browser row to any window belonging to
+      the target file.  To rename a data item, select it and press
+      <keycap>Enter</keycap> or triple-click on it with the mouse.
+    </para>
+    <para>
+      The close button in the top right corner of the data browser closes the
+      current file, discarding all unsaved changes.  A file is also closed when
+      all windows displaying data from this file are closed.
+    </para>
+    <para>
+      If the data browser is closed it can be recalled using the
+      <menuchoice>
+        <guimenu>Info</guimenu>
+        <guimenuitem>Show Data Browser</guimenuitem>
+      </menuchoice>
+      command.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-images'>
+    <title>Images</title>
+    <para>
+      The image list shows thumbnails, check-boxes controlling
+      whether the image is visible (i.e. displayed in a window) and image
+      names.  Right to the name the presence of
+      <link linkend='presentations-masks'>presentation, mask</link> or
+      <link linkend='caldata'>calibration</link> is
+      indicated by the following letters:
+      <itemizedlist>
+        <listitem><guilabel>M</guilabel> – mask</listitem>
+        <listitem><guilabel>P</guilabel> – presentation</listitem>
+        <listitem><guilabel>C</guilabel> – calibration</listitem>
+      </itemizedlist>
+    </para>
+  </sect2>
+  <sect2 id='data-browser-graphs'>
+    <title>Graphs</title>
+    <para>
+      The graph list shows check-boxes controlling whether the graph is visible
+      and graph names.  Right to the name the number of curves in the graph
+      is displayed.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-spectra'>
+    <title>Spectra</title>
+    <para>
+      The spectrum list shows the spectra name and the number of points in the
+      set.  Since single-point spectra are displayed and operated on only in
+      connection with a two-dimensional data using the
+      <link linkend='single-point-spectra'>spectroscopy tool</link>, there is
+      no check-box controlling the visibility.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-volume'>
+    <title>Volume</title>
+    <para>
+      The volume data list shows the data name and the number of levels in the
+      <xi:include href="eqi-z.xml"/> direction, i.e. perpendicular to the
+      section displayed in the window.  A letter <guilabel>Z</guilabel>
+      after the number of levels indicates the presence of a
+      <xi:include href="eqi-z.xml"/>-axis calibration.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-xyz'>
+    <title>XYZ</title>
+    <para>
+      The XYZ data list shows the data name and the number of points in the
+      XYZ point set.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-cmap'>
+    <title>Curve Maps</title>
+    <para>
+      The XYZ data list shows the data name and the number of curves (data
+      series) in each point of the map.  If the curves are segmented the
+      number of segments is displayed after a colon.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

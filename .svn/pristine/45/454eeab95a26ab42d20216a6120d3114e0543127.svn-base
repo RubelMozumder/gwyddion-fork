@@ -1,0 +1,469 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2020-01-04 21:19+0400\n"
+"PO-Revision-Date: 2020-01-04 21:23+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: keyboard-shortcuts.xml:6(title)
+msgid "Keyboard Shortcuts"
+msgstr "Комбинации клавиш"
+
+#: keyboard-shortcuts.xml:8(primary) keyboard-shortcuts.xml:263(primary)
+msgid "Keyboard shortcuts"
+msgstr "Комбинации клавиш"
+
+#: keyboard-shortcuts.xml:9(secondary)
+msgid "standard"
+msgstr "стандартные"
+
+#: keyboard-shortcuts.xml:16(entry)
+msgid "Shortcut"
+msgstr "Комбинация"
+
+#: keyboard-shortcuts.xml:17(entry)
+msgid "Menu equivalent"
+msgstr "Эквивалент меню"
+
+#: keyboard-shortcuts.xml:18(entry)
+msgid "Context"
+msgstr "Контекст"
+
+#: keyboard-shortcuts.xml:19(entry)
+msgid "Action"
+msgstr "Действие"
+
+#: keyboard-shortcuts.xml:24(keycap)
+msgid "F1"
+msgstr "F1"
+
+#: keyboard-shortcuts.xml:26(entry)
+msgid "almost all windows"
+msgstr "все окна"
+
+#: keyboard-shortcuts.xml:27(entry)
+msgid "Open a relevant section of this user guide in a web browser."
+msgstr "Открывает соответствующий раздел руководства пользователя в браузере."
+
+#: keyboard-shortcuts.xml:30(keycap)
+msgid "Ctrl-Q"
+msgstr "Ctrl-Q"
+
+#: keyboard-shortcuts.xml:33(guimenu) keyboard-shortcuts.xml:44(guimenu)
+#: keyboard-shortcuts.xml:55(guimenu) keyboard-shortcuts.xml:69(guimenu)
+#: keyboard-shortcuts.xml:83(guimenu) keyboard-shortcuts.xml:96(guimenu)
+#: keyboard-shortcuts.xml:109(guimenu)
+msgid "File"
+msgstr "Файл"
+
+#: keyboard-shortcuts.xml:34(guimenuitem)
+msgid "Quit"
+msgstr "Выйти"
+
+#: keyboard-shortcuts.xml:37(entry) keyboard-shortcuts.xml:48(entry)
+#: keyboard-shortcuts.xml:59(entry) keyboard-shortcuts.xml:73(entry)
+#: keyboard-shortcuts.xml:100(entry) keyboard-shortcuts.xml:114(entry)
+#: keyboard-shortcuts.xml:152(entry) keyboard-shortcuts.xml:163(entry)
+msgid "toolbox, data window, 3D window, graph window, tool window"
+msgstr ""
+"окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, "
+"окно инструмента"
+
+#: keyboard-shortcuts.xml:38(application)
+msgid "Gwyddion"
+msgstr "Gwyddion"
+
+#: keyboard-shortcuts.xml:38(entry)
+msgid "Quit <placeholder-1/>."
+msgstr "Выйти из <placeholder-1/>."
+
+#: keyboard-shortcuts.xml:41(keycap)
+msgid "Ctrl-O"
+msgstr "Ctrl-O"
+
+#: keyboard-shortcuts.xml:45(guimenuitem)
+msgid "Open"
+msgstr "Открыть"
+
+#: keyboard-shortcuts.xml:49(entry)
+msgid "Open a data file."
+msgstr "Открыть файл данных."
+
+#: keyboard-shortcuts.xml:52(keycap)
+msgid "Ctrl-S"
+msgstr "Ctrl-S"
+
+#: keyboard-shortcuts.xml:56(guimenuitem)
+msgid "Save"
+msgstr "Сохранить"
+
+#: keyboard-shortcuts.xml:60(entry)
+msgid ""
+"Save current data (you will be prompted for a file name if none is "
+"associated yet)."
+msgstr ""
+"Сохранить текущие данные (будет предложено имя файла, если оно ещё не "
+"связано с данными)."
+
+#: keyboard-shortcuts.xml:66(keycap)
+msgid "Ctrl-Shift-S"
+msgstr "Ctrl-Shift-S"
+
+#: keyboard-shortcuts.xml:70(guimenuitem)
+msgid "Save As"
+msgstr "Сохранить как"
+
+#: keyboard-shortcuts.xml:74(entry)
+msgid ""
+"Save current data under a different name. The file name associated with the "
+"data changes to the new name."
+msgstr ""
+"Сохранить текущие данные под другим именем. Имя файла, связанного с данными "
+"будет изменено на другое."
+
+#: keyboard-shortcuts.xml:80(keycap)
+msgid "Ctrl-W"
+msgstr "Ctrl-W"
+
+#: keyboard-shortcuts.xml:84(guimenuitem)
+msgid "Close"
+msgstr "Закрыть"
+
+#: keyboard-shortcuts.xml:87(entry) keyboard-shortcuts.xml:123(entry)
+#: keyboard-shortcuts.xml:131(entry) keyboard-shortcuts.xml:139(entry)
+msgid ""
+"any kind of data window (image, 3D, XYZ, volume, graph), toolbox, data "
+"browser"
+msgstr ""
+"любая разновидность окна данных (изображение, 3D, XYZ, объём, график), окно "
+"инструментов, браузер данных"
+
+#: keyboard-shortcuts.xml:88(entry)
+msgid "Close file containing the current data."
+msgstr "Закрыть файл, содержащий текущие данные."
+
+#: keyboard-shortcuts.xml:93(keycap)
+msgid "Ctrl-Shift-M"
+msgstr "Ctrl-Shift-M"
+
+#: keyboard-shortcuts.xml:97(guimenuitem)
+msgid "Merge"
+msgstr "Объединить"
+
+#: keyboard-shortcuts.xml:101(entry)
+msgid "Merge data from a file to the current file."
+msgstr "Добавить данные из файла к текущему файлу."
+
+#: keyboard-shortcuts.xml:106(keycap)
+msgid "Ctrl-H"
+msgstr "Ctrl-H"
+
+#: keyboard-shortcuts.xml:110(guisubmenu)
+msgid "Open Recent"
+msgstr "Последние файлы"
+
+#: keyboard-shortcuts.xml:111(guimenuitem)
+msgid "Document History"
+msgstr "Предыдущие документы"
+
+#: keyboard-shortcuts.xml:115(entry)
+msgid ""
+"Open the document history browser (or bring it forward if it is already "
+"displayed)."
+msgstr ""
+"Открыть окно просмотра предыдущих документов (или показать его окно поверх "
+"остальных, если оно уже открыто)."
+
+#: keyboard-shortcuts.xml:121(keycap)
+msgid "Ctrl-D"
+msgstr "Ctrl-D"
+
+#: keyboard-shortcuts.xml:122(entry)
+msgid "Duplicate in data browser"
+msgstr "Сделать копию в браузере данных"
+
+#: keyboard-shortcuts.xml:124(entry)
+msgid "Duplicate data in current window as new data in the same file."
+msgstr ""
+"Сделать дубликат данных в текущем окне как нового блока данных в том же "
+"файле."
+
+#: keyboard-shortcuts.xml:129(keycap)
+msgid "Ctrl-Insert"
+msgstr "Ctrl-Insert"
+
+#: keyboard-shortcuts.xml:130(entry)
+msgid "Extract to new file in data browser"
+msgstr "Извлечь в новый файл в браузере данных"
+
+#: keyboard-shortcuts.xml:132(entry)
+msgid "Create new file containing just the current data."
+msgstr "Создать новый файл, содержащий только текущий блок данных."
+
+#: keyboard-shortcuts.xml:137(keycap)
+msgid "Ctrl-Delete"
+msgstr "Ctrl-Delete"
+
+#: keyboard-shortcuts.xml:138(entry)
+msgid "Delete in data browser"
+msgstr "Удалить в браузере данных"
+
+#: keyboard-shortcuts.xml:140(entry)
+msgid "Delete the current current data from the file."
+msgstr "Удалить текущий блок данных из файла"
+
+#: keyboard-shortcuts.xml:145(keycap)
+msgid "Ctrl-Z"
+msgstr "Ctrl-Z"
+
+#: keyboard-shortcuts.xml:148(guimenu) keyboard-shortcuts.xml:159(guimenu)
+#: keyboard-shortcuts.xml:170(guimenu) keyboard-shortcuts.xml:181(guimenu)
+msgid "Edit"
+msgstr "Правка"
+
+#: keyboard-shortcuts.xml:149(guimenuitem)
+msgid "Undo"
+msgstr "Отменить"
+
+#: keyboard-shortcuts.xml:153(entry)
+msgid "Undo the last processing step applied on current data."
+msgstr "Отменить последний шаг обработки, применённый к текущим данным."
+
+#: keyboard-shortcuts.xml:156(keycap)
+msgid "Ctrl-Y"
+msgstr "Ctrl-Y"
+
+#: keyboard-shortcuts.xml:160(guimenuitem)
+msgid "Redo"
+msgstr "Повторить"
+
+#: keyboard-shortcuts.xml:164(entry)
+msgid "Redo the last processing step applied on current data."
+msgstr "Повторить последний шаг обработки, применённый к текущим данным."
+
+#: keyboard-shortcuts.xml:167(keycap)
+msgid "Ctrl-K"
+msgstr "Ctrl-K"
+
+#: keyboard-shortcuts.xml:171(guimenuitem)
+msgid "Remove Mask"
+msgstr "Удалить маску"
+
+#: keyboard-shortcuts.xml:174(entry) keyboard-shortcuts.xml:185(entry)
+#: keyboard-shortcuts.xml:237(entry) keyboard-shortcuts.xml:253(entry)
+msgid "toolbox, data window, 3D window, graph window, tool windows"
+msgstr ""
+"окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, "
+"окно инструмента"
+
+#: keyboard-shortcuts.xml:175(entry)
+msgid "Remove mask from current data window."
+msgstr "Удалить маску с текущего окна данных."
+
+#: keyboard-shortcuts.xml:178(keycap)
+msgid "Ctrl-Shift-K"
+msgstr "Ctrl-Shift-K"
+
+#: keyboard-shortcuts.xml:182(guimenuitem)
+msgid "Remove Presentation"
+msgstr "Удалить презентацию"
+
+#: keyboard-shortcuts.xml:186(entry)
+msgid "Remove presentation from current data (image) window."
+msgstr "Удалить презентацию с текущего окна данных (изображения)."
+
+#: keyboard-shortcuts.xml:189(keycap)
+msgid "F3"
+msgstr "F3"
+
+#: keyboard-shortcuts.xml:191(entry)
+msgid "data window, tool window, toolbox"
+msgstr "окно данных, окно инструмента, окно инструментов"
+
+#: keyboard-shortcuts.xml:192(entry)
+msgid "Show tool window if it is hidden. Hide tool window if it is shown."
+msgstr ""
+"Показать окно инструментов, если оно скрыто. Скрыть окно инструментов если "
+"оно показывается."
+
+#: keyboard-shortcuts.xml:195(keycap)
+msgid "Ctrl-Shift-B"
+msgstr "Ctrl-Shift-B"
+
+#: keyboard-shortcuts.xml:198(guimenuitem)
+msgid "Metadata Browser"
+msgstr "Просмотр метаданных"
+
+#: keyboard-shortcuts.xml:196(entry)
+msgid "<menuchoice><placeholder-1/></menuchoice> (in the context menu)"
+msgstr "<menuchoice><placeholder-1/></menuchoice> (в контекстном меню)"
+
+#: keyboard-shortcuts.xml:202(entry)
+msgid "image, XYZ or volume data window"
+msgstr "окно изображения, данных XYZ или объёмных данных"
+
+#: keyboard-shortcuts.xml:203(entry)
+msgid "Show metadata browser for the data."
+msgstr "Показать окно просмотра метаданных для отображаемых данных."
+
+#: keyboard-shortcuts.xml:206(keycap)
+msgid "+"
+msgstr "+"
+
+#: keyboard-shortcuts.xml:208(entry) keyboard-shortcuts.xml:214(entry)
+#: keyboard-shortcuts.xml:220(entry) keyboard-shortcuts.xml:226(entry)
+msgid "any kind of data window (image, 3D, XYZ, volume, graph)"
+msgstr "любая разновидность окна данных (изображение, 3D, XYZ, объём, график)"
+
+#: keyboard-shortcuts.xml:209(entry) keyboard-shortcuts.xml:215(entry)
+msgid "Zoom current data window in."
+msgstr "Приблизить изображение в текущем окне данных."
+
+#: keyboard-shortcuts.xml:212(keycap)
+msgid "="
+msgstr "="
+
+#: keyboard-shortcuts.xml:218(keycap)
+msgid "-"
+msgstr "-"
+
+#: keyboard-shortcuts.xml:221(entry)
+msgid "Zoom current data window out."
+msgstr "Отодвинуть изображение в текущем окне данных."
+
+#: keyboard-shortcuts.xml:224(keycap)
+msgid "Z"
+msgstr "Z"
+
+#: keyboard-shortcuts.xml:227(entry)
+msgid "Zoom current data window 1:1."
+msgstr "Масштабировать текущее окно данных до масштаба 1:1."
+
+#: keyboard-shortcuts.xml:230(keycap)
+msgid "Ctrl-F"
+msgstr "Ctrl-F"
+
+#: keyboard-shortcuts.xml:233(guimenu) keyboard-shortcuts.xml:249(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: keyboard-shortcuts.xml:234(guimenuitem)
+msgid "Repeat Last"
+msgstr "Повторить последний"
+
+#: keyboard-shortcuts.xml:238(entry)
+msgid ""
+"Repeat last data processing function with the last used parameters, on "
+"current data. Normally the operation is repeated silently, but if the "
+"processing step cannot be carried out without a human interaction, a dialog "
+"is shown."
+msgstr ""
+"Применить к текущим данным последнюю функцию обработки данных с "
+"использованными в последний раз параметрами. Обычно операция будет тихо и "
+"незаметно повторно применена к данным, но если данный шаг обработки "
+"невозможен без участия человека, будет показано диалоговое окно."
+
+#: keyboard-shortcuts.xml:246(keycap)
+msgid "Ctrl-Shift-F"
+msgstr "Ctrl-Shift-F"
+
+#: keyboard-shortcuts.xml:250(guimenuitem)
+msgid "Re-Show Last"
+msgstr "Повторить с настройкой последний"
+
+#: keyboard-shortcuts.xml:254(entry)
+msgid ""
+"Re-show parameter dialog of the last data processing function. If the "
+"operation has no parameters to set, it is performed immediately."
+msgstr ""
+"Показать ещё раз диалог параметров последней функции обработки данных. Если "
+"операция не требует установки параметров, она будет проведена "
+"незамедлительно."
+
+#: keyboard-shortcuts.xml:264(secondary)
+msgid "custom"
+msgstr "модифицированные"
+
+#: keyboard-shortcuts.xml:266(para)
+msgid ""
+"You can assign your own keyboard shortcuts to all functions in the menus and "
+"it is also possible to invoke tools with keyboard shortcuts."
+msgstr ""
+"Можно присвоить свои комбинации клавиш всем функциям в меню, также возможно "
+"вызывать инструменты комбинацией клавиш."
+
+#: keyboard-shortcuts.xml:270(para)
+msgid ""
+"To change the keyboard shortcut of a menu item simply select the item using "
+"the mouse or arrow keys, press the key combination you want to assing to it "
+"and it will be immediately assigned. The shortcut must be either a special "
+"key, e.g. <keycap>F3</keycap>, or a key combination including modifiers, e."
+"g. <keycap>Ctrl-Shift-D</keycap>. It is not possible to assign bare keys "
+"such as <keycap>Q</keycap>."
+msgstr ""
+"Чтобы изменить комбинацию клавиш для пункта меню просто нужно выбрать его с "
+"помощью мыши или клавиш-стрелок, нажать требуемую комбинацию клавиш, и она "
+"незамедлительно будет установлена. Комбинация клавиш должна быть или "
+"специальной клавишей, т.е. <keycap>F3</keycap>, или сочетанием, включающим "
+"модификаторы, т.е. <keycap>Ctrl-Shift-D</keycap>. Нельзя присваивать просто "
+"буквенно-цифровые клавиши, такие как <keycap>Q</keycap>."
+
+#: keyboard-shortcuts.xml:278(para)
+msgid ""
+"To prevent inadvertent modification of shortcuts, they can be changed only "
+"if <menuchoice><guimenu>Edit</guimenu><guimenuitem>Keyboard Shortcuts</"
+"guimenuitem></menuchoice> is enabled. Modifications are disabled by default "
+"which is also the recommended setting during normal use."
+msgstr ""
+"Чтобы предотвратить случайное изменение комбинаций клавиш, они могут "
+"меняться только при включенной опции <menuchoice><guimenu>Правка</"
+"guimenu><guimenuitem>Комбинации клавиш</guimenuitem></menuchoice>. Изменения "
+"по умолчанию выключены, что рекомендуется делать при обычном использовании."
+
+#: keyboard-shortcuts.xml:288(para)
+msgid ""
+"All keyboard shortucts are stored in file <filename>ui/accel_map</filename> "
+"in the user's directory, which usually means <filename>~/.gwyddion</"
+"filename> (Unix) or <filename>Documents and Settings\\gwyddion</filename> "
+"(MS Windows). Assigning shortcuts to tools can be only done by editing this "
+"file. Each line corresponds to an action that can be invoked with a "
+"shortcut. For instance the Mask Editor tool's line is by default: "
+"<informalexample><programlisting>; (gtk_accel_path \"&lt;tool&gt;/"
+"GwyToolMaskEditor\" \"\")</programlisting></informalexample> Semicolons "
+"represents comments, i.e. lines starting with a semicolon are inactive. "
+"Hence, to assign the combo <keycap>Ctrl-Shift-E</keycap> to the Mask Editor "
+"tool, remove the semicolon to make the line active and fill the desired "
+"shortcut in the empty quotes: "
+"<informalexample><programlisting>(gtk_accel_path \"&lt;tool&gt;/"
+"GwyToolMaskEditor\" \"&lt;Control&gt;&lt;Shift&gt;e\")</programlisting></"
+"informalexample>"
+msgstr ""
+"Все комбинации клавиш хранятся в файле <filename>ui/accel_map</filename> в "
+"каталоге пользователя, который обычно называется <filename>~/.gwyddion</"
+"filename> (Unix) или <filename>Documents and Settings\\gwyddion</filename> "
+"(MS Windows). Присвоить комбинации клавиш инструментам можно только путём "
+"редактирования этого файла. Каждая строка соответствует действию, "
+"вызываемому этой комбинацией клавиш. Например, строка для инструмента "
+"\"Редактор маски\" по умолчанию выглядит так: "
+"<informalexample><programlisting>; (gtk_accel_path \"&lt;tool&gt;/"
+"GwyToolMaskEditor\" \"\")</programlisting></informalexample>Точки с запятой "
+"обозначают комментарии, т.е. строки. начинающиеся с них будут неактивными. "
+"Следовательно, чтобы присвоить сочетание клавиш <keycap>Ctrl-Shift-E</"
+"keycap> инструменту \"Редактор маски\", удалите точку с запятой чтобы "
+"сделать эту строку активной и запишите своё сочетание клавиш в пустое место "
+"между кавычками: <informalexample><programlisting>(gtk_accel_path \"&lt;"
+"tool&gt;/GwyToolMaskEditor\" \"&lt;Control&gt;&lt;Shift&gt;e\")</"
+"programlisting></informalexample>"
+
+#~ msgid "Quit <application>Gwyddion</application>."
+#~ msgstr "Выйти из <application>Gwyddion</application>."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

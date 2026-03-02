@@ -1,0 +1,376 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: convolution-deconvolution.xml 22529 2019-09-29 09:37:42Z dn2010 $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='convolution-deconvolution'>
+  <title>Convolution and deconvolution</title>
+  <para>
+    Several Gwyddion functions do convolutions and deconvolutions of some sort.
+    A subtle point which is occasionaly a source of confusion is the difference
+    between continuous and discrete operations.  When images
+    <xi:include href='eqi-f.xml'/> and <xi:include href='eqi-g.xml'/> are
+    physical quantities, i.e. fields sampled in space, their convolution
+    <xi:include href='eqi-h.xml'/>
+    <xi:include href="eq-convolution-continuous.xml"/>
+    is again a physical field.  Its physical dimension (units) is
+    <xi:include href="eq-convolution-units.xml"/>
+    For images <xi:include href="eqi-dim-A.xml"/> has the dimension of image
+    area, i.e. usually square metres.
+  </para>
+  <para>
+    When the integral is realized using a discrete Riemann sum
+    <xi:include href="eq-convolution-Riemann-sum.xml"/>
+    the area appears as the area of one pixel
+    <xi:include href="eqi-Delta-A.xml"/>.  This is how all Gwyddion
+    convolution, deconvolution and transfer function operations work by
+    default, i.e.  with the <guilabel>Normalize as integral</guilabel> option
+    enabled.
+  </para>
+  <para>
+    In digital image processing physical units are sometimes ignored and
+    convolution understood as simple discrete convolution of images
+    <xi:include href="eq-convolution-discrete.xml"/>
+    It is possible to obtain this behaviour by disabling the option
+    <guilabel>Normalize as integral</guilabel> in a particular function.  You
+    should be aware the result of the operation is then no longer a physical
+    quantity sampled in space (it depends on pixel size) and the units are
+    different.  The only function which works this way by default is
+    <link linkend='convolution-filter'>Convolution Filter</link>, where one
+    of the operands is given as a small matrix of unitless numbers.
+  </para>
+  <sect2 id='convolve'>
+    <title>
+      Image convolution <gwy:icon name='convolve'/>
+    </title>
+    <indexterm>
+      <primary>convolution</primary>
+      <secondary>of two images</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>transfer function</primary>
+      <secondary>convolution</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Convolve</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Convolution of two images can be performed using Convolve
+      (see <link linkend='convolution-filter'>Convolution Filter</link> for
+      convolution with a small kernel, entered numerically).  The module has
+      only a few options:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Convolution kernel</guilabel>
+        </term>
+        <listitem>
+          The smaller image to convolve the larger image with, for instance
+          a tip transfer function image. The dimensions of one pixel in both
+          images must correspond.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Exterior type</guilabel>
+        </term>
+        <listitem>
+          What values should be assumed for pixels outside the image
+          (as in <link linkend='extend'>Extend</link>).
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Output size</guilabel>
+        </term>
+        <listitem>
+          The size of the resulting image with respect to which pixels entered
+          the calculation.  <guilabel>Crop to interior</guilabel> cuts the
+          image to consists only of pixels that are sufficiently far from the
+          boundary that the exterior does not matter.  <guilabel>Keep
+          size</guilabel> creates an image with the same as the input image.
+          Finally, <guilabel>Extend to convolved</guilabel> means the resulting
+          image will be extended on each side by half the kernel size.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+  <sect2 id='deconvolve'>
+    <title>
+      Image deconvolution <gwy:icon name='deconvolve'/>
+    </title>
+    <indexterm>
+      <primary>deconvolution</primary>
+      <secondary>of two images</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>Deconvolve</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      A simple regularized deconvolution of two images can be performed using
+      Deconvolve.  L-curve method can be used to search for the optimum
+      regularization parameter, however its applicability highly depends on
+      the data. The module has the following options:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Convolution kernel</guilabel>
+        </term>
+        <listitem>
+          The kernel to be deconvolved from the current image.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Sigma</guilabel>
+        </term>
+        <listitem>
+          Regularization parameter.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>L-curve display</guilabel>
+        </term>
+        <listitem>
+          The data to be shown in the optional L-curve plot, when this is
+          computed. The L-curve consist of two data sources: difference between
+          the result convolved with the kernel and the original data and norm
+          of the result. These two are plotted in a log-log graph providing
+          a L-curve, but their dependences on the regularization parameters can
+          be plotted also individually. The curvature of the resulting curve
+          vs. regularization parameter gives the usual criterion for the best
+          regularization parameters, seeking for the curve maximum.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>L-curve sigma range</guilabel>
+        </term>
+        <listitem>
+          Range of the regularization parameter to be used in the L-curve
+          calculation. This is, similarly to the regularization parameter,
+          logarithmic, so it can span very large range, not necessarily
+          suitable for the particular data set.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Output type <guilabel>Deconvolved</guilabel> produces the deconvolved
+      image; <guilabel>Difference</guilabel> calculates the difference between
+      reconvolved image and the input.
+    </para>
+    <informalfigure id='deconvolve-dialogue'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='deconvolve-dialogue.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the deconvolve dialogue after L-curve data were computed.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+   </sect2>
+  <sect2 id='transfer-function'>
+    <title>
+      Transfer function estimation
+    </title>
+    <indexterm>
+      <primary>transfer function</primary>
+      <secondary>estimation</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>point spread function</primary>
+    </indexterm>
+    <para>
+      The <emphasis>probe transfer function</emphasis> (or point spread
+      function) can be estimated from measured data, even noisy, when the
+      corresponding ideally sharp signal is available.  Gwyddion currently
+      implements a few relatively simple methods.
+    </para>
+    <para id='transfer-function-guess'>
+      <menuchoice>
+        <guimenu>Data Processing</guimenu>
+        <guisubmenu>Statistics</guisubmenu>
+        <guimenuitem>Transfer Function Guess</guimenuitem>
+      </menuchoice>.
+      The user interface of the module is and a typical performance
+      on simulated noisy data is shown in the following figures.
+    </para>
+    <para>
+      The sharp signal is selected as <guilabel>Ideal response</guilabel>.  It
+      must have the same dimensions as the image.  In contrast to the general Deconvolve module
+      this module is optimized for the statistical properties of the transfer functions.
+      There are currently three available deconvolution methods:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Regularised filter</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Simple frequency-space filter with constant regularisation term.
+            It produces transfer function image of the same size as the input
+            images.  Option <guilabel>TF zoom</guilabel> can be used to display
+            zoomed central part of the image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Least squares</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The transfer function is found by solving the least squares problem
+            corresponding to the deconvolution.  The size of transfer function
+            can be chosen arbitrarily.  Usually it is much smaller than the
+            input images.
+          </para>
+          <para>
+            Parameter <guilabel>Size</guilabel> controls the transfer function
+            image size.  If <guilabel>Border</guilabel> is nonzero, the
+            transfer function image is enlarged by this value before solving
+            the least squares problem and then the border is cut.  A small
+            border of 2 or 3 often improves the result because errors tend to
+            accumulate in the edge pixels.  Both sizes can be estimated
+            automatically using <guibutton>Estimate Size</guibutton>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Wiener filter</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Pseudo-Wiener filter assuming the spectral density of the output
+            can be estimated by the spectral density of the input image.
+            It is again a frequency-domain filter, producing transfer function
+            image of the same size as the input images.  Option <guilabel>TF
+            zoom</guilabel> can be used to display zoomed central part of the
+            image.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Two important parameters influence the result.  The dimensionless
+      regularisation parameter <xi:include href='eqi-sigma.xml'/>, which
+      is used in all the methods, but is not directly comparable between them.
+      It can be chosen manually.  Since suitable values can differ by several
+      orders of magnitude, it is presented as base-10 logarithm.  However, the
+      module can find a suitable value also automatically when <guibutton>Fit
+      Sigma</guibutton> is pressed.
+    </para>
+    <para>
+      <guibutton>Windowing type</guibutton> determines the
+      <link linkend='windowing'>windowing function</link> applied to both
+      input images before deconvolution.  Unless the input data are periodic,
+      windowing is a necessity to avoid cross-like artefacts in the transfer
+      function.  The default Welch window is usually a good choice.
+    </para>
+    <para>
+      A few characteristics of the transfer function are immediately displayed
+      in the bottom part of the dialogue as <guilabel>Result</guilabel>:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>TF width</guilabel>
+        </term>
+        <listitem>
+          Width, calculated as square root of dispersion when the transfer
+          function is taken as a distribution.  Only the central peak is
+          included in the calculation (which is important namely for
+          regularised and Wiener filters).  Usually, the optimal reconstruction
+          has also small width.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>TF height</guilabel>
+        </term>
+        <listitem>
+          Maximum value of the transfer function.  When it starts to decrease
+          noticeably, the regularisation parameter is probably too high.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>TF norm</guilabel>
+        </term>
+        <listitem>
+          Mean square value of the transfer function.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Difference norm</guilabel>
+        </term>
+        <listitem>
+          Mean square value of the difference between the input image and
+          ideal sharp image convolved with the reconstructed transfer function.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The tab <guilabel>Output Options</guilabel> allows choosing the images
+      the function will produce: the transfer function (<guilabel>Transfer
+      function</guilabel>), its convolution with the ideal sharp image
+      (<guilabel>Convolved</guilabel>) and/or the difference between the
+      input and the convolved image (<guilabel>Difference</guilabel>).
+      For methods which produce full-size transfer function images,
+      <guilabel>Only zoomed part</guilabel> limits the output image size to
+      the zoomed part displayed in the dialogue.
+    </para>
+    <informalfigure id='fig-psf-guess-dialogue'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='psf-guess-dialogue.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the transfer function estimation module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <informalfigure id='fig-psf-guess-apps'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='psf-guess-apps.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Sample results of the transfer function estimation module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para id='transfer-function-fit'>
+      An alternative method of TF estimation is the fitting of an explicit
+      function form, for instance Gaussian.  The free parameters of the
+      function are sought to minimise the sum of squared differences between
+      measured data and ideal response convolved with the TF.  Since the
+      minimisation can be performed entirely in the frequency domain and does
+      not require repeated convolution, this method is simple and fast, albeit
+      somewhat crude.  It is available as
+      <menuchoice>
+        <guimenu>Data Processing</guimenu>
+        <guisubmenu>Statistics</guisubmenu>
+        <guimenuitem>Transfer Function Fit</guimenuitem>
+      </menuchoice>
+      with three model functions currently implemented: fully symmetrical
+      Gaussian, anisotropic Gaussian which can have different widths
+      in the horizontal and vertical directions, and TF which is exponential
+      in the frequency space.
+    </para>
+  </sect2>
+</sect1>

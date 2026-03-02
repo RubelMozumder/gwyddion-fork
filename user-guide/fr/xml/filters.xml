@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: filters.xml 20496 2017-10-30 19:45:21Z francheu $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='filters' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Filtres</title>
+  <sect2 id='basic-filters'>
+    <title>
+      Outil filtres basiques <gwy:icon name='filter'/>
+    </title>
+    <para>
+      L'<link linkend='basic-filters'>outil filtres</link> vous permet
+      d'appliquer différents filtres simples sur votre image. Ceux-ci
+      peuvent être utiles pour supprimer le bruit ; toutefois, les données
+      mesurées seront altérées, il faut donc prendre soin de ne pas détruire
+      certains détails important de l'image.
+    </para>
+    <para>
+      Tous les filtres modifient les données à partir du voisinage du pixel
+      filtré. Pour certains la taille et la forme du voisinage est prédéterminée.
+      Toutefois, dans la plupart des cas la taille peut être contrôlée par le
+      paramètre <guilabel>taille</guilabel>. En-dehors des filtres de type
+      gaussien (décrits plus bas), la taille détermine le diamètre du voisinage en pixels.
+      Il est ainsi conseillé d'utiliser les filtres de taille impaire à cause
+      de leur effet symétrique.
+    </para>
+    <variablelist>
+      <varlistentry id='filter-mean'>
+        <term>valeur moyenne</term>
+        <listitem>
+          <indexterm>
+            <primary>moyenne</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>débruitage</primary>
+            <secondary>filtre moyenne</secondary>
+          </indexterm>
+          La valeur filtrée correspond à la moyenne des valeurs au voisinnage du
+          pixel original.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-median'>
+        <term>Valeur médiane</term>
+        <listitem>
+          <indexterm>
+            <primary>médiane</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>débruitage</primary>
+            <secondary>filtre médian</secondary>
+          </indexterm>
+          La valeur filtrée correspond à la médiane des valeurs au voisinnage du
+          pixel original.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-conservative-denoise'>
+        <term>Débruitage conservatif</term>
+        <listitem>
+          <indexterm>
+            <primary>débruitage</primary>
+            <secondary>conservatif</secondary>
+          </indexterm>
+          <indexterm><primary>filtre de débruitage conservatif</primary></indexterm>
+          Ce filtre vérifie que la valeur n'est pas un
+          extrême par rapport aux valeurs voisines. Les valeurs non extrêmes sont
+          préservées, tandis que les valeurs extrêmes sont remplacées par la
+          seconde valeur la plus haute ou la plus basse.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-minimum'>
+        <term>Minimum</term>
+        <listitem>
+          <indexterm>
+            <primary>minimum</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>érosion</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          Aussi connu sous le nom de filtre d'érosion, il
+          remplace la valeur par le minimum des valeurs voisines. Plus 
+          précisément, l'érosion est appliquée sur un disque de diamètre spécifié.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-maximum'>
+        <term>Maximum</term>
+        <listitem>
+          <indexterm>
+            <primary>maximum</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>dilatation</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          Aussi connu sous le nom de filtre de dilatation, il
+          remplace la valeur par le maximum des valeurs voisines. Plus 
+          précisément, la diatation est appliquée sur un disque de diamètre 
+          spécifié.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-opening'>
+        <term>Ouverture</term>
+        <listitem>
+          <indexterm>
+            <primary>ouverture</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          L'ouverture est une érosion suivie d'une dilatation. Les bosses sont 
+          ainsi supprimées, tandis que les surfaces lisses et les creux sont plus
+          ou moins préservées.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-closing'>
+        <term>Fermeture</term>
+        <listitem>
+          <indexterm>
+            <primary>fermeture</primary>
+            <secondary>filtre</secondary>
+          </indexterm>
+          La fermeture est une dilatation suivie d'une érosion. Les creux sont 
+          ainsi supprimées, tandis que les surfaces lisses et les bosses sont plus
+          ou moins préservées.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-asf-opening'>
+        <term>Filtre séquentiel alternant, ouverture</term>
+        <listitem>
+          <indexterm>
+            <primary>filtre séquentiel alternant</primary>
+            <secondary>fermeture-ouverture</secondary>
+          </indexterm>
+          Un simple filtre d'ouverture ou de fermeture peut parfois
+          être trop brutal pour la correction de défauts de différentes tailles. 
+          Le filtre séquentiel alternant (ASF, alternating sequential filter) 
+          consiste en une séquence de fermetures et d'ouvertures en 
+          augmentant progressivement la taille du disque jusqu'à la valeur
+          spécifiée. Il préserve mieux la forme des détails ne devant pas être
+          supprimés par l'ouverture. La dernière opération de ce filtre est une
+          ouverture.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-asf-closing'>
+        <term>Filtre séquentiel alternant, fermeture</term>
+        <listitem>
+          <indexterm>
+            <primary>filtre séquentiel alternant</primary>
+            <secondary>ouverture-fermeture</secondary>
+          </indexterm>
+          Ce filtre ne diffère du précédent que par l'ordre des opérations. Ici
+          l'opération finale du filtre est une fermeture.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-kuwahara'>
+        <term>Kuwahara</term>
+        <listitem>
+          <indexterm><primary>filtre de Kuwahara</primary></indexterm>
+          <indexterm>
+            <primary>débruitage</primary>
+            <secondary>filtre de Kuwahara</secondary>
+          </indexterm>
+          Le filtre de Kuwahara est un filtre de lissage préservant les bords.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-dechecker'>
+        <term>Décarèlement</term>
+        <listitem>
+          <indexterm><primary>filtre de décarèlement</primary></indexterm>
+          <indexterm><primary>filtre de suppression de motif carrelé</primary></indexterm>
+          Filtre de lissage spécialement conçu pour
+          supprimer les motifs carrelés d'une image, tout en conservant les autres
+          détails. Il s'agit d'un filtre de convolution utilisant un noyau
+          <xi:include href="eq-filters-dechecker.xml"/>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-gaussian'>
+        <term>Gaussien</term>
+        <listitem>
+          <indexterm><primary>filtre gaussien</primary></indexterm>
+          <indexterm>
+            <primary>débruitage</primary>
+            <secondary>filtre gaussian</secondary>
+          </indexterm>
+          Le filtre gaussien est un filtre de lissage, le paramètre de taille détermine
+          la largeur à mi-hauteur de la gaussienne (FWHM, full width at half
+          maximum). La relation entre la largeur à mi-hauteur et
+          <xi:include href="eqi-sigma.xml"/>
+          est
+          <xi:include href="eq-gaussian-fwhm.xml"/>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-sharpen'>
+        <term>Accentuation</term>
+        <listitem>
+          <indexterm><primary>filtre d'accentuation</primary></indexterm>
+          Filtre d'accentuation complémentaire au 
+          filtre gaussien. Il commence par adoucir l'image avec le filtre 
+          gaussien correspondant, le résultat est ensuite extrapolé en sens 
+          inverse pour estimer l'image accentuée.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Ces filtres sont appliqués par défaut à toute l'image. Vous pouvez
+      cependant appliquer un filtre à une zone particulière en la sélectionnant
+      au préalable avec la souris. Ceci peut être utile pour corriger des zones
+      mal mesurées au sein d'une bonne image.
+    </para>
+    <para>
+      Il est aussi possible de limiter la zone à filtrer à l'aide d'un masque.
+      Dans ce cas celui-ci détermine les pixels actifs dont les valeurs seront
+      modifiées par le filtre. Les pixels au voisinage de la région active 
+      peuvent toutefois entrer de manière passive dans le calcul, ce qui 
+      signifie que leur valeur peut influencer le résultat.
+    </para>
+    <para>
+      Plusieurs filtres basiques peuvent être utilisés pour un simple 
+      débruitage ou la suppression de défauts. D'autres fonctions de marquage et
+      de suppression de défauts sont décrits dans la section
+      <link linkend='editing-correction'>édition des données</link>,
+      avec par exemple le
+      <link linkend='mask-of-outliers'>marquage des points aberrants</link>
+      et la
+      <link linkend='remove-data-under-mask'>suppression des données sous le masque</link>.
+      Des fonctions de débruitage plus avancées, tel que la transformée en 
+      ondelettes (DWT) ou le filtrage de Fourier (FFT) sont décrits dans la 
+      section
+      <link linkend='edit-extended'>correction avancée des données</link>.
+    </para>
+    <informalfigure id='fig-filters-screenshot'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='filter.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Capture d'écran de l'outil filtre avec le filtre moyenne appliqué à
+          une sélection rectangulaire
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='convolution-filter'>
+    <title>
+      Convolution <gwy:icon name='convolution'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Traitement des Données</guimenu>
+        <guisubmenu>Transformées</guisubmenu>
+        <guisubmenu>Filtre de Convolution</guisubmenu>
+      </menuchoice>
+    </para>
+    <para>
+      Des convolutions avec des noyaux allant jusqu'à
+      <xi:include href="eqi-9x9.xml"/>
+      peuvent être appliquées à l'aide des
+      filtres de convolution.
+    </para>
+    <para>
+      Le <guilabel>diviseur</guilabel> represente un facteur commun divisant
+      tous les coefficients avant que le filtre ne soit appliqué. Ce qui permet
+      d'utiliser des coefficients dénormalisés plus faciles à utiliser. La
+      normalisation peut être aussi calculée automatiquement lorsque la case
+      <guilabel>automatique</guilabel> est cochée. Lorsque la somme des
+      coefficients est non nulle, la normalisation permet de rendre le filtre
+      conservatif, c'est-à-dire que le facteur normalise la somme des
+      coefficients à un. Lorsque la somme des coefficients est nulle, le facteur
+      automatique devient simplement égal à un.
+    </para>
+    <para>
+      Comme la plupart des filtres utilisés en pratique présentent différents
+      types de symétrie, les coefficients peuvent être automatiquement
+      complétés selon le type de symétrie sélectionné (pair, impaire). Notez
+      que la complétion n'a lieu qu'après avoir pressé <keycap>entrée</keycap>
+      lors de la saisie des coefficients.
+    </para>
+    <para>
+      Lors de la première installation, seul un filtre identité est présent (qui
+      n'est pas particulièrement utile vu qu'il ne fait rien). Ce filtre ne peut
+      être modifé. Utilisez le bouton <guilabel>nouveau</guilabel> de l'onglet
+      <guilabel>préréglages</guilabel> pour en créer un nouveau.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

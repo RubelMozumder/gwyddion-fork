@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: installation-ms-windows.xml 26266 2024-03-23 08:46:35Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-ms-windows'>
+  <title>MS Windows Packages</title>
+  <para>
+    MS Windows packages built by the developers are available on the project
+    <ulink url='http://gwyddion.net/download.php'>download</ulink> page. At
+    present both 32bit and 64bit executables are provided.  Most new users
+    should choose the 64bit package package nowadays.  The 32bit package
+    still has some uses though.
+  </para>
+  <note>
+    MS Windows will warn the program comes from an unknown publisher, is
+    unsafe, not trusted or something along these lines (the wording depends
+    on OS version). This is because in order to avoid the warning we would
+    have to pay regularly hundreds of € to some certificate company. If you
+    downloaded the installer from SourceForge it is the official Gwyddion
+    installer and there will not be any you can trust more. You simply have
+    to proceed despite MS Windows attempts to discourage you.
+  </note>
+  <note>
+    The packaging of MS Windows executables has changed substantially in
+    version 2.23.  So, if you upgrade from a pre-2.23 version to version 2.23
+    or newer, please read the
+    <ulink url='http://gwyddion.net/switch-to-mingw32.php'>description of the
+      changes</ulink>.
+  </note>
+  <para>
+    If you have already installed <application>Gwyddion</application> the
+    installer asks if you want to replace the previous version.
+  </para>
+  <informalfigure id='fig-win32-installer-upgrade-screenshot'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='win32-installer-upgrade.png' format='PNG'/>
+      </imageobject>
+      <textobject>
+        <phrase>MS Windows installer upgrade question screenshot</phrase>
+      </textobject>
+      <caption>
+        The question what to do with the previous
+        <application>Gwyddion</application> version.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <para>
+    You have three options:
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>Yes (replace)</term>
+      <listitem>
+        The already installed version will be replaced.  This is the normal
+        upgrade method.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>No (keep)</term>
+      <listitem>
+        The already installed version will be ignored and the installation will
+        proceed as a fresh one.  Generally, this is a bad idea as both versions
+        will share settings and registry keys and if you uninstall one the
+        other will be affected.  Furthermore, it does not remove any of the
+        files of the already present version – and they can get into the way.
+        Sill, you may find this option useful in some cases.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>Cancel</term>
+      <listitem>
+        The installation will be aborted and the old version will be kept
+        untouched.
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    In the following steps the installer reminds you of the software
+    components included in the package and their licenses (that are all
+    Free Software), lets you change the installation directory and offers
+    a choice of languages to use for the user interface.
+  </para>
+  <sect2 id='installation-ms-windows-uninstall'>
+    <title>Uninstallation</title>
+    <para>
+      If you want to uninstall Gwyddion go to
+      <menuchoice>
+        <guimenu>Start</guimenu>
+        <guisubmenu>Control Panel</guisubmenu>
+        <guimenuitem>Add or Remove Programs</guimenuitem>
+      </menuchoice>
+      and choose <application>Gwyddion</application>. Note that this is valid for
+      Windows XP. The path to the <guimenuitem>Add/Remove</guimenuitem> window
+      may be slightly different on other Windows OS.
+    </para>
+  </sect2>
+  <sect2 id='installation-ms-windows-registry'>
+    <title>Registry keys</title>
+    <para>
+      The installer creates the following useful keys under
+      <literal>HKEY_LOCAL_MACHINE\Software\Gwyddion\2.0</literal>:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term><literal>InstallDir</literal></term>
+        <listitem>
+          Installation directory, e.g.
+          <filename>C:\Program Files\Gwyddion</filename>.
+          Reading this key can be useful for determining where to install
+          extensions.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><literal>Version</literal></term>
+        <listitem>
+          Full Gwyddion version as a string.
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><literal>Locale</literal></term>
+        <listitem>
+          Language of Gwyddion user interface chosen during the installation
+          (more precisely, a locale specification that, among other things,
+          defines the language).  You can modify it using
+          <command>regedit</command> to choose another language as described
+          below.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The list of available languages and corresponding
+      <literal>Locale</literal> values include:
+    </para>
+    <para>
+      <informaltable id='table-locales'>
+        <tgroup cols='2'>
+          <?dblatex ll?>
+          <thead>
+            <row>
+              <entry><literal>Locale</literal></entry>
+              <entry>Language</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><literal>cs_CZ.UTF-8</literal></entry>
+              <entry>Czech (Czech Republic)</entry>
+            </row>
+            <row>
+              <entry><literal>en_US.UTF-8</literal></entry>
+              <entry>English (United States)</entry>
+            </row>
+            <row>
+              <entry><literal>en_GB.UTF-8</literal></entry>
+              <entry>English (United Kingdom)</entry>
+            </row>
+            <row>
+              <entry><literal>fr_FR.UTF-8</literal></entry>
+              <entry>French (France)</entry>
+            </row>
+            <row>
+              <entry><literal>de_DE.UTF-8</literal></entry>
+              <entry>German (Germany)</entry>
+            </row>
+            <row>
+              <entry><literal>it_IT.UTF-8</literal></entry>
+              <entry>Italian (Italy)</entry>
+            </row>
+            <row>
+              <entry><literal>ko_KR.UTF-8</literal></entry>
+              <entry>Korean (South Korea)</entry>
+            </row>
+            <row>
+              <entry><literal>ru_RU.UTF-8</literal></entry>
+              <entry>Russian (Russia)</entry>
+            </row>
+            <row>
+              <entry><literal>pt_BR.UTF-8</literal></entry>
+              <entry>Portugese (Brazil)</entry>
+            </row>
+            <row>
+              <entry><literal>es_ES.UTF-8</literal></entry>
+              <entry>Spanish (Spain)</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+     </para>
+  </sect2>
+  <sect2 id='installation-ms-windows-missing'>
+    <title>Missing features</title>
+    <para>
+      Gwyddion has a large number of optional features that depend on third
+      party libraries.  The MS Windows packages contain most of them but a few
+      are not included at present:
+    </para>
+    <itemizedlist>
+      <listitem>
+        Flexible Image Transport System (FITS) file import.
+      </listitem>
+      <listitem>
+        Pygwy support in the 64bit packages (it is supported only in the 32bit
+        packages).
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2 id='installation-ms-windows-pygwy'>
+    <title>Enabling pygwy</title>
+    <para>
+      The Python scripting interface, pygwy, is included in the installer.
+      However, you need to install Python and PyGTK2 separately to use Python
+      scripting. This can be done either prior to Gwyddion installation or
+      any time later. If Python and PyGTK2 is not present pygwy simply does
+      not register itself upon Gwyddion startup.
+    </para>
+    <para>
+      MS Windows Python installer could be obtained at
+      <ulink url="https://www.python.org/downloads/">https://www.python.org/downloads/</ulink>.
+      Since pygwy requires Python 2 you need a Python 2.7 package, which are
+      no longer officially supported.
+      The latest version <filename>python-2.7.16.msi</filename>
+      is mirrored at
+      <ulink url='https://sourceforge.net/projects/gwyddion/files/pygtk-win32/'>Gwyddion's SourceForge page</ulink>
+      in case you have trouble finding or downloading it.
+    </para>
+    <para>
+      Three packages are required for PyGTK2: PyGTK, PyCairo and PyGObject.
+      Follow the corresponding download links for these modules at
+      <ulink url="http://www.pygtk.org/downloads.html">http://www.pygtk.org/downloads.html</ulink>
+      to obtain the installers
+      <filename>pygobject-2.28.3.win32-py2.7.msi</filename>,
+      <filename>pycairo-1.8.10.win32-py2.7.msi</filename>, and
+      <filename>pygtk-2.24.0.win32-py2.7.msi</filename>
+      or possibly newer versions (if available).
+      They also mirrored at
+      <ulink url='https://sourceforge.net/projects/gwyddion/files/pygtk-win32/'>Gwyddion's SourceForge page</ulink>
+      in case you have trouble finding or downloading them.
+    </para>
+    <para>
+      Success has also been reported with the all-in-one installer
+      <filename>pygtk-all-in-one-2.24.2.win32-py2.7.msi</filename>
+      that contains everything.  However, using the all-in-one installer means
+      entire Gtk+ will be installed twice (into different locations).  Which
+      bits of which installation will be used in pygwy is difficult to tell.
+      Hence this method is not recommended.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

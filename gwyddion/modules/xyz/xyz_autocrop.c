@@ -1,0 +1,240 @@
+/*
+ *  $Id: xyz_autocrop.c 26355 2024-05-21 08:23:55Z yeti-dn $
+ *  Copyright (C) 2016 David Necas (Yeti).
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/surface.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwydgetutils.h>
+#include <libgwydgets/gwyradiobuttons.h>
+#include <libgwymodule/gwymodule-xyz.h>
+#include <app/gwyapp.h>
+
+#define RUN_MODES (GWY_RUN_IMMEDIATE)
+
+
+static gboolean module_register   (void);
+static void     autocrop          (GwyContainer *data,
+                                   GwyRunType run);
+static GwyXYZ*  pick_points       (GwySurface *surface,
+                                   gint *newn);
+
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Simple XYZ automated crop."),
+    "Petr Klapetek <klapetek@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, xyz_autocrop)
+
+static gboolean
+module_register(void)
+{
+    gwy_xyz_func_register("autocrop",
+                          (GwyXYZFunc)&autocrop,
+                          N_("/Crop Automatically"),
+                          GWY_STOCK_FIX_ZERO,
+                          RUN_MODES,
+                          GWY_MENU_FLAG_XYZ,
+                          N_("Crop data automatically to cover scanned areas"));
+
+    return TRUE;
+}
+
+static void
+autocrop(GwyContainer *data, G_GNUC_UNUSED GwyRunType run)
+{
+    GwySurface *surface = NULL, *newsurface;
+    GQuark quark;
+    gint id, newid;
+    GwyXYZ *newxyz;
+    guint n;
+    const guchar *gradient;
+
+    gwy_app_data_browser_get_current(GWY_APP_SURFACE, &surface,
+                                     GWY_APP_SURFACE_ID, &id,
+                                     0);
+    g_return_if_fail(GWY_IS_SURFACE(surface));
+
+    quark = gwy_app_get_surface_key_for_id(id);
+    gwy_app_undo_qcheckpointv(data, 1, &quark);
+
+    newxyz = pick_points(surface, &n);
+    newsurface = gwy_surface_new_from_data(newxyz, n);
+
+    newid = gwy_app_data_browser_add_surface(newsurface, data, TRUE);
+    gwy_app_set_surface_title(data, newid, _("Cropped"));
+    if (gwy_container_gis_string(data, gwy_app_get_surface_palette_key_for_id(id), &gradient))
+        gwy_container_set_const_string(data, gwy_app_get_surface_palette_key_for_id(newid), gradient);
+
+    g_object_unref(newsurface);
+}
+
+static void
+extract_column_profile(GwyDataField *dfield, GwyDataLine *dline)
+{
+    gint xres, yres, i, j;
+    const gdouble *d, *drow;
+    gdouble *linedata = gwy_data_line_get_data(dline);
+
+    xres = gwy_data_field_get_xres(dfield);
+    yres = gwy_data_field_get_yres(dfield);
+    d = gwy_data_field_get_data_const(dfield);
+
+    for (i = 0; i < yres; i++) {
+        drow = d + i*xres;
+        linedata[i] = 0;
+
+        for (j = 0; j < xres; j++)
+                linedata[i] += drow[j];
+    }
+}
+
+static void
+extract_row_profile(GwyDataField *dfield, GwyDataLine *dline)
+{
+    gint xres, yres, i, j;
+    const gdouble *d, *drow;
+    gdouble *linedata = gwy_data_line_get_data(dline);
+
+    xres = gwy_data_field_get_xres(dfield);
+    yres = gwy_data_field_get_yres(dfield);
+    d = gwy_data_field_get_data_const(dfield);
+
+    for (i = 0; i < yres; i++) {
+        drow = d + i*xres;
+        linedata[i] = 0;
+
+        for (j = 0; j < xres; j++)
+                linedata[j] += drow[j];
+    }
+}
+
+static gdouble
+get_lpos(GwyDataLine *dline, gdouble value)
+{
+    gint i;
+    const gdouble *linedata = gwy_data_line_get_data(dline);
+
+    for (i = 1; i < gwy_data_line_get_res(dline); i++) {
+        if (linedata[i] > value) {
+            return gwy_data_line_itor(dline, i-1) + gwy_data_line_get_offset(dline);
+        }
+    }
+    return gwy_data_line_itor(dline, gwy_data_line_get_res(dline)-1);
+}
+
+static gdouble
+get_rpos(GwyDataLine *dline, gdouble value)
+{
+    gint i;
+    const gdouble *linedata = gwy_data_line_get_data(dline);
+
+    for (i = 0; i < (gwy_data_line_get_res(dline) - 1); i++) {
+        if (linedata[i] > value)
+            return gwy_data_line_itor(dline, i+1) + gwy_data_line_get_offset(dline);
+    }
+    return gwy_data_line_itor(dline, gwy_data_line_get_res(dline)-1);
+}
+
+
+static GwyXYZ*
+pick_points(GwySurface *surface, int *newn)
+{
+    gint i, n, npoints, newnpoints;
+    gint xres = 500;
+    gint yres = 500;
+    gdouble xmin, xmax, ymin, ymax;
+    gdouble xfrom, xto, yfrom, yto;
+    GwyDataField *dfield, *mapfield;
+    GwyDataLine *xline, *yline;
+    GwyXYZ *xyz, *newxyz;
+
+    gwy_surface_get_xrange(surface, &xmin, &xmax);
+    gwy_surface_get_yrange(surface, &ymin, &ymax);
+
+    dfield = gwy_data_field_new(xres, yres, xmax - xmin, ymax - ymin, FALSE);
+    mapfield = gwy_data_field_new_alike(dfield, FALSE);
+    xline = gwy_data_line_new(xres, xmax - xmin, FALSE);
+    yline = gwy_data_line_new(yres, ymax - ymin, FALSE);
+    gwy_data_line_set_offset(xline, xmin);
+    gwy_data_line_set_offset(yline, ymin);
+    gwy_data_field_set_xoffset(dfield, xmin);
+    gwy_data_field_set_yoffset(dfield, ymin);
+
+    gwy_data_field_average_xyz(dfield, mapfield,
+                               gwy_surface_get_data_const(surface),
+                               gwy_surface_get_npoints(surface));
+    extract_row_profile(dfield, xline);
+    extract_column_profile(dfield, yline);
+
+    gwy_data_line_cumulate(xline);
+    gwy_data_line_cumulate(yline);
+    gwy_data_line_multiply(xline, 1.0/gwy_data_line_get_val(xline, xres-1));
+    gwy_data_line_multiply(yline, 1.0/gwy_data_line_get_val(yline, yres-1));
+
+    xfrom = get_lpos(xline, 0.05);
+    xto = get_rpos(xline, 0.95);
+
+    yfrom = get_lpos(yline, 0.05);
+    yto = get_rpos(yline, 0.95);
+
+    //printf("Ranges: %g %g %g %g    %g %g %g %g\n", xmin, xmax, ymin, ymax, xfrom, xto, yfrom, yto);
+
+    xyz = gwy_surface_get_data(surface);
+    npoints = gwy_surface_get_npoints(surface);
+    newnpoints = 0;
+    for (i = 0; i < npoints; i++) {
+        if (xyz[i].x >= xfrom && xyz[i].y >= yfrom && xyz[i].x <= xto && xyz[i].y <= yto)
+            newnpoints++;
+    }
+
+    printf("n %d %d\n", npoints, newnpoints);
+
+    newxyz = g_new(GwyXYZ, newnpoints);
+    n = 0;
+    for (i = 0; i < npoints; i++) {
+        if (xyz[i].x >= xfrom && xyz[i].y >= yfrom && xyz[i].x <= xto && xyz[i].y <= yto) {
+            newxyz[n].x = xyz[i].x;
+            newxyz[n].y = xyz[i].y;
+            newxyz[n].z = xyz[i].z;
+            n++;
+        }
+    }
+
+    g_object_unref(dfield);
+    g_object_unref(mapfield);
+    g_object_unref(xline);
+    g_object_unref(yline);
+
+    *newn = newnpoints;
+    return newxyz;
+}
+
+
+/* vim: set cin et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

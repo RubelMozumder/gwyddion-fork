@@ -1,0 +1,1009 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2003-2023 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/elliptic.h>
+#include <libprocess/stats.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwylayer-basic.h>
+#include <libgwymodule/gwymodule-tool.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+
+enum {
+    RADIUS_MAX = 40,
+    PREVIEW_SIZE = 2*RADIUS_MAX + 3,
+    SCALE = 5,
+    RESPONSE_SET_ZERO = 100,
+};
+
+enum {
+    PARAM_RADIUS,
+    PARAM_SHOW_SELECTION,
+    PARAM_ADAPT_COLOR_RANGE,
+    PARAM_SHOW_MASK,
+
+    BUTTON_SET_ZERO,
+    WIDGET_RESULTS_Z,
+    WIDGET_RESULTS_FACET,
+    WIDGET_RESULTS_CURV,
+};
+
+typedef struct {
+    gint from;
+    gint to;
+    gint dest;
+} Range;
+
+#define GWY_TYPE_TOOL_READ_VALUE            (gwy_tool_read_value_get_type())
+#define GWY_TOOL_READ_VALUE(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GWY_TYPE_TOOL_READ_VALUE, GwyToolReadValue))
+#define GWY_IS_TOOL_READ_VALUE(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GWY_TYPE_TOOL_READ_VALUE))
+#define GWY_TOOL_READ_VALUE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GWY_TYPE_TOOL_READ_VALUE, GwyToolReadValueClass))
+
+typedef struct _GwyToolReadValue      GwyToolReadValue;
+typedef struct _GwyToolReadValueClass GwyToolReadValueClass;
+
+struct _GwyToolReadValue {
+    GwyPlainTool parent_instance;
+
+    GwyParams *params;
+    GwyResults *results;
+
+    GwyContainer *data;
+    GwyDataField *detail;
+    GwyDataField *detail_mask;
+
+    gdouble avg;
+    gdouble bx;
+    gdouble by;
+    gdouble k1;
+    gdouble k2;
+
+    gdouble *values;
+    gint *xpos;
+    gint *ypos;
+
+    GtkWidget *zoomview;
+    GwySelection *zselection;
+    Range xr;
+    Range yr;
+    gint zisel[4];
+    gulong palette_id;
+    gulong mask_colour_id[4];
+
+    GtkWidget *x;
+    GtkWidget *xpix;
+    GtkWidget *y;
+    GtkWidget *ypix;
+
+    GwyParamTable *table;
+
+    gboolean same_units;
+    gboolean complete;
+    gboolean in_update;
+
+    /* to prevent double-update on data_changed -- badly designed code? */
+    gboolean drawn;
+
+    /* potential class data */
+    GType layer_type_point;
+};
+
+struct _GwyToolReadValueClass {
+    GwyPlainToolClass parent_class;
+};
+
+static gboolean module_register(void);
+
+static GType        gwy_tool_read_value_get_type         (void)                      G_GNUC_CONST;
+static GwyParamDef* define_module_params                 (void);
+static void         gwy_tool_read_value_finalize         (GObject *object);
+static void         gwy_tool_read_value_init_dialog      (GwyToolReadValue *tool);
+static void         gwy_tool_read_value_data_switched    (GwyTool *gwytool,
+                                                          GwyDataView *data_view);
+static void         gwy_tool_read_value_data_changed     (GwyPlainTool *plain_tool);
+static void         gwy_tool_read_value_mask_changed     (GwyPlainTool *plain_tool);
+static void         gwy_tool_read_value_selection_changed(GwyPlainTool *plain_tool,
+                                                          gint hint);
+static void         palette_changed                      (GwyToolReadValue *tool);
+static void         mask_colour_changed                  (GwyToolReadValue *tool);
+static void         draw_zoom                            (GwyToolReadValue *tool);
+static void         adapt_colour_range                   (GwyToolReadValue *tool,
+                                                          gboolean make_empty);
+static void         copy_mask_colour                     (GwyToolReadValue *tool);
+static void         pix_spinned                          (GwyToolReadValue *tool);
+static void         calculate                            (GwyToolReadValue *tool,
+                                                          gint col,
+                                                          gint row);
+static void         dialog_response                      (GwyToolReadValue *tool,
+                                                          gint response);
+static void         update_values                        (GwyToolReadValue *tool);
+static void         param_changed                        (GwyToolReadValue *tool,
+                                                          gint id);
+static void         update_units                         (GwyToolReadValue *tool);
+static void         resize_detail                        (GwyToolReadValue *tool);
+static void         calc_curvatures                      (const gdouble *values,
+                                                          const gint *xpos,
+                                                          const gint *ypos,
+                                                          guint npts,
+                                                          gdouble dx,
+                                                          gdouble dy,
+                                                          gdouble *pc1,
+                                                          gdouble *pc2);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Pointer tool, reads value under pointer."),
+    "Yeti <yeti@gwyddion.net>",
+    "4.3",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2003",
+};
+
+GWY_MODULE_QUERY2(module_info, readvalue)
+
+G_DEFINE_TYPE(GwyToolReadValue, gwy_tool_read_value, GWY_TYPE_PLAIN_TOOL)
+
+static gboolean
+module_register(void)
+{
+    gwy_tool_func_register(GWY_TYPE_TOOL_READ_VALUE);
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, "readvalue");
+    gwy_param_def_add_int(paramdef, PARAM_RADIUS, "radius", _("_Averaging radius"), 1, RADIUS_MAX, 1);
+    gwy_param_def_add_boolean(paramdef, PARAM_SHOW_SELECTION, "show-selection", _("Show _selection"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_ADAPT_COLOR_RANGE, "adapt-color-range",
+                              _("Adapt color range to detail"), TRUE);
+    gwy_param_def_add_boolean(paramdef, PARAM_SHOW_MASK, "show-mask", _("Show _mask"), FALSE);
+
+    return paramdef;
+}
+
+static void
+gwy_tool_read_value_class_init(GwyToolReadValueClass *klass)
+{
+    GwyPlainToolClass *ptool_class = GWY_PLAIN_TOOL_CLASS(klass);
+    GwyToolClass *tool_class = GWY_TOOL_CLASS(klass);
+    GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+
+    gobject_class->finalize = gwy_tool_read_value_finalize;
+
+    tool_class->stock_id = GWY_STOCK_POINTER_MEASURE;
+    tool_class->title = _("Read Value");
+    tool_class->tooltip = _("Read value under mouse cursor");
+    tool_class->prefix = "/module/readvalue";
+    tool_class->data_switched = gwy_tool_read_value_data_switched;
+
+    ptool_class->data_changed = gwy_tool_read_value_data_changed;
+    ptool_class->mask_changed = gwy_tool_read_value_mask_changed;
+    ptool_class->selection_changed = gwy_tool_read_value_selection_changed;
+}
+
+static void
+gwy_tool_read_value_finalize(GObject *object)
+{
+    GwyToolReadValue *tool = GWY_TOOL_READ_VALUE(object);
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    guint i;
+
+    GWY_SIGNAL_HANDLER_DISCONNECT(plain_tool->container, tool->palette_id);
+    for (i = 0; i < G_N_ELEMENTS(tool->mask_colour_id); i++)
+        GWY_SIGNAL_HANDLER_DISCONNECT(plain_tool->container, tool->mask_colour_id[i]);
+    gwy_params_save_to_settings(tool->params);
+    GWY_OBJECT_UNREF(tool->params);
+    GWY_OBJECT_UNREF(tool->results);
+    GWY_OBJECT_UNREF(tool->data);
+    GWY_OBJECT_UNREF(tool->detail);
+    GWY_OBJECT_UNREF(tool->detail_mask);
+    g_free(tool->values);
+    g_free(tool->xpos);
+    g_free(tool->ypos);
+
+    G_OBJECT_CLASS(gwy_tool_read_value_parent_class)->finalize(object);
+}
+
+static void
+gwy_tool_read_value_init(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool;
+    GwyResults *results;
+
+    plain_tool = GWY_PLAIN_TOOL(tool);
+    tool->layer_type_point = gwy_plain_tool_check_layer_type(plain_tool, "GwyLayerPoint");
+    if (!tool->layer_type_point)
+        return;
+
+    plain_tool->unit_style = GWY_SI_UNIT_FORMAT_MARKUP;
+    plain_tool->lazy_updates = TRUE;
+
+    tool->params = gwy_params_new_from_settings(define_module_params());
+    gwy_plain_tool_connect_selection(plain_tool, tool->layer_type_point, "pointer");
+    tool->data = gwy_container_new();
+    tool->detail = gwy_data_field_new(PREVIEW_SIZE, PREVIEW_SIZE, PREVIEW_SIZE, PREVIEW_SIZE, TRUE);
+    tool->detail_mask = gwy_data_field_new(PREVIEW_SIZE, PREVIEW_SIZE, PREVIEW_SIZE, PREVIEW_SIZE, TRUE);
+    gwy_container_set_object(tool->data, gwy_app_get_data_key_for_id(0), tool->detail);
+    if (gwy_params_get_boolean(tool->params, PARAM_SHOW_MASK))
+        gwy_container_set_object(tool->data, gwy_app_get_mask_key_for_id(0), tool->detail_mask);
+    adapt_colour_range(tool, TRUE);
+
+    results = tool->results = gwy_results_new();
+    gwy_results_add_value_z(results, "z", "Z");
+    gwy_results_add_value_angle(results, "theta", N_("Inclination θ"));
+    gwy_results_add_value_angle(results, "phi", N_("Inclination φ"));
+    gwy_results_add_value_x(results, "k1", N_("Curvature 1"));
+    gwy_results_add_value_x(results, "k2", N_("Curvature 2"));
+    gwy_results_bind_formats(results, "k1", "k2", NULL);
+
+    gwy_tool_read_value_init_dialog(tool);
+}
+
+static void
+attach_coord_row(GtkTable *table, const gchar *name, gint row,
+                 GtkWidget **pxspin, GtkWidget **reallabel)
+{
+    GtkObject *adj;
+    GtkWidget *spin, *hbox, *label;
+
+    hbox = gwy_hbox_new(4);
+    gtk_table_attach(table, hbox, 0, 3, row, row+1, GTK_EXPAND | GTK_FILL, 0, 0, 0);
+
+    label = gtk_label_new(name);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
+
+    gtk_box_pack_end(GTK_BOX(hbox), gtk_label_new(_("px")), FALSE, FALSE, 0);
+
+    adj = gtk_adjustment_new(1.0, 1.0, 100.0, 1.0, 10.0, 0.0);
+    spin = gtk_spin_button_new(GTK_ADJUSTMENT(adj), 0.0, 0);
+    gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(spin), TRUE);
+    gtk_entry_set_width_chars(GTK_ENTRY(spin), 4);
+    gtk_entry_set_text(GTK_ENTRY(spin), "");
+    gtk_box_pack_end(GTK_BOX(hbox), spin, FALSE, FALSE, 0);
+
+    label = gtk_label_new(NULL);
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_box_pack_end(GTK_BOX(hbox), label, FALSE, FALSE, 4);
+
+    *pxspin = spin;
+    *reallabel = label;
+}
+
+static void
+gwy_tool_read_value_init_dialog(GwyToolReadValue *tool)
+{
+    GtkDialog *dialog = GTK_DIALOG(GWY_TOOL(tool)->dialog);
+    GtkTable *table;
+    GtkWidget *hbox, *vbox;
+    gint row;
+
+    hbox = gwy_hbox_new(8);
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, TRUE, TRUE, 0);
+
+    /* Zoom view */
+    vbox = gwy_vbox_new(0);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+
+    tool->zoomview = gwy_create_preview(tool->data, 0, PREVIEW_SIZE*SCALE, TRUE);
+    tool->zselection = gwy_create_preview_vector_layer(GWY_DATA_VIEW(tool->zoomview), 0, "Point", 1, FALSE);
+    g_object_set(gwy_data_view_get_top_layer(GWY_DATA_VIEW(tool->zoomview)),
+                 "marker-radius", gwy_params_get_int(tool->params, PARAM_RADIUS),
+                 "focus", -1,
+                 NULL);
+    gtk_box_pack_start(GTK_BOX(vbox), tool->zoomview, FALSE, FALSE, 0);
+
+    /* Right pane */
+    vbox = gwy_vbox_new(4);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+
+    table = GTK_TABLE(gtk_table_new(3, 3, FALSE));
+    gtk_table_set_col_spacings(table, 6);
+    gtk_table_set_row_spacings(table, 2);
+    gtk_container_set_border_width(GTK_CONTAINER(table), 4);
+    gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(table), FALSE, FALSE, 0);
+    row = 0;
+
+    gtk_table_attach(table, gwy_label_new_header(_("Position")), 0, 3, row, row+1, GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    row++;
+
+    attach_coord_row(table, "X", row, &tool->xpix, &tool->x);
+    row++;
+    attach_coord_row(table, "Y", row, &tool->ypix, &tool->y);
+    gtk_table_set_row_spacing(table, row, 4);
+    row++;
+
+    tool->table = gwy_param_table_new(tool->params);
+    gwy_param_table_append_header(tool->table, -1, _("Value"));
+    gwy_param_table_append_results(tool->table, WIDGET_RESULTS_Z, tool->results, "z", NULL);
+    gwy_param_table_append_button(tool->table, BUTTON_SET_ZERO, -1, RESPONSE_SET_ZERO, _("Set _Zero"));
+    /* FIXME FIXME FIXME support tooltips in paramtable
+    gtk_widget_set_tooltip_text(tool->set_zero, _("Shift plane z=0 to pass through the selected point"));
+    */
+    gwy_param_table_append_header(tool->table, -1, _("Facet"));
+    gwy_param_table_append_results(tool->table, WIDGET_RESULTS_FACET, tool->results, "theta", "phi", NULL);
+    gwy_param_table_append_header(tool->table, -1, _("Curvatures"));
+    gwy_param_table_append_results(tool->table, WIDGET_RESULTS_CURV, tool->results, "k1", "k2", NULL);
+    gwy_param_table_append_separator(tool->table);
+    gwy_param_table_append_slider(tool->table, PARAM_RADIUS);
+    gwy_param_table_set_unitstr(tool->table, PARAM_RADIUS, _("px"));
+    gwy_param_table_slider_set_mapping(tool->table, PARAM_RADIUS, GWY_SCALE_MAPPING_LINEAR);
+    gwy_param_table_append_checkbox(tool->table, PARAM_SHOW_SELECTION);
+    gwy_param_table_append_checkbox(tool->table, PARAM_ADAPT_COLOR_RANGE);
+    gwy_param_table_append_checkbox(tool->table, PARAM_SHOW_MASK);
+    gwy_plain_tool_add_param_table(GWY_PLAIN_TOOL(tool), tool->table);
+    gtk_box_pack_start(GTK_BOX(vbox), gwy_param_table_widget(tool->table), FALSE, FALSE, 0);
+
+    gwy_plain_tool_add_clear_button(GWY_PLAIN_TOOL(tool));
+    gwy_tool_add_hide_button(GWY_TOOL(tool), TRUE);
+    gwy_help_add_to_tool_dialog(dialog, GWY_TOOL(tool), GWY_HELP_DEFAULT);
+    g_signal_connect_swapped(tool->xpix, "value-changed", G_CALLBACK(pix_spinned), tool);
+    g_signal_connect_swapped(tool->ypix, "value-changed", G_CALLBACK(pix_spinned), tool);
+    g_signal_connect_swapped(tool->table, "param-changed", G_CALLBACK(param_changed), tool);
+    g_signal_connect_swapped(dialog, "response", G_CALLBACK(dialog_response), tool);
+
+    resize_detail(tool);
+
+    gtk_widget_show_all(dialog->vbox);
+}
+
+static gulong
+connect_to_item(GwyContainer *container, GQuark key1, const gchar *key2,
+                GCallback callback, gpointer callback_data)
+{
+    gchar *sigdetail;
+    gulong signal_id;
+
+    sigdetail = g_strconcat("item-changed::", g_quark_to_string(key1), key2, NULL);
+    signal_id = g_signal_connect_swapped(container, sigdetail, callback, callback_data);
+    g_free(sigdetail);
+
+    return signal_id;
+}
+
+static void
+gwy_tool_read_value_data_switched(GwyTool *gwytool, GwyDataView *data_view)
+{
+    static const gchar *colour_components[4] = { "/red", "/green", "/blue", "/alpha" };
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(gwytool);
+    GwyToolReadValue *tool = GWY_TOOL_READ_VALUE(gwytool);
+    GQuark quark;
+    gboolean ignore;
+    guint i;
+
+    ignore = (data_view == plain_tool->data_view);
+
+    if (!ignore) {
+        GWY_SIGNAL_HANDLER_DISCONNECT(plain_tool->container, tool->palette_id);
+        for (i = 0; i < G_N_ELEMENTS(tool->mask_colour_id); i++)
+            GWY_SIGNAL_HANDLER_DISCONNECT(plain_tool->container, tool->mask_colour_id[i]);
+    }
+
+    GWY_TOOL_CLASS(gwy_tool_read_value_parent_class)->data_switched(gwytool, data_view);
+
+    if (ignore || plain_tool->init_failed)
+        return;
+
+    if (data_view) {
+        gwy_object_set_or_reset(plain_tool->layer, tool->layer_type_point,
+                                "draw-marker", gwy_params_get_boolean(tool->params, PARAM_SHOW_SELECTION),
+                                "marker-radius", gwy_params_get_int(tool->params, PARAM_RADIUS),
+                                "editable", TRUE,
+                                "focus", -1,
+                                NULL);
+        gwy_selection_set_max_objects(plain_tool->selection, 1);
+        resize_detail(tool);
+        update_units(tool);
+        /* We need to do this after the detail is resized. */
+        gwy_tool_read_value_selection_changed(plain_tool, -1);
+
+        /* FIXME: We may want to respond also to colour mapping keys in case something else than icolorange changes
+         * them (icolorange can't because it is another tool). */
+        quark = gwy_app_get_data_palette_key_for_id(plain_tool->id);
+        tool->palette_id = connect_to_item(plain_tool->container, quark, NULL,
+                                           G_CALLBACK(palette_changed), tool);
+        quark = gwy_app_get_mask_key_for_id(plain_tool->id);
+        for (i = 0; i < G_N_ELEMENTS(tool->mask_colour_id); i++) {
+            tool->mask_colour_id[i] = connect_to_item(plain_tool->container, quark, colour_components[i],
+                                                      G_CALLBACK(mask_colour_changed), tool);
+        }
+
+        adapt_colour_range(tool, FALSE);
+        palette_changed(tool);
+        copy_mask_colour(tool);
+    }
+    else {
+        gtk_entry_set_text(GTK_ENTRY(tool->xpix), "");
+        gtk_entry_set_text(GTK_ENTRY(tool->ypix), "");
+        adapt_colour_range(tool, TRUE);
+    }
+
+    gtk_widget_set_sensitive(tool->xpix, !!data_view);
+    gtk_widget_set_sensitive(tool->ypix, !!data_view);
+}
+
+static void
+update_units(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyDataField *dfield = plain_tool->data_field;
+    GwySIUnit *siunitxy = gwy_data_field_get_si_unit_xy(dfield);
+    GwySIUnit *siunitz = gwy_data_field_get_si_unit_z(dfield);
+    gint dxres, dyres;
+
+    tool->same_units = gwy_si_unit_equal(siunitxy, siunitz);
+
+    gwy_results_set_unit(tool->results, "x", siunitxy);
+    gwy_results_set_unit(tool->results, "z", siunitz);
+
+    gwy_data_field_copy_units(dfield, tool->detail);
+    dxres = gwy_data_field_get_xres(tool->detail);
+    dyres = gwy_data_field_get_yres(tool->detail);
+    gwy_data_field_set_xreal(tool->detail, dxres*gwy_data_field_get_dx(dfield));
+    gwy_data_field_set_yreal(tool->detail, dyres*gwy_data_field_get_dy(dfield));
+
+    gtk_spin_button_set_range(GTK_SPIN_BUTTON(tool->xpix), 1, gwy_data_field_get_xres(dfield));
+    gtk_spin_button_set_range(GTK_SPIN_BUTTON(tool->ypix), 1, gwy_data_field_get_yres(dfield));
+}
+
+static void
+resize_detail(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyDataField *dfield = plain_tool->data_field;
+    gint xres, yres, dxres, dyres, minres, maxres, newdxres, newdyres, newmaxr;
+    gdouble newzoom;
+
+    if (!dfield)
+        return;
+
+    xres = gwy_data_field_get_xres(dfield);
+    yres = gwy_data_field_get_yres(dfield);
+    dxres = gwy_data_field_get_xres(tool->detail);
+    dyres = gwy_data_field_get_yres(tool->detail);
+    gwy_debug("image %dx%d, detail %dx%d", xres, yres, dxres, dyres);
+
+    /* Max determines the displayed region. */
+    maxres = MIN(MAX(xres, yres), PREVIEW_SIZE);
+    /* Min determines posible cut in orthogonal direction. */
+    minres = MIN(MIN(xres, yres), maxres);
+    gwy_debug("minres %d, maxres %d", minres, maxres);
+
+    newdxres = (xres == minres) ? minres : maxres;
+    newdyres = (yres == minres) ? minres : maxres;
+    gwy_debug("detail should be %dx%d", newdxres, newdyres);
+
+    if (newdxres == dxres && newdyres == dyres)
+        return;
+
+    newmaxr = MAX((MIN(newdyres, newdyres) - 3)/2, 1);
+    gwy_param_table_slider_restrict_range(tool->table, PARAM_RADIUS, 1, newmaxr);
+
+    gwy_data_field_resample(tool->detail, newdxres, newdyres, GWY_INTERPOLATION_NONE);
+    gwy_data_field_clear(tool->detail);
+
+    gwy_data_field_resample(tool->detail_mask, newdxres, newdyres, GWY_INTERPOLATION_NONE);
+    gwy_data_field_clear(tool->detail_mask);
+
+    newzoom = (gdouble)SCALE/MAX(newdxres, newdyres)*PREVIEW_SIZE;
+    gwy_debug("updating zoom to %g", newzoom);
+    gwy_data_view_set_zoom(GWY_DATA_VIEW(tool->zoomview), newzoom);
+    gwy_data_field_data_changed(tool->detail);
+    gwy_data_field_data_changed(tool->detail_mask);
+}
+
+static void
+gwy_tool_read_value_data_changed(GwyPlainTool *plain_tool)
+{
+    GwyToolReadValue *tool = GWY_TOOL_READ_VALUE(plain_tool);
+
+    tool->drawn = FALSE;
+    resize_detail(tool);
+    update_units(tool);
+    gwy_tool_read_value_selection_changed(plain_tool, -1);
+    if (!tool->drawn)
+        draw_zoom(tool);
+}
+
+static void
+gwy_tool_read_value_mask_changed(GwyPlainTool *plain_tool)
+{
+    GwyToolReadValue *tool = GWY_TOOL_READ_VALUE(plain_tool);
+
+    tool->drawn = FALSE;
+    resize_detail(tool);
+    gwy_tool_read_value_selection_changed(plain_tool, -1);
+    copy_mask_colour(tool);
+    if (!tool->drawn)
+        draw_zoom(tool);
+}
+
+static void
+palette_changed(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool;
+
+    plain_tool = GWY_PLAIN_TOOL(tool);
+    gwy_app_sync_data_items(plain_tool->container, tool->data, plain_tool->id, 0, TRUE,
+                            GWY_DATA_ITEM_GRADIENT,
+                            0);
+}
+
+static void
+mask_colour_changed(GwyToolReadValue *tool)
+{
+    copy_mask_colour(tool);
+}
+
+static gboolean
+find_subrange(gint center, gint res, gint size, Range *r)
+{
+    /* complete interval always fit in size */
+    if (res <= size) {
+        r->from = 0;
+        r->to = res;
+        r->dest = (size - res)/2;
+        return FALSE;
+    }
+
+    /* try to keep center in center */
+    r->dest = 0;
+    r->from = center - size/2;
+    r->to = center + size/2 + 1;
+    /* but move it if not possible */
+    if (r->from < 0) {
+        r->to -= r->from;
+        r->from = 0;
+    }
+    if (r->to > res) {
+        r->from -= (r->to - res);
+        r->to = res;
+    }
+    g_assert(r->from >= 0);
+    return TRUE;
+}
+
+static void
+gwy_tool_read_value_selection_changed(GwyPlainTool *plain_tool, gint hint)
+{
+    GwyToolReadValue *tool;
+    GwyDataField *dfield;
+    Range xr, yr;
+    gboolean has_selection, complete;
+    gint xres, yres, dxres, dyres;
+    gdouble sel[2];
+    gint isel[2];
+
+    tool = GWY_TOOL_READ_VALUE(plain_tool);
+    g_return_if_fail(hint <= 0);
+
+    has_selection = FALSE;
+    dfield = plain_tool->data_field;
+    if (plain_tool->selection)
+        has_selection = gwy_selection_get_object(plain_tool->selection, 0, sel);
+
+    update_values(tool);
+    gwy_param_table_set_sensitive(tool->table, BUTTON_SET_ZERO, has_selection);
+
+    complete = TRUE;
+    if (has_selection) {
+        dxres = gwy_data_field_get_xres(tool->detail);
+        dyres = gwy_data_field_get_yres(tool->detail);
+        isel[0] = floor(gwy_data_field_rtoj(dfield, sel[0]));
+        isel[1] = floor(gwy_data_field_rtoi(dfield, sel[1]));
+        xres = gwy_data_field_get_xres(dfield);
+        yres = gwy_data_field_get_yres(dfield);
+        complete &= find_subrange(isel[0], xres, dxres, &xr);
+        complete &= find_subrange(isel[1], yres, dyres, &yr);
+        gwy_debug("complete: %d", complete);
+        tool->in_update = TRUE;
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(tool->xpix), isel[0] + 1);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(tool->ypix), isel[1] + 1);
+        tool->in_update = FALSE;
+    }
+    else {
+        xr.from = yr.from = xr.to = yr.to = -1;
+        gtk_entry_set_text(GTK_ENTRY(tool->xpix), "");
+        gtk_entry_set_text(GTK_ENTRY(tool->ypix), "");
+    }
+
+    tool->xr = xr;
+    tool->yr = yr;
+    tool->complete = complete;
+    draw_zoom(tool);
+    tool->drawn = TRUE;
+
+    if (!has_selection) {
+        gwy_selection_clear(tool->zselection);
+        return;
+    }
+
+    gwy_debug("x: %d - %d => %d", isel[0], tool->xr.from, isel[0] - tool->xr.from);
+    gwy_debug("x: %d - %d => %d", isel[1], tool->yr.from, isel[1] - tool->yr.from);
+    sel[0] = gwy_data_field_jtor(dfield, isel[0] - tool->xr.from + 0.5);
+    sel[1] = gwy_data_field_itor(dfield, isel[1] - tool->yr.from + 0.5);
+    gwy_selection_set_object(tool->zselection, 0, sel);
+}
+
+static void
+param_changed(GwyToolReadValue *tool, gint id)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyParams *params = tool->params;
+
+    if (id == PARAM_RADIUS || id < 0) {
+        gint radius = gwy_params_get_int(params, PARAM_RADIUS);
+        if (plain_tool->layer)
+            g_object_set(plain_tool->layer, "marker-radius", radius, NULL);
+        if (plain_tool->selection)
+            update_values(tool);
+
+        g_object_set(gwy_data_view_get_top_layer(GWY_DATA_VIEW(tool->zoomview)), "marker-radius", radius, NULL);
+    }
+    if (id == PARAM_SHOW_SELECTION || id < 0) {
+        if (plain_tool->layer) {
+            g_object_set(plain_tool->layer,
+                         "draw-marker", gwy_params_get_boolean(tool->params, PARAM_SHOW_SELECTION),
+                         NULL);
+        }
+    }
+    if (id < 0 || id == PARAM_ADAPT_COLOR_RANGE)
+        adapt_colour_range(tool, FALSE);
+    if (id < 0 || id == PARAM_SHOW_MASK) {
+        if (gwy_params_get_boolean(tool->params, PARAM_SHOW_MASK))
+            gwy_container_set_object(tool->data, gwy_app_get_mask_key_for_id(0), tool->detail_mask);
+        else
+            gwy_container_remove(tool->data, gwy_app_get_mask_key_for_id(0));
+    }
+}
+
+static void
+dialog_response(GwyToolReadValue *tool, gint response)
+{
+    if (response == RESPONSE_SET_ZERO) {
+        GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+        GQuark quark = gwy_app_get_data_key_for_id(plain_tool->id);
+
+        if (!plain_tool->data_field || !gwy_selection_get_data(plain_tool->selection, NULL) || !tool->avg)
+            return;
+
+        gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+        gwy_data_field_add(plain_tool->data_field, -tool->avg);
+        gwy_data_field_data_changed(plain_tool->data_field);
+    }
+}
+
+static void
+draw_zoom(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool;
+    gdouble min;
+
+    if (tool->xr.from < 0 || tool->yr.from < 0) {
+        gwy_data_field_clear(tool->detail);
+        gwy_data_field_clear(tool->detail_mask);
+        adapt_colour_range(tool, TRUE);
+    }
+    else {
+        plain_tool = GWY_PLAIN_TOOL(tool);
+        if (!tool->complete) {
+            min = gwy_data_field_area_get_min(plain_tool->data_field, NULL,
+                                              tool->xr.from, tool->yr.from,
+                                              tool->xr.to - tool->xr.from,
+                                              tool->yr.to - tool->yr.from);
+            gwy_data_field_fill(tool->detail, min);
+            gwy_data_field_clear(tool->detail_mask);
+        }
+        gwy_data_field_area_copy(plain_tool->data_field, tool->detail,
+                                 tool->xr.from, tool->yr.from,
+                                 tool->xr.to - tool->xr.from, tool->yr.to - tool->yr.from,
+                                 tool->xr.dest, tool->yr.dest);
+        adapt_colour_range(tool, FALSE);
+        if (plain_tool->mask_field) {
+            gwy_data_field_area_copy(plain_tool->mask_field, tool->detail_mask,
+                                     tool->xr.from, tool->yr.from,
+                                     tool->xr.to - tool->xr.from, tool->yr.to - tool->yr.from,
+                                     tool->xr.dest, tool->yr.dest);
+        }
+        else
+            gwy_data_field_clear(tool->detail_mask);
+    }
+    gwy_data_field_data_changed(tool->detail);
+    gwy_data_field_data_changed(tool->detail_mask);
+}
+
+static void
+adapt_colour_range(GwyToolReadValue *tool, gboolean make_empty)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyContainer *data = tool->data;
+    GwyDataField *field = plain_tool->data_field;
+    gboolean do_adapt = gwy_params_get_boolean(tool->params, PARAM_ADAPT_COLOR_RANGE);
+    gint id = plain_tool->id;
+    GwyLayerBasicRangeType range_type = GWY_LAYER_BASIC_RANGE_FULL;
+    gdouble min = 0.0, max = 0.0;
+
+    if (make_empty || !field || !plain_tool->container) {
+        gwy_container_set_enum(data, gwy_app_get_data_range_type_key_for_id(0), GWY_LAYER_BASIC_RANGE_FULL);
+        gwy_container_set_double(data, gwy_app_get_data_range_min_key_for_id(0), 0.0);
+        gwy_container_set_double(data, gwy_app_get_data_range_max_key_for_id(0), 0.0);
+        return;
+    }
+
+    if (do_adapt) {
+        gwy_container_set_enum(data, gwy_app_get_data_range_type_key_for_id(0), GWY_LAYER_BASIC_RANGE_FULL);
+        gwy_container_remove(data, gwy_app_get_data_range_min_key_for_id(0));
+        gwy_container_remove(data, gwy_app_get_data_range_max_key_for_id(0));
+        return;
+    }
+
+    gwy_container_gis_enum(plain_tool->container, gwy_app_get_data_range_type_key_for_id(id), &range_type);
+    if (range_type == GWY_LAYER_BASIC_RANGE_AUTO)
+        gwy_data_field_get_autorange(field, &min, &max);
+    else {
+        gwy_data_field_get_min_max(field, &min, &max);
+        if (range_type == GWY_LAYER_BASIC_RANGE_FIXED) {
+            gwy_container_gis_double(plain_tool->container, gwy_app_get_data_range_min_key_for_id(id), &min);
+            gwy_container_gis_double(plain_tool->container, gwy_app_get_data_range_max_key_for_id(id), &max);
+        }
+        /* FIXME: Adaptive mapping using the distribution of different data field is currently not possible. */
+    }
+    gwy_container_set_enum(data, gwy_app_get_data_range_type_key_for_id(0), GWY_LAYER_BASIC_RANGE_FIXED);
+    gwy_container_set_double(data, gwy_app_get_data_range_min_key_for_id(0), min);
+    gwy_container_set_double(data, gwy_app_get_data_range_max_key_for_id(0), max);
+}
+
+static void
+copy_mask_colour(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyContainer *data = plain_tool->container;
+    gint id = plain_tool->id;
+    GwyRGBA colour;
+
+    if (!data || !gwy_rgba_get_from_container(&colour, data, g_quark_to_string(gwy_app_get_mask_key_for_id(id))))
+        gwy_rgba_get_from_container(&colour, gwy_app_settings_get(), "/mask");
+    gwy_rgba_store_to_container(&colour, tool->data, g_quark_to_string(gwy_app_get_mask_key_for_id(0)));
+}
+
+static void
+pix_spinned(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GtkSpinButton *spin;
+    gdouble sel[2];
+
+    if (tool->in_update)
+        return;
+
+    if (!plain_tool->selection || !plain_tool->data_field)
+        return;
+
+    if (!strlen(gtk_entry_get_text(GTK_ENTRY(tool->xpix)))
+        || !strlen(gtk_entry_get_text(GTK_ENTRY(tool->ypix))))
+        return;
+
+    spin = GTK_SPIN_BUTTON(tool->xpix);
+    sel[0] = gwy_data_field_jtor(plain_tool->data_field, gtk_spin_button_get_value(spin) - 0.5);
+    spin = GTK_SPIN_BUTTON(tool->ypix);
+    sel[1] = gwy_data_field_itor(plain_tool->data_field, gtk_spin_button_get_value(spin) - 0.5);
+    gwy_selection_set_object(plain_tool->selection, 0, sel);
+}
+
+static void
+update_label(GwySIValueFormat *units,
+             GtkWidget *label,
+             gdouble value)
+{
+    static gchar buffer[64];
+
+    g_return_if_fail(units);
+    g_return_if_fail(GTK_IS_LABEL(label));
+
+    g_snprintf(buffer, sizeof(buffer), "%.*f%s%s",
+               units->precision, value/units->magnitude,
+               *units->units ? " " : "", units->units);
+    gtk_label_set_markup(GTK_LABEL(label), buffer);
+}
+
+static void
+update_values(GwyToolReadValue *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    gboolean is_selected = FALSE;
+    gdouble point[2];
+    gdouble xoff, yoff;
+    gint col, row;
+
+    if (plain_tool->data_field && plain_tool->selection)
+        is_selected = gwy_selection_get_object(plain_tool->selection, 0, point);
+
+    if (!is_selected) {
+        gtk_label_set_text(GTK_LABEL(tool->x), NULL);
+        gtk_label_set_text(GTK_LABEL(tool->y), NULL);
+        gwy_param_table_results_clear(tool->table, WIDGET_RESULTS_Z);
+        gwy_param_table_results_clear(tool->table, WIDGET_RESULTS_FACET);
+        gwy_param_table_results_clear(tool->table, WIDGET_RESULTS_CURV);
+        return;
+    }
+
+    xoff = gwy_data_field_get_xoffset(plain_tool->data_field);
+    yoff = gwy_data_field_get_yoffset(plain_tool->data_field);
+
+    col = floor(gwy_data_field_rtoj(plain_tool->data_field, point[0]));
+    row = floor(gwy_data_field_rtoi(plain_tool->data_field, point[1]));
+
+    update_label(plain_tool->coord_format, tool->x, point[0] + xoff);
+    update_label(plain_tool->coord_format, tool->y, point[1] + yoff);
+    calculate(tool, col, row);
+
+    gwy_results_fill_values(tool->results, "z", tool->avg, NULL);
+    if (tool->same_units) {
+        gwy_results_fill_values(tool->results,
+                                "theta", atan(hypot(tool->bx, tool->by)),
+                                "phi", atan2(tool->by, tool->bx),
+                                "k1", tool->k1,
+                                "k2", tool->k2,
+                                NULL);
+    }
+    else
+        gwy_results_set_na(tool->results, "theta", "phi", "k1", "k2", NULL);
+
+    gwy_param_table_results_fill(tool->table, WIDGET_RESULTS_Z);
+    gwy_param_table_results_fill(tool->table, WIDGET_RESULTS_FACET);
+    gwy_param_table_results_fill(tool->table, WIDGET_RESULTS_CURV);
+}
+
+static void
+calculate(GwyToolReadValue *tool, gint col, gint row)
+{
+    gint radius = gwy_params_get_int(tool->params, PARAM_RADIUS);
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyDataField *dfield = plain_tool->data_field;
+    gint n, i;
+    gdouble m[6], z[3];
+
+    if (radius == 1) {
+        tool->avg = gwy_data_field_get_val(dfield, col, row);
+        tool->bx = gwy_data_field_get_xder(dfield, col, row);
+        tool->by = gwy_data_field_get_yder(dfield, col, row);
+        tool->k1 = tool->k2 = 0.0;
+        return;
+    }
+
+    /* Create the arrays the first time radius > 1 is requested */
+    if (!tool->values) {
+        n = gwy_data_field_get_circular_area_size(RADIUS_MAX - 0.5);
+        tool->values = g_new(gdouble, n);
+        tool->xpos = g_new(gint, n);
+        tool->ypos = g_new(gint, n);
+    }
+
+    n = gwy_data_field_circular_area_extract_with_pos(dfield, col, row, radius - 0.5, tool->values,
+                                                      tool->xpos, tool->ypos);
+    tool->avg = 0.0;
+    if (!n) {
+        tool->bx = tool->by = 0.0;
+        tool->k1 = tool->k2 = 0.0;
+        g_warning("Z average calculated from an empty area");
+        return;
+    }
+
+    /* Fit plane through extracted data */
+    memset(m, 0, 6*sizeof(gdouble));
+    memset(z, 0, 3*sizeof(gdouble));
+    for (i = 0; i < n; i++) {
+        m[0] += 1.0;
+        m[1] += tool->xpos[i];
+        m[2] += tool->xpos[i] * tool->xpos[i];
+        m[3] += tool->ypos[i];
+        m[4] += tool->xpos[i] * tool->ypos[i];
+        m[5] += tool->ypos[i] * tool->ypos[i];
+        z[0] += tool->values[i];
+        z[1] += tool->values[i] * tool->xpos[i];
+        z[2] += tool->values[i] * tool->ypos[i];
+    }
+    tool->avg = z[0]/n;
+    gwy_math_choleski_decompose(3, m);
+    gwy_math_choleski_solve(3, m, z);
+    /* The signs may seem odd.  We have to invert y due to coordinate system and then invert both for downward slopes.
+     * As a result x is inverted. */
+    tool->bx = -z[1]/gwy_data_field_get_dx(dfield);
+    tool->by = z[2]/gwy_data_field_get_dy(dfield);
+
+    calc_curvatures(tool->values, tool->xpos, tool->ypos, n,
+                    gwy_data_field_get_dx(dfield), gwy_data_field_get_dy(dfield),
+                    &tool->k1, &tool->k2);
+}
+
+static void
+calc_curvatures(const gdouble *values,
+                const gint *xpos, const gint *ypos,
+                guint npts,
+                gdouble dx, gdouble dy,
+                gdouble *pc1,
+                gdouble *pc2)
+{
+    gdouble sx2 = 0.0, sy2 = 0.0, sx4 = 0.0, sx2y2 = 0.0, sy4 = 0.0;
+    gdouble sz = 0.0, szx = 0.0, szy = 0.0, szx2 = 0.0, szxy = 0.0, szy2 = 0.0;
+    gdouble scale = sqrt(dx*dy)*4.0;
+    gdouble a[21], b[6], k1, k2;
+    gint i, n = 0;
+
+    for (i = 0; i < npts; i++) {
+        gdouble x = xpos[i]*dx/scale;
+        gdouble y = ypos[i]*dy/scale;
+        gdouble z = values[i]/scale;
+        gdouble xx = x*x, yy = y*y;
+
+        sx2 += xx;
+        sx2y2 += xx*yy;
+        sy2 += yy;
+        sx4 += xx*xx;
+        sy4 += yy*yy;
+
+        sz += z;
+        szx += x*z;
+        szy += y*z;
+        szx2 += xx*z;
+        szxy += x*y*z;
+        szy2 += yy*z;
+        n++;
+    }
+
+    gwy_clear(a, 21);
+    a[0] = n;
+    a[2] = a[6] = sx2;
+    a[5] = a[15] = sy2;
+    a[18] = a[14] = sx2y2;
+    a[9] = sx4;
+    a[20] = sy4;
+    if (gwy_math_choleski_decompose(6, a)) {
+        b[0] = sz;
+        b[1] = szx;
+        b[2] = szy;
+        b[3] = szx2;
+        b[4] = szxy;
+        b[5] = szy2;
+        gwy_math_choleski_solve(6, a, b);
+    }
+    else {
+        *pc1 = *pc2 = 0.0;
+        return;
+    }
+
+    gwy_math_curvature_at_origin(b, &k1, &k2, NULL, NULL);
+    *pc1 = k1/scale;
+    *pc2 = k2/scale;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

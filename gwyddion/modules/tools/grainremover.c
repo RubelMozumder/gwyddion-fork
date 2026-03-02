@@ -1,0 +1,406 @@
+/*
+ *  $Id: grainremover.c 24935 2022-08-24 15:43:45Z yeti-dn $
+ *  Copyright (C) 2003-2022 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwymodule/gwymodule-tool.h>
+#include <libprocess/grains.h>
+#include <libprocess/fractals.h>
+#include <libprocess/correct.h>
+#include <libprocess/stats.h>
+#include <libgwydgets/gwystock.h>
+#include <app/gwyapp.h>
+
+enum {
+    PARAM_MODE,
+    PARAM_METHOD,
+};
+
+typedef enum {
+    GRAIN_REMOVE_MASK = 1 << 0,
+    GRAIN_REMOVE_DATA = 1 << 1,
+    GRAIN_REMOVE_BOTH = GRAIN_REMOVE_DATA | GRAIN_REMOVE_MASK
+} RemoveMode;
+
+typedef enum {
+    GRAIN_REMOVE_LAPLACE         = 1,
+    GRAIN_REMOVE_FRACTAL         = 2,
+    GRAIN_REMOVE_FRACTAL_LAPLACE = 3,
+    GRAIN_REMOVE_ZERO            = 4,
+} RemoveAlgorithm;
+
+#define GWY_TYPE_TOOL_GRAIN_REMOVER            (gwy_tool_grain_remover_get_type())
+#define GWY_TOOL_GRAIN_REMOVER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GWY_TYPE_TOOL_GRAIN_REMOVER, GwyToolGrainRemover))
+#define GWY_IS_TOOL_GRAIN_REMOVER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GWY_TYPE_TOOL_GRAIN_REMOVER))
+#define GWY_TOOL_GRAIN_REMOVER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GWY_TYPE_TOOL_GRAIN_REMOVER, GwyToolGrainRemoverClass))
+
+typedef struct _GwyToolGrainRemover      GwyToolGrainRemover;
+typedef struct _GwyToolGrainRemoverClass GwyToolGrainRemoverClass;
+
+struct _GwyToolGrainRemover {
+    GwyPlainTool parent_instance;
+
+    GwyParams *params;
+    GwyParamTable *table;
+
+    /* potential class data */
+    GType layer_type_point;
+};
+
+struct _GwyToolGrainRemoverClass {
+    GwyPlainToolClass parent_class;
+};
+
+static gboolean     module_register                          (void);
+static GwyParamDef* define_module_params                     (void);
+static GType        gwy_tool_grain_remover_get_type          (void)                       G_GNUC_CONST;
+static void         gwy_tool_grain_remover_finalize          (GObject *object);
+static void         gwy_tool_grain_remover_init_dialog       (GwyToolGrainRemover *tool);
+static void         gwy_tool_grain_remover_data_switched     (GwyTool *gwytool,
+                                                              GwyDataView *data_view);
+static void         gwy_tool_grain_remover_selection_finished(GwyPlainTool *plain_tool);
+static void         param_changed                            (GwyToolGrainRemover *tool,
+                                                              gint id);
+static void         laplace_interpolation                    (GwyDataField *field,
+                                                              GwyDataField *grain);
+static void         fractal_laplace_interpolation            (GwyDataField *field,
+                                                              GwyDataField *grain);
+static void         fill_with_zero                           (GwyDataField *field,
+                                                              GwyDataField *grain);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Grain removal tool, removes continuous parts of mask and/or underlying data."),
+    "Petr Klapetek <klapetek@gwyddion.net>, Yeti <yeti@gwyddion.net>",
+    "4.0",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2003",
+};
+
+GWY_MODULE_QUERY2(module_info, grainremover)
+
+G_DEFINE_TYPE(GwyToolGrainRemover, gwy_tool_grain_remover, GWY_TYPE_PLAIN_TOOL)
+
+static gboolean
+module_register(void)
+{
+    gwy_tool_func_register(GWY_TYPE_TOOL_GRAIN_REMOVER);
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum modes[] = {
+        { N_("_Mask"), GRAIN_REMOVE_MASK },
+        { N_("_Data"), GRAIN_REMOVE_DATA },
+        { N_("_Both"), GRAIN_REMOVE_BOTH },
+    };
+    static const GwyEnum methods[] = {
+        { N_("Laplace solver"),        GRAIN_REMOVE_LAPLACE,         },
+        { N_("Fractal correction"),    GRAIN_REMOVE_FRACTAL,         },
+        { N_("Fractal-Laplace blend"), GRAIN_REMOVE_FRACTAL_LAPLACE, },
+        { N_("Zero"),                  GRAIN_REMOVE_ZERO,            },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, "grainremover");
+    gwy_param_def_add_gwyenum(paramdef, PARAM_MODE, "mode", _("Remove"),
+                              modes, G_N_ELEMENTS(modes), GRAIN_REMOVE_BOTH);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_METHOD, "method", _("_Interpolation method"),
+                              methods, G_N_ELEMENTS(methods), GRAIN_REMOVE_LAPLACE);
+
+    return paramdef;
+}
+
+static void
+gwy_tool_grain_remover_class_init(GwyToolGrainRemoverClass *klass)
+{
+    GwyPlainToolClass *ptool_class = GWY_PLAIN_TOOL_CLASS(klass);
+    GwyToolClass *tool_class = GWY_TOOL_CLASS(klass);
+    GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+
+    gobject_class->finalize = gwy_tool_grain_remover_finalize;
+
+    tool_class->stock_id = GWY_STOCK_GRAINS_REMOVE;
+    tool_class->title = _("Grain Remove");
+    tool_class->tooltip = _("Remove individual grains (continuous parts of mask)");
+    tool_class->prefix = "/module/grainremover";
+    tool_class->data_switched = gwy_tool_grain_remover_data_switched;
+
+    ptool_class->selection_finished = gwy_tool_grain_remover_selection_finished;
+}
+
+static void
+gwy_tool_grain_remover_finalize(GObject *object)
+{
+    GwyToolGrainRemover *tool = GWY_TOOL_GRAIN_REMOVER(object);
+
+    gwy_params_save_to_settings(tool->params);
+    GWY_OBJECT_UNREF(tool->params);
+
+    G_OBJECT_CLASS(gwy_tool_grain_remover_parent_class)->finalize(object);
+}
+
+static void
+gwy_tool_grain_remover_init(GwyToolGrainRemover *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+
+    tool->layer_type_point = gwy_plain_tool_check_layer_type(plain_tool, "GwyLayerPoint");
+    if (!tool->layer_type_point)
+        return;
+
+    tool->params = gwy_params_new_from_settings(define_module_params());
+
+    gwy_plain_tool_connect_selection(plain_tool, tool->layer_type_point, "pointer");
+
+    gwy_tool_grain_remover_init_dialog(tool);
+}
+
+static void
+gwy_tool_grain_remover_init_dialog(GwyToolGrainRemover *tool)
+{
+    GtkDialog *dialog = GTK_DIALOG(GWY_TOOL(tool)->dialog);
+    GwyParamTable *table;
+
+    table = tool->table = gwy_param_table_new(tool->params);
+    gwy_param_table_append_radio(table, PARAM_MODE);
+    gwy_param_table_append_combo(table, PARAM_METHOD);
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+    gwy_plain_tool_add_param_table(GWY_PLAIN_TOOL(tool), table);
+
+    gwy_tool_add_hide_button(GWY_TOOL(tool), TRUE);
+    gwy_help_add_to_tool_dialog(dialog, GWY_TOOL(tool), GWY_HELP_DEFAULT);
+
+    g_signal_connect_swapped(tool->table, "param-changed", G_CALLBACK(param_changed), tool);
+
+    param_changed(tool, -1);
+
+    gtk_widget_show_all(dialog->vbox);
+}
+
+static void
+gwy_tool_grain_remover_data_switched(GwyTool *gwytool,
+                                     GwyDataView *data_view)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(gwytool);
+    GwyToolGrainRemover *tool = GWY_TOOL_GRAIN_REMOVER(gwytool);
+    gboolean ignore = (data_view == plain_tool->data_view);
+
+    GWY_TOOL_CLASS(gwy_tool_grain_remover_parent_class)->data_switched(gwytool, data_view);
+
+    if (ignore || plain_tool->init_failed)
+        return;
+
+    if (data_view) {
+        gwy_object_set_or_reset(plain_tool->layer, tool->layer_type_point,
+                                "draw-marker", FALSE,
+                                "editable", TRUE,
+                                "focus", -1,
+                                NULL);
+        gwy_selection_set_max_objects(plain_tool->selection, 1);
+    }
+}
+
+static void
+param_changed(GwyToolGrainRemover *tool, gint id)
+{
+    if (id < 0 || id == PARAM_MODE) {
+        RemoveMode mode = gwy_params_get_enum(tool->params, PARAM_MODE);
+
+        gwy_param_table_set_sensitive(tool->table, PARAM_METHOD,
+                                      mode == GRAIN_REMOVE_DATA || mode == GRAIN_REMOVE_BOTH);
+    }
+}
+
+static void
+gwy_tool_grain_remover_selection_finished(GwyPlainTool *plain_tool)
+{
+    GwyToolGrainRemover *tool = GWY_TOOL_GRAIN_REMOVER(plain_tool);
+    RemoveMode mode = gwy_params_get_enum(tool->params, PARAM_MODE);
+    RemoveAlgorithm method = gwy_params_get_enum(tool->params, PARAM_METHOD);
+    GwyDataField *field = plain_tool->data_field;
+    GwyDataField *mask = plain_tool->mask_field;
+    GwyDataField *tmp;
+    gint col, row;
+    gdouble point[2];
+    GQuark quarks[2];
+
+    if (!mask || !gwy_selection_get_object(plain_tool->selection, 0, point))
+        return;
+
+    row = floor(gwy_data_field_rtoi(mask, point[1]));
+    col = floor(gwy_data_field_rtoj(mask, point[0]));
+    if (!gwy_data_field_get_val(mask, col, row))
+        return;
+
+    quarks[0] = quarks[1] = 0;
+    if (mode & GRAIN_REMOVE_DATA)
+        quarks[0] = gwy_app_get_data_key_for_id(plain_tool->id);
+    if (mode & GRAIN_REMOVE_MASK)
+        quarks[1] = gwy_app_get_mask_key_for_id(plain_tool->id);
+
+    gwy_app_undo_qcheckpointv(plain_tool->container, 2, quarks);
+    if (mode & GRAIN_REMOVE_DATA) {
+        tmp = gwy_data_field_duplicate(mask);
+        gwy_data_field_grains_extract_grain(tmp, col, row);
+        if (method == GRAIN_REMOVE_LAPLACE)
+            laplace_interpolation(field, tmp);
+        else if (method == GRAIN_REMOVE_FRACTAL)
+            gwy_data_field_fractal_correction(field, tmp, GWY_INTERPOLATION_LINEAR);
+        else if (method == GRAIN_REMOVE_FRACTAL_LAPLACE)
+            fractal_laplace_interpolation(field, tmp);
+        else if (method == GRAIN_REMOVE_ZERO)
+            fill_with_zero(field, tmp);
+        else {
+            g_assert_not_reached();
+        }
+        g_object_unref(tmp);
+        gwy_data_field_data_changed(field);
+    }
+    if (mode & GRAIN_REMOVE_MASK) {
+        gwy_data_field_grains_remove_grain(mask, col, row);
+        gwy_data_field_data_changed(mask);
+    }
+    gwy_params_save_to_settings(tool->params);   /* Ensure correct parameters in the log. */
+    gwy_plain_tool_log_add(plain_tool);
+    gwy_selection_clear(plain_tool->selection);
+}
+
+static void
+find_grain_bbox(GwyDataField *mask,
+                gint *col, gint *row, gint *w, gint *h)
+{
+    gint xres, yres, xmin, xmax, ymin, ymax, i, j;
+    const gdouble *data;
+
+    /* Find mask bounds */
+    xmin = ymin = G_MAXINT;
+    xmax = ymax = -1;
+    xres = gwy_data_field_get_xres(mask);
+    yres = gwy_data_field_get_yres(mask);
+    data = gwy_data_field_get_data_const(mask);
+    for (i = 0; i < yres; i++) {
+        for (j = 0; j < xres; j++) {
+            if (data[i*xres + j]) {
+                if (i < ymin)
+                    ymin = i;
+                if (i > ymax)
+                    ymax = i;
+                if (j < xmin)
+                    xmin = j;
+                if (j > xmax)
+                    xmax = j;
+            }
+        }
+    }
+    g_return_if_fail(xmax > -1 && ymax > -1);
+    *col = MAX(0, xmin-1);
+    *row = MAX(0, ymin-1);
+    *w = MIN(xres, xmax+2) - *col;
+    *h = MIN(yres, ymax+2) - *row;
+}
+
+static void
+laplace_interpolation(GwyDataField *field,
+                      GwyDataField *grain)
+{
+    GwyDataField *area, *mask;
+    gint col, row, w, h;
+
+    /* Work on extracted area for better memory locality. */
+    find_grain_bbox(grain, &col, &row, &w, &h);
+    area = gwy_data_field_area_extract(field, col, row, w, h);
+    mask = gwy_data_field_area_extract(grain, col, row, w, h);
+    gwy_data_field_laplace_solve(area, mask, 1, 2.0);
+    g_object_unref(mask);
+    gwy_data_field_area_copy(area, field, 0, 0, w, h, col, row);
+    g_object_unref(area);
+}
+
+/* XXX: Common with spotremove.c */
+static void
+blend_fractal_and_laplace(GwyDataField *field,
+                          GwyDataField *area,
+                          GwyDataField *distances,
+                          gint col, gint row)
+{
+    gint xres, w, h, i, j, k, kk;
+    const gdouble *a, *e;
+    gdouble *d;
+    gdouble t;
+
+    xres = gwy_data_field_get_xres(field);
+    w = gwy_data_field_get_xres(area);
+    h = gwy_data_field_get_yres(area);
+    a = gwy_data_field_get_data_const(area);
+    e = gwy_data_field_get_data_const(distances);
+    d = gwy_data_field_get_data(field) + row*xres + col;
+
+    for (i = k = kk = 0; i < h; i++) {
+        for (j = 0; j < w; j++, k++, kk++) {
+            if (e[k] <= 0.0)
+                continue;
+
+            t = exp(0.167*(1.0 - e[k]));
+            d[kk] *= (1.0 - t);
+            d[kk] += t*a[k];
+        }
+        kk += xres - w;
+    }
+}
+
+static void
+fractal_laplace_interpolation(GwyDataField *field,
+                              GwyDataField *grain)
+{
+    GwyDataField *area, *mask;
+    gint col, row, w, h;
+
+    /* Extract the area for Laplace.  Then overwrite it with fractal interpolation. */
+    find_grain_bbox(grain, &col, &row, &w, &h);
+    area = gwy_data_field_area_extract(field, col, row, w, h);
+    mask = gwy_data_field_area_extract(grain, col, row, w, h);
+    gwy_data_field_laplace_solve(area, mask, 1, 1.0);
+    gwy_data_field_grain_distance_transform(mask);
+
+    gwy_data_field_fractal_correction(field, grain, GWY_INTERPOLATION_LINEAR);
+    blend_fractal_and_laplace(field, area, mask, col, row);
+    g_object_unref(mask);
+    g_object_unref(area);
+}
+
+static void
+fill_with_zero(GwyDataField *field,
+               GwyDataField *grain)
+{
+    gint col, row, w, h;
+
+    find_grain_bbox(grain, &col, &row, &w, &h);
+    gwy_data_field_area_fill_mask(field, grain, GWY_MASK_INCLUDE, col, row, w, h, 0.0);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,1231 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2024-01-05 21:54+0400\n"
+"PO-Revision-Date: 2024-01-05 21:55+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: edit-extended.xml:6(title)
+msgid "Global Distortions"
+msgstr "Общие искажения"
+
+#: edit-extended.xml:7(para)
+msgid ""
+"This section presents extended functions for correction (or creation) of "
+"global errors, such as low frequencies modulated on the data or drift in the "
+"slow scanning axis. Most of the functions described below deal with "
+"distortion purely in the <include href=\"eqi-xy.xml\"/> plane – for instance "
+"<link linkend=\"drift-compensation\">Drift Compensation</link> or <link "
+"linkend=\"straighten-path\">Straighten Path</link>. Some modify the value "
+"distribution (<link linkend=\"coerce\">Coerce</link>) or perform complex "
+"operations involving both coordinates and values."
+msgstr ""
+"Этот раздел описывает расширенные функции по коррекции (или созданию) общих "
+"погрешностей, таких как модуляция данных низкой частотой или дрейф медленной "
+"оси сканирования. Большинство описанных ниже функций имеют дело с "
+"искажениями только в плоскости <include href=\"eqi-xy.xml\"/>– например, "
+"<link linkend=\"drift-compensation\">Компенсация дрейфа</link> или <link "
+"linkend=\"straighten-path\">Выпрямить путь</link>. Некоторые модифицируют "
+"распределение данных (<link linkend=\"coerce\">Вынудить</link>) или "
+"производят сложные операции, затрагивающие как координаты, так и значения в "
+"точках."
+
+#: edit-extended.xml:19(title)
+msgid "Drift Compensation <gwy:icon name=\"drift\"/>"
+msgstr "Компенсировать дрейф <gwy:icon name=\"drift\"/>"
+
+#: edit-extended.xml:22(primary)
+msgid "drift compensation"
+msgstr "компенсация дрейфа"
+
+#: edit-extended.xml:25(guimenu) edit-extended.xml:93(guimenu)
+#: edit-extended.xml:218(guimenu) edit-extended.xml:278(guimenu)
+#: edit-extended.xml:314(guimenu) edit-extended.xml:414(guimenu)
+#: edit-extended.xml:449(guimenu) edit-extended.xml:674(guimenu)
+#: edit-extended.xml:715(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: edit-extended.xml:26(guisubmenu) edit-extended.xml:94(guisubmenu)
+#: edit-extended.xml:219(guisubmenu) edit-extended.xml:279(guisubmenu)
+#: edit-extended.xml:315(guisubmenu) edit-extended.xml:415(guisubmenu)
+#: edit-extended.xml:675(guisubmenu) edit-extended.xml:716(guisubmenu)
+msgid "Distortion"
+msgstr "Искажение"
+
+#: edit-extended.xml:27(guimenuitem)
+msgid "Compensate Drift"
+msgstr "Компенсировать дрейф"
+
+#: edit-extended.xml:30(para)
+msgid ""
+"Compensate Drift calculates and/or corrects drift in the fast scanning axis "
+"(horizontal). This adverse effect can be caused by thermal effects or "
+"insufficient mechanical rigidity of the measuring device."
+msgstr ""
+"Функция <quote>компенсировать дрейф</quote> рассчитывает и/или корректирует "
+"дрейф в быстрой оси сканирования (горизонтальной). Этот неблагоприятный "
+"эффект может быть вызван тепловым воздействием или недостаточной "
+"механической жесткостью устройства измерения."
+
+#: edit-extended.xml:35(para)
+msgid ""
+"The drift graph, which is one of possible outputs, represents the horizontal "
+"shift of individual rows compared to a reference row (which could be in "
+"principle chosen arbitrarily, in practice the zero shift is chosen to "
+"minimize the amount of data sticking out of the image after compensation), "
+"with the row <include href=\"eqi-y.xml\"/>-coordinate on the abscissa."
+msgstr ""
+"График дрейфа, который является одним из возможных получаемых результатов, "
+"представляет горизонтальный сдвиг отдельных строк по отношению к строке-"
+"эталону (которая может быть, в принципе, выбрана произвольно, на практике "
+"выбирают нулевой сдвиг чтобы минимизировать количество данных, которые "
+"теряются за краем изображения после компенсации), с координатой "
+"<inlineequation><mathphrase><phrase role=\"mathvar\">y</phrase></"
+"mathphrase><alt>y</alt></inlineequation> строки в качестве абсциссы."
+
+#: edit-extended.xml:48(guilabel)
+msgid "Search range"
+msgstr "Диапазон поиска"
+
+#: edit-extended.xml:46(listitem)
+msgid ""
+"A mutual horizontal offset is estimated for each couple of rows not more "
+"distant than <placeholder-1/>. It is estimated as the offset value giving "
+"the maximum mutual correlation of the two rows. Thus a set of local row "
+"drift estimations is obtained (together with the maximum correlation scores "
+"providing an estimate of their actual similarity)."
+msgstr ""
+"Взаимное горизонтальное смещение оценивается для каждого набора строк "
+"расположенных не дальше <placeholder-1/> друг от друга. Оно оценивается как "
+"значение сдвига, дающего максимальную взаимную корреляцию двух строк. "
+"Следовательно, в результате получается множество локальных оценок смещения "
+"строки (вместе с максимальным весом корреляции, который даёт оценку их "
+"взаимной похожести)."
+
+#: edit-extended.xml:54(listitem)
+msgid ""
+"Global offsets are calculated from the local ones. At present the method is "
+"very simple as it seems sufficient in most cases: local drift derivatives "
+"are fitted for each row onto the local drift estimations and the global "
+"drift is then obtained by integration (i.e. summing the local drifts)."
+msgstr ""
+"Глобальные сдвиги рассчитываются из локальных. В настоящее время "
+"используется очень простой метод поскольку он хорошо работает в большинстве "
+"случаев: локальные производные сдвига аппроксимируются для каждой строки в "
+"оценку локального сдвига и общий сдвиг затем получается путём интегрирования "
+"(т.е. сложения локальных дрейфов)."
+
+#: edit-extended.xml:43(para)
+msgid "The drift is determined in two steps: <placeholder-1/>"
+msgstr "Сдвиг определяется в два этапа: <placeholder-1/>"
+
+#: edit-extended.xml:63(para)
+msgid ""
+"Option <guilabel>Exclude linear skew</guilabel> subtracts the linear term "
+"from the calculated drift, it can be useful when the image is anisotropic "
+"and its features are supposed to be oriented in a direction not paralled to "
+"the image sides."
+msgstr ""
+"Опция <guilabel>Исключить линейный уклон</guilabel> вычитает линейный член "
+"из рассчитанного дрейфа. это может быть полезно, когда изображение является "
+"анизотропным и его выраженные детали считаются ориентированными "
+"непараллельно сторонам изображения."
+
+#: edit-extended.xml:74(caption)
+msgid ""
+"Drift correction example: (a) original data exhibiting strong drift in the "
+"fast scan axis, (b) corrected data, (c) calculated drift graph."
+msgstr ""
+"Пример коррекции дрейфа: (a) исходные данные с сильным дрейфом в оси "
+"быстрого сканирования, (b) исправленные данные, (c) рассчитанный график "
+"дрейфа."
+
+#: edit-extended.xml:84(title)
+msgid "Affine Distortion <gwy:icon name=\"correct_affine\"/>"
+msgstr "Аффинное искажение <gwy:icon name=\"correct_affine\"/>"
+
+#: edit-extended.xml:88(primary) edit-extended.xml:213(primary)
+#: edit-extended.xml:273(primary) edit-extended.xml:309(primary)
+msgid "distortion in xy plane"
+msgstr "искривление в плоскости xy"
+
+#: edit-extended.xml:89(secondary)
+msgid "affine"
+msgstr "аффинное"
+
+#: edit-extended.xml:95(guimenuitem)
+msgid "Affine"
+msgstr "Аффинное"
+
+#: edit-extended.xml:98(para)
+msgid ""
+"Affine distortion in the horizontal plane caused by thermal drift is common "
+"for instance in STM. If the image contains a regular structure, for instance "
+"an atomic lattice of known parameters, the distortion can be easily "
+"corrected using this function."
+msgstr ""
+"Аффинное искажение в горизонтальной плоскости вызванное термическим дрейфом "
+"является обычным явлением, например, в СТМ. Если изображение содержит "
+"регулярную структуру, например, атомную решетку с известными параметрами, "
+"искажение может быть легко исправлено с использованием этой функции."
+
+#: edit-extended.xml:104(para)
+msgid ""
+"The affine distortion correction requires to first select the distorted "
+"lattice in the image. This is done by moving the lattice selection on the "
+"preview with mouse until it matches the regular features present in the "
+"image. For images of periodic lattices, it is usually easier to select the "
+"lattice in the autocorrelation function image (<guilabel>2D ACF</guilabel>). "
+"Also, only a rough match needs to be found manually in this case. Button "
+"<guibutton>Refine</guibutton> refines the selected lattice vectors to the "
+"nearest maxima in autocorrelation function with subpixel precision."
+msgstr ""
+"Коррекция аффинных искажений требует прежде всего выбрать искаженную решетку "
+"на изображении. Это делается перемещением сетки на изображении предпросмотра "
+"с помощью мыши пока она не станет соответствовать периодическим особенностям "
+"изображения. Для изображений периодических структур обычно проще выбирать "
+"решетку на графике двумерной функции автокорреляции (<guilabel>2D ACF</"
+"guilabel>). Также обычно для этого нужно найти вручную достаточно грубое "
+"соответствие. Кнопка <guibutton>уточнить</guibutton> поможет рассчитать "
+"точные значения выбранных векторов решетки для ближайших максимумов в "
+"функции автокорреляции с субпиксельной точностью."
+
+#: edit-extended.xml:115(para)
+msgid ""
+"If scan lines contain lots of high-frequency noise the horizontal ACF "
+"(middle row in the ACF image) can be also quite noisy. In such case it is "
+"better to interpolate it from the surrounding rows by enabling the option "
+"<guilabel>Interpolate horizontal ACF</guilabel>."
+msgstr ""
+"Если линии сканирования содержат много высокочастотного шума, горизонтальная "
+"автокорреляционная функция (средняя строка на изображении АКФ) также может "
+"оказаться достаточно шумной. В этом случае лучше интерполировать её по "
+"окружающим строкам используя опцию <guilabel>Интерполировать горизонтальную "
+"АКФ</guilabel>."
+
+#: edit-extended.xml:121(para)
+msgid ""
+"The correct lengths of the lattice vectors <include href=\"eqi-a_1.xml\"/> "
+"and <include href=\"eqi-a_2.xml\"/> and the angle <include href=\"eqi-phi.xml"
+"\"/> between them, entered to the dialogue, determine the affine "
+"transformation to perform. A few common lattice types (such as HOPG surface) "
+"are offered predefined, but it is possible to enter arbitrary lengths and "
+"angle."
+msgstr ""
+"Правильные длины векторов решетки <include href=\"eqi-a_1.xml\"/> и <include "
+"href=\"eqi-a_2.xml\"/> и угла <include href=\"eqi-phi.xml\"/> между ними, "
+"введённые в диалоговом окне, определяют производимое аффинное "
+"преобразование. Некоторые распространённые типы решеток (такие, как "
+"поверхность высокоориентированного пирографита HOPG) уже есть в "
+"предустановках, но можно вводить произвольные длины и угол."
+
+#: edit-extended.xml:137(caption)
+msgid ""
+"Affine correction example: (a) original image exhibiting an affine "
+"distortion, (b) correction dialogue with the lattice selected on the two-"
+"dimensional autocorrelation, (c) corrected image."
+msgstr ""
+"Пример аффинной коррекции: (a) оригинальное изображение, демонстрирующее "
+"аффинные искажения, (b) диалог коррекции, демонстрирующий выбранную решетку "
+"на двумерной функции автокорреляции, (c) исправленное изображение."
+
+#: edit-extended.xml:146(para)
+msgid ""
+"It should be noted that the correction method described above causes all "
+"lateral scale information in the image to be lost because the new lateral "
+"scale is fully determined by the correct lattice vectors. This is usually "
+"the best option for STM images of known atomic lattices, however, for a "
+"general skew or affine correction it can be impractical. Therefore, the "
+"dialogue offers three different scaling choices:"
+msgstr ""
+"Следует отметить, что описанный выше метод коррекции вызывает полную потерю "
+"латеральных размеров изображения поскольку новый латеральный размер будет "
+"определяться исключительно правильными векторами решетки. Это обычно "
+"является лучшим вариантом для изображений СТМ известных атомных решеток, "
+"однако, в общем случае коррекций наклона и аффинных искажений он может "
+"оказаться непрактичным. Следовательно, диалоговое окно предлагает три "
+"различных варианта масштабирования:"
+
+#: edit-extended.xml:157(guilabel)
+msgid "Exactly as specified"
+msgstr "Точно как задано"
+
+#: edit-extended.xml:160(para)
+msgid ""
+"Lattice vectors in the corrected image will have the specified lengths and "
+"angle between them. Scale information of the original image is discarded "
+"completely."
+msgstr ""
+"Вектора решетки в исправленном изображении будут иметь заданную длину и угол "
+"между ними. Информация о масштабе исходного изображения полностью "
+"игнорируется."
+
+#: edit-extended.xml:169(guilabel)
+msgid "Preserve area"
+msgstr "Сохранять площадь"
+
+#: edit-extended.xml:172(para)
+msgid ""
+"Lattice vectors in the corrected image will have the specified ratio of "
+"lengths and angle between them. However, the overall scale is calculated as "
+"to make the affine transformation area-preserving."
+msgstr ""
+"Вектора решетки в исправленном изображении будут иметь заданное соотношение "
+"длин и угол между ними. Однако, общий масштаб будет скорректирован таким "
+"образом, чтобы аффинное преобразование пространства сохраняло площади "
+"областей."
+
+#: edit-extended.xml:182(guilabel)
+msgid "Preserve X scale"
+msgstr "Сохранять масштаб X"
+
+#: edit-extended.xml:185(para)
+msgid ""
+"Lattice vectors in the corrected image will have the specified ratio of "
+"lengths and angle between them. However, the overall scale is calculated as "
+"to make the affine transformation preserve the original <include href=\"eqi-"
+"x.xml\"/>-axis scale. This is somewhat analogous to the scale treatment in "
+"<link linkend=\"drift-compensation\">Drift compensation</link>."
+msgstr ""
+"Вектора решетки в исправленном изображении будут иметь заданное соотношение "
+"длин и угол между ними. Однако, общий масштаб будет вычисляться таким "
+"образом, чтобы аффинное преобразование сохраняло оригинальный масштаб оси "
+"<include href=\"eqi-x.xml\"/>. Этот режим в чём-то похож на работу с  "
+"масштабами в модуле <link linkend=\"drift-compensation\">компенсации дрейфа</"
+"link>."
+
+#: edit-extended.xml:196(para)
+msgid ""
+"The function can also correct one image using the ACF calculated from "
+"another image (presumably a different channel in the same measurement) or "
+"apply the correction to all images in the file. The former is accomplished "
+"by selecting a different image as <guilabel>Image for ACF</guilabel> in the "
+"options. Affine transformation of all images in the file is enabled by "
+"<guilabel>Apply to all compatible images</guilabel>. Both options requite "
+"the other images to be compatible with the current one, i.e. having the same "
+"pixel and real dimensions."
+msgstr ""
+"Данная функция также может исправить одно изображение, используя "
+"автокорреляционную функцию, рассчитанную из другого (подразумевается другой "
+"канал данных в одном измерении) или применить коррекцию ко всем изображениям "
+"в файле. Первое можно сделать выбрав другое изображение в качестве "
+"<guilabel>Изображения для АКФ</guilabel> в опциях. Аффинное преобразование "
+"всех изображений в файле включается опцией <guilabel>Применить ко всем "
+"совместимым изображениям</guilabel>. Обе опции требуют чтобы изображения "
+"были совместимы с текущим, т.е. имели одинаковое физическое разрешение и "
+"разрешение в пикселях."
+
+#: edit-extended.xml:209(title)
+msgid "Perspective Distortion"
+msgstr "Искажение перспективы"
+
+#: edit-extended.xml:214(secondary)
+msgid "perspective"
+msgstr "перспективы"
+
+#: edit-extended.xml:220(guimenuitem)
+msgid "Perspective"
+msgstr "Перспективы"
+
+#: edit-extended.xml:223(para)
+msgid ""
+"Perspective distortion is unusual in scanning probe microscopy, but "
+"relatively common in other types of image data. The perspective distortion "
+"module can correct such distortion if the image contains features which are "
+"known to be in fact rectangular."
+msgstr ""
+"Искажение перспективы обычно не встречается в сканирующей зондовой "
+"микроскопии, но относительно часто происходит в других видах получения "
+"изображений. Модуль коррекции перспективных искажений может исправлять этот "
+"дефект в то случае, если изображение содержит какие-то формы, про которые "
+"точно известно что они прямоугольные."
+
+#: edit-extended.xml:229(para)
+msgid ""
+"To apply the correction, a perspective rectangle is selected on the image by "
+"moving its four corners. The selected region is then transformed and "
+"extracted to the result. The preview can be switched between original and "
+"corrected data."
+msgstr ""
+"Чтобы применить коррекцию, прямоугольник, задающий перспективу, выбирается "
+"на изображении перемещением его четырёх углов. Выбранная область после этого "
+"преобразуется и результат коррекции извлекается в новое изображение. "
+"Изображение предпросмотра можно переключать между исходными и исправленными "
+"данными."
+
+#: edit-extended.xml:235(para)
+msgid ""
+"The module sets the pixel and physical dimensions of the result to estimated "
+"reasonable values, based on the assumption the distortion is not large. The "
+"dimensions then more or less correspond to the dimensions of the selected "
+"distorted rectangle in the original image. However, it is just an estimate. "
+"If the dimensions of the extracted rectangle can be determined more "
+"precisely, for instance using markings in the image, they should be set "
+"using <link linkend=\"dimensions-and-units\">Dimensions and Units</link>."
+msgstr ""
+"Модуль задаёт физические размеры и размеры в пикселях результирующего "
+"изображения в разумные по его оценке значения, которые рассчитываются в "
+"предположении, что искажение невелико. Размеры при этом более-менее "
+"соответствуют выбранному прямоугольнику с искажением на исходном "
+"изображении. Однако, это всего лишь оценка. Если размеры получаемого "
+"прямоугольника можно определить более точно, например, используя метки на "
+"изображении, их лучше задать используя инструмент <link linkend=\"dimensions-"
+"and-units\">Размеры и единицы измерения</link>."
+
+#: edit-extended.xml:253(caption)
+msgid ""
+"Perspective correction example. Left: original image exhibiting an "
+"perspective distortion. Centre: correction dialogue with the rectangle "
+"selected in the image. Right: corrected image."
+msgstr ""
+"Пример коррекции искажения перспективы. Слева оригинальное изображение, "
+"демонстрирующее искажение перспективы, по центру диалог коррекции, "
+"демонстрирующий выбранный прямоугольник на изображении, справа исправленное "
+"изображение."
+
+#: edit-extended.xml:262(para)
+msgid ""
+"Option <guilabel>Create new image</guilabel> controls whether the image is "
+"replaced with corrected or a new image created. The function can also apply "
+"the correction to all compatible images in the file."
+msgstr ""
+"Опция <guilabel>Создать новое изображение</guilabel> управляет тем, будет ли "
+"изображения заменяться исправленным или создаваться новое изображение. "
+"Функция также может применить коррекцию ко всем совместимым изображениям в "
+"файле."
+
+#: edit-extended.xml:269(title)
+msgid "Polynomial Distortion <gwy:icon name=\"poly_distort\"/>"
+msgstr "Полиномиальное искривление <gwy:icon name=\"poly_distort\"/>"
+
+#: edit-extended.xml:274(secondary)
+msgid "polynomial"
+msgstr "полиномиальное"
+
+#: edit-extended.xml:280(guimenuitem)
+msgid "Polynomial"
+msgstr "Полиномиальное"
+
+#: edit-extended.xml:283(para)
+msgid ""
+"General distortion in the horizontal plane can be compensated, or created, "
+"with Polynomial distortion. It performs transforms that can be expressed as"
+msgstr ""
+"Общее искривление в горизонтальной плоскости может быть компенсировано или, "
+"наоборот, внесено с помощью полиномиального искривления. Оно делает "
+"преобразования, которые могут быть выражены как"
+
+#: edit-extended.xml:289(para)
+msgid ""
+"where <include href=\"eqi-P_x.xml\"/> and <include href=\"eqi-P_y.xml\"/> "
+"are polynomials up to the third total degree with user-defined coefficients. "
+"Note the direction of the coordinate transform – the reverse direction would "
+"not guarantee an unambiguous mapping."
+msgstr ""
+"где <include href=\"eqi-P_x.xml\"/> и <include href=\"eqi-P_y.xml\"/> – "
+"полиномы степени до третьей с заданными пользователем коэффициентами. "
+"Следует отметить направление преобразования координат – обратное направление "
+"не будет гарантировать однозначного отображения."
+
+#: edit-extended.xml:296(para)
+msgid ""
+"The polynomial coefficients are entered as scale-free, i.e. as if the "
+"coordinate ranges were always [0, 1]. If <guilabel>Instant updates</"
+"guilabel> are enabled, pressing <keycap>Enter</keycap> in a coefficient "
+"entry (or just leaving moving keyboard focus elsewhere) updates the preview."
+msgstr ""
+"Полиномиальные коэффициенты вводятся как безмасштабные, т.е. как если "
+"диапазоны координат были всегда [0, 1]. Если включено <guilabel>Обновлять "
+"сразу</guilabel>, нажатие <keycap>Enter</keycap> в поле ввода коэффициента "
+"(или просто перемещение фокуса клавиатуры в другое место) обновляет "
+"предпросмотр."
+
+#: edit-extended.xml:305(title)
+msgid "Straighten Path <gwy:icon name=\"straighten_path\"/>"
+msgstr "Выпрямить путь <gwy:icon name=\"straighten_path\"/>"
+
+#: edit-extended.xml:310(secondary)
+msgid "along path"
+msgstr "вдоль пути"
+
+#: edit-extended.xml:316(guimenuitem)
+msgid "Straighten Path"
+msgstr "Выпрямить путь"
+
+#: edit-extended.xml:319(para)
+msgid ""
+"Extraction of data along circular features, curved step edges and other "
+"arbitrarily shaped smooth paths can be a useful preprocessing step for "
+"further analysis. Function <guimenuitem>Straighten Path</guimenuitem> "
+"creates a new image by <quote>straightening</quote> the input image along a "
+"spline path specified using a set of points on the image."
+msgstr ""
+"Извлечение данных вдоль дугообразных особых областей, искривлённых границ "
+"ступеней и других гладких путей произвольной формы могут оказаться удобным "
+"вариантом предобработки для дальнейшего анализа. Функция  "
+"<guimenuitem>Выпрямить путь</guimenuitem> создаёт новое изображение путём "
+"<quote>выпрямления</quote> исходного вдоль пути, заданного сплайном, "
+"проходящим через набор точек, выбранных на изображении."
+
+#: edit-extended.xml:326(para)
+msgid ""
+"The points defining the path can be defined on the preview image. Each "
+"control point can be moved with mouse. Clicking into the empty space adds a "
+"new point, connected to the closer end of the path. Individual points can be "
+"deleted by selecting them in the point list in the left part of the dialogue "
+"and pressing <keycap>Delete</keycap>."
+msgstr ""
+"Точки, задающие путь, могут быть выбраны на изображении предпросмотра. Любую "
+"контрольную точку можно двигать мышью. Клик на пустое место добавляет новую "
+"точку, привязанную к ближайшему концу пути. Отдельные точки можно удалить "
+"если выбрать их в списке точек в правой части диалогового окна и нажать "
+"<keycap>Delete</keycap>."
+
+#: edit-extended.xml:333(para)
+msgid ""
+"The shape of the extracted area is controlled by the following parameters:"
+msgstr "Форма извлекаемой области управляется следующими параметрами:"
+
+#: edit-extended.xml:340(guilabel)
+msgid "Thickness"
+msgstr "Толщина"
+
+#: edit-extended.xml:343(para)
+msgid ""
+"The width of the extracted image, denoted by the perpendicular marks on the "
+"path. This is the full width, i.e. the distance to each side of the path is "
+"half of the thickness."
+msgstr ""
+"Ширина извлекаемого изображения, обозначаемая перпендикулярными отметками на "
+"линии пути. Здесь это полная ширина, т.е. расстояние до каждого края "
+"извлекаемого изображения будет половиной заданной толщины."
+
+#: edit-extended.xml:352(guilabel)
+msgid "Slackness"
+msgstr "Неточность"
+
+#: edit-extended.xml:355(para)
+msgid ""
+"Parameter influencing the shape of the path between the control points. It "
+"can be visualised as the slackness of a string connecting the control "
+"points. For zero slackness the string is taut and the path is formed by "
+"straight segments. Increasing slackness means decreasing tensile stress in "
+"the string, up to slackness of unity for which the string is stress-free. "
+"Values larger than unity mean there is an excess string length, leading to "
+"compressive stress."
+msgstr ""
+"Параметр, влияющий на форму пути между контрольными точками. Он может быть "
+"показан как слабина упругой пружины, соединяющей контрольные точки. Для "
+"нулевой слабины пружина будет туго натянута и путь будет формироваться "
+"прямыми сегментами. Увеличение слабины уменьшает натяжение в пружине вплоть "
+"до единичной, при которой пружина полностью свободна. Значения больше "
+"единицы означают, что длина пружины слишком велика и она будет сжиматься."
+
+#: edit-extended.xml:369(guilabel)
+msgid "Closed curve"
+msgstr "Замкнутая кривая"
+
+#: edit-extended.xml:372(para)
+msgid ""
+"If this option is enabled the path is closed, allowing the extraction of "
+"ring-shaped areas (for instance). Otherwise the path has two free ends."
+msgstr ""
+"Если включена эта опция, путь будет замкнут, что позволяет извлекать "
+"кольцевые области (как пример). В противном случае у пути будет два "
+"свободных конца."
+
+#: edit-extended.xml:380(para)
+msgid ""
+"Pressing <guibutton>Update</guibutton> computes a preview of the extracted "
+"image and shows it to the right of the input image. The preview is displayed "
+"vertically, with top edge corresponding to the path beginning and bottom "
+"edge to its end. The extracted image can be either oriented the same way or "
+"horizontally (from left to right), depending on <guilabel>Output "
+"orientation</guilabel>."
+msgstr ""
+"Нажатие кнопки <guibutton>Обновить</guibutton> рассчитывает изображение "
+"предпросмотра для извлекаемого изображения и показывает его справа от "
+"входного изображения. Изображение предпросмотра показывается вертикально, "
+"верхняя грань соответствует началу пути и нижняя его концу. Извлекаемое "
+"изображение может быть ориентировано либо подобным образом, либо "
+"горизонтально (слева направо) в зависимости от выбора опции "
+"<guilabel>Направление вывода</guilabel>."
+
+#: edit-extended.xml:387(para)
+msgid ""
+"For certain combinations of path shape and thickness the resulting image can "
+"contain regions that lie outside the original image. Such regions are masked "
+"in the output and filled with a neutral value."
+msgstr ""
+"Для определённых комбинаций формы и толщины пути результирующее изображение "
+"может содержать области, которые лежат вне исходного изображения. Эти "
+"области будут помечены маской на выводимом изображении и заполнены "
+"нейтральными значениями."
+
+#: edit-extended.xml:397(caption)
+msgid ""
+"Straighten Path example, showing extraction of data along a closed circular "
+"path. The left part of the dialogue contains coordinates of the path-"
+"defining points and function options, the middle part shows the selected "
+"circular path (with perpendicular markers denoting the thickness), and the "
+"right part is a preview of the extracted straightened data."
+msgstr ""
+"Пример применения функции Выпрямить путь, показывающий извлечение данных "
+"вдоль замкнутого кругового пути. Левая часть диалогового окна содержит "
+"координаты точек, задающих путь и опций данной функции, средняя часть "
+"показывает выбранный круговой путь (с перпендикулярными маркерами, "
+"показывающими толщину), правая часть показывает изображение предпросмотра "
+"для извлекаемых данных."
+
+#: edit-extended.xml:409(title)
+msgid "Extract Path Selection <gwy:icon name=\"extract_path\"/>"
+msgstr "Извлечь выбранный путь <gwy:icon name=\"extract_path\"/>"
+
+#: edit-extended.xml:416(guimenuitem)
+msgid "Extract Path Selection"
+msgstr "Извлечь выбранный путь"
+
+#: edit-extended.xml:419(para)
+msgid ""
+"Function <link linkend=\"straighten-path\">Straighten Path</link> stores the "
+"selected path with the data so that it can be recalled later. If you need "
+"the coordinates and/or directions corresponding to the straightened image "
+"for further processing you can use <guimenuitem>Extract Path Selection</"
+"guimenuitem>."
+msgstr ""
+"Функция <link linkend=\"straighten-path\">Выпрямить путь</link> сохраняет "
+"выбранный путь вместе с данными, так что её можно вызвать заново позднее. "
+"Если вам нужны координаты и/или направления, соответствующие выпрямленному "
+"изображению, для дальнейшей обработки, то можно использовать опцию "
+"<guimenuitem>Извлечь выбранный путь</guimenuitem>."
+
+#: edit-extended.xml:426(para)
+msgid ""
+"The function plots the real coordinates or tangents to the path, i.e. the "
+"direction cosines and sines, as graphs. Coordinates are selected as "
+"<guilabel>X position</guilabel> and <guilabel>Y position</guilabel>; "
+"directions are selected as <guilabel>X tangent</guilabel> and <guilabel>Y "
+"tangent</guilabel>. The number of points of each graph curve is the same as "
+"the number of rows of the straightened image created by <link linkend="
+"\"straighten-path\">Straighten Path</link> and there is one-to-one "
+"correspondence between the rows and graph curve points."
+msgstr ""
+"Эта функция строит действительные координаты или касательные к пути, т.е. "
+"направляющие синусы и косинусы в виде графиков. Координаты выбраны как "
+"<guilabel>положение X</guilabel> и <guilabel>положение Y </guilabel>; "
+"направления как <guilabel>касательная по X</guilabel> и "
+"<guilabel>касательная по Y</guilabel>. Количество точек в каждой кривой "
+"графика будет таким же, как число строк в выпрямленном изображении, "
+"созданном функцией <link linkend=\"straighten-path\">Выпрямить путь</link>, "
+"а строки изображения будут соответствовать одна к одной точкам кривой "
+"графика."
+
+#: edit-extended.xml:442(title)
+msgid "Unrotate <gwy:icon name=\"unrotate\"/>"
+msgstr "Исправить разворот <gwy:icon name=\"unrotate\"/>"
+
+#: edit-extended.xml:445(primary)
+msgid "rotation correction"
+msgstr "коррекция разворота"
+
+#: edit-extended.xml:446(primary)
+msgid "unrotate"
+msgstr "исправить разворот"
+
+#: edit-extended.xml:450(guisubmenu)
+msgid "Correct Data"
+msgstr "Исправить данные"
+
+#: edit-extended.xml:451(guimenuitem)
+msgid "Unrotate"
+msgstr "Исправить разворот"
+
+#: edit-extended.xml:454(para)
+msgid ""
+"Unrotate can automatically make principal directions in an image parallel "
+"with horizontal and/or vertical image edges. For that to work, the data need "
+"to have some principal directions, therefore it is most useful for scans of "
+"artificial and possibly crystalline structures."
+msgstr ""
+"Исправить разворот может автоматически сделать главные оси изображения "
+"параллельными горизонтальным или вертикальным сторонам изображения. Чтобы "
+"это работало, у данных должны быть эти главные оси, следовательно, этот "
+"метод наиболее полезен при сканировании искусственных и, возможно, "
+"кристаллических структур."
+
+#: edit-extended.xml:460(para)
+msgid ""
+"The rotation necessary to straighten the image – displayed as "
+"<guilabel>Correction</guilabel> – is calculated from peaks in angular <link "
+"linkend=\"slope-distribution\">slope distribution</link> assuming a "
+"prevalent type of structure, or symmetry. The symmetry can be estimated "
+"automatically too, but it is possible to select a particular symmetry type "
+"manually and let the module calculate only corresponding rotation "
+"correction. Note if you assume a structure type that does not match the "
+"actual structure, the calculated rotation is rarely meaningful."
+msgstr ""
+"Поворот, необходимый для выравнивания изображения – показанный как "
+"<guilabel>Поправка</guilabel> – рассчитывается из пиков на угловом <link "
+"linkend=\"slope-distribution\">распределении наклонов</link> предполагая "
+"преобладающий тип структуры или симметрию. Симметрия также может быть "
+"оценена автоматически, но можно выбрать какой-то тип симметрии вручную и "
+"оставить модулю расчёт только соответствующего корректирующего поворота. "
+"Следует заметить, что если вы выбрали тип структуры, не соответствующий "
+"реальности, то рассчитанный поворот редко когда будет иметь смысл."
+
+#: edit-extended.xml:471(para)
+msgid ""
+"It is recommended to level (or <link linkend=\"facet-level\">facet-level</"
+"link>) the data first as overall slope can skew the calculated rotations."
+msgstr ""
+"Рекомендуется перед расчётом выровнять данные (или <link linkend=\"facet-"
+"level\">выровнять грани</link>) поскольку общий наклон может исказить "
+"рассчитанный поворот."
+
+#: edit-extended.xml:485(phrase)
+msgid "Unrotate symmetries scheme"
+msgstr "Схема симметрий коррекции поворота"
+
+#: edit-extended.xml:487(caption)
+msgid ""
+"Orientations of prevalent directions corresponding to Unrotate symmetry "
+"types."
+msgstr ""
+"Ориентация главных осей в соответствии с типами симметрии, доступных при "
+"коррекции поворота."
+
+#: edit-extended.xml:498(term)
+msgid "Detected"
+msgstr "Найденная"
+
+#: edit-extended.xml:502(para)
+msgid ""
+"Automatically detected symmetry type, displayed above as <guilabel>Detected</"
+"guilabel>."
+msgstr ""
+"Автоматически определённый тип симметрии, показанный выше как "
+"<guilabel>обнаруженный</guilabel>."
+
+#: edit-extended.xml:509(term)
+msgid "Parallel"
+msgstr "Параллельная"
+
+#: edit-extended.xml:513(para)
+msgid "Parallel lines, one prevalent direction."
+msgstr "Параллельные линии, одно преимущественное направление."
+
+#: edit-extended.xml:519(term)
+msgid "Triangular"
+msgstr "Треугольная"
+
+#: edit-extended.xml:523(para)
+msgid ""
+"Triangular symmetry, three prevalent directions (unilateral) by 120 degrees."
+msgstr ""
+"Треугольная симметрия, три преимущественных направления (однонаправленных) "
+"под углами 120 градусов."
+
+#: edit-extended.xml:530(term)
+msgid "Square"
+msgstr "Квадрат"
+
+#: edit-extended.xml:534(para)
+msgid ""
+"Square symmetry, two prevalent directions oriented approximately along image "
+"sides."
+msgstr ""
+"Прямоугольная симметрия, два преимущественных направления приблизительно "
+"вдоль сторон изображения."
+
+#: edit-extended.xml:541(term)
+msgid "Rhombic"
+msgstr "Ромбическая"
+
+#: edit-extended.xml:545(para)
+msgid ""
+"Rhombic symmetry, two prevalent directions oriented approximately along "
+"diagonals. The only difference from Square is the preferred diagonal "
+"orientation (as opposed to parallel with sides)."
+msgstr ""
+"Ромбическая симметрия, два преимущественных направления приблизительно вдоль "
+"диагоналей. Единственным отличием от прямоугольной симметрии является "
+"предпочтение диагональной ориентации (в противоположность параллельной "
+"сторонам изображения)."
+
+#: edit-extended.xml:554(term)
+msgid "Hexagonal"
+msgstr "Гексагональная"
+
+#: edit-extended.xml:558(para)
+msgid ""
+"Hexagonal symmetry, three prevalent directions (bilateral) by 120 degrees."
+msgstr ""
+"Гексагональная симметрия, три преимущественных направления (двунаправленных) "
+"под углами 120 градусов."
+
+#: edit-extended.xml:493(para)
+msgid ""
+"The assumed structure type can be set with <guilabel>Assume</guilabel> "
+"selector. Following choices are possible: <placeholder-1/>"
+msgstr ""
+"Предполагаемый тип структуры может быть задан с помощью меню выбора "
+"<guilabel>Предполагаемая</guilabel>. Доступен выбор из следующих вариантов: "
+"<placeholder-1/>"
+
+#: edit-extended.xml:568(title)
+msgid "Displacement Field"
+msgstr "Поле смещения"
+
+#: edit-extended.xml:571(para)
+msgid ""
+"Displacement field is a general method of image distortion in the <include "
+"href=\"eqi-xy.xml\"/> plane. A vector is assigned to each point in the "
+"output image. This vector determines how far and in which direction to move "
+"from this point. The value found at the shifted position in the source image "
+"becomes the value of the pixel in the output image:"
+msgstr ""
+"Поле смещения это общий метод искажения изображения в плоскости <include "
+"href=\"eqi-xy.xml\"/>. Каждой точке результирующего изображения "
+"присваивается вектор. Этот вектор определяет в каком направлении двигаться "
+"из этой точки. Значение, найденное по заданному смещению в исходном "
+"изображении становится значением пикселя в выходном изображении:"
+
+#: edit-extended.xml:580(para)
+msgid "where <include href=\"eqi-vec-v.xml\"/> is the displacement vector."
+msgstr "где <include href=\"eqi-vec-v.xml\"/> - вектор смещения."
+
+#: edit-extended.xml:583(para)
+msgid "The displacement field can be generated or obtained by several methods:"
+msgstr "Поле смещения может быть создано или получено несколькими способами:"
+
+#: edit-extended.xml:589(guilabel)
+msgid "Gaussian (scan lines)"
+msgstr "Гауссово (линии скана)"
+
+#: edit-extended.xml:592(para)
+msgid ""
+"The vectors have only the <include href=\"eqi-x.xml\"/> component. The "
+"displacement is one-dimensional, along scan lines (image rows). It is a "
+"random Gaussian image, similar to Gaussian images generated by <link linkend="
+"\"spectral-synthesis\">Spectral Synthesis</link>."
+msgstr ""
+"Вектора содержат только компоненту <include href=\"eqi-x.xml\"/>. Смещение "
+"будет одномерным, вдоль линий сканирования (строк изображения). Это "
+"случайное гауссово изображение, подобное гауссовым изображениям генерируемым "
+"с помощью <link linkend=\"spectral-synthesis\">Спектрального синтеза</link>."
+
+#: edit-extended.xml:604(guilabel)
+msgid "Gaussian (two-dimensional)"
+msgstr "Гауссово (двумерное)"
+
+#: edit-extended.xml:607(para)
+msgid ""
+"The vectors have both <include href=\"eqi-x.xml\"/> and <include href=\"eqi-"
+"y.xml\"/> components, so the displacement is two-dimensional. It is again a "
+"random Gaussian image."
+msgstr ""
+"Вектора содержат обе компоненты <include href=\"eqi-x.xml\"/> и <include "
+"href=\"eqi-y.xml\"/>, следовательно смещение будет двумерным. В этом случае "
+"это снова случайное гауссово изображение."
+
+#: edit-extended.xml:618(guilabel)
+msgid "Tear scan lines"
+msgstr "Разрывать линии скана"
+
+#: edit-extended.xml:621(para)
+msgid ""
+"The vectors have only the <include href=\"eqi-x.xml\"/> component. The "
+"displacement is one-dimensional, along scan lines (image rows). It is "
+"generated to tear segments of neighbour rows by shifting one to the left and "
+"another to the right. In the rest of the image the displacement is smooth "
+"(and close to zero) so continuity is preserved outside the tear."
+msgstr ""
+"Вектора содержат только компоненту <include href=\"eqi-x.xml\"/>. Смещение "
+"будет одномерным, вдоль линий сканирования (строк изображения). Оно "
+"генерируется чтобы разорвать сегменты соседних строк смещением одной из них "
+"влево и другой вправо. В оставшейся части изображения смещение гладкое (и "
+"близкое к нулю), таким образом, непрерывность сохраняется вне разрыва."
+
+#: edit-extended.xml:634(guilabel)
+msgid "Image (scan lines)"
+msgstr "Изображение (линии скана)"
+
+#: edit-extended.xml:637(para)
+msgid ""
+"The vectors have only the <include href=\"eqi-x.xml\"/> component. The "
+"displacement is one-dimensional, along scan lines (image rows), and given by "
+"another image (selected as <guilabel>X displacement</guilabel>). The values "
+"of the image are directly used as the displacement vectors and must have the "
+"same units as lateral coordinates of the deformed image."
+msgstr ""
+"Вектора содержат только компоненту <include href=\"eqi-x.xml\"/>. Смещение "
+"будет одномерным, вдоль линий сканирования (строк изображения), и задаётся "
+"другим изображением (выбранным в качестве <guilabel>Смещения по X</"
+"guilabel>). Значения изображения используются напрямую в качестве векторов "
+"смещения и должны иметь ту же размерность, что и пространственные координаты "
+"деформируемого изображения."
+
+#: edit-extended.xml:650(guilabel)
+msgid "Image (two-dimensional)"
+msgstr "Изображение (двумерное)"
+
+#: edit-extended.xml:653(para)
+msgid ""
+"The vectors have both <include href=\"eqi-x.xml\"/> and <include href=\"eqi-"
+"y.xml\"/> components, so the displacement is two-dimensional. They are given "
+"by another images (selected as <guilabel>X displacement</guilabel> and "
+"<guilabel>Y displacement</guilabel>). The values of the images are directly "
+"used as the displacement vectors and must have the same units as lateral "
+"coordinates of the deformed image."
+msgstr ""
+"Вектора содержат обе компоненты <include href=\"eqi-x.xml\"/> и <include "
+"href=\"eqi-y.xml\"/>, следовательно смещение будет двумерным. Они задаются "
+"другими изображениями (выбранными в качестве <guilabel>Смещения по X</"
+"guilabel> и <guilabel>Смещения по Y</guilabel>). Значения изображений "
+"используются напрямую в качестве векторов смещения и должны иметь ту же "
+"размерность, что и пространственные координаты деформируемого изображения."
+
+#: edit-extended.xml:669(title)
+msgid "Coerce <gwy:icon name=\"enforce_distribution\"/>"
+msgstr "Задать статистику <gwy:icon name=\"enforce_distribution\"/>"
+
+#: edit-extended.xml:676(guimenuitem)
+msgid "Coerce"
+msgstr "Задать статистику"
+
+#: edit-extended.xml:679(para)
+msgid ""
+"The module transforms the values in a height field to enforce certain "
+"prescribed statistical properties. The distribution of values can be "
+"transformed to Gaussian, with mean value and rms roughness preserved, or "
+"uniform, with minimum and maximum value preserved. It is also possible to "
+"enforce the same distribution as another height field selected as "
+"<guilabel>Template</guilabel>."
+msgstr ""
+"Этот модуль преобразует значения в поле данных таким образом, чтобы "
+"установить некоторые заданные статистические свойства. Распределение "
+"значений может быть преобразовано в гауссово, с сохранением среднего "
+"значения и среднеквадратичной шероховатости, или равномерное, с сохранением "
+"минимального и максимального значения. Также можно установить такое же "
+"распределение, как у другого поля данных, выбранного в качестве "
+"<guilabel>шаблона</guilabel>."
+
+#: edit-extended.xml:687(para)
+msgid ""
+"The transformation preserves the ordering of the values, i.e. if one point "
+"is higher than another before the transformation it will be also higher "
+"after the transformation. Option <guilabel>Data processing</guilabel> "
+"controls whether the transformation is applied to the image as a whole "
+"(<guilabel>Entire image</guilabel>) or each row separately, with the same "
+"distribution (<guilabel>By row (identically)</guilabel>). Note that in the "
+"latter case if a template is selected each row of the transformed image will "
+"have the same value distribution (approximately) as the template."
+msgstr ""
+"Преобразование сохраняет порядок значений, т.е. если некоторая точка была "
+"выше другой до преобразования, она также будет выше после него. Опция "
+"<guilabel>обработка данных</guilabel> управляет тем, будет ли преобразование "
+"применяться к изображению целиком (<guilabel>Всё изображение</guilabel>) или "
+"к каждой строке отдельно, с одинаковым распределением (<guilabel>По строкам "
+"(одинаково)</guilabel>). Следует отметить, что если в последнем случае "
+"выбран шаблон для распределения, то каждая строка преобразованного "
+"изображения будет иметь (примерно) такое же распределение значений как "
+"шаблон."
+
+#: edit-extended.xml:698(para)
+msgid ""
+"In addition, a different kind of transformation can be performed, "
+"discretisation of the values into given number of levels. This operation is "
+"selected with <guilabel>Discrete levels</guilabel>. There are two different "
+"discretisations available, either the height levels are equidistant from "
+"minimum to maximum value (<guilabel>Uniform</guilabel>) or they are "
+"calculated so that after the transformation each level will consist of "
+"approximately the same number of pixels (<guilabel>Same area</guilabel>)."
+msgstr ""
+"В дополнение можно проводить другой тип преобразования, дискретизацию "
+"значений на заданное количество уровней. Эта операция выбирается с помощью "
+"опции <guilabel>Дискретные уровни</guilabel>. Доступны два различных типа "
+"дискретизации, либо уровни высоты равноудалены от минимального и "
+"максимального значения (<guilabel>Равномерное</guilabel>), либо они "
+"рассчитываются таким образом, чтобы после преобразования каждый уровень "
+"состоял из примерно одинакового количества пикселей (<guilabel>Одинаковая "
+"площадь</guilabel>)."
+
+#: edit-extended.xml:710(title) edit-extended.xml:717(guimenuitem)
+msgid "Radial Smoothing"
+msgstr "Радиальное сглаживание"
+
+#: edit-extended.xml:720(para)
+msgid ""
+"Radial smoothing processes the image with a Gaussian smoothing filter, but "
+"in polar coordinates. This function is useful for images which should be "
+"relatively smooth and exhibit radial symmetry."
+msgstr ""
+"Радиальное сглаживание обрабатывает изображение гауссовым сглаживающим "
+"фильтром, но в полярных координатах. Эта функция полезна для изображений "
+"которые должны быть относительно гладкими и демонстрировать радиальную "
+"симметрию."
+
+#: edit-extended.xml:725(para)
+msgid ""
+"The image can be smoothed either along radial profiles – with Gaussian "
+"filter width controlled by <guilabel>Radius</guilabel> – or angularly along "
+"arcs of constant radius from the centre – with width controlled by "
+"<guilabel>Angle</guilabel>. The transformation to polar coordinates and back "
+"does not preserve the image perfectly. Subtle (and occasionally less subtle) "
+"artefacts can occur, in particular close to the centre, even with no actual "
+"smoothing."
+msgstr ""
+"Изображение может сглаживаться либо вдоль радиальных профилей - с шириной "
+"гауссова фильтра управляемой опцией <guilabel>Радиус</guilabel> - или в "
+"угловом направлении воль дуги постоянного радиуса вокруг центра - с "
+"шириной,  управляемой параметром <guilabel>Угол</guilabel>. Преобразование "
+"изображения в полярные координаты и назад не идеально сохраняет его. При "
+"этом могут появляться небольшие (и иногда не столь небольшие) артефакты, в "
+"частности около центра, даже если сглаживание при этом не использовалось."
+
+#~ msgid "Polynomial Distortion"
+#~ msgstr "Полиномиальное искривление"
+
+#~ msgid "Extended Data Editing"
+#~ msgstr "Расширенное редактирование данных"
+
+#~ msgid ""
+#~ "This section presents extended modules designed for editing (correcting) "
+#~ "SPM data. Using simple data editing tools presented in chapter <link "
+#~ "linkend=\"editing-correction\" endterm=\"editing-correction.title\"/> it "
+#~ "is possible to correct many local scanning defects that can be found on "
+#~ "SPM images. There are also many error sources within SPM methods that "
+#~ "lead to global errors, like low frequencies modulated on the data or data "
+#~ "drift in the slow scanning axis."
+#~ msgstr ""
+#~ "Этот раздел представляет модули, разработанные для расширенного "
+#~ "редактирования (коррекции) данных СЗМ. Используя простые инструменты "
+#~ "редактирования данных, представленные в разделе <link linkend=\"editing-"
+#~ "correction\" endterm=\"editing-correction.title\"/>, возможна коррекция "
+#~ "многих локальных дефектов сканирования, которые могут появляться на "
+#~ "данных СЗМ. Но в то же время при использовании методов СЗМ есть много "
+#~ "источников ошибок которые ведут к глобальным ошибкам, такие как модуляция "
+#~ "данных с низкой частотой или дрейф данных в медленной оси сканирования."
+
+#~ msgid "1D FFT Filter <gwy:icon name=\"fft_filter_1d\"/>"
+#~ msgstr "Одномерная фильтрация БПФ <gwy:icon name=\"fft_filter_1d\"/>"
+
+#~ msgid "Fourier transform"
+#~ msgstr "Преобразование Фурье"
+
+#~ msgid "1D filtering"
+#~ msgstr "одномерная фильтрация"
+
+#~ msgid "1D FFT Filtering"
+#~ msgstr "Одномерная фильтрация БПФ"
+
+#~ msgid ""
+#~ "One excellent way of removing frequency based of noise from an image is "
+#~ "to use Fourier filtering. First, the Fourier transform of the image is "
+#~ "calculated. Next, a filter is applied to this transform. Finally, the "
+#~ "inverse transform is applied to obtain a filtered image. Gwyddion uses "
+#~ "the Fast Fourier Transform (or FFT) to make this intensive calculation "
+#~ "much faster."
+#~ msgstr ""
+#~ "Одним из наиболее удачных способов удаления шума на определённых частотах "
+#~ "из изображения является Фурье-фильтрация. Сначала вычисляется прямое "
+#~ "преобразование Фурье изображения. Затем к результату преобразования "
+#~ "применяется фильтр. После этого обратное преобразование используется для "
+#~ "получения отфильтрованного изображения. Gwyddion использует быстрое "
+#~ "преобразование Фурье (БПФ или FFT) для существенного ускорения этого "
+#~ "большого расчёта."
+
+#~ msgid ""
+#~ "Within the 1D FFT filter the frequencies that should be removed from "
+#~ "spectrum (suppress type: null) or suppressed to value of neighbouring "
+#~ "frequencies (suppress type: suppress) can be selected by marking "
+#~ "appropriate areas in the power spectrum graph. The selection can be "
+#~ "inverted easily using the Filter type choice. 1D FFT filter can be used "
+#~ "both for horizontal and vertical direction."
+#~ msgstr ""
+#~ "При использовании одномерного фильтра БПФ частоты, которые должны быть "
+#~ "удалены со спектра (тип подавления: убрать) или подавлены до значения "
+#~ "соседних частот (тип подавления: выровнять), могут быть выбраны отметкой "
+#~ "нужных областей на графике спектра мощности. Выбранная область может быть "
+#~ "легко инвертирована использованием опции \"тип фильтра\". Одномерная "
+#~ "фильтрация БПФ может использоваться как для горизонтального, так и для "
+#~ "вертикального направления."
+
+#~ msgid "2D FFT Filter <gwy:icon name=\"fft_filter_2d\"/>"
+#~ msgstr "Двумерная фильтрация БПФ <gwy:icon name=\"fft_filter_2d\"/>"
+
+#~ msgid "2D filtering"
+#~ msgstr "двумерная фильтрация"
+
+#~ msgid "2D FFT Filtering"
+#~ msgstr "двумерная фильтрация БПФ"
+
+#~ msgid ""
+#~ "2D FFT filter acts similarly as the 1D variant (see above) but using 2D "
+#~ "FFT transform. Therefore, the spatial frequencies that should be filtered "
+#~ "must be selected in 2D using mask editor. As the frequencies are related "
+#~ "to center of the image (corresponding to zero frequency), the mask can be "
+#~ "snapped to the center (coordinate system origin) while being edited. "
+#~ "There are also different display and output modes that are self-"
+#~ "explanatory – image or FFT coefficients can be outputted by module (or "
+#~ "both)."
+#~ msgstr ""
+#~ "Двумерная фильтрация БПФ работает подобно одномерному варианту (см. "
+#~ "выше), но использует двумерное преобразование Фурье. Следовательно, "
+#~ "пространственные частоты, которые нужно отфильтровать должны быть выбраны "
+#~ "в двумерном пространстве с использованием редактора маски. Поскольку "
+#~ "частоты измеряются относительно центра изображения (который соответствует "
+#~ "нулевой частоте), маску можно прикрепить к центру (началу координат) в "
+#~ "процессе редактирования. Также доступны различные режимы отображения и "
+#~ "вывода результата, которые не требуют разъяснений – модуль может выводить "
+#~ "изображение или коэффициенты БПФ (или оба)."
+
+#~ msgid "Frequency Split"
+#~ msgstr "Разбиение частот"
+
+#~ msgid "high-pass filter"
+#~ msgstr "фильтр верхних частот"
+
+#~ msgid "low-pass filter"
+#~ msgstr "фильтр нижних частот"
+
+#~ msgid "Level"
+#~ msgstr "Выравнивание"
+
+#~ msgid ""
+#~ "A simple alternative to <link linkend=\"fft-filter-2d\">2D FFT filtering</"
+#~ "link> is the separation of low and high spatial frequencies in the image "
+#~ "using a simple low-pass and/or high-pass filter. The frequency split "
+#~ "module can create either the low-frequency or high-frequency image or "
+#~ "both, depending on the selected <guilabel>Output type</guilabel>."
+#~ msgstr ""
+#~ "Простой альтернативой <link linkend=\"fft-filter-2d\">двумерной "
+#~ "фильтрации с помощью БПФ</link> будет разделение изображение на "
+#~ "составляющие с низкими и высокими пространственными частотами исполюзуя "
+#~ "простые фильтры нижних и верхних частот. В зависимости от выбранной опции "
+#~ "<guilabel>тип вывода</guilabel> модуль разделения частот может создавать "
+#~ "либо низкочастотное, либо высокочастотное изображение, либо оба"
+
+#~ msgid ""
+#~ "<guilabel>Cut-off</guilabel> selects the spatial frequency cut off, which "
+#~ "is displayed as relative fraction of the Nyquist frequency and also as "
+#~ "the corresponding spatial wavelength. If <guilabel>Edge width</guilabel> "
+#~ "(again given as relative to Nyquist frequency) is zero the filter has "
+#~ "sharp edge. For non-zero values the transition has the shape of error "
+#~ "function, with specified width."
+#~ msgstr ""
+#~ "<guilabel>Порог</guilabel> задаёт пространственную частоту, которая "
+#~ "показывается как относительная доля частоты Найквиста и также как "
+#~ "соответствующая пространственная длина волны. Если <guilabel>Ширина "
+#~ "пороговой функции</guilabel> задаётся нулевой, фильтр будет иметь узкий "
+#~ "порог частоты. Для ненулевых значений переход будет иметь форму функции "
+#~ "ошибки erf с заданной шириной."
+
+#~ msgid ""
+#~ "Frequency domain filtering can lead to artefacts close to image "
+#~ "boundaries. Therefore, several boundary handling options are provided, "
+#~ "aside from <guilabel>None</guilabel> which is mostly useful for periodic "
+#~ "data (or otherwise continuous across edges). <guilabel>Laplace</guilabel> "
+#~ "and <guilabel>Mirror</guilabel> extend the image by Laplace's equation "
+#~ "method and mirroring, respectively, exactly as the <link linkend=\"extend"
+#~ "\">Extend</link> function. <guilabel>Smooth connect</guilabel> applies to "
+#~ "rows and column the one-dimensional smooth extension method used in <link "
+#~ "linkend=\"roughness-iso\">Roughness tool</link> to suppress edge "
+#~ "artefacts."
+#~ msgstr ""
+#~ "Фильтрация в частотной области может приводить к артефактам вдоль границ "
+#~ "изображения. Вследствие этого модуль предлагает несколько вариантов "
+#~ "работы с граничной областью помимо варианта <guilabel>Нет</guilabel>, "
+#~ "который годится только для периодических данных (или другим способом "
+#~ "непрерывных при переходе через границу изображения). <guilabel>По "
+#~ "Лапласу</guilabel> и <guilabel>зеркально</guilabel> расширяют изображение "
+#~ "решением уравнения Лапласа или зеркальным отображением, соответственно, "
+#~ "точно таким же способом, как и функция <link linkend=\"extend"
+#~ "\">Расширить</link>. <guilabel>Гладкий переход</guilabel> применяет к "
+#~ "строкам и колонкам изображения одномерный гладкий метод расширения, "
+#~ "который используется в <link linkend=\"roughness-iso\">инструменте "
+#~ "измерения шероховатости</link> для подавления артефактов на границе."
+
+#~ msgid "XY denoising <gwy:icon name=\"xy_denoise\"/>"
+#~ msgstr "Удаление шума XY <gwy:icon name=\"xy_denoise\"/>"
+
+#~ msgid "xy denoising"
+#~ msgstr "удаление шума xy"
+
+#~ msgid "Multidata"
+#~ msgstr "Множественные данные"
+
+#~ msgid "XY denoise"
+#~ msgstr "Удалить шум XY"
+
+#~ msgid ""
+#~ "Calculates denoised image on the basis of two measurements of the same "
+#~ "area – one performed in x direction and one in y direction (and rotated "
+#~ "back to be aligned the same way as the x direction one). It is based on "
+#~ "work of E. Anguiano and M. Aguilar (see [<link linkend=\"xy-denoise-"
+#~ "ref-1\">1</link>]). Module performs FFT of both images, combines "
+#~ "information from both images in reciprocal space, and then performs "
+#~ "backward FFT in order to get denoised image. It is useful namely for "
+#~ "large scars and fast scanning axis stripes removal."
+#~ msgstr ""
+#~ "Рассчитывает изображение без шума на основе двух измерений одной и той же "
+#~ "области – одного вдоль оси x и другого вдоль оси y (и повёрнутой так, "
+#~ "чтобы быть выровненной так же, как и скан вдоль оси x). Основано на "
+#~ "работе E. Anguiano и M. Aguilar (см. [<link linkend=\"xy-denoise-"
+#~ "ref-1\">1</link>]). Модуль производит БПФ обоих изображений, комбинирует "
+#~ "информацию из обоих изображений в обратном пространстве и затем "
+#~ "производит обратное БПФ для получения изображения без шума. Модуль в "
+#~ "частности может быть полезен для удаления больших царапин и полос вдоль "
+#~ "быстрой оси сканирования."
+
+#~ msgid ""
+#~ "XY denoise procedure simulation: A) original data, B) simulated "
+#~ "measurement in x axis, C) simulated measurement in y axis, D) denoised "
+#~ "image."
+#~ msgstr ""
+#~ "Модель процедуры удаления шума XY: A) исходные данные, B) модель "
+#~ "измерения по оси x, C) модель измерения по оси Y, D) изображение без шума."
+
+#~ msgid "References"
+#~ msgstr "Ссылки"
+
+#~ msgid ""
+#~ "[1] <ulink url=\"http://dx.doi.org/10.1016/S0304-3991(98)00074-6\"> E. "
+#~ "Anguiano and M. Aguilar, Ultramicroscopy, 76 (1999) 47 </ulink>"
+#~ msgstr ""
+#~ "[1] <ulink url=\"http://dx.doi.org/10.1016/S0304-3991(98)00074-6\"> E. "
+#~ "Anguiano and M. Aguilar, Ultramicroscopy, 76 (1999) 47 </ulink>"
+
+#~ msgid "Drift Compensation"
+#~ msgstr "Компенсация дрейфа"
+
+#~ msgid "1D FFT Filter"
+#~ msgstr "Одномерная фильтрация БПФ"
+
+#~ msgid "2D FFT Filter"
+#~ msgstr "Двумерная фильтрация БПФ"
+
+#~ msgid "XY denoising"
+#~ msgstr "Удаление шума XY"
+
+#~ msgid ""
+#~ "Note that the filter usually resamples the data to size that fits to the "
+#~ "available FFT algorithm (FFTW or Gwyddion FFT). As this may affect "
+#~ "results, the resampled image size information is stated in the module "
+#~ "window."
+#~ msgstr ""
+#~ "Следует заметить, что фильтр обычно передискретизирует данные до размера, "
+#~ "который подходит для имеющегося алгоритма БПФ (FFTW или  Gwyddion FFT). "
+#~ "Поскольку это может влиять на результат, размер передискретизированного "
+#~ "изображения указан в окне модуля."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

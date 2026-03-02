@@ -1,0 +1,707 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion user guide\n"
+"POT-Creation-Date: 2023-05-05 07:44+0400\n"
+"PO-Revision-Date: 2023-05-05 07:45+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru_RU@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: gwyddion.xml:7(productname) gwyddion.xml:11(refentrytitle)
+#: gwyddion.xml:17(refname) gwyddion.xml:24(command)
+msgid "gwyddion"
+msgstr "gwyddion"
+
+#: gwyddion.xml:8(othername)
+msgid "Yeti"
+msgstr "Yeti"
+
+#: gwyddion.xml:12(manvolnum)
+msgid "1"
+msgstr "1"
+
+#: gwyddion.xml:13(refmiscinfo)
+msgid "Gwyddion"
+msgstr "Gwyddion"
+
+#: gwyddion.xml:18(refpurpose)
+msgid "SPM data visualization and analysis"
+msgstr "Отображение и анализ данных СЗМ"
+
+#: gwyddion.xml:22(title)
+msgid "Synopsis"
+msgstr "Аннотация"
+
+#: gwyddion.xml:25(replaceable)
+msgid "OPTION"
+msgstr "ОПЦИЯ"
+
+#: gwyddion.xml:26(replaceable)
+msgid "FILE"
+msgstr "ФАЙЛ"
+
+#: gwyddion.xml:31(title)
+msgid "Description"
+msgstr "Описание"
+
+#: gwyddion.xml:32(para)
+msgid ""
+"Gwyddion is a graphical SPM (Scanning Probe Microscope) data visualization "
+"and analysis program, using Gtk+."
+msgstr ""
+"Gwyddion – графическая программа отображения и анализа данных СЗМ "
+"(Сканирующей Зондовой Микроскопии), написанная с использованием Gtk+."
+
+#: gwyddion.xml:39(title)
+msgid "Options"
+msgstr "Параметры"
+
+#: gwyddion.xml:40(para)
+msgid ""
+"The program accepts all standard Gtk+, Gdk, and GtkGLExt options like "
+"<option>--display</option> or <option>--sync</option>. Please see "
+"documentation of these packages for description of toolkit options."
+msgstr ""
+"Программа принимает все стандартные опции Gtk+, Gdk и GtkGLExt, такие, как "
+"<option>--display</option> или <option>--sync</option>. См. документацию по "
+"этим пакетам для описания опций тулкитов."
+
+#: gwyddion.xml:45(para)
+msgid ""
+"The behaviour of the remote control options <option>--remote-<replaceable>*</"
+"replaceable></option> is undefined when more than one instance of Gwyddion "
+"is running on the display. They can choose an arbitrary instance to "
+"communicate to. The last remote control option given (including <option>--"
+"new-instance</option>) overrides all preceding ones."
+msgstr ""
+"Поведение опции удалённого управления  <option>--remote-<replaceable>*</"
+"replaceable></option> не определено, когда на данном дисплее запущено более "
+"одного экземпляра Gwyddion. Они могут выбирать произвольный экземпляр "
+"программы для работы с ним. Последняя заданная опция удалённого управления "
+"(включая <option>--new-instance</option>) переопределяет все предыдущие "
+"заданные."
+
+#: gwyddion.xml:53(para)
+msgid ""
+"If a directory is given as <replaceable>FILE</replaceable> argument the "
+"program opens a file chooser in this directory."
+msgstr ""
+"Если каталог задан как аргумент <replaceable>ФАЙЛ</replaceable>, программа "
+"открывает диалог выбора файлов в заданном каталоге."
+
+#: gwyddion.xml:57(para)
+msgid "Gwyddion options:"
+msgstr "Опции Gwyddion:"
+
+#: gwyddion.xml:63(option)
+msgid "--help"
+msgstr "--help"
+
+#: gwyddion.xml:66(para)
+msgid "Prints a brief help and terminates."
+msgstr "Выводит короткую справку и завершается."
+
+#: gwyddion.xml:73(option)
+msgid "--version"
+msgstr "--version"
+
+#: gwyddion.xml:76(para)
+msgid "Prints version information and terminates."
+msgstr "Выводит информацию о версии и завершается."
+
+#: gwyddion.xml:83(option)
+msgid "--no-splash"
+msgstr "--no-splash"
+
+#: gwyddion.xml:86(para)
+msgid "Disables splash screen on program startup."
+msgstr "Отключает заставку при старте."
+
+#: gwyddion.xml:93(option)
+msgid "--remote-new"
+msgstr "--remote-new"
+
+#: gwyddion.xml:96(para)
+msgid ""
+"Opens files given on the command line in an already running instance of "
+"Gwyddion on the display. Runs a new instance if none is running."
+msgstr ""
+"Открывает на экране файлы заданные в командной строке в запущенном "
+"экземпляре Gwyddion. Запускает новый экземпляр, если ни одного не запущено."
+
+#: gwyddion.xml:101(para)
+msgid ""
+"This is probably the most useful remote control option. File type "
+"associations are usually installed to run Gwyddion with this option."
+msgstr ""
+"Вероятно, это наиболее полезная из опций удалённого управления. Ассоциации с "
+"типами файлов обычно настроены для запуска Gwyddion с этой опцией."
+
+#: gwyddion.xml:110(option)
+msgid "--remote-existing"
+msgstr "--remote-existing"
+
+#: gwyddion.xml:113(para)
+msgid ""
+"Opens files given on the command line in an already running instance of "
+"Gwyddion on the display. Fails if none is running."
+msgstr ""
+"Запускает файлы, указанные в командной строке, в уже запущенном экземпляре "
+"Gwyddion. Возвращает ошибку, если ни одного экземпляра не запущено."
+
+#: gwyddion.xml:117(para)
+msgid ""
+"This is useful if you want to handle the case of Gwyddion not running "
+"differently than by starting it."
+msgstr ""
+"Может быть полезно для случая, если вы хотите обрабатывать ситуацию с "
+"незапущенным Gwyddion иным способом, отличным от его запуска."
+
+#: gwyddion.xml:125(option)
+msgid "--remote-query"
+msgstr "--remote-query"
+
+#: gwyddion.xml:128(para)
+msgid ""
+"Succeeds if an instance of Gwyddion is already running on the display and "
+"prints its instance identifier. Fails if none is running."
+msgstr ""
+"Успешно завершается, если Gwyddion уже запущен на дисплее и печатает "
+"идентификатор экземпляра. Возвращает ошибку, если Gwyddion не запущен."
+
+#: gwyddion.xml:133(para)
+msgid ""
+"The instance identifier depends on the remote control backend in use. In "
+"some cases it is useful as a global window identifier, in some it is not. "
+"With libXmu this option prints the X11 <type>Window</type>, on Win32 "
+"<type>HWND</type> is printed, while with LibUnique the startup id is printed."
+msgstr ""
+"Идентификатор экземпляра зависит от используемого интерфейса удалённого "
+"управления. В некоторых случаях он представляет полезную информацию, как, "
+"например, глобальный идентификатор окна, в некоторых нет. С libXmu эта опция "
+"печатает X11 <type>Window</type>, на Win32 печатается <type>HWND</type>, в "
+"то время как с LibUnique печатается идентификатор запуска."
+
+#: gwyddion.xml:144(option)
+msgid "--new-instance"
+msgstr "--new-instance"
+
+#: gwyddion.xml:147(para)
+msgid ""
+"Runs a new instance of Gwyddion. It can also used to override preceding "
+"remote control options and to ensure a new instance is run when the default "
+"remote control behaviour is modified."
+msgstr ""
+"Запускает новый экземпляр программы. Может также использоваться чтобы "
+"проигнорировать предыдущие опции удалённого управления и убедиться, что "
+"будет запущен новый экземпляр, когда меняется режим управления программой по "
+"умолчанию."
+
+#: gwyddion.xml:156(option)
+msgid "--identify"
+msgstr "--identify"
+
+#: gwyddion.xml:159(para)
+msgid ""
+"Instead of running the user interface and opening <replaceable>FILE</"
+"replaceable>s, it detects the file type for each and terminates."
+msgstr ""
+"Вместо запуска пользовательского интерфейса и открытия <replaceable>FILE</"
+"replaceable>, определяет тип файла для каждого и завершает свою работу."
+
+#: gwyddion.xml:164(para)
+msgid ""
+"The SPM file type printed corresponds to the description shown in the list "
+"of supported file formats in the user guide. The file type is followed (in "
+"square brackets) by the name of Gwyddion file import module that would be "
+"used to load the file and detection score. Scores considerably lower than "
+"100 mean that although the detection produced a possible file type, it is "
+"unsure about it."
+msgstr ""
+"Тип файла СЗМ, который будет напечатан, соответствует описанию, показанному "
+"в списке поддерживаемых форматов файлов в руководстве пользователя. За типом "
+"файла следует (в квадратных скобках) название модуля импорта файлов "
+"программы Gwyddion, который будет использован для загрузки файла, и оценка "
+"правильности детекции в баллах. Оценка значительно ниже 100 означает, что "
+"хотя в ходе детекции был найден возможно подходящий тип файла, но в "
+"правильности его детектирования нет уверенности."
+
+#: gwyddion.xml:173(para)
+msgid ""
+"If the file type is not recognised at all, <literal>Unknown</literal> is "
+"printed as the file type. The program exit code is 1 if any "
+"<replaceable>FILE</replaceable> was not recognised."
+msgstr ""
+"Если тип файла вообще не распознан, то вместо типа файла печатается "
+"<literal>Unknown</literal>. Код выхода из программы будет 1 если любой из "
+"<replaceable>FILE</replaceable> не был распознан."
+
+#: gwyddion.xml:182(option)
+msgid "--check"
+msgstr "--check"
+
+#: gwyddion.xml:185(para)
+msgid ""
+"Instead of running the user interface and opening <replaceable>FILE</"
+"replaceable>s, it loads the files, performs a sanity check on them (printing "
+"errors to standard error output) and terminates."
+msgstr ""
+"Вместо запуска пользовательского интерфейса и открытия <replaceable>FILE</"
+"replaceable>, загружает файлы, проверяет их на наличие ошибок (выводя ошибки "
+"на стандартный вывод ошибок stderr) и завершается."
+
+#: gwyddion.xml:195(replaceable)
+msgid "OUTFILE.gwy"
+msgstr "OUTFILE.gwy"
+
+#: gwyddion.xml:195(option)
+msgid "--convert-to-gwy=<placeholder-1/>"
+msgstr "--convert-to-gwy=<placeholder-1/>"
+
+#: gwyddion.xml:198(para)
+msgid ""
+"Instead of running the user interface and opening <replaceable>FILE</"
+"replaceable>s, it reads them, merges all the data and writes a GWY file "
+"<replaceable>OUTFILE.gwy</replaceable>."
+msgstr ""
+"Вместо запуска пользовательского интерфейса и открытия <replaceable>FILE</"
+"replaceable>, загружает файлы, объединяет все данные и записывает файл в "
+"формате GWY <replaceable>OUTFILE.gwy</replaceable>."
+
+#: gwyddion.xml:207(option)
+msgid "--disable-gl"
+msgstr "--disable-gl"
+
+#: gwyddion.xml:210(para)
+msgid ""
+"Disables OpenGL entirely, including any checks whether it is available. This "
+"option, of course, has any effect only if Gwyddion was built with OpenGL "
+"support and one of the most visible effects is that 3D view becomes "
+"unavailable. However, you may find it useful if you encounter a system so "
+"broken that even checking for OpenGL capabilities leads to X server errors. "
+"It can also help when you run Gwyddion remotely using X11 forwarding and the "
+"start-up time seems excessively long."
+msgstr ""
+"Полностью отключает OpenGL, включая все проверки на его доступность. Эта "
+"опция, разумеется, будет действовать только в том случае, если Gwyddion был "
+"собран с поддержкой OpenGL, и наиболее заметным эффектом от её использование "
+"будет недоступность опции трёхмерного просмотра. Однако, эта опция может "
+"оказаться полезной в том случае, если система сломана настолько, что даже "
+"проверка поддержки OpenGL приводит к ошибкам X-сервера. Также она может "
+"оказаться полезной при удалённом запуске Gwyddion через перенаправление X11, "
+"в том случае, если время запуска оказывается чрезмерно долгим."
+
+#: gwyddion.xml:224(option)
+msgid "--log-to-file"
+msgstr "--log-to-file"
+
+#: gwyddion.xml:227(para)
+msgid ""
+"Write messages from GLib, Gtk+, Gwyddion, etc. to <filename>~/.gwyddion/"
+"gwyddion.log</filename> or file given in <link linkend=\"GWYDDION_LOGFILE"
+"\"><envar>GWYDDION_LOGFILE</envar></link> environment variable. This option "
+"is most useful on Unix as on Win32 messages are redirected to a file by "
+"default. Logging to a file and console are not exclusive; messages can go to "
+"both."
+msgstr ""
+"Перенаправляет сообщения от GLib, Gtk+, Gwyddion, и т.д. в <filename>~/."
+"gwyddion/gwyddion.log</filename> или в файл, указанный в переменной "
+"окружения <link linkend=\"GWYDDION_LOGFILE\"><envar>GWYDDION_LOGFILE</"
+"envar></link>. Эта опция наиболее полезна в среде Unix, поскольку на "
+"платформе Win32 сообщения по умолчанию перенаправляются в файл. Вывод "
+"сообщений в файл и на консоль не исключают друг друга, сообщения могут "
+"выводиться одновременно двумя вариантами."
+
+#: gwyddion.xml:240(option)
+msgid "--no-log-to-file"
+msgstr "--no-log-to-file"
+
+#: gwyddion.xml:243(para)
+msgid ""
+"Prevents writing messages from GLib, Gtk+, Gwyddion, etc. to a file. This is "
+"most useful on Win32 where messages are written to a file by default."
+msgstr ""
+"Предотвращает перенаправление сообщений от GLib, Gtk+, Gwyddion, и т.д. в "
+"файл. Наиболее полезна на платформе Win32 (где сообщения перенаправляются в "
+"файл по умолчанию)."
+
+#: gwyddion.xml:252(option)
+msgid "--log-to-console"
+msgstr "--log-to-console"
+
+#: gwyddion.xml:255(para)
+msgid ""
+"Print messages from GLib, Gtk+, Gwyddion, etc. to the console. More "
+"precisely, debugging messages are printed to the standard output, errors and "
+"warnings to the standard error. On Unix messages are printed to the console "
+"by default. Logging to a file and console are not exclusive; messages can go "
+"to both."
+msgstr ""
+"Выводит сообщения от GLib, Gtk+, Gwyddion, и т.д. на консоль. Точнее, "
+"отладочные сообщения выводятся в стандартный вывод, ошибки и предупреждения "
+"в стандартный поток ошибок. В Unix сообщения печатаются на консоль по "
+"умолчанию. Вывод сообщений в файл и на консоль не исключает друг друга, "
+"сообщения могут выводиться двумя вариантами одновременно."
+
+#: gwyddion.xml:267(option)
+msgid "--no-log-to-console"
+msgstr "--no-log-to-console"
+
+#: gwyddion.xml:270(para)
+msgid ""
+"Disables printing messages to the console. This is most useful on Unix where "
+"messages are printed to the console by default."
+msgstr ""
+"Отменяет вывод сообщений на консоль. Наиболее полезна под Unix, где "
+"сообщения выводятся на консоль по умолчанию."
+
+#: gwyddion.xml:279(replaceable)
+msgid "MODULE,..."
+msgstr "MODULE,..."
+
+#: gwyddion.xml:279(option)
+msgid "--disable-modules=<placeholder-1/>"
+msgstr "--disable-modules=<placeholder-1/>"
+
+#: gwyddion.xml:282(para)
+msgid ""
+"Prevents the registration modules of given names. This is mostly useful for "
+"development and debugging. For instance, you might want to use <option>--"
+"disable-modules=pygwy</option> when running under Valgrind for faster "
+"startup (and possibly to avoid extra errors)."
+msgstr ""
+"Предотвращает регистрацию модулей с заданными именами. В основном полезно "
+"для разработки и отладки. Например, вам может пригодиться использование "
+"<option>--disable-modules=pygwy</option> при запуске под Valgrind для "
+"ускорения процесса (и возможно избежания дополнительных ошибок)."
+
+#: gwyddion.xml:293(option)
+msgid "--startup-time"
+msgstr "--startup-time"
+
+#: gwyddion.xml:296(para)
+msgid ""
+"Prints wall-clock time taken by various startup (and shutdown) tasks. Useful "
+"only for developers and people going to complain about too slow startup."
+msgstr ""
+"Печатает общее время, затраченное на выполнение различных задач при старте "
+"(и закрытии). Полезно только для разработчиков и людей, собирающихся "
+"пожаловаться на слишком медленный запуск."
+
+#: gwyddion.xml:307(title)
+msgid "Environment"
+msgstr "Окружение"
+
+#: gwyddion.xml:308(para)
+msgid ""
+"On Linux/Unix, following environment variables can be used to override "
+"compiled-in installation paths (MS Windows version always looks to "
+"directories relative to path where it was installed). Note they are intended "
+"to override system installation paths therefore they are not path lists, "
+"they can contain only a single path."
+msgstr ""
+"На Linux/Unix следующие переменные окружения используются для "
+"переопределения вкомпилированных путей установки (версия под MS Windows "
+"всегда рассматривает пути относительно места установки). Они предназначены "
+"для переопределения системных путей установки и не являются списком путей, "
+"они могут содержать только один путь."
+
+#: gwyddion.xml:318(envar)
+msgid "GWYDDION_DATADIR"
+msgstr "GWYDDION_DATADIR"
+
+#: gwyddion.xml:321(para)
+msgid ""
+"Base data directory where resources (color gradients, OpenGL materials, …) "
+"were installed. Gwyddion looks into its <filename>gwyddion</filename> "
+"subdirectory for resources."
+msgstr ""
+"Основной каталог данных, куда были установлены файлы ресурсов (цветовые "
+"градиенты, материалы OpenGL, …). Gwyddion ищет файлы ресурсов в его "
+"подкаталоге <filename>gwyddion</filename>."
+
+#: gwyddion.xml:326(para)
+msgid ""
+"When it is unset, it defaults to compiled-in value of <varname>${datadir}</"
+"varname> which is usually <filename>/usr/local/share</filename>."
+msgstr ""
+"Если не установлено, по умолчанию используется вкомпилированное значение "
+"<varname>${datadir}</varname> обычно установленное в <filename>/usr/local/"
+"share</filename>."
+
+#: gwyddion.xml:335(envar)
+msgid "GWYDDION_LIBDIR"
+msgstr "GWYDDION_LIBDIR"
+
+#: gwyddion.xml:338(para)
+msgid ""
+"Base library directory where modules were installed. Gwyddion looks into its "
+"<filename>gwyddion/modules</filename> subdirectory for modules."
+msgstr ""
+"Основной каталог модулей, куда они были установлены. Gwyddion ищет модули в "
+"его подкаталоге <filename>gwyddion/modules</filename>."
+
+#: gwyddion.xml:343(para)
+msgid ""
+"When it is unset, it defaults to compiled-in value of <varname>${libdir}</"
+"varname> which is usually <filename>/usr/local/lib</filename> or <filename>/"
+"usr/local/lib64</filename>."
+msgstr ""
+"Если не установлен, по умолчанию используется вкомпилированное значение "
+"<varname>${libdir}</varname>, обычно установленное в <filename>/usr/local/"
+"lib</filename> или <filename>/usr/local/lib64</filename>."
+
+#: gwyddion.xml:353(envar)
+msgid "GWYDDION_LIBEXECDIR"
+msgstr "GWYDDION_LIBEXECDIR"
+
+#: gwyddion.xml:356(para)
+msgid ""
+"Base lib-exec directory where plug-ins were installed. Gwyddion looks into "
+"its <filename>gwyddion/plugins</filename> subdirectory for plug-ins."
+msgstr ""
+"Основной каталог lib-exec, куда были установлены подключаемые модули. "
+"Gwyddion ищет подключаемые модули в его подкаталоге  <filename>gwyddion/"
+"plugins</filename>."
+
+#: gwyddion.xml:361(para)
+msgid ""
+"When it is unset, it defaults to compiled-in value of <varname>${libexecdir}"
+"</varname> which is usually <filename>/usr/local/libexec</filename>."
+msgstr ""
+"Если не установлено, по умолчанию используется вкомпилированное значение "
+"<varname>${libexecdir}</varname> обычно установленное в <filename>/usr/local/"
+"libexec</filename>."
+
+#: gwyddion.xml:370(envar)
+msgid "GWYDDION_LOCALEDIR"
+msgstr "GWYDDION_LOCALEDIR"
+
+#: gwyddion.xml:373(para)
+msgid ""
+"Locale data directory where message catalogs (translations) were installed."
+msgstr ""
+"Каталог данных о локализации, куда были установлены каталоги сообщений "
+"(переводы)."
+
+#: gwyddion.xml:377(para)
+msgid ""
+"When it is unset, it defaults to compiled-in value of <varname>${datadir}/"
+"locale</varname> which is usually <filename>/usr/local/share/locale</"
+"filename>."
+msgstr ""
+"Если не установлен, по умолчанию используется вкомпилированное значение "
+"<varname>${datadir}/locale</varname> обычно установленное в <filename>/usr/"
+"local/share/locale</filename>."
+
+#: gwyddion.xml:385(para)
+msgid ""
+"Other variables that influence <application>Gwyddion</application> run-time "
+"behaviour include <ulink url=\"http://library.gnome.org/devel/glib/stable/"
+"glib-running.html\">GLib+ variables</ulink> and <ulink url=\"http://library."
+"gnome.org/devel/gtk/stable/gtk-running.html\">Gtk+ variables</ulink> and "
+"some Gwyddion-specific variables:"
+msgstr ""
+"Другие переменные, которые влияют на поведение <application>Gwyddion</"
+"application> при запуске включают в себя <ulink url=\"http://library.gnome."
+"org/devel/glib/stable/glib-running.html\">переменные GLib+</ulink> и <ulink "
+"url=\"http://library.gnome.org/devel/gtk/stable/gtk-running.html"
+"\">переменные Gtk+</ulink>, а также некоторые специфичные для Gwyddion "
+"переменные:"
+
+#: gwyddion.xml:396(envar)
+msgid "GWYDDION_LOGFILE"
+msgstr "GWYDDION_LOGFILE"
+
+#: gwyddion.xml:399(para)
+msgid ""
+"Name of file to redirect log messages to. On MS Windows, messages are always "
+"sent to a file as working with the terminal is cumbersome there. The default "
+"log file location, <filename>gwyddion.log</filename> in user's Documents and "
+"Settings, can be overridden with <envar>GWYDDION_LOGFILE</envar>. On Unix, "
+"messages go to the terminal by default and this environment variable has "
+"effect only if <option>--log-to-file</option> is given."
+msgstr ""
+"Имя файла, куда перенаправляются сообщения журналов. На MS Windows сообщения "
+"всегда отправляются в файл, поскольку работа с терминалом там весьма "
+"затруднительна. Местоположение журналов по умолчанию, <filename>gwyddion."
+"log</filename> в каталоге пользователя внутри Documents and Settings (или "
+"Users), может быть переопределено с помощью переменной окружения "
+"<envar>GWYDDION_LOGFILE</envar>. На unix сообщения по умолчанию отправляются "
+"на терминал, и эта переменная будет действовать только при задании опции "
+"<option>--log-to-file</option>."
+
+#: gwyddion.xml:412(para)
+msgid ""
+"If <application>Gwyddion</application> is built with OpenMP support, it "
+"utilizes parallelization (not all data processing methods implement "
+"parallelization, but a sizable part does). OpenMP environment variables such "
+"as <envar>OMP_NUM_THREADS</envar> can be used to tune it."
+msgstr ""
+"Если <application>Gwyddion</application> собран с поддержкой OpenMP, он "
+"использует распараллеливание вычислений (не все модули это поддерживают, но "
+"значительная часть да). Переменные окружения OpenMP такие, как "
+"<envar>OMP_NUM_THREADS</envar> можно использовать для его настройки."
+
+#: gwyddion.xml:421(title)
+msgid "Files"
+msgstr "Файлы"
+
+#: gwyddion.xml:425(filename)
+msgid "~/.gwyddion/settings"
+msgstr "~/.gwyddion/settings"
+
+#: gwyddion.xml:428(para)
+msgid ""
+"Saved user settings and tool states. Do not edit while Gwyddion is running, "
+"it will overwrite it at exit."
+msgstr ""
+"Сохранённые пользовательские настройки и состояния инструментов. Не стоит "
+"редактировать при запущенном Gwyddion, он всё равно перезапишет этот файл "
+"при выходе."
+
+#: gwyddion.xml:435(term)
+msgid ""
+"<filename>~/.gwyddion/glmaterials</filename>, <filename>~/.gwyddion/"
+"gradients</filename>, ..."
+msgstr ""
+"<filename>~/.gwyddion/glmaterials</filename>, <filename>~/.gwyddion/"
+"gradients</filename>, ..."
+
+#: gwyddion.xml:441(para)
+msgid ""
+"User directories with various resources (OpenGL materials, color "
+"gradients, ...)."
+msgstr ""
+"Пользовательские каталоги с различными ресурсами (материалами OpenGL, "
+"цветовыми градиентами, ...)."
+
+#: gwyddion.xml:448(term)
+msgid ""
+"<filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/glmaterials</filename>, "
+"<filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/gradients</filename> ..."
+msgstr ""
+"<filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/glmaterials</filename>, "
+"<filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/gradients</filename> ..."
+
+#: gwyddion.xml:454(para)
+msgid "The same for system-wide resources."
+msgstr "То же самое для общесистемных ресурсов."
+
+#: gwyddion.xml:461(filename)
+msgid "~/.gwyddion/pixmaps"
+msgstr "~/.gwyddion/pixmaps"
+
+#: gwyddion.xml:464(para)
+msgid ""
+"Directory to place user icons to. This is mainly useful for installation of "
+"modules to home."
+msgstr ""
+"Каталог для пользовательских иконок. В основном полезно при установке "
+"модулей в домашний каталог."
+
+#: gwyddion.xml:471(term)
+msgid "<filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/pixmaps</filename>,"
+msgstr ""
+"<filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/pixmaps</filename>,"
+
+#: gwyddion.xml:475(para)
+msgid "The same for system-wide icons."
+msgstr "То же самое для общесистемных иконок."
+
+#: gwyddion.xml:482(filename)
+msgid "~/.gwyddion/modules"
+msgstr "~/.gwyddion/modules"
+
+#: gwyddion.xml:485(para)
+msgid ""
+"Directory to place user modules to. They should be placed into "
+"<filename>file</filename>, <filename>graph</filename>, <filename>process</"
+"filename>, <filename>layer</filename>, and <filename>tools</filename> "
+"subdirectories according to their kind, though this is more a convention "
+"than anything else."
+msgstr ""
+"Каталог для пользовательских модулей. Они должны находиться в подкаталогах "
+"<filename>file</filename>, <filename>graph</filename>,  <filename>process</"
+"filename>, <filename>layer</filename> и <filename>tools</filename> в "
+"зависимости от их вида, хотя это больше традиция, чем обязательное правило."
+
+#: gwyddion.xml:495(term)
+msgid "<filename><envar>$GWYDDION_LIBDIR</envar>/gwyddion/modules</filename>,"
+msgstr "<filename><envar>$GWYDDION_LIBDIR</envar>/gwyddion/modules</filename>,"
+
+#: gwyddion.xml:499(para)
+msgid "The same for system-wide modules."
+msgstr "То же самое для общесистемных модулей."
+
+#: gwyddion.xml:506(filename)
+msgid "~/.gwyddion/plugins"
+msgstr "~/.gwyddion/plugins"
+
+#: gwyddion.xml:509(para)
+msgid ""
+"Directory to place user plug-ins to. They should be placed into "
+"<filename>file</filename> and <filename>process</filename> subdirectories "
+"according to their kind."
+msgstr ""
+"Каталог для пользовательских подключаемых модулей. Они должны находиться в "
+"подкаталогах <filename>file</filename> и <filename>process</filename> в "
+"зависимости от их вида."
+
+#: gwyddion.xml:517(term)
+msgid ""
+"<filename><envar>$GWYDDION_LIBEXECDIR</envar>/gwyddion/plugins</filename>,"
+msgstr ""
+"<filename><envar>$GWYDDION_LIBEXECDIR</envar>/gwyddion/plugins</filename>,"
+
+#: gwyddion.xml:521(para)
+msgid "The same for system-wide plug-ins."
+msgstr "То же самое для общесистемных подключаемых модулей."
+
+#: gwyddion.xml:528(filename)
+msgid "~/.gwyddion/pygwy"
+msgstr "~/.gwyddion/pygwy"
+
+#: gwyddion.xml:531(para)
+msgid "Directory to place user python modules or scripts to."
+msgstr "Каталог для пользовательских скриптов и модулей на python."
+
+#: gwyddion.xml:539(title)
+msgid "See also"
+msgstr "См. также"
+
+#: gwyddion.xml:540(para)
+msgid ""
+"<citerefentry><refentrytitle>gwyddion-thumbnailer</"
+"refentrytitle><manvolnum>1</manvolnum></citerefentry>, "
+"<citerefentry><refentrytitle>gxsm</refentrytitle><manvolnum>1</manvolnum></"
+"citerefentry>"
+msgstr ""
+"<citerefentry><refentrytitle>gwyddion-thumbnailer</"
+"refentrytitle><manvolnum>1</manvolnum></citerefentry>, "
+"<citerefentry><refentrytitle>gxsm</refentrytitle><manvolnum>1</manvolnum></"
+"citerefentry>"
+
+#~ msgid ""
+#~ "Prevents the registration modules of given names. This is mostly useful "
+#~ "for development and debugging."
+#~ msgstr ""
+#~ "Предотвращает регистрацию модулей с заданными именами. Наиболее полезна "
+#~ "для разработки и отладки."
+
+#~ msgid "--debug-objects"
+#~ msgstr "--debug-objects"
+
+#~ msgid ""
+#~ "Prints list of objects created during run time, with creation and "
+#~ "desctruction times or reference counts on program exit. Useful only for "
+#~ "developers."
+#~ msgstr ""
+#~ "Печатает список объектов, созданных при запуске, с временами создания и "
+#~ "удаления или счётчиком ссылок при выходе из программы. Полезно только для "
+#~ "разработчиков."

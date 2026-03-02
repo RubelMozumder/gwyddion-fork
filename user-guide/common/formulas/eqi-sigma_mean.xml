@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-sigma_mean.xml 19060 2016-10-12 18:39:11Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase><phrase role='mathvar'>σ</phrase><subscript>mean</subscript></mathphrase>
+  <alt>\sigma_{\rm mean}</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

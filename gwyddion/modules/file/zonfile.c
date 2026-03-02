@@ -1,0 +1,474 @@
+/*
+ *  $Id: zonfile.c 26168 2024-02-08 10:18:02Z yeti-dn $
+ *  Copyright (C) 2023 David Necas (Yeti).
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Keyence ZON data
+ * .zon
+ * Read
+ **/
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-zon-profilometry">
+ *   <comment>Zon profilometry data</comment>
+ *   <glob pattern="*.zon"/>
+ *   <glob pattern="*.ZON"/>
+ * </mime-type>
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <glib/gstdio.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyutils.h>
+#include <libprocess/filters.h>
+#include <libprocess/stats.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwymoduleutils-file.h>
+#include <app/data-browser.h>
+
+#include "err.h"
+#include "gwyzip.h"
+
+#define MAGIC_PK "PK\x03\x04"
+#define MAGIC_PK_SIZE (sizeof(MAGIC_PK)-1)
+#define BLOODY_UTF8_BOM "\xef\xbb\xbf"
+#define EXTENSION ".zon"
+
+enum {
+    ZON_PK_HEADER_SIZE = 8,
+    ZON_BMP_HEADER_SIZE = 54,
+    ZON_HEADER_SIZE = ZON_PK_HEADER_SIZE + ZON_BMP_HEADER_SIZE,
+};
+
+typedef struct {
+    gchar *uuid;
+    gchar *freeme;
+    guint xres;
+    guint yres;
+    guint itemsize;
+    guint rowstride;
+    guchar *data;
+} ZONData;
+
+typedef struct {
+    GHashTable *hash;
+    GArray *datafiles;
+    GString *path;
+    GString *str;
+    gboolean ignore;
+} ZONFile;
+
+static gboolean      module_register        (void);
+static gint          zon_detect             (const GwyFileDetectInfo *fileinfo,
+                                             gboolean only_name);
+static GwyContainer* zon_load               (const gchar *filename,
+                                             GwyRunType mode,
+                                             GError **error);
+static gboolean      zon_parse_one_file     (GwyZipFile zipfile,
+                                             ZONFile *zonfile,
+                                             GError **error);
+static void          zon_file_free          (ZONFile *zonfile);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Reads Keyence ZON files."),
+    "Yeti <yeti@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti)",
+    "2023",
+};
+
+GWY_MODULE_QUERY(module_info)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("zonfile",
+                           N_("Keyence ZON data (.zon)"),
+                           (GwyFileDetectFunc)&zon_detect,
+                           (GwyFileLoadFunc)&zon_load,
+                           NULL,
+                           NULL);
+
+    return TRUE;
+}
+
+/* The weird ZIP + BMP header. Since it is nonstandard, consider it sufficient. */
+static gboolean
+check_magic_header(const guchar *buffer, gsize size)
+{
+    if (size < ZON_HEADER_SIZE)
+        return FALSE;
+    if (memcmp(buffer, "KPK", 3) != 0)
+        return FALSE;
+    if (memcmp(buffer + 8, "BM", 2) != 0)
+        return FALSE;
+    return TRUE;
+}
+
+static gint
+zon_detect(const GwyFileDetectInfo *fileinfo,
+           gboolean only_name)
+{
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 15 : 0;
+
+    if (!check_magic_header(fileinfo->head, fileinfo->buffer_len))
+        return 0;
+
+    return 95;
+}
+
+static GwyZipFile
+open_contained_zip_file(const gchar *filename, gchar **zipfilename, GError **error)
+{
+    GwyZipFile zipfile = NULL;
+    GError *err = NULL;
+    guchar *buffer = NULL;
+    const guchar *p;
+    G_GNUC_UNUSED gsize headersize;
+    gsize bmpsize, size = 0;
+
+    if (!gwy_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        return NULL;
+    }
+    if (!check_magic_header(buffer, size)) {
+        err_FILE_TYPE(error, "ZON");
+        goto end;
+    }
+
+    p = buffer + 4;
+    headersize = gwy_get_guint32_le(&p);
+
+    /* Check if we find the ZIP header after the bitmap. */
+    p = buffer + ZON_PK_HEADER_SIZE + 2;  /* 2 for BM **/
+    bmpsize = gwy_get_guint32_le(&p);
+
+    gwy_debug("header size %lu, bmp size %lu", (gulong)headersize, (gulong)bmpsize);
+
+    if (ZON_PK_HEADER_SIZE + bmpsize + MAGIC_PK_SIZE > size) {
+        err_FILE_TYPE(error, "ZON");
+        goto end;
+    }
+
+    gwy_debug("opening ZIP");
+    zipfile = gwyzip_make_temporary_archive(buffer + ZON_PK_HEADER_SIZE + bmpsize, size - ZON_PK_HEADER_SIZE - bmpsize,
+                                            "gwyddion-zonfile-XXXXXX.zip", zipfilename, error);
+
+end:
+    gwy_file_abandon_contents(buffer, size, NULL);
+
+    return zipfile;
+}
+
+static GwyContainer*
+zon_load(const gchar *filename,
+         G_GNUC_UNUSED GwyRunType mode,
+         GError **error)
+{
+    GwyContainer *container = NULL;
+    ZONFile zonfile;
+    GwyZipFile zipfile = NULL;
+    ZONData *zd;
+    gchar *zipfilename = NULL, *xml_filename;
+    const gchar *s;
+    GwyDataField *field, *mask;
+    gdouble *d;
+    gdouble dxy, q;
+    guint i, j, id, mask_i = G_MAXUINT;
+
+    gwy_clear(&zonfile, 1);
+    if (!(zipfile = open_contained_zip_file(filename, &zipfilename, error)))
+        goto fail;
+
+    gwy_debug("OK");
+    if (!gwyzip_first_file(zipfile, error))
+        goto fail;
+
+    zonfile.hash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    zonfile.datafiles = g_array_new(FALSE, FALSE, sizeof(ZONData));
+    zonfile.path = g_string_new(NULL);
+    zonfile.str = g_string_new(NULL);
+
+    do {
+        if (!gwyzip_get_current_filename(zipfile, &xml_filename, error))
+            goto fail;
+        gwy_debug("found file: <%s>", xml_filename);
+        if (!zon_parse_one_file(zipfile, &zonfile, error))
+            goto fail;
+        g_free(xml_filename);
+    } while (gwyzip_next_file(zipfile, NULL));
+
+    if (!(s = g_hash_table_lookup(zonfile.hash, "/Calibration/XYCalibration/MeterPerPixel"))) {
+        err_MISSING_FIELD(error, "/Calibration/XYCalibration/MeterPerPixel");
+        goto fail;
+    }
+    dxy = g_ascii_strtod(s, NULL);
+    sanitise_real_size(&dxy, "pixel size");
+
+    if (!(s = g_hash_table_lookup(zonfile.hash, "/Calibration/ZCalibration/MeterPerUnit"))) {
+        err_MISSING_FIELD(error, "/Calibration/ZCalibration/MeterPerUnit");
+        goto fail;
+    }
+    q = g_ascii_strtod(s, NULL);
+
+    container = gwy_container_new();
+    for (i = id = 0; i < zonfile.datafiles->len; i++) {
+        zd = &g_array_index(zonfile.datafiles, ZONData, i);
+        if (zd->itemsize == 1)
+            mask_i = i;
+        if (zd->itemsize != 4)
+            continue;
+
+        field = gwy_data_field_new(zd->xres, zd->yres, zd->xres*dxy, zd->yres*dxy, FALSE);
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(field), "m");
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(field), "m");
+        d = gwy_data_field_get_data(field);
+        for (j = 0; j < zd->yres; j++) {
+            gwy_convert_raw_data(zd->data + j*zd->rowstride, zd->xres, 1,
+                                 GWY_RAW_DATA_SINT32, GWY_BYTE_ORDER_LITTLE_ENDIAN, d + j*zd->xres, q, 0.0);
+        }
+        gwy_container_pass_object(container, gwy_app_get_data_key_for_id(id), field);
+        gwy_app_channel_title_fall_back(container, id);
+        id++;
+    }
+    if (mask_i != G_MAXUINT) {
+        zd = &g_array_index(zonfile.datafiles, ZONData, mask_i);
+        mask = gwy_data_field_new(zd->xres, zd->yres, zd->xres*dxy, zd->yres*dxy, FALSE);
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(mask), "m");
+        d = gwy_data_field_get_data(mask);
+        for (j = 0; j < zd->yres; j++) {
+            gwy_convert_raw_data(zd->data + j*zd->rowstride, zd->xres, 1,
+                                 GWY_RAW_DATA_UINT8, GWY_BYTE_ORDER_LITTLE_ENDIAN, d + j*zd->xres, 1.0, 0.0);
+        }
+        gwy_data_field_threshold(mask, 0.5, 0.0, 1.0);
+        for (i = 0; i < id; i++) {
+            if (i == id-1)
+                gwy_container_set_object(container, gwy_app_get_mask_key_for_id(i), mask);
+            else
+                gwy_container_pass_object(container, gwy_app_get_mask_key_for_id(i), gwy_data_field_duplicate(mask));
+        }
+        g_object_unref(mask);
+    }
+
+    if (!gwy_container_get_n_items(container)) {
+        GWY_OBJECT_UNREF(container);
+        err_NO_DATA(error);
+        goto fail;
+    }
+
+fail:
+    if (zipfilename) {
+        g_unlink(zipfilename);
+        g_free(zipfilename);
+    }
+    if (zipfile)
+        gwyzip_close(zipfile);
+    zon_file_free(&zonfile);
+
+    return container;
+}
+
+static void
+zon_start_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                  const gchar *element_name,
+                  G_GNUC_UNUSED const gchar **attribute_names,
+                  G_GNUC_UNUSED const gchar **attribute_values,
+                  gpointer user_data,
+                  G_GNUC_UNUSED GError **error)
+{
+    ZONFile *zonfile = (ZONFile*)user_data;
+
+    if (zonfile->ignore)
+        return;
+
+    g_string_append_c(zonfile->path, '/');
+    g_string_append(zonfile->path, element_name);
+    //gwy_debug("%s", zonfile->path->str);
+    if (gwy_stramong(zonfile->path->str,
+                     "/DataMap", "/ColorPaletteData/Palette", "/DeviceDumpInformations",
+                     NULL)) {
+        zonfile->ignore = TRUE;
+        gwy_debug("found %s, ignoring", zonfile->path->str);
+    }
+}
+
+static void
+zon_end_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                 const gchar *element_name,
+                 gpointer user_data,
+                 G_GNUC_UNUSED GError **error)
+{
+    ZONFile *zonfile = (ZONFile*)user_data;
+    guint n, len = zonfile->path->len;
+    gchar *path = zonfile->path->str;
+
+    if (zonfile->ignore)
+        return;
+
+    n = strlen(element_name);
+    g_return_if_fail(g_str_has_suffix(path, element_name));
+    g_return_if_fail(len > n);
+    g_return_if_fail(path[len-1 - n] == '/');
+    //gwy_debug("%s", path);
+
+    g_string_set_size(zonfile->path, len-1 - n);
+}
+
+static void
+zon_text(G_GNUC_UNUSED GMarkupParseContext *context,
+          const gchar *text,
+          G_GNUC_UNUSED gsize text_len,
+          gpointer user_data,
+          G_GNUC_UNUSED GError **error)
+{
+    ZONFile *zonfile = (ZONFile*)user_data;
+    gchar *path = zonfile->path->str;
+    GString *str = zonfile->str;
+
+    if (zonfile->ignore || !strlen(text))
+        return;
+
+    g_string_assign(str, text);
+    g_strstrip(str->str);
+    if (!*(str->str))
+        return;
+
+    gwy_debug("%s = <%s>", path, str->str);
+    g_hash_table_replace(zonfile->hash, g_strdup(path), g_strdup(str->str));
+}
+
+static gboolean
+gather_data_file(GwyZipFile zipfile, ZONFile *zonfile,
+                 guchar *buffer, gsize size,
+                 GError **error)
+{
+    ZONData zd;
+    const guchar *p = buffer;
+
+    if (!gwyzip_get_current_filename(zipfile, &zd.uuid, error))
+        return FALSE;
+    gwy_debug("non-XML file %s", zd.uuid);
+
+    if (size <= 16) {
+        err_TRUNCATED_PART(error, zd.uuid);
+        goto fail;
+    }
+
+    zd.xres = gwy_get_guint32_le(&p);
+    zd.yres = gwy_get_guint32_le(&p);
+    zd.itemsize = gwy_get_guint32_le(&p);
+    zd.rowstride = gwy_get_guint32_le(&p);
+    gwy_debug("xres %u, yres %u, item size %u, rowstride %u", zd.xres, zd.yres, zd.itemsize, zd.rowstride);
+    if (err_DIMENSION(error, zd.xres) || err_DIMENSION(error, zd.yres))
+        goto fail;
+    if (zd.rowstride/zd.itemsize < zd.xres) {
+        g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_DATA,
+                    _("Rows stride %u does not match length and bytes per item (%u×%u)."),
+                    zd.rowstride, zd.itemsize, zd.xres);
+        goto fail;
+    }
+    size -= 16;
+    if (size % zd.rowstride || size/zd.rowstride != zd.yres) {
+        g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_DATA,
+                    _("Data size %u does not match data dimensions (%u×%u)."),
+                    (guint)size, zd.xres, zd.yres);
+        goto fail;
+    }
+
+    zd.data = buffer + 16;
+    zd.freeme = buffer;
+    g_array_append_val(zonfile->datafiles, zd);
+    return TRUE;
+
+fail:
+    g_free(buffer);
+    return FALSE;
+}
+
+static gboolean
+zon_parse_one_file(GwyZipFile zipfile, ZONFile *zonfile, GError **error)
+{
+    GMarkupParser parser = {
+        &zon_start_element, &zon_end_element, &zon_text, NULL, NULL,
+    };
+    GMarkupParseContext *context = NULL;
+    guchar *content = NULL, *s;
+    gboolean ok = FALSE;
+    GError *err = NULL;
+    gsize size;
+
+    if (!(content = gwyzip_get_file_content(zipfile, &size, error)))
+        return FALSE;
+
+    if (g_str_has_prefix(content, "<"))
+        s = gwy_strkill(content, "\r");
+    else if (g_str_has_prefix(content, BLOODY_UTF8_BOM "<"))
+        s = gwy_strkill(content + strlen(BLOODY_UTF8_BOM), "\r");
+    else if (size >= MAGIC_PK_SIZE && memcmp(content, MAGIC_PK, MAGIC_PK_SIZE) == 0) {
+        gwy_debug("ignoring nested compressed file");
+        g_free(content);
+        /* Just ignore nested compressed files. They probably contain other compressed files inside, which in turn
+         * contain stuff already present in the main archive… */
+        return TRUE;
+    }
+    else
+        return gather_data_file(zipfile, zonfile, content, size, error);
+
+    g_string_truncate(zonfile->path, 0);
+    zonfile->ignore = FALSE;
+    context = g_markup_parse_context_new(&parser, 0, zonfile, NULL);
+    if (!g_markup_parse_context_parse(context, s, -1, &err) || !g_markup_parse_context_end_parse(context, &err))
+        err_XML(error, &err);
+    else
+        ok = TRUE;
+
+    if (context)
+        g_markup_parse_context_free(context);
+    g_free(content);
+
+    return ok;
+}
+
+static void
+zon_file_free(ZONFile *zonfile)
+{
+    guint i;
+
+    if (zonfile->hash)
+        g_hash_table_destroy(zonfile->hash);
+    if (zonfile->path)
+        g_string_free(zonfile->path, TRUE);
+    if (zonfile->str)
+        g_string_free(zonfile->str, TRUE);
+    if (zonfile->datafiles) {
+        for (i = 0; i < zonfile->datafiles->len; i++) {
+            ZONData *zondata = &g_array_index(zonfile->datafiles, ZONData, i);
+            g_free(zondata->uuid);
+            g_free(zondata->freeme);
+        }
+        g_array_free(zonfile->datafiles, TRUE);
+    }
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

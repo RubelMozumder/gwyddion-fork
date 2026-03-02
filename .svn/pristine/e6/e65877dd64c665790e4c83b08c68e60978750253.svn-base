@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: pygwy.xml 22265 2019-07-16 07:24:24Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="pygwy">
+  <title>Скриптовый интерфейс на Python <gwy:icon name="pygwy"/></title>
+  <indexterm><primary>Python</primary></indexterm>
+  <indexterm><primary>pygwy</primary></indexterm>
+  <para>Скриптовый интерфейс на Python позволяет автоматизировать задачи обработки данных СЗМ, как внутри <application>Gwyddion</application>, так и при использовании его функциональности в отдельных программах на Python, которые запускаются отдельно от него. Эти программы могут варьироваться от последовательного выполнения нескольких команд как в макросах, до достаточно сложных программ, собирающих данные из нескольких файлов, обрабатывающих их и использующих сторонние библиотеки и программы.</para>
+  <para>Модуль Gwyddion, предоставляющий данную функциональность называется <emphasis>pygwy</emphasis>, это название также обобщённо используется для обозначения написания скриптов Python для работы с Gwyddion в целом, даже если оно непосредственно не связано с модулем pygwy.</para>
+  <para>Термин <quote>Скриптовый интерфейс на Python</quote> подразумевает, что скрипты в Gwyddion написаны на <ulink url="http://python.org/">Python</ulink>. Python является мощным, широко используемым высокоуровневым интерпретируемым языком программирования общего назначения с ясным, легким для понимания синтаксисом, широким набором библиотек и поддержкой большого числа операционных систем и сред. Все доступные возможности и потенциал языка Python можно использовать в скриптах в Gwyddion. Единственной новой вещью будет то, что вы также получите доступ к структурам данных, функциям и состоянию программы Gwyddion.</para>
+  <sect2 id="pygwy-extending-embedding">
+    <title>Расширение и встраивание, модули и модули.</title>
+    <para>Поскольку Python и Gwyddion можно использовать совместно несколькими различными способами и обе программы широко используют термин <quote>модуль</quote> для обозначения различных по своей природе вещей, требуется некоторое уточнение формулировок.</para>
+    <para>Gwyddion предоставляет модуль расширения Python под названием <code>gwy</code>. Таким образом, можно запустить Python, загрузить модуль <literal>gwy</literal> так же, как любой другой модуль языка с помощью команды <informalexample><programlisting language="python">import gwy</programlisting></informalexample> и начать использовать его <ulink url="http://gwyddion.net/documentation/head/pygwy/">функции и классы</ulink> в командной оболочке Python или скрипте. Этот режим называется <emphasis>автономный</emphasis> скрипт pygwy. Естественно, что при этом вы запускаете Python, а не Gwyddion. таким образом, нельзя использовать функциональность, относящуюся к взаимодействию с Gwyddion (программой). Даже если экземпляр Gwyddion запущен параллельно, он полностью независим от скрипта и не может напрямую управляться им.</para>
+    <para>С одной стороны, модуль pygwy (модуль Gwyddion) позволяет комбинировать эти вещи в обратном порядке и запускать интерпретатор языка Python внутри программы Gwyddion, тем самым встраивая Python в Gwyddion. если запустить пункт меню <menuchoice><guimenu>Обработка данных</guimenu><guimenuitem>Консоль Pygwy</guimenuitem></menuchoice>, появится оболочка для Python, в которой можно будет выполнять команды языка. В этом случае код на Python может взаимодействовать с текущим запущенным экземпляром Gwyddion различными способами. Скрипт, запущенный таким путём обычно называется просто скрипт pygwy (безо всяких дополнительных уточнений).</para>
+    <para>Пункт <guilabel>Команда</guilabel> в нижней части окна консоли позволяет выполнять отдельные простые команды. Они запускаются сразу после нажатия <keycap>Enter</keycap> и их вывод печатается в область журнала выше.</para>
+    <para>Более длинные скрипты могут быть набраны, скопированы или загружены в основную область в верхней части. Кнопка <guibutton>Выполнить</guibutton> (<keycap>Ctrl-E</keycap>) при этом запускает скрипт. Вывод скрипта снова будет записан в область журнала вместе с любыми сообщениями об ошибках. Другие кнопки управления позволяют сохранять (<keycap>Ctrl-S</keycap>) и загружать (<keycap>Ctrl-O</keycap>) скрипты. Кнопка <guibutton>Очистить журнал</guibutton> очищает область журнала.</para>
+    <informalfigure id="fig-pygwy-simple">
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="pygwy-simple.png" format="PNG"/>
+        </imageobject>
+        <caption>Консоль Pygwy, демонстрирующая простой скрипт (печатающий диапазон значений для текущего изображения) и его вывод.</caption>
+      </mediaobject>
+    </informalfigure>
+    <para>также существуют некоторые другие небольшие отличия от автономно запускаемых скриптов. Модуль <literal>gwy</literal> всегда автоматически импортирован для консоли. В дополнение, он будет доступен здесь даже если вы найдёте модуль расширения Python на диске и удалите его, поскольку здесь он генерируется на лету из Gwyddion.</para>
+    <para>И, наконец, можно писать модули расширения Gwyddion на Python. Такие модули будут появляться в меню <guimenu>Обработка данных</guimenu> подобно другим функциям обработки данных. также можно написать модули, которые реализуют загрузку и сохранение данных в новых форматах. Это слегка более запутанный процесс, чем предыдущие два варианта и будет более подробно <link linkend="pygwy-writing-modules">объяснён ниже</link>. Этот тип модулей обычно называется модуль обработки данных на Python (в контексте Gwyddion) или модуль Gwyddion для обработки данных на Python, если контекст неясен.</para>
+    <para>В дополнение к основному модулю <code>gwy</code>, также есть небольшой модуль <code>gwyutils</code>, который предоставляет некоторые дополнительные функции. Часть из них предоставляет обходные пути для функциональности, которая обычно не покрывается в достаточной степени самим модулем <code>gwy</code> и по большей части является устаревшей. Некоторая часть, однако, по прежнему полезна. Модуль <code>gwyutils</code> не импортируется автоматически; его всегда требуется подгрузить в явном виде с помощью команды <informalexample><programlisting language="python">import gwyutils</programlisting></informalexample> В зависимости от того, как Gwyddion был установлен, может потребоваться добавить путь до <filename>gwyutils.py</filename> в <code>sys.path</code> перед этим: <informalexample><programlisting language="python">import sys
+sys.path.append('/the/path/to/the/gwyutils/module')</programlisting></informalexample></para>
+  </sect2>
+  <sect2 id="pygwy-datafield">
+    <title>Поля данных — как представлены изображения</title>
+    <para>Наверное наиболее важной из структур данных Gwyddion, с которой вам придётся работать, будет <ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.DataField-class.html"><type>DataField</type></ulink>, которая представляет изображение.</para>
+    <para>По существу она представляет собой массив <xi:include href="eqi-NxM.xml"/> значений данных с плавающей точкой, который также содержит некоторую дополнительную информацию, такую как размеры и единицы измерения. Значения данных всегда хранятся в основных единицах СИ (т.е. метрах или Вольтах, не в нанометрах или милливольтах). В большинстве случаев вы будете работать со структурами <type>DataField</type>, полученными из какого-то файла. Однако, создание нового заполненного нулями поля данных размером 128 на 128 точек (с физическими размерами один на один) не является сложным:  <informalexample><programlisting language="python">data_field = gwy.DataField(128, 128, 1.0, 1.0)</programlisting></informalexample> Размеры в пикселях называются в Gwyddion разрешениями и могут быть получены используя функции <function>get_xres()</function> и <function>get_yres()</function>: <informalexample><programlisting language="python"># Ширина в пикселях
+xres = data_field.get_xres()
+
+# Высота в пикселях
+yres = data_field.get_yres()</programlisting></informalexample> Также можно создать поле данных как копию другого: <informalexample><programlisting language="python">another_field = data_field.duplicate()</programlisting></informalexample> или сделать его таким же, как другое, но заполнить при этом нулями: <informalexample><programlisting language="python">similar_field = data_field.new_alike()</programlisting></informalexample> Объект <type>DataField</type> имеет множество методов от простых, таких как получение физических размеров или простых статистических свойств: <informalexample><programlisting language="python"># Физические размеры
+xreal, yreal = data_field.get_xreal(), data_field.get_yreal()
+
+# Диапазон значений
+zmin, zmax = data_field.get_min_max()
+
+# Среднее значение
+mean = data_field.get_avg()</programlisting></informalexample> до сложных, которые проводят нетривиальные операции со множеством настраиваемых параметров, такие как удаление штрихов (царапин) <informalexample><programlisting language="python">data_field.mark_scars(result_field, high, low, min_len, max_width, False)</programlisting></informalexample> Их все можно найти в <ulink url="http://gwyddion.net/documentation/head/pygwy/">справочной документации</ulink>. Некоторые распространённые операции могут включать в себя сочетание нескольких функций вместе. Например, эквивалентом функции <link linkend="fix-zero">Исправить нуль</link> можно получить комбинацией <function>get_min()</function> и <function>add()</function>: <informalexample><programlisting language="python">data_field.add(-data_field.get_min())</programlisting></informalexample></para>
+    <para>Если вы делаете более сложную обработку данных, простое использование имеющихся методов может быть недостаточным, и возможно потребуется читать или менять непосредственно значения отдельных пикселей. Для этого есть несколько возможных методов. Простейшим будет прямая индексация; чтобы прочитать значение в верхнем левом углу можно использовать просто <informalexample><programlisting language="python">value = data_field[0]</programlisting></informalexample> и аналогично <informalexample><programlisting language="python">data_field[0] = 1.5</programlisting></informalexample> установит значение в верхнем левом углу в 1.5. Следует отметить, что данные изображения представлены в <quote>плоском</quote> виде, т.е. представлены в виде одного большого массива, упорядоченного строка за строкой, и даже несмотря на то, что <type>DataField</type> представляет собой изображение, используется только один индекс (в противоположность раздельным индексам для строк и столбцов). Таким образом, последнее значение в третьей строке поля данных размером 128 на 128 может быть изменено на -1.0 с помощью команды <informalexample><programlisting language="python">data_field[2*128 + 127] = -1.0</programlisting></informalexample></para>
+    <para>Другим возможным вариантом будет использование методов <function>get_data()</function> и <function>set_data()</function> которые извлекают полный набор данных в список Python и заполняют полный набор данных <type>DataField</type> из списка Python (или другой последовательности), соответственно. Следует заметить, что эти методы всегда копируют данные. Если изменить список после извлечения, при этом не поменяются значения поля данных и наоборот. Например, если вы не боитесь запачкать руки, <link linkend="fix-zero">Исправить нуль</link> может быть реализован заново следующим образом: <informalexample><programlisting language="python">data = data_field.get_data()
+m = min(data)
+data = [z-m for z in data]
+data_field.set_data(data)</programlisting></informalexample></para>
+    <para>наконец, если использовать <ulink url="http://www.numpy.org/">NumPy</ulink>, вам возможно потребуется напрямую проводить операции над полем данных с использованием функций NumPy. Вспомогательный модуль <code>gwyutils</code> предоставляет функции, которые позволяют это делать. Вызов <informalexample><programlisting language="python">array = gwyutils.data_field_data_as_array(data_field)</programlisting></informalexample> создаёт массив NumPy, который будет содержать данные поля данных. Этот подход необходимо использовать осторожно, поскольку некоторые операции с типом <type>DataField</type> меняют представление данных (например, меняют размер) и после этого массив NumPy ломается. В общем случае не рекомендуется смешивать случайным образом операции с массивом и методы <type>DataField</type>.</para>
+    <para>Когда вы закончили менять поле данных соответствующее изображению в Gwyddion, необходимо вызвать <informalexample><programlisting language="python">data_field.data_changed()</programlisting></informalexample> Это посылает сигнал объекту <type>DataField</type>, уведомляющий что все окна данных и миниатюры, показывающие изображение, должны обновить сами себя. В общем случае это должно быть сделано по одному разу для каждого изменённого поля данных в конце скрипта (или после того, как вы закончили работать с конкретным изображением). Если забыть сделать это, отображаемая информация может оказаться рассинхронизированной с реальным содержимым изображений.</para>
+  </sect2>
+  <sect2 id="pygwy-container">
+    <title>Контейнеры — как представлены файлы</title>
+    <para>Файл СЗМ представлен в виде класса <ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.Container-class.html"><type>Container</type></ulink>, который является похожим на словарь объектом, содержащим всё, что может быть в файле GWY. Каждый файл при импорте преобразуется в <type>Container</type> с аналогичной структурой. Таким образом файлы GWY и любые другие типы файлов не отличаются после того, как они будут загружены в программу.</para>
+    <para>Элементы в типе <type>Container</type> идентифицируются строковыми ключами (или эквивалентыми целочисленными ключами, хотя в Python их использование будет более редким), например, <literal>"/0/data"</literal> идентифицирует изображение номер 0 и <literal>"/5/select/rectangle"</literal> идентифицирует прямоугольное выделение на изображении номер 5. Положение отдельных фрагментов данных описано в <link linkend="gwyfile-format">спецификации формата файла GWY</link>.</para>
+    <para>Можно получить доступ к элементам объекта <type>Container</type> путём простого индексирования: <informalexample><programlisting language="python"># Сделать изображением 0 наше поле данных
+container['/0/data'] = data_field
+
+# Получить прямоугольное выделение для изображения 5
+selection = container['/5/select/rectangle']</programlisting></informalexample> Однако, <type>Container</type> отличается от словаря Python в некоторых аспектах. Он может содержать только определённые типы данных: булевы, целочисленные, значения с плавающей точкой, строки и объекты Gwyddion, которые можно перевести в последовательную форму (что фактически означает любой объект данных в Gwyddion, который может вам встретиться. Он содержит такие методы, как <function>set_object_by_name()</function> или <function>get_boolean_by_name()</function>, которые уточняют тип данных, который будет сохранён или извлечён и их можно использовать вместо индексации. Более того, даже с этими ограничениями, если начать сохранять случайные вещи под случайными именами здесь, в результате не получится то, что Gwyddion понимает как файл СЗМ, и скорее всего это нарушит его нормальную работу вплоть до падения. Следовательно, всегда нужно использовать имена элементов, заданные в спецификации и соответствующие им типы элементов.</para>
+    <para>Функции, которые помогают с конструированием ключей, идентифицирующих различные элементы в файле, называются <function>gwy_app_get_<replaceable>something</replaceable>_key_for_id()</function>, где <quote>something</quote> заменяется на тип элемента. Так, ключ для изображения 3 может быть сконструирован используя <informalexample><programlisting language="python">key = gwy.gwy_app_get_data_key_for_id(3)</programlisting></informalexample> Следует отметить, что эти функции конструируют целочисленные ключи (которые работают столь же хорошо, но непонятны для пользователя). Можно использовать функции <function>gwy_name_from_key()</function> и <function>gwy_key_from_name()</function> чтобы делать преобразования между целочисленными и строковыми ключами. Вызов <informalexample><programlisting language="python">gwy.gwy_name_from_key(gwy.gwy_app_get_data_key_for_id(3))</programlisting></informalexample> вернёт <literal>"/3/data"</literal>, как и ожидалось.</para>
+    <para>Список всего, содержащегося внутри объекта <type>Container</type> может быть получен с помощью методов  <function>keys()</function>, который выдаёт список целочисленных ключей, или <function>keys_by_name()</function> который выдаёт список строковых идентификаторов. Это может иногда пригодиться если вы хотите просканировать содержимое контейнера. В большинстве случаев, однако, <link linkend="pygwy-finding-data">функции для работы с отдельными типами данных</link> могут оказаться более удобными.</para>
+  </sect2>
+  <sect2 id="pygwy-other-data-types">
+    <title>Другие типы данных</title>
+    <para>Файл Gwyddion содержит не только изображения. Он также может содержать маски, выбранные области, объёмные данные, графики, данные XYZ, ... Таким образом здесь мы вкратце опишем остальные объекты, которые вы имеете шанс встретить на своём пути.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.DataField-class.html"><type>DataField</type></ulink> также используется для представления <link linkend="masks">масок</link> и <link linkend="presentations">презентаций</link>. Они должны иметь те же пространственные размеры, что и основное поле данных. В полях данных маски значение 1 (или больше) означает маску и 0 (или меньше) отсутствие маски. Значений между 0 и 1 следует избегать. Для презентаций диапазон значений не важен. Они сохраняются под ключами в виде <literal>"/0/mask"</literal> или <literal>"/0/show"</literal>.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.Container-class.html"><type>Container</type></ulink> также используется для представления <link linkend="metadata">метаданных</link>. Элементы типа <type>Container</type> метаданных используют другие правила: все значения метаданных должны быть строками. В остальном и ключи, и значения записываются в свободной форме.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.Brick-class.html"><type>Brick</type></ulink> представляет <link linkend="volume-data">объёмные данные</link>. Он очень похож на <type>DataField</type> за исключением того, что он имеет три оси размеров вместо двух.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.DataLine-class.html"><type>DataLine</type></ulink> представляет наоборот одномерные данные снятые с фиксированным шагом. В реальной жизни вы не встретите их в файлах GWY (графики кривых представлены другим образом), но они используются в различных функциях обработки данных.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.Spectra-class.html"><type>Spectra</type></ulink> представляет набор кривых спектров, т.е. <link linkend="single-point-spectra">данных спектроскопии в отдельных точках</link>.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.SIUnit-class.html"><type>SIUnit</type></ulink> представляет физические единицы измерения. Это вспомогательный объект, который не встретится сам по себе, но практически любой другой тип объектов данных будет содержать внутри элементы <type>SIUnit</type> задающие физические единицы измерения осей размеров или данных.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.GraphModel-class.html"><type>GraphModel</type></ulink> представляет <link linkend="graph-windows">график</link>, содержащий набор кривых.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.GraphCurveModel-class.html"><type>GraphCurveModel</type></ulink> представляет отдельную кривую на графике.</para>
+    <para><ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.Selection-class.html"><type>Selection</type></ulink> представляет <link linkend="selections">выделенные элементы</link> на изображении или графики. Они представляют собой последовательности координат. <type>Selection</type> фактически является абстрактным базовым классом, каждый тип выделенных элементов (точка, линия, прямоугольник, ...) это отдельный подкласс.</para>
+  </sect2>
+  <sect2 id="pygwy-finding-data">
+    <title>Поиск и перебор данных</title>
+    <para>Зная всё про элементы <type>Container</type>, <type>DataField</type> and <type>SIUnit</type> возможно вы также захотите узнать как добраться до данных, которые нужно обрабатывать.</para>
+    <para>В контексте скриптов или модулей, которые должны работать с данными, активными в данный момент, как делают обычные модули обработки данных Gwyddion, вопрос ставится как каким образом можно получить активные в данный момент данные. Ответом будет функция <function>gwy_app_data_browser_get_current()</function>. Она принимает аргумент <ulink url="http://gwyddion.net/documentation/head/pygwy/gwy.AppWhat-class.html"><type>AppWhat</type></ulink>, задающий какой тип текущего элемента вам нужен и возвращает соответствующий элемент. Она может использоваться чтобы получить сами объекты данных <informalexample><programlisting language="python"># Получить текущее активное изображение (DataField)
+data_field = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD)
+
+# Получить текущий файл (Container)
+container = gwy.gwy_app_data_browser_get_current(gwy.APP_CONTAINER)</programlisting></informalexample> или их номер в файле <informalexample><programlisting language="python"># Получить номер активного изображения
+i = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD_ID)
+
+# Получить номер активного графика
+i = gwy.gwy_app_data_browser_get_current(gwy.APP_GRAPH_MODEL_ID)</programlisting></informalexample> или их целочисленные ключи <informalexample><programlisting language="python"># Получить ключ активного изображения
+key = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD_KEY)
+
+# Получить ключ активного поля данных маски
+key = gwy.gwy_app_data_browser_get_current(gwy.APP_MASK_FIELD_KEY)</programlisting></informalexample> и некоторых менее распространённых вещей, таких как текущая активная страница в <link linkend="data-browser">браузере данных</link>. Если активных элементов требуемого типа нет, функция возвращает <type>None</type>.</para>
+    <para>С другой стороны, нередко необходимо найти все данные определённого типа в файле. Список всех номеров изображений (каналов) может быть получен с помощью <informalexample><programlisting language="python">ids = gwy.gwy_app_data_browser_get_data_ids(container)</programlisting></informalexample> Когда функция возвращает список <literal>[0, 1, 4]</literal> это означает, что контейнер содержит изображения с номерами 0, 1 и 4. Другими словами, там будут изображения с ключами <literal>"/0/data"</literal>, <literal>"/1/data"</literal> и <literal>"/4/data"</literal>. Подобные функции будут для перечисления графиков, спектров, объёмных данных и данных XYZ. Также есть функция <function>gwy_app_data_browser_get_containers()</function> которая возвращает список всех файлов (т.е. элементов <type>Container</type> соответствующих файлам), которые в данное время открыты.</para>
+    <para>Наконец, нередко полезно найти объекты данных по заголовку. Для этого представлена простая функция поиска <function>gwy_app_data_browser_find_data_by_title()</function> Она сравнивает заголовки используя символы подстановки так же, как командная оболочка Unix: <informalexample><programlisting language="python"># Найти изображения с заголовком точно соответствующим "Height"
+ids = gwy.gwy_app_data_browser_find_data_by_title(container, 'Height')
+
+# Найти изображения с заголовком, начинающимся с "Current"
+ids = gwy.gwy_app_data_browser_find_data_by_title(container, 'Current*')
+
+# Найти изображения с заголовком, содержащим "03"
+ids = gwy.gwy_app_data_browser_find_data_by_title(container, '*03*')</programlisting></informalexample></para>
+    <para>Когда вы добавляете новое изображение или другой тип данных в файл используйте функцию браузера данных: <informalexample><programlisting language="python">i = gwy.gwy_app_data_browser_add_data_field(container, data_field, True)</programlisting></informalexample> Последний параметр задаёт, показывать ли данные в <link linkend="data-windows">окне данных</link> или нет. Функция возращает номер, присвоенный новому полю данных. Можно затем использовать его для конструирования идентификаторов связанных данных. Подобные функции существуют для других типов данных.</para>
+  </sect2>
+  <sect2 id="pygwy-running-modules">
+    <title>Выполнение функций модуля</title>
+    <para>Использование <type>DataField</type> (и других) методов, возможно в комбинации с небольшим использованием прямого доступа к данным, является наиболее простым и часто предпочтительным подходом к обработке данных в скрипте pygwy. Тем не менее, иногда вам необходимо запустить функцию Gwyddion точно таким же образом, как если бы она была выбрана из меню. Либо потому, что это функция не доступна напрямую как метод <type>DataField</type> и не может быть легко скопирована, или вы предпочитаете писать скрипт как макрос, который вызывает различные существующие функции Gwyddion.</para>
+    <para>Функция обработки данных (соответствующая элементу меню или панели инструментов) запускается используя <function>gwy_process_func_run()</function>: <informalexample><programlisting language="python">gwy.gwy_process_func_run('level', container, gwy.RUN_IMMEDIATE)</programlisting></informalexample> Первый аргумент <literal>'level'</literal> это имя функции, второй это контейнер (который всегда должен быть текущим контейнером чтобы не происходили разные странные вещи) и последний аргумент это режим, в котором запускать функцию. Функции обработки данных имеют два возможных режима: <literal>RUN_INTERACTIVE</literal>, который означает, что если у функции есть какие-либо диалоговые окна, она должна их показать, и <literal>RUN_IMMEDIATE</literal>, который означает, что функция не должна показывать диалоговых окон и должна немедленно выполнить нужную операцию. Следует отметить, что не для всех функций доступны оба режима. У некоторых отсутствует интерфейс пользователя, в то время, как другие могут быть запущены исключительно интерактивно.</para>
+    <para>Как функция узнаёт, какие из данных нужно обрабатывать? Она обрабатывает текущие данные. Для макросоподобных скриптов и функций обработки данных, написанных на Python это в точности то, что вы хотите. Можно также выбрать (сделать текущими) другие данные в скрипте, как описано в следующем разделе.</para>
+    <para>Где окажется результата работы? Некоторые из функций меняют существующие данные, некоторые создают новые изображения (и иные виды выходных данных). Некоторые даже позволяют выбирать между этими двумя вариантами. То, что функция делает при запуске из графического интерфейса, она также делает при запуске из скрипта pygwy. Если создаются новые изображения, вам необходимо их найти. Это можно сделать следующим образом: <informalexample><programlisting language="python">ids_before = set(gwy.gwy_app_data_browser_get_data_ids(container))
+gwy.gwy_process_func_run('some_func', container, gwy.RUN_IMMEDIATE)
+ids_after = set(gwy.gwy_app_data_browser_get_data_ids(container))
+new_ids = ids_after - ids_before</programlisting></informalexample> Обычно множество <code><varname>new_ids</varname></code> будет содержать единственный элемент, численный идентификатор только что созданного изображения, но некоторые модули могут создавать несколько элементов выходных данных.</para>
+    <para>Использование функций модулей может чередоваться с операциями непосредственно над полями данных <type>DataField</type>. Если так делать, то важно знать, что функции модулей могут менять, добавлять, удалять и заменять элементы данных в контейнере. Следующий фрагмент кода, который запускает функцию и получает поле данных <informalexample><programlisting language="python">gwy.gwy_process_func_run('weird_func', container, gwy.RUN_IMMEDIATE)
+data_field = container['/5/data']</programlisting></informalexample> не будет эквивалентом <informalexample><programlisting language="python">data_field = container['/5/data']
+gwy.gwy_process_func_run('weird_func', container, gwy.RUN_IMMEDIATE)</programlisting></informalexample> поскольку функция <literal>'weird_func'</literal> могла заменить (или удалить) поле данных в <literal>'/5/data'</literal>. Таким образом, хотя <code><varname>data_field</varname></code> будет оставаться правильным элементом <type>DataField</type>, она может больше не соответствовать изображению номер пять в файле.</para>
+    <para>Имя функции это имя высокоуровневых <quote>функций</quote> предоставляемых модулями обработки данных. Каждой соответствует какое-то действие, доступное из меню Обработка данных. Если вы расширяет функции Gwyddion с помощью модуля, функции, которые он задаёт будут доступны тем же путём, что и функции встроенных модулей.</para>
+    <para>Список функций может быть получен различными путями (кроме изучения исходного кода):</para>
+    <itemizedlist>
+      <listitem>Используя <ulink url="http://gwyddion.net/module-list.en.php">онлайновый просмотр модулей</ulink>. Если навести мышь поверх имени модуля, браузер покажет список предоставляемых функций. Те, у которых тип указан как <quote>proc</quote>, являются функциями обработки данных. Если знать путь в меню, функция может быть быстро найдена поиском в расширенном онлайновом браузере модулей. Следует отметить, что онлайновый браузер показывает модули (и функции) доступные в последнем стабильном релизе.</listitem>
+      <listitem>Отыскать функцию в Gwyddion в меню <menuchoice><guimenu>Информация</guimenu><guimenuitem>Просмотр модулей</guimenuitem></menuchoice>. Здесь представлена та же информация, что и в онлайновом браузере, за исключением того, что здесь будут перечислены модули и функции присутствующие в текущей инсталляции Gwyddion.</listitem>
+      <listitem>Используя <link linkend="logging">журнал</link>. Когда вы используете функцию обработки данных, она появляется в журнале, включая имена её параметров, называемые настройки. Это пожалуй наиболее удобный способ поскольку можно интерактивно увидеть функции, появляющиеся в журнале, по мере того, как вы их выполняете.</listitem>
+    </itemizedlist>
+    <para>Некоторые функции не имеют настраиваемых параметров, например, <literal>"fix_zero"</literal>. Но многие имеют по несколько параметров и некоторые имеют много параметров. Последние использованные значения всех параметров сохранены в <link linkend="settings">настройках</link>. При выполнении функции обработки данных она читает параметры из настроек, и, в зависимости от режима, либо сразу выполняет операцию, либо показывает диалоговое окно, где можно настроить значения. Следовательно, если просто запустить функцию из скрипта pygwy, она будет использовать параметры сохранённые в настройках. Это полезно если вы планируете сначала использовать функцию интерактивно, подобрать хороший набор параметров, и затем запускать её много раз с точно такими же настройками используя скрипт.</para>
+    <para>С другой стороны, иногда может потребоваться выполнить функцию из скрипта с заданным набором настроек. В этом случае можно получить настройки с помощью команды <informalexample><programlisting language="python">settings = gwy.gwy_app_settings_get()</programlisting></informalexample> Результатом будет снова <type>Container</type> и снова существуют некоторые правила что и где хранится в нём. Настройки функций модуля обычно хранятся под именем <literal>"/module/<replaceable>modulename</replaceable>"</literal>. Для настроек модулей отсутствует формальная документация и фактически есть два способа найти какие у модуля есть настройки: наблюдать за журналом, в котором будут перечислены все параметры и посмотреть файл настроек <filename>settings</filename>. Например, модуль выравнивания плоскости может быть запущен с использованием маски установленным в исключить маску следующим образом (следует отметить, что такого же результата можно достичь напрямую используя методы <type>DataField</type>): <informalexample><programlisting language="python">settings['/module/level/mode'] = int(gwy.MASKING_EXCLUDE)
+gwy.gwy_process_func_run('level', container, gwy.RUN_IMMEDIATE)</programlisting></informalexample></para>
+  </sect2>
+  <sect2 id="pygwy-managing-files">
+    <title>Работа с файлами</title>
+    <para>Одним из основных предназначений скриптов является автоматизация операций, которые нужно проводить неоднократно. Это нередко включает обработку нескольких блоков или всех данных в файле и последовательную обработку нескольких файлов данных.</para>
+    <para>Касательно обработки нескольких изображений в одном файле, функции перечисления и поиска данных, <link linkend="pygwy-finding-data">описанные выше</link>, легко позволяют получить необходимые данные. Простой полный пример скрипта, который выравнивает вычитанием средней плоскости все изображения в файле может быть записан следующим образом: <informalexample><programlisting language="python">container = gwy.gwy_app_data_browser_get_current(gwy.APP_CONTAINER)
+for i in gwy.gwy_app_data_browser_get_data_ids(container):
+    data_field = container[gwy.gwy_app_get_data_key_for_id(i)]
+    coeffs = data_field.fit_plane()
+    data_field.plane_level(*coeffs)
+    data_field.data_changed()</programlisting></informalexample></para>
+    <para>Для выполнения функции обработки данных с помощью <function>gwy_process_func_run()</function>, последним недостающим фрагментом является выбор изображения в браузере данных, так что они могли работать с корректными. Это делается вызовом <function>gwy_app_data_browser_select_data_field()</function>: <informalexample><programlisting language="python">gwy.gwy_app_data_browser_select_data_field(container, i)</programlisting></informalexample> где <varname>i</varname> — номер изображения. Подобные функции существуют для других типов данных. После завершения обработки рекомендуется снова выбрать то изображение, которые было выбрано вначале. Если забыть сделать это инструменты могут вести себя странно (по крайней мере пока не будет выбрано другое изображение переключением в его окно данных). Небольшой завершенный скрипт выполняющий функцию обработки данных для всех изображений в текущем файле может быть записан следующим образом: <informalexample><programlisting language="python">container = gwy.gwy_app_data_browser_get_current(gwy.APP_CONTAINER)
+orig_i = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD_ID)
+for i in gwy.gwy_app_data_browser_get_data_ids(container):
+    gwy.gwy_app_data_browser_select_data_field(container, i)
+    gwy_process_func_run('align_rows', container, gwy.RUN_IMMEDIATE)
+gwy.gwy_app_data_browser_select_data_field(container, orig_i)</programlisting></informalexample></para>
+    <para>Также просто перебираются все открытые файлы с использованием функции <function>gwy_app_data_browser_get_containers()</function>: <informalexample><programlisting language="python">for container in gwy.gwy_app_data_browser_get_containers():
+    for i in gwy.gwy_app_data_browser_get_data_ids(container):
+        # Ничего нового здесь</programlisting></informalexample></para>
+    <para>Чтобы обработать несколько файлов с диска необходимо найти способ найти или идентифицировать их на диске, но это выходит за рамки данного руководства (Модули Python <code>glob</code> и <code>os</code> могут помочь в данном случае). Чтобы загрузить файл данных СЗМ можно использовать просто <function>gwy_file_load()</function>: <informalexample><programlisting language="python">container = gwy.gwy_file_load(filename, gwy.RUN_NONINTERACTIVE)</programlisting></informalexample> Эта функция определяет тип файла и вызывает правильный модуль работы с файлами чтобы загрузить его. Полученный в результате <type>Container</type> не будет добавлен автоматически в браузер данных. Другими словами, Gwyddion не знает о нём и не может непосредственно использовать функции модулей обработки данных на его содержимом. Это ваш личный <type>Container</type>. Можно добавить его в браузер данных используя <informalexample><programlisting language="python">gwy.gwy_app_data_browser_add(container)</programlisting></informalexample> В качестве альтернативы можно использовать функцию загрузки файлов из приложения <informalexample><programlisting language="python">container = gwy.gwy_app_file_load(filename)</programlisting></informalexample> которая не только загружает файл, но и добавляет его в браузер данных. Когда нужно обработать много файлов требуется также убедиться, что они не скапливаются в оперативной памяти. Функция <function>gwy_app_data_browser_remove()</function> удаляет <type>Container</type> из браузер данных. Чтобы действительно освободить ресурсу нужно также убедиться, что объекты данных не удерживаются в каких-то других структурах данных в вашем скрипте.</para>
+    <para>Следует отметить, что мы использовали <literal>RUN_NONINTERACTIVE</literal> вместо <literal>RUN_IMMEDIATE</literal> в примере функции <function>gwy_file_load()</function>. Функции работы с файлами имеют два возможных режима, <literal>RUN_INTERACTIVE</literal>, который означает то же самое, что и для функций обработки данных, и <literal>RUN_NONINTERACTIVE</literal>, который означает что функция не должна показывать никаких диалоговых окон. Большинство функций работы с файлами не имеют никакого интерфейса пользователя, заметными исключениями являются <link linkend="image-export">экспорт изображений</link> и импорт <link linkend="raw-file-import">сырых данных</link> и <link linkend="specific-data-import">других типов данных</link>, которые не могут быть загружены автоматически.</para>
+    <para>Сохранение файла происходит подобным образом: <informalexample><programlisting language="python">gwy.gwy_file_save(container, filename, gwy.RUN_NONINTERACTIVE)</programlisting></informalexample> Формат файла определяется автоматически из расширения. Эта же функция может быть использована для экспорта изображений. Существует два основных метода создания файла с изображением, отрисованным псевдоцветом. Простая функция <function>gwy_app_get_channel_thumbnail()</function> создаёт <type>GdkPixbuf</type> который затем можно сохранить в файл используя его метод <function>save()</function>. Этот подход наиболее полезен для значков и простых изображений предпросмотра. Если вы хотите использовать все возможности модуля <link linkend="image-export">экспорта изображений</link>, то можно использовать функцию <function>gwy_file_save()</function> в формат изображений (PNG, PDF, SVG, ...) <informalexample><programlisting language="python">gwy.gwy_file_save(container, "image.png", gwy.RUN_NONINTERACTIVE)</programlisting></informalexample> Естественно, подобно функциям обработки данных, модуль экспорта изображений будет отрисовывать его в соответствии с текущими настройками. Можно изменить настройки (они находятся в поддереве <literal>"/module/pixmap"</literal>) чтобы рисовать изображение заданным образом. Учитывайте, что экспорт изображений имеет <emphasis>очень много</emphasis> настроек.</para>
+    <para>Можно совместить всё вместе в простом отдельном скрипте, который будет загружать все файлы в текущем каталоге, соответствующие заданному шаблону, находить канал высоты в каждом, производить некоторое выравнивание, вызывая функции из модулей, и извлекать несколько основных статистических величин: <informalexample><programlisting language="python"><![CDATA[
+import gwy, glob, sys
+
+# Set up parameters for the 'align_rows' function.
+settings = gwy.gwy_app_settings_get()
+settings['/module/linematch/direction'] = int(gwy.ORIENTATION_HORIZONTAL)
+settings['/module/linematch/do_extract'] = False
+settings['/module/linematch/do_plot'] = False
+settings['/module/linematch/method'] = 2
+
+print 'Filename\tRa\tRms\tSkewness\tKurtosis'
+
+# Go through files matching a given pattern:
+for filename in glob.glob('MARENA-0??C-Maximum.0??'):
+    container = gwy.gwy_file_load(filename, gwy.RUN_NONINTERACTIVE)
+    gwy.gwy_app_data_browser_add(container)
+
+    # Find channel(s) called 'Height', expecting to find one.
+    ids = gwy.gwy_app_data_browser_find_data_by_title(container, 'Height')
+    if len(ids) == 1:
+        i = ids[0]
+        # Select the channel and run some functions.
+        gwy.gwy_app_data_browser_select_data_field(container, i)
+        gwy.gwy_process_func_run('align_rows', container, gwy.RUN_IMMEDIATE)
+        gwy.gwy_process_func_run('flatten_base', container, gwy.RUN_IMMEDIATE)
+        # Extract simple statistics and print them.
+        data_field = container[gwy.gwy_app_get_data_key_for_id(i)]
+        avg, ra, rms, skew, kurtosis = data_field.get_stats()
+        print '%s\t%g\t%g\t%g\t%g' % (filename, ra, rms, skew, kurtosis)
+    else:
+        sys.stderr.write('Expected one Height channel in %s but found %u.\n'
+                         % (filename, len(ids)))
+
+    gwy.gwy_app_data_browser_remove(container)
+]]></programlisting></informalexample></para>
+  </sect2>
+  <sect2 id="pygwy-writing-modules">
+    <title>Написание модулей в Python</title>
+    <para>Модули Python не слишком отличаются от скриптов. Однако, они должны определять определённые функции и переменные чтобы gwyddion знал какой тип функциональности предоставляет модуль, куда поместить его в меню или как его запускать. Gwyddion распознаёт несколько типов модулей: файловые, обработки данных (точнее, обработки данных изображений), графиков, обработки объёмных данных, обработки данных XYZ, слоёв и инструментов. Последние два типа являются сложными и не могут быть написаны в настоящее время на Python. Все остальные типы могут.</para>
+    <para>Все модули расширения написанные на Python должны помещаться в каталог пользователя в подкаталоге <filename>pygwy</filename>. Это будет <filename>~/.gwyddion/pygwy</filename> (Unix) или <filename>Documents and Settings\gwyddion\pygwy</filename> (старые  версии MS Windows) чтобы Gwyddion мог найти их.</para>
+    <para>Переменные, которые модуль должен определить, являются более или менее общими для всех типов. По историческим причинам они все имеют префикс <code>plugin_</code>, хотя <code>module_</code> в настоящее время было бы более подходящим:</para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <code><varname>plugin_type</varname></code>
+        </term>
+        <listitem>
+          <para>Тип модуля, как строка в верхнем регистре. Может быть одной из <literal>"FILE"</literal>, <literal>"PROCESS"</literal>, <literal>"GRAPH"</literal>, <literal>"VOLUME"</literal> и <literal>"XYZ"</literal>, которые соответствуют доступным типам модуля очевидным образом.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <code><varname>plugin_desc</varname></code>
+        </term>
+        <listitem>
+          <para>Короткое описание функции, используемое в подсказках для модулей обработки данных и в качестве описания типа файла в модулях работы с файлами.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <code><varname>plugin_menu</varname></code>
+        </term>
+        <listitem>
+          <para>Путь в меню, где модуль должен появиться, в виде строки где косой чертой обозначаются подменю. Путь в меню записывается относительно корня меню для функций модуля заданного типа. Например, модули обработки данных всегда будут появляться в меню <guimenu>Обработка данных</guimenu> и переменная не должна включать эту часть. Файловые модули не задают путь в меню ( если они это делают, он игнорируется).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <code><varname>plugin_icon</varname></code>
+        </term>
+        <listitem>
+          <para>Опциональное имя иконки по умолчанию в виде строки (чтобы функцию можно было поместить в панель инструментов). Можно выбирать из наборов стандартных иконок Gwyddion и GTK+. В первом имен иконок содержат символы подчёркивания, например, <literal>"gwy_level"</literal>, последний с символами дефисов, например, <literal>"gtk-execute"</literal>. См. документацию по API для получения списка доступных иконок. Иконки, устанавливаемой по умолчанию, в Gwyddion нет.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <code><varname>plugin_sens</varname></code>
+        </term>
+        <listitem>
+          <para>Опциональные флаги чувствительности в виде комбинации значений <type>GwyMenuSensFlags</type>, таких как <literal>MENU_FLAG_DATA</literal> или <literal>MENU_FLAG_DATA_MASK</literal>. Флаги задают будет ли элемент меню (или кнопка панели инструментов) доступна. Если не задано, по умолчанию требовать чтобы присутствовал соответствующий тип данных, например, модули работы с графиками требуют чтобы в файле существовал хотя бы один график. Обычно значения по умолчанию работают хорошо, но могут быть неправильными, например, для модулей синтеза данных (которые не требуют чтобы данные нужного типа уже были загружены), иногда модуль требует для своей работы обязательного наличия маски, и т.д.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <code><varname>plugin_run</varname></code>
+        </term>
+        <listitem>
+          <para>Опциональные флаги режима исполнения как комбинация флагов <literal>RUN_INTERACTIVE</literal> и <literal>RUN_IMMEDIATE</literal>. В основном полезно для указания, что функция требует взаимодействия с пользователем и не может быть запущена в неинтерактивном режиме. По умолчанию считается что функция может работать в обоих режимах.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>Все типы модулей обработки данных (изображений, объёмных и XYZ) должны определить функцию <function>run()</function>, которая принимает два аргумента, текущий <type>Container</type> и режим (<literal>RUN_INTERACTIVE</literal> или <literal>RUN_IMMEDIATE</literal>). Если вам всё равно насчёт режима, можно также определить функцию с одним аргументом. Простой полный пример модуля обработки данных приведён ниже: <informalexample><programlisting language="python"><![CDATA[
+plugin_menu = "/Pygwy Examples/Invert"
+plugin_desc = "Invert values"
+plugin_type = "PROCESS"
+
+def run(data, mode):
+   key = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD_KEY)
+   gwy.gwy_app_undo_qcheckpoint(data, [key])
+   data_field = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD)
+   data_field.invert(False, False, True)
+   data_field.data_changed()
+]]></programlisting></informalexample> Он делает простую инверсию значений используя функцию <function>invert()</function> объекта <type>DataField</type>. Вызов <function>gwy_app_undo_qcheckpoint()</function> реализует правильную поддержку отмены операции. Если вы хотите поддерживать отмену, вызовите его со списком целочисленных ключей всех элементов данных, которые функция будет менять <emphasis>перед тем, как начнёте их менять</emphasis>.</para>
+    <para>Модули работы с графиками отличаются в мелочах, их функция <function>run()</function> принимает только один аргумент, типа <type>Graph</type>.</para>
+    <para>Модули работы с файлами должны предоставить несколько функций. Если они реализуют импорт файла, они определяют функции <function>load()</function> и <function>detect_by_content()</function>. Функция загрузки берёт имя файла (и опционально режим выполнения) и возвращает либо <type>Container</type> представляющий загруженный файл, либо <type>None</type>. Функция детекции должна определить, является ли файл файлом того формата, который реализован модуле. Она получает имя файла, байтовые строки содержащие начало и конец содержимого файла (поскольку они обычно содержат информацию полезную для определения типа файла) и размер файла. Она должна вернуть целочисленную оценку между 0 и 100, где 0 означает <quote>определённо не этот тип файла</quote> и 100 означает <quote>точно этот тип файла</quote>. Ни один из файловых модулей Gwyddion не возвращает оценку больше 100. Если вам действительно нужно подменить встроенный модуль, то это можно сделать вернув оценку больше 100, но в общем случае это не рекомендуется.</para>
+    <para>Если модуль реализует сохранение файла, он наоборот должен определить функции <function>save()</function> и <function>detect_by_name()</function>. Функция сохранения принимает аргументы <type>Container</type>, имя файла и опционально режим выполнения и должна записать файл. Нередко вы не хотите или не можете сохранить всё, что есть в файле, открытом сейчас в Gwyddion. В этом случае можно получить текущее изображение (или другой объект данных) используя функцию <function>gwy_app_data_browser_get_current()</function> в точности как в модуле обработки данных и сохранить только это изображение. Функция детекции намного проще поскольку файл ещё только нужно записать и она может использовать только имя файла. Простой законченный пример файлового модуля, реализующего как загрузку, так и сохранение, приведён ниже. Настоящий модуль должен заботиться об обработке ошибок, которая не включена в этот пример для простоты и ясности:<informalexample><programlisting language="python"><![CDATA[
+plugin_type = "FILE"
+plugin_desc = "High definition stable format store (.hdsf)"
+
+def detect_by_name(filename):
+    if filename.endswith(".hdsf"):
+        return 100
+    return 0
+
+def detect_by_content(filename, head, tail, filesize):
+    if head.startswith("HDSF:"):
+        return 100
+    return 0
+
+def load(filename, mode=None):
+    f = file(filename)
+    header = f.readline()
+    magic, xres, yres, xreal, yreal = header.split()
+    xres, yres = int(xres), int(yres)
+    xreal, yreal = float(xreal), float(yreal)
+    container = gwy.Container()
+    data_field = gwy.DataField(xres, yres, xreal, yreal)
+    data_field.set_data([float(z) for z in f])
+    container['/0/data'] = data_field
+    return container
+
+def save(container, filename, mode=None):
+    data_field = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD)
+    if not data_field:
+        return False
+    f = file(filename, 'w')
+    f.write('HDSF: %d %d %g %g\n'
+            % (data_field.get_xres(), data_field.get_yres(),
+               data_field.get_xreal(), data_field.get_yreal()))
+    f.write('\n'.join('%g' % z for z in data_field))
+    f.write('\n')
+    f.close()
+    return True
+]]></programlisting></informalexample></para>
+    <para>Модули Pygwy перезагружаются если они были изменены со времени последнего использования. Таким образом, их можно менять при запущенном Gwyddion, при этом всегда будет использоваться последняя версия модуля. Однако, при этом они не регистрируются заново. Это означает, что записанный в файл код заново исполняется при перезапуске модуля, но значения переменных <code>plugin_</code> имеют значение только при первой загрузке модуля. Последующие их изменения не будут влиять на работу пока Gwyddion не будет закрыт и перезапущен заново. Вследствие этого модуль работы с файлами не может внезапно стать модулем работы с графиками, возможно, что к лучшему.</para>
+  </sect2>
+  <sect2 id="pygwy-gui">
+    <title>Графический интерфейс пользователя</title>
+    <para>Если вы хотите добавить к модулю графический интерфейс, то можно использовать <ulink url="http://www.pygtk.org/pygtk2reference/">PyGTK</ulink> совместно с виджетами Gwyddion для отображения данных. Следует отметить, что необходимо явно импортировать PyGTK командой <informalexample><programlisting language="python">import gtk</programlisting></informalexample> поскольку, в отличие от <code>gwy</code>, оно не импортируется автоматически. Модуль с опциональным графическим интерфейсом пользователя должен в общем случае определить вариант <function>run()</function> с двумя аргументами и придерживаться заданного режима, действуя или сразу, или показывая сначала графический интерфейс. Типичной структурой модуля будет: <informalexample><programlisting language="python"><![CDATA[
+import gtk
+
+# Define module info...
+
+def run(data, mode):
+    if mode == gwy.RUN_INTERACTIVE:
+        dialogue = gtk.Dialog(title='Title...', flags=gtk.DIALOG_MODAL,
+                              buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                       gtk.STOCK_OK, gtk.RESPONSE_OK))
+
+        # Construct and show the user interface...
+
+        response = dialogue.run()
+        dialogue.destroy()
+        if response != gtk.RESPONSE_OK:
+            return
+
+    # Process the data...
+]]></programlisting></informalexample> У скриптов Pygwy нет режима, они просто запускаются, таким образом, хотя они тоже могут показывать диалоговое окно похожим образом, если они так делают, то оно будет показываться всегда. Создание и использование флажков, кнопок, ползунков, элементов ввода и других элементов интерфейса пользователя выходит за рамки данного руководства. В этом случае вам нужно обратиться к подробной документации PyGTK.</para>
+    <para>Модуль может использовать настройки таким же образом, как и другие модули Gwyddion. В начале, прочесть параметры из файла настроек, обработать случай когда в файле настроек ещё нет значений параметров:<informalexample><programlisting language="python"><![CDATA[
+settings = gwy.gwy_app_settings_get()
+
+tuning_parameter = 1.0
+if '/module/mymodule/tuning_parameter' in settings:
+    tuning_parameter = settings['/module/mymodule/tuning_parameter']
+]]></programlisting></informalexample> и в конце работы сохранить параметры в файл настроек чтобы их можно было восстановить при следующем запуске: <informalexample><programlisting language="python"><![CDATA[
+settings['/module/mymodule/tuning_parameter'] = tuning_parameter
+]]></programlisting></informalexample></para>
+    <para>Если нужно показать данные изображений, можно использовать виджет Gwyddion <type>DataView</type>. Он работает не совсем напрямую. Вместо того, чтобы передать <type>DataField</type>, который необходимо показать, вы всегда передаёте <type>Container</type> и затем указываете, где там найти что нужно показывать. Показ изображений реализуется путём создания так называемого слоя просмотра данных и добавления его к отображению данных. Простой модуль, который просто показывает текущее изображение может выглядеть как: <informalexample><programlisting language="python"><![CDATA[
+import gtk, gobject
+
+plugin_menu = "/Pygwy Examples/Display Data"
+plugin_desc = "Just display the current image"
+plugin_type = "PROCESS"
+
+def run(data, mode):
+    dialogue = gtk.Dialog(title='Display Data', flags=gtk.DIALOG_MODAL,
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE,))
+
+    data_field = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD)
+
+    container = gwy.Container()
+    container['/0/data'] = data_field
+
+    data_view = gwy.DataView(container)
+    data_view.set_zoom(400.0/data_field.get_xres())
+    data_view.set_data_prefix('/0/data')
+
+    layer = gwy.LayerBasic()
+    layer.set_data_key('/0/data')
+    data_view.set_base_layer(layer)
+
+    dialogue.vbox.pack_start(data_view, False, 4)
+
+    dialogue.show_all()
+    dialogue.run()
+    dialogue.destroy()
+]]></programlisting></informalexample> Следует отметить использование функции <function>set_zoom()</function>, которая ограничивает размер области просмотра до 400 пикселей.</para>
+    <para>Чтобы позволить пользователю интерактивно выбирать точки или линии на изображении предпросмотра необходимо создать другой слой, именуемый векторным слоем, и добавить его к представлению данных. Каждый векторный слой имеет соответствующий тип <type>Selection</type>, который содержит координаты выбранных геометрических фигур. Простой модуль, позволяющий пользователю выбрать точку на изображении и показывающий её координаты может быть написан следующим образом:
+<informalexample><programlisting language="python"><![CDATA[
+import gtk, gobject
+
+plugin_menu = "/Pygwy Examples/Analyse"
+plugin_desc = "Display the current image and selected coordinates"
+plugin_type = "PROCESS"
+
+def update_info_label(selection, i, label, vformat):
+    coords = selection.get_data()
+    if not coords:
+        label.set_markup('')
+        return
+
+    label.set_markup('(%.*f, %.*f) %s'
+                     % (vformat.precision, coords[0]/vformat.magnitude,
+                        vformat.precision, coords[1]/vformat.magnitude,
+                        vformat.units))
+
+def run(data, mode):
+    dialogue = gtk.Dialog(title='Analyse Data', flags=gtk.DIALOG_MODAL,
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE,))
+
+    data_field = gwy.gwy_app_data_browser_get_current(gwy.APP_DATA_FIELD)
+
+    container = gwy.Container()
+    container['/0/data'] = data_field
+
+    data_view = gwy.DataView(container)
+    data_view.set_zoom(400.0/data_field.get_xres())
+    data_view.set_data_prefix('/0/data')
+
+    layer = gwy.LayerBasic()
+    layer.set_data_key('/0/data')
+    data_view.set_base_layer(layer)
+
+    layer = gobject.new(gobject.type_from_name('GwyLayerPoint'))
+    data_view.set_top_layer(layer)
+    layer.set_selection_key('/0/select/point')
+    selection = layer.ensure_selection()
+
+    dialogue.vbox.pack_start(data_view, False, 4)
+
+    info_label = gtk.Label()
+    info_label.set_alignment(0.0, 0.5)
+    dialogue.vbox.pack_start(info_label, False, 4)
+
+    value_format = data_field.get_value_format_xy(gwy.SI_UNIT_FORMAT_VFMARKUP)
+    selection.connect('changed', update_info_label, info_label, value_format)
+
+    dialogue.show_all()
+    response = dialogue.run()
+    dialogue.destroy()
+]]></programlisting></informalexample></para>
+  </sect2>
+  <sect2 id="pygwy-remarks">
+    <title>Примечания</title>
+    <para>Документация по функциям, доступным в Python, относительно полна, но ценой этого является то, что только небольшая часть её была написана специально для функций Python. Большая часть документации генерируется автоматически из <ulink url="http://gwyddion.net/documentation/#devel">документации по соответствующим функциям языка C</ulink>. Вследствие этого иногда там содержатся остатки информации, которая относится только к C.</para>
+    <para>Это включает в себя правила принадлежности и другие правила для подобных массивам аргументов функций. В Python всё передаётся и возвращается по значению. В частности, это относится к строкам, которые в Python даже не модифицируются, поэтому любые комментарии о принадлежности и изменении строк не относятся к коду на Python.</para>
+    <para>Функции на Python в Gwyddion, которые принимают массив в качестве аргумента, принимают любую последовательность из Python (список, кортеж (tuple), массив, ...) с элементами требуемого типа (обычно либо вещественного, либо целочисленного). И если они возвращают данные в формате типа массива, они всегда возвращают созданные заново списки, которые можно менять не влияя ни на что.</para>
+    <para>Обычно функции на Python не принимают отдельные аргументы длины последовательности, о которых может быть написано в документации, сгенерированной из C. Если существует какое-либо ограничение на число элементов, оно естественно распространяется и на Python. Например, метод <function>set_data()</function> для типа <type>Selection</type> просто принимает координаты последовательности списком. Однако, длина последовательности должна быть кратна <quote>размеру объекта</quote>, т.е. числу координат, представляющих один выбранный объект для данного типа выбранного элемента.</para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,1284 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2006-2022 Martin Hason, David Necas (Yeti), Petr Klapetek.
+ *  E-mail: hasonm@physics.muni.cz, yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <stdlib.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyresults.h>
+#include <libprocess/datafield.h>
+#include <libprocess/linestats.h>
+#include <libprocess/inttrans.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwydgets/gwycombobox.h>
+#include <libgwydgets/gwydgetutils.h>
+#include <libgwymodule/gwymodule-tool.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils.h>
+
+enum {
+    NGROUPS = 4
+};
+
+enum {
+    PARAM_INTERPOLATION,
+    PARAM_GRAPH,
+    PARAM_REPORT_STYLE,
+    PARAM_THICKNESS,
+    PARAM_CUTOFF,
+    PARAM_EXPANDED,
+    PARAM_TARGET_GRAPH,
+
+    MESSAGE_MISSING,
+    LABEL_CUTOFF,
+};
+
+typedef enum {
+    GWY_ROUGHNESS_GRAPH_TEXTURE   = 0,
+    GWY_ROUGHNESS_GRAPH_WAVINESS  = 1,
+    GWY_ROUGHNESS_GRAPH_ROUGHNESS = 2,
+    GWY_ROUGHNESS_GRAPH_ADF       = 3,
+    GWY_ROUGHNESS_GRAPH_BRC       = 4,
+    GWY_ROUGHNESS_GRAPH_PC        = 5
+} GwyRoughnessGraph;
+
+typedef enum {
+    /* Output */
+    DATALINE_TEXTURE,
+    DATALINE_WAVINESS,
+    DATALINE_ROUGHNESS,
+    DATALINE_ADF,
+    DATALINE_BRC,
+    DATALINE_PC,
+    /* Auxiliary */
+    DATALINE_EXTLINE,
+    DATALINE_RTMP,
+    DATALINE_ITMP,
+    DATALINE_ROUT,
+    DATALINE_IOUT,
+    NDATALINES
+} RoughnessDataLine;
+
+#define GWY_TYPE_TOOL_ROUGHNESS           (gwy_tool_roughness_get_type())
+#define GWY_TOOL_ROUGHNESS(obj)           (G_TYPE_CHECK_INSTANCE_CAST((obj), GWY_TYPE_TOOL_ROUGHNESS, GwyToolRoughness))
+#define GWY_IS_TOOL_ROUGHNESS(obj)        (G_TYPE_CHECK_INSTANCE_TYPE((obj), GWY_TYPE_TOOL_ROUGHNESS))
+#define GWY_TOOL_ROUGHNESS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS((obj), GWY_TYPE_TOOL_ROUGHNESS, GwyToolRoughnessClass))
+
+typedef struct _GwyToolRoughness      GwyToolRoughness;
+typedef struct _GwyToolRoughnessClass GwyToolRoughnessClass;
+
+struct _GwyToolRoughness {
+    GwyPlainTool parent_instance;
+
+    GwyParams *params;
+    gboolean same_units;
+    GwyResults *results;
+    GtkTreeStore *store;
+
+    gboolean have_data;
+    GwyDataLine *dataline;
+    GwyDataLine *datalines[NDATALINES];
+
+    GwyGraphModel *gmodel;
+    GwyGraphModel *gmodel_profile;
+
+    GwyParamTable *table;
+
+    /* potential class data */
+    GType layer_type_line;
+};
+
+struct _GwyToolRoughnessClass {
+    GwyPlainToolClass parent_class;
+};
+
+static gboolean      module_register                     (void);
+static GwyParamDef*  define_module_params                (void);
+static GType         gwy_tool_roughness_get_type         (void)                      G_GNUC_CONST;
+static void          gwy_tool_roughness_finalize         (GObject *object);
+static void          gwy_tool_roughness_init_dialog      (GwyToolRoughness *tool);
+static void          gwy_tool_roughness_data_switched    (GwyTool *gwytool,
+                                                          GwyDataView *data_view);
+static void          gwy_tool_roughness_response         (GwyTool *tool,
+                                                          gint response_id);
+static void          gwy_tool_roughness_data_changed     (GwyPlainTool *plain_tool);
+static void          gwy_tool_roughness_selection_changed(GwyPlainTool *plain_tool,
+                                                          gint hint);
+static void          gwy_tool_roughness_apply            (GwyToolRoughness *tool);
+static GwyResults*   create_results                      (void);
+static GtkTreeStore* create_tree_store                   (void);
+static GtkWidget*    create_param_view                   (GwyToolRoughness *tool);
+static void          param_changed                       (GwyToolRoughness *tool,
+                                                          gint id);
+static void          recalculate                         (GwyToolRoughness *tool);
+static void          update_units                        (GwyToolRoughness *tool);
+static void          update_parameters                   (GwyToolRoughness *tool);
+static void          update_graphs                       (GwyToolRoughness *tool);
+static gint          gwy_data_line_extend                (GwyDataLine *dline,
+                                                          GwyDataLine *extline);
+static void          set_data_from_profile               (GwyToolRoughness *tool);
+static gdouble       gwy_tool_roughness_Xz               (GwyDataLine *data_line);
+static gdouble       gwy_tool_roughness_Ry               (GwyDataLine *data_line);
+static gdouble       gwy_tool_roughness_Da               (GwyDataLine *data_line);
+static gdouble       gwy_tool_roughness_Sm               (GwyDataLine *dline);
+static gdouble       gwy_tool_roughness_l0               (GwyDataLine *data_line);
+static gdouble       gwy_tool_roughness_H                (GwyDataLine *data_line);
+static void          gwy_tool_roughness_distribution     (GwyDataLine *data_line,
+                                                          GwyDataLine *distr);
+static void          updata_dataline_adf                 (GwyToolRoughness *tool);
+static void          updata_dataline_brc                 (GwyToolRoughness *tool);
+static void          updata_dataline_pc                  (GwyToolRoughness *tool);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Calculate surface profile parameters."),
+    "Martin Hasoň <hasonm@physics.muni.cz>, Yeti <yeti@gwyddion.net>",
+    "3.1",
+    "Martin Hasoň & David Nečas (Yeti)",
+    "2006",
+};
+
+GWY_MODULE_QUERY2(module_info, roughness)
+
+G_DEFINE_TYPE(GwyToolRoughness, gwy_tool_roughness, GWY_TYPE_PLAIN_TOOL)
+
+static gboolean
+module_register(void)
+{
+    gwy_tool_func_register(GWY_TYPE_TOOL_ROUGHNESS);
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum graphs[] =  {
+        { N_("Texture"),    GWY_ROUGHNESS_GRAPH_TEXTURE,   },
+        { N_("Waviness"),   GWY_ROUGHNESS_GRAPH_WAVINESS,  },
+        { N_("Roughness"),  GWY_ROUGHNESS_GRAPH_ROUGHNESS, },
+        { N_("ADF"),        GWY_ROUGHNESS_GRAPH_ADF,       },
+        { N_("BRC"),        GWY_ROUGHNESS_GRAPH_BRC,       },
+        { N_("Peak Count"), GWY_ROUGHNESS_GRAPH_PC,        },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, "roughness");
+    gwy_param_def_add_enum(paramdef, PARAM_INTERPOLATION, "interpolation", NULL, GWY_TYPE_INTERPOLATION_TYPE,
+                           GWY_INTERPOLATION_LINEAR);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_GRAPH, "graph", _("_Graph"),
+                              graphs, G_N_ELEMENTS(graphs), GWY_ROUGHNESS_GRAPH_TEXTURE);
+    gwy_param_def_add_report_type(paramdef, PARAM_REPORT_STYLE, "report_style", _("Save Roughness Parameters"),
+                                  GWY_RESULTS_EXPORT_PARAMETERS, GWY_RESULTS_REPORT_COLON);
+    gwy_param_def_add_int(paramdef, PARAM_THICKNESS, "thickness", _("_Thickness"), 1, 128, 1);
+    gwy_param_def_add_double(paramdef, PARAM_CUTOFF, "cutoff", _("C_ut-off"), 0.0, 0.3, 0.05);
+    gwy_param_def_add_int(paramdef, PARAM_EXPANDED, "expanded", NULL, 0, (1u << NGROUPS) - 1, 1);
+    gwy_param_def_add_target_graph(paramdef, PARAM_TARGET_GRAPH, NULL, NULL);
+
+    return paramdef;
+}
+
+static void
+gwy_tool_roughness_class_init(GwyToolRoughnessClass *klass)
+{
+    GwyPlainToolClass *ptool_class = GWY_PLAIN_TOOL_CLASS(klass);
+    GwyToolClass *tool_class = GWY_TOOL_CLASS(klass);
+    GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+
+    gobject_class->finalize = gwy_tool_roughness_finalize;
+
+    tool_class->stock_id = GWY_STOCK_ISO_ROUGHNESS;
+    tool_class->title = _("Roughness");
+    tool_class->tooltip = _("Calculate roughness parameters");
+    tool_class->prefix = "/module/roughness";
+    tool_class->default_width = 400;
+    tool_class->default_height = 400;
+    tool_class->data_switched = gwy_tool_roughness_data_switched;
+    tool_class->response = gwy_tool_roughness_response;
+
+    ptool_class->data_changed = gwy_tool_roughness_data_changed;
+    ptool_class->selection_changed = gwy_tool_roughness_selection_changed;
+}
+
+static void
+gwy_tool_roughness_finalize(GObject *object)
+{
+    GwyToolRoughness *tool = GWY_TOOL_ROUGHNESS(object);
+    guint i;
+
+    gwy_params_save_to_settings(tool->params);
+    GWY_OBJECT_UNREF(tool->params);
+    GWY_OBJECT_UNREF(tool->store);
+    GWY_OBJECT_UNREF(tool->dataline);
+    for (i = 0; i < NDATALINES; i++)
+        GWY_OBJECT_UNREF(tool->datalines[i]);
+    GWY_OBJECT_UNREF(tool->gmodel);
+    GWY_OBJECT_UNREF(tool->gmodel_profile);
+
+    G_OBJECT_CLASS(gwy_tool_roughness_parent_class)->finalize(object);
+
+    /* XXX: Window size saving may invoke size request and bad things happen when we no longer have results. */
+    GWY_OBJECT_UNREF(tool->results);
+}
+
+static void
+gwy_tool_roughness_init(GwyToolRoughness *tool)
+{
+    GwyPlainTool *plain_tool;
+    guint i;
+
+    plain_tool = GWY_PLAIN_TOOL(tool);
+    tool->layer_type_line = gwy_plain_tool_check_layer_type(plain_tool, "GwyLayerLine");
+    if (!tool->layer_type_line)
+        return;
+
+    plain_tool->unit_style = GWY_SI_UNIT_FORMAT_VFMARKUP;
+    plain_tool->lazy_updates = TRUE;
+
+    tool->params = gwy_params_new_from_settings(define_module_params());
+    tool->results = create_results();
+    tool->store = create_tree_store();
+    for (i = 0; i < NDATALINES; i++) {
+        if (i == DATALINE_ADF || i == DATALINE_BRC)
+            tool->datalines[i] = gwy_data_line_new(101, 1.0, FALSE);
+        else if (i == DATALINE_PC)
+            tool->datalines[i] = gwy_data_line_new(121, 1.0, FALSE);
+        else
+            tool->datalines[i] = gwy_data_line_new(1, 1.0, FALSE);
+    }
+
+    gwy_plain_tool_connect_selection(plain_tool, tool->layer_type_line, "line");
+
+    gwy_tool_roughness_init_dialog(tool);
+}
+
+static void
+gwy_tool_roughness_init_dialog(GwyToolRoughness *tool)
+{
+    GtkDialog *dialog = GTK_DIALOG(GWY_TOOL(tool)->dialog);
+    GtkWidget *hbox, *vbox_left, *vbox_right, *graph, *scwin, *treeview;
+    GtkSizeGroup *sizegroup;
+    GwyParamTable *table;
+
+    tool->gmodel = gwy_graph_model_new();
+    tool->gmodel_profile = gwy_graph_model_new();
+
+    hbox = gwy_hbox_new(4);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, TRUE, TRUE, 0);
+
+    vbox_left = gwy_vbox_new(4);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox_left, TRUE, TRUE, 0);
+
+    vbox_right = gwy_vbox_new(0);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox_right, TRUE, TRUE, 0);
+
+    scwin = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scwin), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(vbox_left), scwin, TRUE, TRUE, 0);
+
+    treeview = create_param_view(tool);
+    gtk_container_add(GTK_CONTAINER(scwin), treeview);
+
+    table = tool->table = gwy_param_table_new(tool->params);
+    gwy_param_table_append_report(table, PARAM_REPORT_STYLE);
+    gwy_param_table_report_set_results(table, PARAM_REPORT_STYLE, tool->results);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_combo(table, PARAM_GRAPH);
+    gwy_param_table_append_slider(table, PARAM_CUTOFF);
+    gwy_param_table_append_info(table, LABEL_CUTOFF, NULL);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_slider(table, PARAM_THICKNESS);
+    gwy_param_table_set_unitstr(tool->table, PARAM_THICKNESS, _("px"));
+    gwy_param_table_append_combo(table, PARAM_INTERPOLATION);
+    gwy_param_table_append_target_graph(table, PARAM_TARGET_GRAPH, tool->gmodel);
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_message(table, MESSAGE_MISSING, NULL);
+    gwy_param_table_message_set_type(table, MESSAGE_MISSING, GTK_MESSAGE_WARNING);
+
+    gtk_box_pack_start(GTK_BOX(vbox_left), gwy_param_table_widget(table), FALSE, FALSE, 0);
+    gwy_plain_tool_add_param_table(GWY_PLAIN_TOOL(tool), table);
+
+    sizegroup = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
+
+    graph = gwy_graph_new(tool->gmodel_profile);
+    gtk_widget_set_size_request(graph, 300, 250);
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gtk_box_pack_start(GTK_BOX(vbox_right), graph, TRUE, TRUE, 0);
+    gtk_size_group_add_widget(sizegroup, GTK_WIDGET(gwy_graph_get_axis(GWY_GRAPH(graph), GTK_POS_LEFT)));
+
+    graph = gwy_graph_new(tool->gmodel);
+    gtk_widget_set_size_request(graph, 300, 250);
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+    gtk_box_pack_start(GTK_BOX(vbox_right), graph, TRUE, TRUE, 0);
+    gtk_size_group_add_widget(sizegroup, GTK_WIDGET(gwy_graph_get_axis(GWY_GRAPH(graph), GTK_POS_LEFT)));
+
+    gwy_plain_tool_add_clear_button(GWY_PLAIN_TOOL(tool));
+    gwy_tool_add_hide_button(GWY_TOOL(tool), FALSE);
+    gtk_dialog_add_button(dialog, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY);
+    gtk_dialog_set_default_response(dialog, GTK_RESPONSE_APPLY);
+    gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_APPLY, FALSE);
+    gwy_param_table_set_sensitive(table, PARAM_REPORT_STYLE, FALSE);
+    gwy_help_add_to_tool_dialog(dialog, GWY_TOOL(tool), GWY_HELP_DEFAULT);
+
+    g_object_unref(sizegroup);
+
+    g_signal_connect_swapped(tool->table, "param-changed", G_CALLBACK(param_changed), tool);
+
+    gtk_widget_show_all(dialog->vbox);
+}
+
+static void
+add_group_rows(GtkTreeStore *store, GtkTreeIter *grpiter,
+               const gchar **ids, guint nids)
+{
+    GtkTreeIter iter;
+    guint j;
+
+    gtk_tree_store_insert_after(store, &iter, grpiter, NULL);
+    gtk_tree_store_set(store, &iter, 0, ids[0], -1);
+
+    for (j = 1; j < nids; j++) {
+        gtk_tree_store_insert_after(store, &iter, grpiter, &iter);
+        gtk_tree_store_set(store, &iter, 0, ids[j], -1);
+    }
+}
+
+static GwyResults*
+create_results(void)
+{
+    GwyResults *results = gwy_results_new();
+
+    gwy_results_add_header(results, N_("Roughness Parameters"));
+    gwy_results_add_value_str(results, "file", N_("File"));
+    gwy_results_add_value_str(results, "image", N_("Image"));
+    gwy_results_add_format(results, "isel", N_("Selected line"), TRUE,
+                           N_("(%{x1}i, %{y1}i) to (%{x2}i, %{y2}i)"),
+                           "unit-str", _("px"), "translate-unit", TRUE,
+                           NULL);
+    gwy_results_add_format(results, "realsel", "", TRUE,
+                           N_("(%{x1}v, %{y1}v) to (%{x2}v, %{y2}v)"),
+                           "power-x", 1,
+                           NULL);
+    gwy_results_add_value_x(results, "cutoff", N_("Cut-off"));
+
+    gwy_results_add_separator(results);
+    gwy_results_add_header(results, _("Amplitude"));
+    gwy_results_add_value(results, "Ra", N_("Roughness average"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>a</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rq", N_("Root mean square roughness"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>q</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rt", N_("Maximum height of the roughness"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>t</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rv", N_("Maximum roughness valley depth"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>v</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rp", N_("Maximum roughness peak height"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>p</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rtm", N_("Average maximum height of the roughness"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>tm</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rvm", N_("Average maximum roughness valley depth"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>vm</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rpm", N_("Average maximum roughness peak height"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>pm</sub>",
+                          NULL);
+    gwy_results_add_value(results, "R3z", N_("Average third highest peak to third lowest valley height"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>3z</sub>",
+                          NULL);
+    gwy_results_add_value(results, "R3zISO", N_("Average third highest peak to third lowest valley height"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>3z ISO</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rz", N_("Average maximum height of the profile"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>z</sub>",
+                          NULL);
+    gwy_results_add_value(results, "RzISO", N_("Average maximum height of the roughness"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>z ISO</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Ry", N_("Maximum peak to valley roughness"),
+                          "power-z", 1, "symbol", "<i>R</i><sub>y</sub> = <i>R</i><sub>max</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rsk", N_("Skewness"),
+                          "symbol", "<i>R</i><sub>sk</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Rku", N_("Kurtosis"),
+                          "symbol", "<i>R</i><sub>ku</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Wa", N_("Waviness average"),
+                          "power-z", 1, "symbol", "<i>W</i><sub>a</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Wq", N_("Root mean square waviness"),
+                          "power-z", 1, "symbol", "<i>W</i><sub>q</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Wy", N_("Waviness maximum height"),
+                          "power-z", 1, "symbol", "<i>W</i><sub>y</sub> = <i>W</i><sub>max</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Pt", N_("Maximum height of the profile"),
+                          "power-z", 1, "symbol", "<i>P</i><sub>t</sub>",
+                          NULL);
+
+    gwy_results_add_separator(results);
+    gwy_results_add_header(results, _("Spatial"));
+    /* TODO (Spatial):
+     * S, Mean spacing of local peaks of the profile
+     * D, Profile peak density
+     * Pc, Peak count (peak density)
+     * HSC, Hight spot count
+     */
+    gwy_results_add_value(results, "Sm", N_("Mean spacing of profile irregularities"),
+                          "power-x", 1, "symbol", "<i>S</i><sub>m</sub>",
+                          NULL);
+    gwy_results_add_value(results, "lambdaa", N_("Average wavelength of the profile"),
+                          "power-x", 1, "symbol", "λ<sub>a</sub>",
+                          NULL);
+    gwy_results_add_value(results, "lambdaq", N_("Root mean square (RMS) wavelength of the profile"),
+                          "power-x", 1, "symbol", "λ<sub>q</sub>",
+                          NULL);
+
+    gwy_results_add_separator(results);
+    gwy_results_add_header(results, N_("parameters|Hybrid"));
+    gwy_results_add_value(results, "Deltaa", N_("Average absolute slope"),
+                          "power-z", 1, "power-x", -1, "symbol", "Δ<sub>a</sub>",
+                          NULL);
+    gwy_results_add_value(results, "Deltaq", N_("Root mean square (RMS) slope"),
+                          "power-z", 1, "power-x", -1, "symbol", "Δ<sub>q</sub>",
+                          NULL);
+    gwy_results_add_value(results, "L", N_("Length"),
+                          "power-x", 1, "symbol", "<i>L</i>",
+                          NULL);
+    gwy_results_add_value(results, "L0", N_("Developed profile length"),
+                          "power-x", 1, "symbol", "<i>L</i><sub>0</sub>",
+                          NULL);
+    gwy_results_add_value(results, "lr", N_("Profile length ratio"),
+                          "symbol", "<i>l</i><sub>r</sub>",
+                          NULL);
+
+    gwy_results_add_separator(results);
+    gwy_results_add_header(results, N_("parameters|Functional"));
+    gwy_results_add_value(results, "H", N_("Swedish height"),
+                          "power-z", 1, "symbol", "<i>H</i>",
+                          NULL);
+    /* TODO (Functional):
+     * Htp, Profile section height difference
+     * Rk, Core roughness depth
+     * Rkp, Reduced peak height
+     * Rkv, Reduced valley depth
+     * Mr1, Material portion...
+     * Mr2, Material portion...
+     */
+    return results;
+}
+
+static GtkTreeStore*
+create_tree_store(void)
+{
+    static const gchar *amplitude_guivalues[] = {
+        "Ra", "Rq", "Rt", "Rv", "Rp", "Rtm", "Rvm", "Rpm", "R3z", "R3zISO", "Rz", "RzISO", "Ry",
+        "Rsk", "Rku", "Wa", "Wq", "Wy", "Pt",
+    };
+    static const gchar *spatial_guivalues[] = {
+        "Sm", "lambdaa", "lambdaq",
+    };
+    static const gchar *hybrid_guivalues[] = {
+        "Deltaa", "Deltaq", "L", "L0", "lr",
+    };
+    static const gchar *functional_guivalues[] = {
+        "H",
+    };
+
+    GtkTreeStore *store = gtk_tree_store_new(1, G_TYPE_POINTER);
+    GtkTreeIter grpiter;
+
+    gtk_tree_store_insert_after(store, &grpiter, NULL, NULL);
+    gtk_tree_store_set(store, &grpiter, 0, "::Amplitude", -1);
+    add_group_rows(store, &grpiter, amplitude_guivalues, G_N_ELEMENTS(amplitude_guivalues));
+
+    gtk_tree_store_insert_after(store, &grpiter, NULL, &grpiter);
+    gtk_tree_store_set(store, &grpiter, 0, "::Spatial", -1);
+    add_group_rows(store, &grpiter, spatial_guivalues, G_N_ELEMENTS(spatial_guivalues));
+
+    gtk_tree_store_insert_after(store, &grpiter, NULL, &grpiter);
+    gtk_tree_store_set(store, &grpiter, 0, "::Hybrid", -1);
+    add_group_rows(store, &grpiter, hybrid_guivalues, G_N_ELEMENTS(hybrid_guivalues));
+
+    gtk_tree_store_insert_after(store, &grpiter, NULL, &grpiter);
+    gtk_tree_store_set(store, &grpiter, 0, "::Functional", -1);
+    add_group_rows(store, &grpiter, functional_guivalues, G_N_ELEMENTS(functional_guivalues));
+
+    return store;
+}
+
+static void
+render_symbol(G_GNUC_UNUSED GtkTreeViewColumn *column,
+              GtkCellRenderer *renderer,
+              GtkTreeModel *model,
+              GtkTreeIter *iter,
+              gpointer user_data)
+{
+    GwyToolRoughness *tool = (GwyToolRoughness*)user_data;
+    const gchar *id;
+
+    gtk_tree_model_get(model, iter, 0, &id, -1);
+    if (strncmp(id, "::", 2) == 0) {
+        g_object_set(renderer, "text", "", NULL);
+        return;
+    }
+    g_object_set(renderer, "markup", gwy_results_get_symbol(tool->results, id), NULL);
+}
+
+static void
+render_name(G_GNUC_UNUSED GtkTreeViewColumn *column,
+            GtkCellRenderer *renderer,
+            GtkTreeModel *model,
+            GtkTreeIter *iter,
+            gpointer user_data)
+{
+    GwyToolRoughness *tool = (GwyToolRoughness*)user_data;
+    PangoEllipsizeMode ellipsize = PANGO_ELLIPSIZE_END;
+    PangoWeight weight = PANGO_WEIGHT_NORMAL;
+    const gchar *id, *name;
+
+    gtk_tree_model_get(model, iter, 0, &id, -1);
+    if (strncmp(id, "::", 2) == 0) {
+        ellipsize = PANGO_ELLIPSIZE_NONE;
+        weight = PANGO_WEIGHT_BOLD;
+        name = id+2;
+    }
+    else
+        name = gwy_results_get_label(tool->results, id);
+
+    g_object_set(renderer, "ellipsize", ellipsize, "weight", weight, "markup", name, NULL);
+}
+
+static void
+render_value(G_GNUC_UNUSED GtkTreeViewColumn *column,
+             GtkCellRenderer *renderer,
+             GtkTreeModel *model,
+             GtkTreeIter *iter,
+             gpointer user_data)
+{
+    GwyToolRoughness *tool = (GwyToolRoughness*)user_data;
+    const gchar *id, *value;
+
+    if (!tool->have_data) {
+        g_object_set(renderer, "text", "", NULL);
+        return;
+    }
+
+    gtk_tree_model_get(model, iter, 0, &id, -1);
+    if (strncmp(id, "::", 2) == 0) {
+        g_object_set(renderer, "text", "", NULL);
+        return;
+    }
+    value = gwy_results_get_full(tool->results, id);
+    g_object_set(renderer, "markup", value, NULL);
+}
+
+static guint
+group_bit_from_name(const gchar *name)
+{
+    guint i = gwy_stramong(name, "Amplitude", "Spatial", "Hybrid", "Functional", NULL);
+    g_return_val_if_fail(i > 0, 0);
+    return 1 << (i-1);
+}
+
+static void
+param_row_expanded_collapsed(GtkTreeView *treeview,
+                             GtkTreeIter *iter,
+                             GtkTreePath *path,
+                             GwyToolRoughness *tool)
+{
+    guint bit, expanded = gwy_params_get_int(tool->params, PARAM_EXPANDED);
+    const gchar *id;
+
+    gtk_tree_model_get(gtk_tree_view_get_model(treeview), iter, 0, &id, -1);
+    bit = group_bit_from_name(id + 2);
+    if (gtk_tree_view_row_expanded(treeview, path))
+        gwy_params_set_int(tool->params, PARAM_EXPANDED, expanded | bit);
+    else
+        gwy_params_set_int(tool->params, PARAM_EXPANDED, expanded & ~bit);
+}
+
+static GtkWidget*
+create_param_view(GwyToolRoughness *tool)
+{
+    guint expanded = gwy_params_get_int(tool->params, PARAM_EXPANDED);
+    GtkWidget *treeview;
+    GtkTreeModel *model;
+    GtkTreeSelection *selection;
+    GtkTreeViewColumn *column;
+    GtkCellRenderer *renderer;
+    GtkTreeIter iter;
+
+    model = GTK_TREE_MODEL(tool->store);
+    treeview = gtk_tree_view_new_with_model(model);
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(treeview), FALSE);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
+
+    column = gtk_tree_view_column_new();
+    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+    renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "xalign", 0.0, NULL);
+    gtk_tree_view_column_pack_start(column, renderer, TRUE);
+    gtk_tree_view_column_set_cell_data_func(column, renderer, render_symbol, tool, NULL);
+
+    column = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_expand(column, TRUE);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+    renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "weight-set", TRUE, "ellipsize-set", TRUE, NULL);
+    gtk_tree_view_column_pack_start(column, renderer, TRUE);
+    gtk_tree_view_column_set_cell_data_func(column, renderer, render_name, tool, NULL);
+
+    column = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+    renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "xalign", 1.0, NULL);
+    gtk_tree_view_column_pack_start(column, renderer, TRUE);
+    gtk_tree_view_column_set_cell_data_func(column, renderer, render_value, tool, NULL);
+
+    /* Restore set visibility state */
+    if (gtk_tree_model_get_iter_first(model, &iter)) {
+        do {
+            GtkTreePath *path;
+            const gchar *id;
+
+            gtk_tree_model_get(model, &iter, 0, &id, -1);
+            if (strncmp(id, "::", 2) == 0 && (expanded & group_bit_from_name(id + 2))) {
+                path = gtk_tree_model_get_path(model, &iter);
+                gtk_tree_view_expand_row(GTK_TREE_VIEW(treeview), path, TRUE);
+                gtk_tree_path_free(path);
+            }
+        } while (gtk_tree_model_iter_next(model, &iter));
+    }
+    g_signal_connect(treeview, "row-collapsed", G_CALLBACK(param_row_expanded_collapsed), tool);
+    g_signal_connect(treeview, "row-expanded", G_CALLBACK(param_row_expanded_collapsed), tool);
+
+    return treeview;
+}
+
+static void
+gwy_tool_roughness_response(GwyTool *tool,
+                            gint response_id)
+{
+    GWY_TOOL_CLASS(gwy_tool_roughness_parent_class)->response(tool, response_id);
+
+    if (response_id == GTK_RESPONSE_APPLY)
+        gwy_tool_roughness_apply(GWY_TOOL_ROUGHNESS(tool));
+}
+
+static void
+gwy_tool_roughness_data_switched(GwyTool *gwytool,
+                                 GwyDataView *data_view)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(gwytool);
+    GwyToolRoughness *tool = GWY_TOOL_ROUGHNESS(gwytool);
+    gboolean ignore = (data_view == plain_tool->data_view);
+
+    GWY_TOOL_CLASS(gwy_tool_roughness_parent_class)->data_switched(gwytool, data_view);
+
+    if (ignore || plain_tool->init_failed)
+        return;
+
+    if (data_view) {
+        gwy_object_set_or_reset(plain_tool->layer, tool->layer_type_line,
+                                "thickness", gwy_params_get_int(tool->params, PARAM_THICKNESS),
+                                "line-numbers", FALSE,
+                                "editable", TRUE,
+                                "focus", -1,
+                                NULL);
+        gwy_selection_set_max_objects(plain_tool->selection, 1);
+        update_units(tool);
+        gwy_param_table_set_unitstr(tool->table, LABEL_CUTOFF, plain_tool->coord_format->units);
+    }
+    else {
+        gwy_param_table_info_set_valuestr(tool->table, LABEL_CUTOFF, NULL);
+        gwy_param_table_set_unitstr(tool->table, LABEL_CUTOFF, NULL);
+    }
+
+    recalculate(tool);
+    gwy_param_table_data_id_refilter(tool->table, PARAM_TARGET_GRAPH);
+}
+
+static void
+gwy_tool_roughness_data_changed(GwyPlainTool *plain_tool)
+{
+    GwyToolRoughness *tool = GWY_TOOL_ROUGHNESS(plain_tool);
+
+    recalculate(tool);
+    update_units(tool);
+    gwy_param_table_data_id_refilter(tool->table, PARAM_TARGET_GRAPH);
+}
+
+static void
+gwy_tool_roughness_selection_changed(GwyPlainTool *plain_tool,
+                                     gint hint)
+{
+    GwyToolRoughness *tool = GWY_TOOL_ROUGHNESS(plain_tool);
+    gint n = 0;
+
+    g_return_if_fail(hint <= 0);
+
+    if (plain_tool->selection) {
+        n = gwy_selection_get_data(plain_tool->selection, NULL);
+        /* We can get here before set-max-objects takes effect. */
+        if (!(n == 0 || n == 1))
+            return;
+    }
+
+    recalculate(tool);
+}
+
+static void
+param_changed(GwyToolRoughness *tool, gint id)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyParams *params = tool->params;
+    gboolean do_update = (id != PARAM_EXPANDED && id != PARAM_REPORT_STYLE
+                          && id != PARAM_GRAPH && id != PARAM_TARGET_GRAPH);
+
+    if (id == PARAM_THICKNESS) {
+        if (plain_tool->layer)
+            g_object_set(plain_tool->layer, "thickness", gwy_params_get_int(params, PARAM_THICKNESS), NULL);
+    }
+    if (id == PARAM_GRAPH) {
+        update_graphs(tool);
+        gwy_param_table_data_id_refilter(tool->table, PARAM_TARGET_GRAPH);
+    }
+    if (do_update)
+        recalculate(tool);
+}
+
+static void
+gwy_tool_roughness_apply(GwyToolRoughness *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyGraphModel *gmodel;
+    GwyGraphCurveModel *gcmodel;
+    gchar *s;
+    gint n;
+
+    g_return_if_fail(plain_tool->selection);
+    n = gwy_selection_get_data(plain_tool->selection, NULL);
+    g_return_if_fail(n);
+
+    if ((gmodel = gwy_params_get_graph(tool->params, PARAM_TARGET_GRAPH))) {
+        gwy_graph_model_append_curves(gmodel, tool->gmodel, 1);
+        return;
+    }
+
+    gmodel = gwy_graph_model_new_alike(tool->gmodel);
+    g_object_set(gmodel, "label-visible", TRUE, NULL);
+    gcmodel = gwy_graph_model_get_curve(tool->gmodel, 0);
+    gcmodel = gwy_graph_curve_model_duplicate(gcmodel);
+    gwy_graph_model_add_curve(gmodel, gcmodel);
+    g_object_unref(gcmodel);
+    g_object_get(gcmodel, "description", &s, NULL);
+    g_object_set(gmodel, "title", s, NULL);
+    g_free(s);
+    gwy_app_data_browser_add_graph_model(gmodel, plain_tool->container, TRUE);
+    g_object_unref(gmodel);
+}
+
+static gboolean
+emit_row_changed(GtkTreeModel *model,
+                 GtkTreePath *path,
+                 GtkTreeIter *iter,
+                 G_GNUC_UNUSED gpointer user_data)
+{
+    gtk_tree_model_row_changed(model, path, iter);
+    return FALSE;
+}
+
+static void
+update_controls(GwyToolRoughness *tool, gboolean have_data)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    const gchar *message = (have_data || !plain_tool->data_field ? NULL : _("No profile in the image selected."));
+    gdouble cutoff = gwy_params_get_double(tool->params, PARAM_CUTOFF);
+    GwySIValueFormat *vf = plain_tool->coord_format;
+    gdouble real;
+    gint lineres;
+    gchar buf[24];
+
+    tool->have_data = have_data;
+    update_graphs(tool);
+
+    if (tool->store)
+        gtk_tree_model_foreach(GTK_TREE_MODEL(tool->store), emit_row_changed, NULL);
+    gwy_param_table_set_label(tool->table, MESSAGE_MISSING, message);
+
+    if (have_data) {
+        lineres = gwy_data_line_get_res(tool->dataline);
+        real = gwy_data_line_get_real(tool->dataline);
+        if (cutoff > 0.0) {
+            cutoff = 2.0*real/lineres/cutoff;
+            g_snprintf(buf, sizeof(buf), "%.*f", vf->precision+1, cutoff/vf->magnitude);
+            gwy_results_fill_values(tool->results, "cutoff", cutoff, NULL);
+            gwy_param_table_info_set_valuestr(tool->table, LABEL_CUTOFF, buf);
+        }
+        else {
+            gwy_param_table_info_set_valuestr(tool->table, LABEL_CUTOFF, "∞");
+            gwy_results_set_na(tool->results, "cutoff", NULL);
+        }
+    }
+    else
+        gwy_param_table_info_set_valuestr(tool->table, LABEL_CUTOFF, NULL);
+
+    gwy_param_table_set_sensitive(tool->table, PARAM_REPORT_STYLE, have_data);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(GWY_TOOL(tool)->dialog), GTK_RESPONSE_APPLY, have_data);
+}
+
+void
+recalculate(GwyToolRoughness *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyDataField *field = plain_tool->data_field;
+    gint thickness = gwy_params_get_int(tool->params, PARAM_THICKNESS);
+    GwyInterpolationType interpolation = gwy_params_get_enum(tool->params, PARAM_INTERPOLATION);
+    GwyResults *results = tool->results;
+    gdouble line[4];
+    gint xl1, yl1, xl2, yl2;
+    gint n, lineres;
+    gdouble xoff, yoff;
+
+    if (!plain_tool->selection || !(n = gwy_selection_get_data(plain_tool->selection, NULL))) {
+        update_controls(tool, FALSE);
+        return;
+    }
+
+    g_return_if_fail(plain_tool->selection);
+    g_return_if_fail(gwy_selection_get_object(plain_tool->selection, 0, line));
+
+    xl1 = floor(gwy_data_field_rtoj(field, line[0]));
+    yl1 = floor(gwy_data_field_rtoi(field, line[1]));
+    xl2 = floor(gwy_data_field_rtoj(field, line[2]));
+    yl2 = floor(gwy_data_field_rtoi(field, line[3]));
+
+    lineres = GWY_ROUND(hypot(abs(xl1 - xl2) + 1, abs(yl1 - yl2) + 1));
+    if (lineres < 8) {
+        update_controls(tool, FALSE);
+        return;
+    }
+
+    plain_tool->pending_updates = 0;
+    tool->have_data = TRUE;
+    xoff = gwy_data_field_get_xoffset(field);
+    yoff = gwy_data_field_get_yoffset(field);
+    gwy_results_fill_format(results, "isel", "x1", xl1, "y1", yl1, "x2", xl2, "y2", yl2, NULL);
+    gwy_results_fill_format(results, "realsel",
+                            "x1", line[0] + xoff, "y1", line[1] + yoff,
+                            "x2", line[2] + xoff, "y2", line[3] + yoff,
+                            NULL);
+    tool->dataline = gwy_data_field_get_profile(field, tool->dataline, xl1, yl1, xl2, yl2,
+                                                lineres, thickness, interpolation);
+
+    gwy_results_fill_filename(results, "file", plain_tool->container);
+    gwy_results_fill_channel(results, "image", plain_tool->container, plain_tool->id);
+
+    set_data_from_profile(tool);
+
+    update_graphs(tool);
+    update_parameters(tool);
+    update_controls(tool, TRUE);
+}
+
+static void
+update_units(GwyToolRoughness *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyDataField *field = plain_tool->data_field;
+    GwySIUnit *siunitxy, *siunitz;
+
+    siunitxy = gwy_data_field_get_si_unit_xy(field);
+    siunitz = gwy_data_field_get_si_unit_z(field);
+    gwy_results_set_unit(tool->results, "x", siunitxy);
+    gwy_results_set_unit(tool->results, "y", siunitxy);
+    gwy_results_set_unit(tool->results, "z", siunitz);
+    tool->same_units = gwy_si_unit_equal(siunitxy, siunitz);
+
+    gwy_data_field_copy_units_to_data_line(field, tool->datalines[DATALINE_TEXTURE]);
+    gwy_data_field_copy_units_to_data_line(field, tool->datalines[DATALINE_WAVINESS]);
+    gwy_data_field_copy_units_to_data_line(field, tool->datalines[DATALINE_ROUGHNESS]);
+    /* ADF and BRC are updated upon calculation */
+}
+
+static void
+update_parameters(GwyToolRoughness *tool)
+{
+    GwyDataLine *roughness = tool->datalines[DATALINE_ROUGHNESS];
+    GwyDataLine *waviness = tool->datalines[DATALINE_WAVINESS];
+    GwyDataLine *texture = tool->datalines[DATALINE_TEXTURE];
+    gdouble ra, rq, da, dq, rp, rv, rpm, rvm, rtm, l0, real;
+
+    /* This definitely does something because we do not have form removed. Not sure; it affects only RP which seems to
+     * be defined for zero-mean profiles. */
+    gwy_data_line_add(texture, -gwy_data_line_get_avg(texture));
+    /* This definitely does something because we do not have form removed and it should be also correct. */
+    gwy_data_line_add(waviness, -gwy_data_line_get_avg(waviness));
+    /* This should essentially do nothing but it is safe. */
+    gwy_data_line_add(roughness, -gwy_data_line_get_avg(roughness));
+
+    ra = gwy_data_line_get_ra(roughness);
+    rq = gwy_data_line_get_rms(roughness);
+    rv = gwy_data_line_get_xvm(roughness, 1, 1);
+    rp = gwy_data_line_get_xpm(roughness, 1, 1);
+    rvm = gwy_data_line_get_xvm(roughness, 5, 1);
+    rpm = gwy_data_line_get_xpm(roughness, 5, 1);
+    rtm = rvm + rpm;
+    da = gwy_tool_roughness_Da(roughness);
+    dq = gwy_data_line_get_tan_beta0(roughness);
+    real = gwy_data_line_get_real(roughness);
+    gwy_results_fill_values(tool->results,
+                            "Ra", ra, "Rq", rq,
+                            "Rv", rv, "Rp", rp, "Rt", rp + rv, "Rvm", rvm, "Rpm", rpm, "Rtm", rtm,
+                            "R3z", gwy_data_line_get_xtm(roughness, 1, 3),
+                            "R3zISO", gwy_data_line_get_xtm(roughness, 5, 3),
+                            "Rz", gwy_tool_roughness_Xz(roughness),
+                            "RzISO", rtm,
+                            "Ry", gwy_tool_roughness_Ry(roughness),
+                            "Rsk", gwy_data_line_get_skew(roughness),
+                            "Rku", gwy_data_line_get_kurtosis(roughness) + 3.0,
+                            "Wa", gwy_data_line_get_ra(waviness),
+                            "Wq", gwy_data_line_get_rms(waviness),
+                            "Wy", gwy_data_line_get_xtm(waviness, 1, 1),
+                            "Pt", gwy_data_line_get_xtm(texture, 1, 1),
+                            "Deltaa", da, "Deltaq", dq,
+                            "Sm", gwy_tool_roughness_Sm(roughness),
+                            "lambdaa", 2*G_PI*ra/da, "lambdaq", 2*G_PI*rq/dq,
+                            "L", real,
+                            "H", gwy_tool_roughness_H(roughness),
+                            NULL);
+    if (tool->same_units) {
+        l0 = gwy_tool_roughness_l0(roughness);
+        gwy_results_fill_values(tool->results, "L0", l0, "lr", l0/real, NULL);
+    }
+    else
+        gwy_results_set_na(tool->results, "L0", "lr", NULL);
+
+    updata_dataline_adf(tool);
+    updata_dataline_brc(tool);
+    updata_dataline_pc(tool);
+}
+
+static void
+update_graphs(GwyToolRoughness *tool)
+{
+    /* Subset to show in profile graphs */
+    static const guint profile_graphs[] = {
+        GWY_ROUGHNESS_GRAPH_TEXTURE, GWY_ROUGHNESS_GRAPH_WAVINESS, GWY_ROUGHNESS_GRAPH_ROUGHNESS,
+    };
+    /* This array is indexed by GwyRoughnessGraph values */
+    const gchar *graph_labels[] =  {
+        N_("Texture"), N_("Waviness"), N_("Roughness"),
+        N_("Amplitude Distribution Function"), N_("The Bearing Ratio Curve"), N_("Peak Count"),
+    };
+
+    gint graph_type = gwy_params_get_int(tool->params, PARAM_GRAPH);
+    GwyGraphCurveModel *gcmodel;
+    GwyGraphModel *gmodel;
+    gint i;
+
+    if (!tool->have_data) {
+        gwy_graph_model_remove_all_curves(tool->gmodel);
+        gwy_graph_model_remove_all_curves(tool->gmodel_profile);
+        return;
+    }
+
+    gmodel = tool->gmodel_profile;
+    for (i = 0; i < G_N_ELEMENTS(profile_graphs); i++) {
+        if (i < gwy_graph_model_get_n_curves(gmodel))
+            gcmodel = gwy_graph_model_get_curve(gmodel, i);
+        else {
+            gcmodel = gwy_graph_curve_model_new();
+            g_object_set(gcmodel,
+                         "mode", GWY_GRAPH_CURVE_LINE,
+                         "color", gwy_graph_get_preset_color(i),
+                         "description", gettext(graph_labels[profile_graphs[i]]),
+                         NULL);
+            gwy_graph_model_add_curve(gmodel, gcmodel);
+            g_object_unref(gcmodel);
+        }
+        gwy_graph_curve_model_set_data_from_dataline(gcmodel, tool->datalines[i], 0, 0);
+    }
+    g_object_set(gmodel, "title", _("Surface Profiles"), NULL);
+    gwy_graph_model_set_units_from_data_line(gmodel, tool->dataline);
+
+    gmodel = tool->gmodel;
+    if (gwy_graph_model_get_n_curves(gmodel))
+        gcmodel = gwy_graph_model_get_curve(gmodel, 0);
+    else {
+        gcmodel = gwy_graph_curve_model_new();
+        g_object_set(gcmodel,
+                     "mode", GWY_GRAPH_CURVE_LINE,
+                     "color", gwy_graph_get_preset_color(0),
+                     NULL);
+        gwy_graph_model_add_curve(gmodel, gcmodel);
+        g_object_unref(gcmodel);
+    }
+    g_object_set(gcmodel, "description", graph_labels[graph_type], NULL);
+    g_object_set(gmodel, "title", graph_labels[graph_type], NULL);
+    gwy_graph_model_set_units_from_data_line(gmodel, tool->datalines[graph_type]);
+    gwy_graph_curve_model_set_data_from_dataline(gcmodel, tool->datalines[graph_type], 0, 0);
+}
+
+static gint
+gwy_data_line_extend(GwyDataLine *dline,
+                     GwyDataLine *extline)
+{
+    enum { SMEAR = 6 };
+    gint n, next, k, i;
+    gdouble *data, *edata;
+    gdouble der0, der1;
+
+    n = gwy_data_line_get_res(dline);
+    next = gwy_fft_find_nice_size(4*n/3);
+    g_return_val_if_fail(next < 3*n, n);
+
+    gwy_data_line_resample(extline, next, GWY_INTERPOLATION_NONE);
+    gwy_data_line_set_real(extline, next*gwy_data_line_get_real(dline)/n);
+    data = gwy_data_line_get_data(dline);
+    edata = gwy_data_line_get_data(extline);
+
+    gwy_assign(edata, data, n);
+    /* 0 and 1 in extension data coordinates, not primary data */
+    der0 = (2*data[n-1] - data[n-2] - data[n-3])/3;
+    der1 = (2*data[0] - data[1] - data[2])/3;
+    k = next - n;
+    for (i = 0; i < k; i++) {
+        gdouble x, y, ww, w;
+
+        y = w = 0.0;
+        if (i < SMEAR) {
+            ww = 2.0*(SMEAR-1 - i)/SMEAR;
+            y += ww*(data[n-1] + der0*(i + 1));
+            w += ww;
+        }
+        if (k-1 - i < SMEAR) {
+            ww = 2.0*(i + SMEAR-1 - (k-1))/SMEAR;
+            y += ww*(data[0] + der1*(k - i));
+            w += ww;
+        }
+        if (i < n) {
+            x = 1.0 - i/(k - 1.0);
+            ww = x*x;
+            y += ww*data[n-1 - i];
+            w += ww;
+        }
+        if (k-1 - i < n) {
+            x = 1.0 - (k-1 - i)/(k - 1.0);
+            ww = x*x;
+            y += ww*data[k-1 - i];
+            w += ww;
+        }
+        edata[n + i] = y/w;
+    }
+
+    return next;
+}
+
+static void
+set_data_from_profile(GwyToolRoughness *tool)
+{
+    GwyDataLine *extline = tool->datalines[DATALINE_EXTLINE];
+    GwyDataLine *iout = tool->datalines[DATALINE_IOUT];
+    GwyDataLine *rout = tool->datalines[DATALINE_ROUT];
+    GwyDataLine *rtmp = tool->datalines[DATALINE_RTMP];
+    GwyDataLine *itmp = tool->datalines[DATALINE_ITMP];
+    GwyDataLine *dline = tool->dataline;
+    gdouble cutoff = gwy_params_get_double(tool->params, PARAM_CUTOFF);
+    gint next, i;
+    gdouble *re, *im, *wdata, *rdata;
+    const gdouble *tdata, *data;
+    gdouble real = gwy_data_line_get_real(dline);
+    gint n = gwy_data_line_get_res(dline);
+
+    gwy_data_line_assign(tool->datalines[DATALINE_TEXTURE], dline);
+    gwy_data_line_resample(tool->datalines[DATALINE_WAVINESS], n, GWY_INTERPOLATION_NONE);
+    gwy_data_line_set_real(tool->datalines[DATALINE_WAVINESS], real);
+    gwy_data_line_resample(tool->datalines[DATALINE_ROUGHNESS], n, GWY_INTERPOLATION_NONE);
+    gwy_data_line_set_real(tool->datalines[DATALINE_ROUGHNESS], real);
+
+    next = gwy_data_line_extend(dline, extline);
+    gwy_data_line_resample(rtmp, next, GWY_INTERPOLATION_NONE);
+    gwy_data_line_resample(itmp, next, GWY_INTERPOLATION_NONE);
+    gwy_data_line_fft_raw(extline, NULL, rout, iout, GWY_TRANSFORM_DIRECTION_FORWARD);
+
+    re = gwy_data_line_get_data(rout);
+    im = gwy_data_line_get_data(iout);
+    for (i = 0; i < next; i++) {
+        gdouble f = 2.0*MIN(i, next-i)/next;
+
+        if (f > cutoff)
+            re[i] = im[i] = 0.0;
+    }
+
+    gwy_data_line_fft_raw(rout, iout, rtmp, itmp, GWY_TRANSFORM_DIRECTION_BACKWARD);
+
+    data = gwy_data_line_get_data_const(extline);
+    tdata = gwy_data_line_get_data_const(rtmp);
+    wdata = gwy_data_line_get_data(tool->datalines[DATALINE_WAVINESS]);
+    rdata = gwy_data_line_get_data(tool->datalines[DATALINE_ROUGHNESS]);
+    for (i = 0; i < n; i++) {
+        wdata[i] = tdata[i];
+        rdata[i] = data[i] - tdata[i];
+    }
+}
+
+static gdouble
+gwy_tool_roughness_Xz(GwyDataLine *data_line)
+{
+    gdouble p, v;
+
+    gwy_data_line_get_kth_peaks(data_line, 1, 5, TRUE, TRUE, 0.0, 0.0, &p);
+    gwy_data_line_get_kth_peaks(data_line, 1, 5, FALSE, TRUE, 0.0, 0.0, &v);
+
+    return p + v;
+}
+
+static gdouble
+gwy_tool_roughness_Ry(GwyDataLine *data_line)
+{
+    gdouble p[5], v[5], Ry = 0.0;
+    guint i;
+
+    gwy_data_line_get_kth_peaks(data_line, 5, 1, TRUE, FALSE, 0.0, 0.0, p);
+    gwy_data_line_get_kth_peaks(data_line, 5, 1, FALSE, FALSE, 0.0, 0.0, v);
+
+    for (i = 0; i < 5; i++) {
+        if (p[i] >= 0.0 && v[i] >= 0.0 && p[i] + v[i] > Ry)
+            Ry = p[i] + v[i];
+    }
+
+    return Ry;
+}
+
+static gdouble
+gwy_tool_roughness_Da(GwyDataLine *dline)
+{
+    return gwy_data_line_get_variation(dline)/gwy_data_line_get_real(dline);
+}
+
+static gdouble
+gwy_tool_roughness_Sm(GwyDataLine *dline)
+{
+    gint count = gwy_data_line_count_peaks(dline, TRUE, 0.0, 0.0);
+    gdouble real = gwy_data_line_get_real(dline);
+    return real/count;
+}
+
+static gdouble
+gwy_tool_roughness_l0(GwyDataLine *data_line)
+{
+    /* This might be not according to the srandard.  However, the original definitions can give lr < 1 for short lines
+     * which is obviously wrong. It has to be corrected for the res vs. res-1 ratio somehow. */
+    return gwy_data_line_get_length(data_line);
+}
+
+static gdouble
+gwy_tool_roughness_H(GwyDataLine *dline)
+{
+    /* The lower line exposes 90%, i.e. 10% remain below. The upper line exposes 5%, i.e. 95% remain below. */
+    gdouble z[2], p[2] = { 10.0, 95.0 };
+    gint n = gwy_data_line_get_res(dline);
+    gdouble *buf = g_new(gdouble, n);
+
+    gwy_assign(buf, gwy_data_line_get_data(dline), n);
+    gwy_math_percentiles(n, buf, GWY_PERCENTILE_INTERPOLATION_LINEAR, 2, p, z);
+    g_free(buf);
+
+    return z[1] - z[0];
+}
+
+static void
+gwy_tool_roughness_distribution(GwyDataLine *data_line, GwyDataLine *distr)
+{
+    gdouble max;
+
+    gwy_data_line_dh(data_line, distr, 0.0, 0.0, gwy_data_line_get_res(distr));
+    if (data_line->real == 0.0)
+        data_line->real = 1.0;
+
+    max = gwy_data_line_get_max(distr);
+    if (max > 0.0)
+        gwy_data_line_multiply(distr, 1.0/max);
+
+    gwy_si_unit_assign(gwy_data_line_get_si_unit_x(distr), gwy_data_line_get_si_unit_y(data_line));
+}
+
+static void
+updata_dataline_adf(GwyToolRoughness *tool)
+{
+    GwyDataLine *roughness = tool->datalines[DATALINE_ROUGHNESS];
+    GwyDataLine *adf = tool->datalines[DATALINE_ADF];
+
+    gwy_tool_roughness_distribution(roughness, adf);
+}
+
+static void
+updata_dataline_brc(GwyToolRoughness *tool)
+{
+    GwyDataLine *roughness = tool->datalines[DATALINE_ROUGHNESS];
+    GwyDataLine *brc = tool->datalines[DATALINE_BRC];
+    gdouble max;
+
+    gwy_tool_roughness_distribution(roughness, brc);
+    gwy_data_line_cumulate(brc);
+    max = gwy_data_line_get_max(brc);
+    if (max > 0.0)
+        gwy_data_line_multiply(brc, 1.0/max);
+}
+
+static void
+updata_dataline_pc(GwyToolRoughness *tool)
+{
+    GwyDataLine *roughness = tool->datalines[DATALINE_ROUGHNESS];
+    GwyDataLine *pc = tool->datalines[DATALINE_PC];
+    gint samples = gwy_data_line_get_res(pc);
+    gdouble ymax, dy, threshold, real;
+    gint i, peakcount;
+
+    ymax = gwy_data_line_get_max(roughness);
+    gwy_data_line_set_real(pc, ymax);
+    real = gwy_data_line_get_real(roughness);
+    dy = ymax/samples;
+
+    gwy_si_unit_power(gwy_data_line_get_si_unit_y(roughness), 1, gwy_data_line_get_si_unit_x(pc));
+    gwy_si_unit_power(gwy_data_line_get_si_unit_x(roughness), -1, gwy_data_line_get_si_unit_y(pc));
+
+    for (i = 0; i < samples; i++) {
+        threshold = dy*i;
+        peakcount = gwy_data_line_count_peaks(roughness, TRUE, threshold, threshold);
+        gwy_data_line_set_val(pc, i, peakcount/real);
+    }
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

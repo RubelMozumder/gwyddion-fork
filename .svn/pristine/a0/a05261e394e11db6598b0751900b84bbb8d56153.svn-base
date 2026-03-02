@@ -1,0 +1,502 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='scan-line-defects' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Scan Line Artefacts</title>
+  <para>
+    This section describes functions for marking and correction of various
+    artefacts in SPM data related to the line by line acquisition.
+    Scan line alignment and correction methods frequently involve heavy data
+    modification which should be avoided if possible.  Unfortunately,
+    scan line defects are ubiquitous and, also frequently, correction may be
+    the only way to proceed.  Nevertheless, they should be applied with care.
+  </para>
+  <para>
+    See also section <link linkend='editing-correction'>Data Editing and
+    Correction </link> for methods that deal with general local defects.
+  </para>
+  <indexterm>
+    <primary>defect correction</primary>
+    <secondary>scan line</secondary>
+  </indexterm>
+  <sect2 id='line-correction'>
+    <title>
+      Align Rows <gwy:icon name='line_level'/>
+    </title>
+    <indexterm><primary>line correction</primary></indexterm>
+    <indexterm><primary>row levelling</primary></indexterm>
+    <para>
+      Profiles taken in the fast scanning axis (usually
+      <xi:include href="eqi-x.xml"/>-axis) can be mutually shifted by some
+      amount or have slightly different slopes. The basic line correction
+      function
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Align Rows</guimenuitem>
+      </menuchoice>
+      deals with this type of discrepancy using several different correction
+      algorithms:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Median</guilabel>
+        </term>
+        <listitem>
+          <para>
+            A basic correction method, based on finding a representative
+            height of each scan line and subtracting it, thus moving the lines to the
+            same height.  Here the line median is used as the representative
+            height.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Modus</guilabel>
+        </term>
+        <listitem>
+          <para>
+            This method differs from <guilabel>Median</guilabel> only in the
+            quantity used: modus of the height distribution.  Of course, the modus
+            is only estimated because only a finite set of heights is avaiable.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Polynomial</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The <guilabel>Polynomial</guilabel> method fits a polynomial of given
+            degree and subtracts if from the line.  For polynomial degree
+            of 0 the mean value of each row is subtracted.  Degree 1 means removal
+            of linear slopes, degree 2 bow removal, etc.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Median difference</guilabel>
+        </term>
+        <listitem>
+          <para>
+            In contrast to shifting a representative height for each line,
+            <guimenuitem>Median difference</guimenuitem> shifts the lines so that
+            the median of height differences (between vertical neighbour pixels) becomes
+            zero.  Therefore it better preserves large features while it is more
+            sensitive to completely bogus lines.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Matching</guilabel>
+        </term>
+        <listitem>
+          <para>
+            This algorithm is somewhat experimental but it may be useful sometimes.
+            It minimizes a certain line difference function that gives more
+            weight to flat areas and less weight to areas with large slopes.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Facet-level tilt</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Inspired by <link linkend='facet-level'>Facet level</link>, this method
+            tilts individual scan lines to make the prevalent normals vertical.
+            This only removes tilt; line height offsets are preserved.  In one dimension
+            it is generally a somewhat less effective strategy than for images.  However,
+            it can correct the tilt in some cases when other methods do not work at all.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Trimmed mean</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Trimmed mean lies between the standard mean value and median, depending on
+            how large fraction of lowest and highest values are trimmed.  For no trimming
+            (0) this method is equivalent to mean value subtraction, i.e.
+            <guilabel>Polynomial</guilabel> with degree 0, for maximum possible trimming
+            (0.5) it is equivalent to <guilabel>Median</guilabel>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Trimmed mean of differences</guilabel>
+        </term>
+        <listitem>
+          <para>
+            This method similarly offers a continuous transition between
+            <guilabel>Median difference</guilabel> and mean value subtraction.  It makes
+            zero the trimmed means of height differences (between vertical neighbour
+            pixels).  For the maximum possible trimming (0.5) it is equivalent
+            to <guilabel>Median difference</guilabel>.  Since the mean difference is
+            the same as the difference of mean values (unlike for medians), for no
+            trimming (0) it is again equivalent to <guilabel>Polynomial</guilabel>
+            with degree 0.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Similarly as in the two-dimensional <link linkend='polynomial-level'>polynomial
+      levelling</link>, the background, i.e. values subtracted from individual rows can
+      be extracted to another image.  Or plotted in a graph since the value is the same
+      for the entire row.
+    </para>
+    <para>
+      The line correction function support masking, allowing the exclusion of
+      large features that could distract the correction algorithms.  The masking
+      options are offered only if a mask is present though.
+      Note the
+      <link linkend='path-level'>Path level</link> tools described below offers
+      a different method of choosing the image parts important for alignment.  It can be
+      more convenient in some cases.
+    </para>
+    <tip>
+      Use <keycap>Ctrl-F</keycap> (<guimenuitem>Repeat Last</guimenuitem>) to
+      run the line correction with the same settings on several images without
+      going through the dialogue.
+    </tip>
+    <informalfigure id='fig-align-rows'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='align-rows.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Line correction example: an image with defects (left), the row alignment
+          dialogue previewing the median correction (centre), and extracted row
+          background (right).  Note the false colour scales are not the same in the
+          three images.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='path-level'>
+    <title>
+      Path Levelling Tool <gwy:icon name='path_level'/>
+    </title>
+    <indexterm><primary>path levelling</primary></indexterm>
+    <indexterm>
+      <primary>line correction</primary>
+      <secondary>along paths</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>row levelling</primary>
+      <secondary>along paths</secondary>
+    </indexterm>
+    <para>
+      The <guilabel>Path Levelling</guilabel>
+      tool can be used to correct the heights in an arbitrary subset of rows
+      in complicated images.
+    </para>
+    <para>
+      First, one selects a number of straight lines on the data.  The
+      intersections of these lines with the rows then form a set of points
+      in each row that is used for levelling.  The rows are moved up or down
+      to minimize the difference between the heights of the points of
+      adjacent rows.  Rows that are not intersected by any line are not
+      moved (relatively to neighbouring rows).
+    </para>
+    <informalfigure id='fig-path-level'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='path-level.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Path Level example:
+          (a) uncorrected data with steps that the automated method may
+          fail to correct, two suitable levelling lines are selected;
+          (b) the result of Path Level application with line width 5.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='line-correction-step'>
+    <title>
+      Step Line Correction
+    </title>
+    <para>
+      Function <guimenuitem>Step Line Correction</guimenuitem> attempts to deal with
+      height jumps that may occur in the middle of a scan line.  It tries to identify
+      misaligned segments within the rows and correct the height of each such
+      segment individually by subtracting its mean value.  Therefore it is
+      often able to correct data with discontinuities in the middle of a row.
+    </para>
+    <para>
+      This function is somewhat experimental and the exact way it works can be
+      subject to further changes. Note that it still alignes all rows similarly
+      to the Mean method in <link linkend='line-correction'>Align rows</link>.
+      See <link linkend='line-correction-block'>Block line correction</link>
+      for a method which attempts to only remove the jumps, preserving
+      everything else.
+    </para>
+  </sect2>
+  <sect2 id='line-correction-block'>
+    <title>
+      Block Line Correction
+    </title>
+    <para>
+      Function <guimenuitem>Block Line Correction</guimenuitem> also attempts to correct
+      jumps that may occur in the middle of a scan line. It also tries to change the image
+      as little as possible, i.e. less than <link linkend='line-correction-step'>Step line
+      correction</link> which applies somewhat aggressive correction (and is thus generally
+      more successful at removing the jumps as long as one does not mind the accompanying
+      scan line flattening).
+    </para>
+    <para>
+      The block line correction identifies the sudden jumps, computes their
+      heights and then shifts height in entire blocks of scan lines between them. That is
+      where the name <quote>block</quote> comes from. In regions where no
+      sudden jump occured mutual the height relations bewtween scan lines are perfectly
+      preserved.
+    </para>
+    <para>
+      Since entire blocks are shifted the direction of scanning is important in determining
+      which pixels from a contiguous block. It has to be selected as
+      <guilabel>Scanning direction</guilabel>. The directions are labelled as for scanning from
+      top to bottom in the slow axis. For scanning from the bottom upwards the meaning is
+      reversed. If the functions seems unable to notice obvious jumps check
+      that the direction is correct.
+    </para>
+    <informalfigure id='fig-scan-step-artefacts'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='scan-step-artefacts.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Step artefacts examples for top-to-bottom scanning in the slow axis.
+          Left: left-to-right. Right: right-to-left.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      <guilabel>Threshold</guilabel> determines the sensitivity, in other words how large jumps
+      are considered discontinuities. It is given as a multiple of the root mean square of all
+      differences between two vertical neighbour pixels. By selecting <guilabel>Marked
+      discontinuities</guilabel> in <guilabel>Display</guilabel> one can get an
+      overview of all locations where the height difference exceeds given
+      threshold. The option <guilabel>Marked block boundaries</guilabel> is probably more useful
+      as is shows where a discontinuity spans the entire image width and is, therefore, considered
+      a boundary between two blocks. The number of total detected jumps is displayed below
+      <guilabel>Threshold</guilabel>.
+    </para>
+  </sect2>
+  <sect2 id='mean-good-profile'>
+    <title>
+      Mean Good Profile
+    </title>
+    <indexterm>
+      <primary>profile extraction</primary>
+      <secondary>mean scan line</secondary>
+    </indexterm>
+    <para>
+      Taking mean or median rows from the entire image using
+      <link linkend='line-stats'>Row/Column Statistics tool</link> can provide clean
+      profiles from images formed by repeated scanning of the same feature.
+      This is sometimes done with slow scanning axis disabled entirely, other
+      times with scanning enabled but with much reduced range in the slow axis.
+      If defects are present they should be excluded by masking.  When both
+      forward and backward scans are available, comparing them can help
+      determining which parts of the profiles are good and which contain defects.
+    </para>
+    <para>
+      The <guimenuitem>Mean Good Profile</guimenuitem> function simplifies this in a couple
+      of common situations:
+    </para>
+    <itemizedlist>
+      <listitem>
+        If only two images are available, select the other image as <guilabel>Second
+        image</guilabel>.  A portion of pixels with the highest inter-image differences
+        is then thrown away, as controlled by <guilabel>Trim fraction</guilabel>.  The
+        rest is used to calculate column-wise mean values, producing the cleaned up
+        mean profile.
+      </listitem>
+      <listitem>
+        If only one image is available, inter-image comparison is not possible.
+        Therefore, simple column-wise trimmed mean is used instead.
+        <guilabel>Trim fraction</guilabel> again controls the portion of pixels thrown
+        away – in this case the fraction applies to each image column independently.
+      </listitem>
+    </itemizedlist>
+    <para>
+      In both modes either the profile graph is shown, or the image with corresponding
+      mask of excluded pixels.  The module also shows the variation, i.e. the integral
+      of the absolute value of the derivative.  Large variation means more noisy or jagged
+      profile.  Hence, lower values usually correspond to better profiles.
+    </para>
+  </sect2>
+  <sect2 id='line-inversion-marking'>
+    <title>
+      Mark Inverted Rows
+    </title>
+    <para>
+      Function <guimenuitem>Mark Inverted Rows</guimenuitem> finds scan lines
+      with vertically inverted features and marks them with a mask.  Line
+      inversion is an artefact which occasionally occurs for instance in
+      Magnetic Force Microscopy.  Since the line is generally only inverted
+      very approximately, value inversion would be a poor correction and
+      one should usually use
+      <link linkend='remove-data-under-mask'>Laplace's interpolation</link>
+      for correction.
+    </para>
+  </sect2>
+  <sect2 id='mark-scars'>
+    <title>
+      Mark Scars <gwy:icon name='mark_scars'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Mark Scars</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Similarly, the <classname>Mark Scars</classname> module can create a mask
+      of the points treated as scars. Unlike
+      <link linkend='remove-scars'>Remove Scars</link>
+      which directly interpolates the located defects, this module lets you
+      interactively set several parameters which can fine-tune the scar
+      selection process:
+    </para>
+    <itemizedlist>
+      <listitem>
+        Maximum width – only scars that are as thin or thinner than this value
+        (in pixels) will be marked.
+      </listitem>
+      <listitem>
+        Minimum length – only scars that are as long or longer than this value
+        (in pixels) will be marked.
+      </listitem>
+      <listitem>
+        Hard threshold – the minimum difference of the value from the
+        neighbouring upper and lower lines to be considered a defect.
+        The units are relative to image RMS.
+      </listitem>
+      <listitem>
+        Soft threshold – values differing at least this much do not form
+        defects themselves, but they are attached to defects obtained from
+        the hard threshold if they touch one.
+      </listitem>
+      <listitem>
+        Positive, Negative, Both – the type of defects to remove.  Positive
+        means defects with outlying values above the normal values (peaks),
+        negative means defects with outlying values below the normal values
+        (holes).
+      </listitem>
+    </itemizedlist>
+    <para>
+      After clicking <guibutton>Ok</guibutton> the new scar mask will be applied
+      to the image. Other modules or tools can then be run to edit this data.
+    </para>
+    <informalfigure id='fig-scars'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='remove-scars.png' format='PNG'/>
+        </imageobject>
+        <textobject>
+          <phrase>Scrars removal example</phrase>
+        </textobject>
+        <caption>
+          Scars marking and removal example:
+          (a) original data with defects,
+          (b) data with marked defects,
+          (c) corrected data.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='remove-scars'>
+    <title>
+      Remove Scars <gwy:icon name='scars'/>
+    </title>
+    <indexterm><primary>scars correction</primary></indexterm>
+    <indexterm><primary>strokes correction</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Remove Scars</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      Scars (or stripes, strokes) are parts of the image that are corrupted
+      by a very common scanning error: local fault of the closed loop. Line
+      defects are usually parallel to the fast scanning axis in the image.
+      This function will automatically find and remove these scars, using
+      neighbourhood lines to <quote>fill-in</quote> the gaps.  The method
+      is run with the last settings used in <link linkend='mark-scars'>Mark
+      Scars</link>.
+    </para>
+  </sect2>
+  <sect2 id='xy-denoise'>
+    <title>
+      XY Denoising <gwy:icon name='xy_denoise'/>
+    </title>
+    <indexterm><primary>xy denoising</primary></indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Multidata</guisubmenu>
+        <guimenuitem>XY denoise</guimenuitem>
+      </menuchoice>
+    </para>
+    <para>
+      The function denoises and image on the basis of two measurements of the
+      same area – one performed in
+      <xi:include href='eqi-x.xml'/> direction and one in
+      <xi:include href='eqi-y.xml'/> direction
+      (and rotated back to be aligned the same way as the
+      <xi:include href='eqi-x.xml'/>-direction one). It
+      is based on work of E. Anguiano and M. Aguilar
+      (see [<link linkend='xy-denoise-ref-1'>1</link>]).
+    </para>
+    <para>
+      The denoising works by performing the Fourier transform of both images,
+      combining the information them in the frequency space, and then
+      using backward Fourier transform in order to get the denoised image. It
+      is useful namely for the removal of large scars and fast scanning axis
+      stripes.
+    </para>
+    <para>
+      The images do not appear symmetrically in the procedure.  By using option
+      <guilabel>Average denoising directions</guilabel> one can apply it in
+      both ways and average the results.
+    </para>
+    <informalfigure id='fig-edit-extended-xy-denoise'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='xydenoise.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        XY denoise procedure simulation: A) original data, B) simulated
+        measurement in x axis, C) simulated measurement in y axis, D) denoised
+        image.
+      </caption>
+    </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='scan-line-defects-ref'>
+    <title>References</title>
+    <para id='xy-denoise-ref-1'>
+      [1] E. Anguiano and M. Aguilar: A cross-measurement procedure (CMP) for
+      near noise-free imaging in scanning microscopes. Ultramicroscopy, 76
+      (1999) 47
+      <ulink url='http://dx.doi.org/10.1016/S0304-3991(98)00074-6'>doi:10.1016/S0304-3991(98)00074-6</ulink>
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

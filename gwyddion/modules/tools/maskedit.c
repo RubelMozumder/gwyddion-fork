@@ -1,0 +1,1117 @@
+/*
+ *  $Id: maskedit.c 25639 2023-09-07 12:23:42Z yeti-dn $
+ *  Copyright (C) 2003-2022 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <string.h>
+#include <gtk/gtk.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwymodule/gwymodule-tool.h>
+#include <libprocess/elliptic.h>
+#include <libprocess/stats.h>
+#include <libprocess/filters.h>
+#include <libprocess/grains.h>
+#include <libgwydgets/gwystock.h>
+#include <app/gwyapp.h>
+
+enum {
+    SENS_DATA = 1 << 0,
+    SENS_MASK = 1 << 1,
+};
+
+enum {
+    PARAM_STYLE,
+    PARAM_DIST_TYPE,
+    PARAM_MODE,
+    PARAM_SHAPE,
+    PARAM_TOOL,
+    PARAM_RADIUS,
+    PARAM_GSAMOUNT,
+    PARAM_FILL_NONSIMPLE,
+    PARAM_FROM_BORDER,
+    PARAM_PREVENT_MERGE,
+    PARAM_LINES_4_CONNECTED,
+
+    WIDGET_ACTIONS,
+    WIDGET_FILL_VOIDS,
+    WIDGET_GROW_SHRINK,
+};
+
+typedef enum {
+    ACTION_REMOVE,
+    ACTION_INVERT,
+    ACTION_FILL,
+    ACTION_FILL_VOIDS,
+    ACTION_GROW,
+    ACTION_SHRINK,
+} MaskEditAction;
+
+typedef enum {
+    MASK_EDIT_STYLE_SHAPES  = 0,
+    MASK_EDIT_STYLE_DRAWING = 1,
+} MaskEditStyle;
+
+typedef enum {
+    MASK_EDIT_OP_SET       = 0,
+    MASK_EDIT_OP_ADD       = 1,
+    MASK_EDIT_OP_REMOVE    = 2,
+    MASK_EDIT_OP_INTERSECT = 3,
+} MaskEditLogicalOp;
+
+typedef enum {
+    MASK_SHAPE_RECTANGLE  = 0,
+    MASK_SHAPE_ELLIPSE    = 1,
+    MASK_SHAPE_LINE       = 2,
+    /* Not a real shape, but permits putting layer-related things into one array. */
+    MASK_SHAPE_POINT      = 3,
+    MASK_NLAYER_TYPES
+} MaskEditShape;
+
+typedef enum {
+    MASK_TOOL_PAINT_DRAW  = 0,
+    MASK_TOOL_PAINT_ERASE = 1,
+    MASK_TOOL_FILL_DRAW   = 2,
+    MASK_TOOL_FILL_ERASE  = 3,
+} MaskEditTool;
+
+typedef void (*FieldFillFunc)(GwyDataField*, gint, gint, gint, gint, gdouble);
+typedef void (*FieldExtractFunc)(GwyDataField*, gint, gint, gint, gint, gdouble*);
+typedef void (*FieldUnextractFunc)(GwyDataField*, gint, gint, gint, gint, const gdouble*);
+typedef gint (*FieldSizeFunc)(gint, gint);
+
+#define GWY_TYPE_TOOL_MASK_EDITOR            (gwy_tool_mask_editor_get_type())
+#define GWY_TOOL_MASK_EDITOR(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GWY_TYPE_TOOL_MASK_EDITOR, GwyToolMaskEditor))
+#define GWY_IS_TOOL_MASK_EDITOR(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GWY_TYPE_TOOL_MASK_EDITOR))
+#define GWY_TOOL_MASK_EDITOR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GWY_TYPE_TOOL_MASK_EDITOR, GwyToolMaskEditorClass))
+
+typedef struct _GwyToolMaskEditor      GwyToolMaskEditor;
+typedef struct _GwyToolMaskEditorClass GwyToolMaskEditorClass;
+
+struct _GwyToolMaskEditor {
+    GwyPlainTool parent_instance;
+
+    GwyParams *params;
+
+    GwyParamTable *table;
+    GwySensitivityGroup *sensgroup;
+    GtkSizeGroup *sizegroup;
+
+    /* paintrbrush only */
+    gboolean drawing_started;
+    gint oldisel[2];
+
+    /* potential class data */
+    GType layer_types[MASK_NLAYER_TYPES];
+};
+
+struct _GwyToolMaskEditorClass {
+    GwyPlainToolClass parent_class;
+};
+
+static gboolean     module_register                        (void);
+static GwyParamDef* define_module_params                   (void);
+static GType        gwy_tool_mask_editor_get_type          (void)                      G_GNUC_CONST;
+static void         gwy_tool_mask_editor_finalize          (GObject *object);
+static void         gwy_tool_mask_editor_init_dialog       (GwyToolMaskEditor *tool);
+static void         gwy_tool_mask_editor_data_switched     (GwyTool *gwytool,
+                                                            GwyDataView *data_view);
+static void         gwy_tool_mask_editor_mask_changed      (GwyPlainTool *plain_tool);
+static void         gwy_tool_mask_editor_selection_changed (GwyPlainTool *plain_tool,
+                                                            gint hint);
+static void         gwy_tool_mask_editor_selection_finished(GwyPlainTool *plain_tool);
+static void         terrible_hack                          (GwyToolMaskEditor *tool);
+static GtkWidget*   create_actions                         (gpointer user_data);
+static GtkWidget*   create_fill_voids                      (gpointer user_data);
+static GtkWidget*   create_grow_shrink                     (gpointer user_data);
+static void         connect_selection                      (GwyToolMaskEditor *tool);
+static void         setup_layer                            (GwyToolMaskEditor *tool);
+static void         param_changed                          (GwyToolMaskEditor *tool,
+                                                            gint id);
+static void         fill_nonsimple_changed                 (GwyToolMaskEditor *tool,
+                                                            GtkToggleButton *toggle);
+static void         run_action                             (GwyToolMaskEditor *tool,
+                                                            GtkButton *button);
+static void         bucket_fill                            (GwyToolMaskEditor *tool,
+                                                            gint j,
+                                                            gint i);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Mask editor tool, allows interactive modification of parts of the mask."),
+    "Yeti <yeti@gwyddion.net>",
+    "4.2",
+    "David Nečas (Yeti) & Petr Klapetek",
+    "2004",
+};
+
+static const GwyEnum mode_icons[] = {
+    { GWY_STOCK_MASK_SET,       MASK_EDIT_OP_SET,       },
+    { GWY_STOCK_MASK_ADD,       MASK_EDIT_OP_ADD,       },
+    { GWY_STOCK_MASK_SUBTRACT,  MASK_EDIT_OP_REMOVE,    },
+    { GWY_STOCK_MASK_INTERSECT, MASK_EDIT_OP_INTERSECT, },
+};
+static const GwyEnum shape_icons[] = {
+    { GWY_STOCK_MASK,        MASK_SHAPE_RECTANGLE, },
+    { GWY_STOCK_MASK_CIRCLE, MASK_SHAPE_ELLIPSE,   },
+    { GWY_STOCK_MASK_LINE,   MASK_SHAPE_LINE,      },
+};
+static const GwyEnum tool_icons[] = {
+    { GWY_STOCK_MASK_PAINT_DRAW,  MASK_TOOL_PAINT_DRAW,  },
+    { GWY_STOCK_MASK_PAINT_ERASE, MASK_TOOL_PAINT_ERASE, },
+    { GWY_STOCK_MASK_FILL_DRAW,   MASK_TOOL_FILL_DRAW,   },
+    { GWY_STOCK_MASK_FILL_ERASE,  MASK_TOOL_FILL_ERASE,  },
+};
+
+GWY_MODULE_QUERY2(module_info, maskedit)
+
+G_DEFINE_TYPE(GwyToolMaskEditor, gwy_tool_mask_editor, GWY_TYPE_PLAIN_TOOL)
+
+static gboolean
+module_register(void)
+{
+    gwy_tool_func_register(GWY_TYPE_TOOL_MASK_EDITOR);
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static const GwyEnum styles[] = {
+        { N_("_Shapes"),        MASK_EDIT_STYLE_SHAPES,  },
+        { N_("_Drawing Tools"), MASK_EDIT_STYLE_DRAWING, },
+    };
+    static const GwyEnum modes[] = {
+        { N_("Set mask to selection"),         MASK_EDIT_OP_SET,       },
+        { N_("Add selection to mask"),         MASK_EDIT_OP_ADD,       },
+        { N_("Subtract selection from mask"),  MASK_EDIT_OP_REMOVE,    },
+        { N_("Intersect selection with mask"), MASK_EDIT_OP_INTERSECT, },
+    };
+    static const GwyEnum shapes[] = {
+        { N_("Rectangular shapes"), MASK_SHAPE_RECTANGLE, },
+        { N_("Elliptic shapes"),    MASK_SHAPE_ELLIPSE,   },
+        { N_("Thin lines"),         MASK_SHAPE_LINE,      },
+    };
+    static const GwyEnum tools[] = {
+        { N_("Freehand mask drawing"),                 MASK_TOOL_PAINT_DRAW,  },
+        { N_("Freehand mask erasing"),                 MASK_TOOL_PAINT_ERASE, },
+        { N_("Fill continuous empty areas with mask"), MASK_TOOL_FILL_DRAW,   },
+        { N_("Erase continuous parts of mask"),        MASK_TOOL_FILL_ERASE,  },
+    };
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, "maskedit");
+    gwy_param_def_add_gwyenum(paramdef, PARAM_STYLE, "style", NULL,
+                              styles, G_N_ELEMENTS(styles), MASK_EDIT_STYLE_SHAPES);
+    gwy_param_def_add_enum(paramdef, PARAM_DIST_TYPE, "dist_type", _("_Distance type"),
+                           GWY_TYPE_DISTANCE_TRANSFORM_TYPE, GWY_DISTANCE_TRANSFORM_EUCLIDEAN);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_MODE, "mode", _("Mode"), modes, G_N_ELEMENTS(modes), MASK_EDIT_OP_SET);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_SHAPE, "shape", _("Shape"),
+                              shapes, G_N_ELEMENTS(shapes), MASK_SHAPE_RECTANGLE);
+    gwy_param_def_add_gwyenum(paramdef, PARAM_TOOL, "tool", _("Tool"),
+                              tools, G_N_ELEMENTS(tools), MASK_TOOL_PAINT_DRAW);
+    gwy_param_def_add_int(paramdef, PARAM_RADIUS, "radius", _("_Radius"), 1, 15, 5);
+    gwy_param_def_add_int(paramdef, PARAM_GSAMOUNT, "gsamount", _("_Amount"), 1, 256, 1);
+    gwy_param_def_add_boolean(paramdef, PARAM_FILL_NONSIMPLE, "fill_nonsimple", _("Fill non-simple-connected"), FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_FROM_BORDER, "from_border", _("Shrink from _border"), TRUE);
+    gwy_param_def_add_boolean(paramdef, PARAM_PREVENT_MERGE, "prevent_merge", _("_Prevent grain merging by growing"),
+                              FALSE);
+    gwy_param_def_add_boolean(paramdef, PARAM_LINES_4_CONNECTED, "lines-4-connected",
+                              _("Thin lines are 4-connected"), FALSE);
+
+    return paramdef;
+}
+
+static void
+gwy_tool_mask_editor_class_init(GwyToolMaskEditorClass *klass)
+{
+    GwyPlainToolClass *ptool_class = GWY_PLAIN_TOOL_CLASS(klass);
+    GwyToolClass *tool_class = GWY_TOOL_CLASS(klass);
+    GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+
+    gobject_class->finalize = gwy_tool_mask_editor_finalize;
+
+    tool_class->stock_id = GWY_STOCK_MASK_EDITOR;
+    tool_class->title = _("Mask Editor");
+    tool_class->tooltip = _("Edit mask");
+    tool_class->prefix = "/module/maskeditor";
+    tool_class->data_switched = gwy_tool_mask_editor_data_switched;
+
+    ptool_class->mask_changed = gwy_tool_mask_editor_mask_changed;
+    ptool_class->selection_changed = gwy_tool_mask_editor_selection_changed;
+    ptool_class->selection_finished = gwy_tool_mask_editor_selection_finished;
+}
+
+static void
+gwy_tool_mask_editor_finalize(GObject *object)
+{
+    GwyToolMaskEditor *tool = GWY_TOOL_MASK_EDITOR(object);
+
+    gwy_params_save_to_settings(tool->params);
+    GWY_OBJECT_UNREF(tool->params);
+    GWY_OBJECT_UNREF(tool->sizegroup);
+    GWY_OBJECT_UNREF(tool->sensgroup);
+
+    G_OBJECT_CLASS(gwy_tool_mask_editor_parent_class)->finalize(object);
+}
+
+static void
+gwy_tool_mask_editor_init(GwyToolMaskEditor *tool)
+{
+    static const gchar *const shape_layer_types[MASK_NLAYER_TYPES] = {
+        "GwyLayerRectangle", "GwyLayerEllipse", "GwyLayerLine", "GwyLayerPoint",
+    };
+
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    guint i;
+
+    for (i = 0; i < MASK_NLAYER_TYPES; i++) {
+        tool->layer_types[i] = gwy_plain_tool_check_layer_type(plain_tool, shape_layer_types[i]);
+        if (!tool->layer_types[i])
+            return;
+    }
+
+    tool->params = gwy_params_new_from_settings(define_module_params());
+    connect_selection(tool);
+    gwy_tool_mask_editor_init_dialog(tool);
+}
+
+static void
+gwy_tool_mask_editor_init_dialog(GwyToolMaskEditor *tool)
+{
+    GtkDialog *dialog = GTK_DIALOG(GWY_TOOL(tool)->dialog);
+    GwyParamTable *table;
+
+    table = tool->table = gwy_param_table_new(tool->params);
+    tool->sensgroup = gwy_sensitivity_group_new();
+    tool->sizegroup = gtk_size_group_new(GTK_SIZE_GROUP_VERTICAL);
+
+    gwy_param_table_append_header(table, -1, _("Editor"));
+    gwy_param_table_append_radio_item(table, PARAM_STYLE, MASK_EDIT_STYLE_SHAPES);
+    gwy_param_table_append_radio_buttons(table, PARAM_MODE, mode_icons);
+    gwy_param_table_append_radio_buttons(table, PARAM_SHAPE, shape_icons);
+    gwy_param_table_append_checkbox(table, PARAM_LINES_4_CONNECTED);
+
+    gwy_param_table_append_separator(table);
+    gwy_param_table_append_radio_item(table, PARAM_STYLE, MASK_EDIT_STYLE_DRAWING);
+    gwy_param_table_append_radio_buttons(table, PARAM_TOOL, tool_icons);
+    gwy_param_table_append_slider(table, PARAM_RADIUS);
+    gwy_param_table_set_unitstr(table, PARAM_RADIUS, _("px"));
+
+    gwy_param_table_append_header(table, -1, _("Actions"));
+    gwy_param_table_append_foreign(table, WIDGET_ACTIONS, create_actions, tool, NULL);
+    gwy_param_table_append_foreign(table, WIDGET_FILL_VOIDS, create_fill_voids, tool, NULL);
+
+    gwy_param_table_append_header(table, -1, _("Grow/Shrink"));
+    gwy_param_table_append_foreign(table, WIDGET_GROW_SHRINK, create_grow_shrink, tool, NULL);
+    gwy_param_table_append_slider(table, PARAM_GSAMOUNT);
+    gwy_param_table_set_unitstr(table, PARAM_GSAMOUNT, _("px"));
+    gwy_param_table_append_combo(table, PARAM_DIST_TYPE);
+    gwy_param_table_append_checkbox(table, PARAM_FROM_BORDER);
+    gwy_param_table_append_checkbox(table, PARAM_PREVENT_MERGE);
+
+    gwy_plain_tool_add_param_table(GWY_PLAIN_TOOL(tool), table);
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), gwy_param_table_widget(table), FALSE, FALSE, 0);
+    terrible_hack(tool);
+
+    gwy_tool_add_hide_button(GWY_TOOL(tool), TRUE);
+    gwy_help_add_to_tool_dialog(dialog, GWY_TOOL(tool), GWY_HELP_DEFAULT);
+
+    g_signal_connect_swapped(tool->table, "param-changed", G_CALLBACK(param_changed), tool);
+
+    gtk_widget_show_all(dialog->vbox);
+}
+
+static void
+ensure_style(GwyToolMaskEditor *tool, GObject *button)
+{
+    MaskEditStyle style = GPOINTER_TO_UINT(g_object_get_data(button, "mask-editor-style"));
+
+    gwy_debug("switch to style %d", style);
+    gwy_param_table_set_enum(tool->table, PARAM_STYLE, style);
+}
+
+/* XXX: Never do this. The documentation clearly says so. But it restores the convenient behaviour when clicking on
+ * a mode/shape/tool button switches to the corresponding drawing style ***even when you click on an already active
+ * button***. GwyParamTable is too smart for that and does not emit any signal when nothing changes. */
+static void
+terrible_hack(GwyToolMaskEditor *tool)
+{
+    GList *l, *children = gtk_container_get_children(GTK_CONTAINER(gwy_param_table_widget(tool->table)));
+    gint hack_count = 0;
+
+    for (l = children; l; l = g_list_next(l)) {
+        GtkWidget *widget = GTK_WIDGET(l->data);
+
+        if (GTK_IS_HBOX(widget)) {
+            GList *l2, *children2 = gtk_container_get_children(GTK_CONTAINER(widget));
+
+            for (l2 = children2; l2; l2 = g_list_next(l2)) {
+                GtkWidget *img, *widget2 = GTK_WIDGET(l2->data);
+
+                if (GTK_IS_RADIO_BUTTON(widget2) && (img = gtk_bin_get_child(GTK_BIN(widget2))) && GTK_IS_IMAGE(img)) {
+                    gchar *stock_id = NULL;
+
+                    gtk_image_get_stock(GTK_IMAGE(img), &stock_id, NULL);
+                    if (stock_id) {
+                        MaskEditStyle style;
+                        gboolean known_style = FALSE;
+                        guint i;
+
+                        for (i = 0; i < G_N_ELEMENTS(mode_icons) && !known_style; i++) {
+                            if (gwy_strequal(mode_icons[i].name, stock_id)) {
+                                style = MASK_EDIT_STYLE_SHAPES;
+                                known_style = TRUE;
+                            }
+                        }
+                        for (i = 0; i < G_N_ELEMENTS(shape_icons) && !known_style; i++) {
+                            if (gwy_strequal(shape_icons[i].name, stock_id)) {
+                                style = MASK_EDIT_STYLE_SHAPES;
+                                known_style = TRUE;
+                            }
+                        }
+                        for (i = 0; i < G_N_ELEMENTS(tool_icons) && !known_style; i++) {
+                            if (gwy_strequal(tool_icons[i].name, stock_id)) {
+                                style = MASK_EDIT_STYLE_DRAWING;
+                                known_style = TRUE;
+                            }
+                        }
+
+                        if (known_style) {
+                            g_object_set_data(G_OBJECT(widget2), "mask-editor-style", GUINT_TO_POINTER(style));
+                            g_signal_connect_swapped(widget2, "clicked", G_CALLBACK(ensure_style), tool);
+                            hack_count++;
+                        }
+                    }
+                }
+            }
+            g_list_free(children2);
+        }
+    }
+    g_list_free(children);
+
+    if (hack_count != 4+3+4)
+        g_warning("Hacked only %d mode/shape/tool icons of %d. Something went wrong.", hack_count, 4+3+4);
+}
+
+static void
+create_button(GwyToolMaskEditor *tool, GtkBox *hbox,
+              const gchar *label, const gchar *stock_id, MaskEditAction action, guint sens_flags)
+{
+    GtkWidget *button;
+
+    if (stock_id)
+        button = gwy_stock_like_button_new(label, stock_id);
+    else
+        button = gtk_button_new_with_mnemonic(label);
+
+    g_object_set_data(G_OBJECT(button), "action", GUINT_TO_POINTER(action));
+    gwy_sensitivity_group_add_widget(tool->sensgroup, button, sens_flags);
+    gtk_size_group_add_widget(tool->sizegroup, button);
+    gtk_box_pack_start(hbox, button, TRUE, TRUE, 0);
+    g_signal_connect_swapped(button, "clicked", G_CALLBACK(run_action), tool);
+}
+
+static GtkWidget*
+create_actions(gpointer user_data)
+{
+    GwyToolMaskEditor *tool = (GwyToolMaskEditor*)user_data;
+    GtkBox *hbox = GTK_BOX(gtk_hbox_new(TRUE, 0));
+
+    create_button(tool, hbox, _("_Invert"), GWY_STOCK_MASK_INVERT, ACTION_INVERT, SENS_DATA | SENS_MASK);
+    create_button(tool, hbox, _("_Remove"), GWY_STOCK_MASK_REMOVE, ACTION_REMOVE, SENS_DATA | SENS_MASK);
+    create_button(tool, hbox, _("_Fill"), GWY_STOCK_MASK, ACTION_FILL, SENS_DATA);
+
+    return GTK_WIDGET(hbox);
+}
+
+static GtkWidget*
+create_fill_voids(gpointer user_data)
+{
+    GwyToolMaskEditor *tool = (GwyToolMaskEditor*)user_data;
+    GtkBox *hbox = GTK_BOX(gtk_hbox_new(FALSE, 4));
+    GtkWidget *checkbox;
+
+    create_button(tool, hbox, _("Fill _Voids"), NULL, ACTION_FILL_VOIDS, SENS_DATA | SENS_MASK);
+
+    checkbox = gtk_check_button_new_with_mnemonic(_("Fill non-simple-connected"));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbox),
+                                 gwy_params_get_boolean(tool->params, PARAM_FILL_NONSIMPLE));
+    gtk_box_pack_start(hbox, checkbox, TRUE, TRUE, 0);
+    g_signal_connect_swapped(checkbox, "toggled", G_CALLBACK(fill_nonsimple_changed), tool);
+
+    return GTK_WIDGET(hbox);
+}
+
+static GtkWidget*
+create_grow_shrink(gpointer user_data)
+{
+    GwyToolMaskEditor *tool = (GwyToolMaskEditor*)user_data;
+    GtkBox *hbox = GTK_BOX(gtk_hbox_new(TRUE, 0));
+
+    create_button(tool, hbox, _("_Grow"), GWY_STOCK_MASK_GROW, ACTION_GROW, SENS_DATA | SENS_MASK);
+    create_button(tool, hbox, _("Shrin_k"), GWY_STOCK_MASK_SHRINK, ACTION_SHRINK, SENS_DATA | SENS_MASK);
+
+    return GTK_WIDGET(hbox);
+}
+
+static void
+connect_selection(GwyToolMaskEditor *tool)
+{
+    static const gchar *const shape_selection_names[MASK_NLAYER_TYPES] = {
+        "rectangle", "ellipse", "line", "pointer",
+    };
+
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    MaskEditStyle style = gwy_params_get_enum(tool->params, PARAM_STYLE);
+    MaskEditShape shape = (style == MASK_EDIT_STYLE_DRAWING
+                           ? MASK_SHAPE_POINT
+                           : gwy_params_get_enum(tool->params, PARAM_SHAPE));
+
+    gwy_plain_tool_connect_selection(plain_tool, tool->layer_types[shape], shape_selection_names[shape]);
+}
+
+static void
+gwy_tool_mask_editor_data_switched(GwyTool *gwytool,
+                                   GwyDataView *data_view)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(gwytool);
+    GwyToolMaskEditor *tool = GWY_TOOL_MASK_EDITOR(gwytool);
+    gboolean ignore = (data_view == plain_tool->data_view);
+
+    GWY_TOOL_CLASS(gwy_tool_mask_editor_parent_class)->data_switched(gwytool, data_view);
+
+    if (ignore || plain_tool->init_failed)
+        return;
+
+    gwy_sensitivity_group_set_state(tool->sensgroup, SENS_DATA, data_view ? SENS_DATA : 0);
+    gwy_tool_mask_editor_mask_changed(plain_tool);
+    gwy_debug("explicitly calling param_changed()");
+    if (tool->table)
+        gwy_param_table_param_changed(tool->table, -1);
+    gwy_debug("explicit call ended");
+}
+
+static void
+gwy_tool_mask_editor_mask_changed(GwyPlainTool *plain_tool)
+{
+    GwyToolMaskEditor *tool = GWY_TOOL_MASK_EDITOR(plain_tool);
+    GwyDataField *mask = plain_tool->mask_field;
+
+    gwy_sensitivity_group_set_state(tool->sensgroup, SENS_MASK,
+                                    mask && gwy_data_field_get_max(mask) > 0.0 ? SENS_MASK : 0);
+}
+
+static void
+param_changed(GwyToolMaskEditor *tool, gint id)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+
+    /* First ensure that clicking on a shape/mode/tool switches to the corresponding style. */
+    if (id == PARAM_RADIUS || id == PARAM_TOOL) {
+        if (gwy_params_get_enum(tool->params, PARAM_STYLE) != MASK_EDIT_STYLE_DRAWING) {
+            gwy_param_table_set_enum(tool->table, PARAM_STYLE, MASK_EDIT_STYLE_DRAWING);
+            id = PARAM_STYLE;
+        }
+    }
+    if (id == PARAM_SHAPE || id == PARAM_MODE) {
+        if (gwy_params_get_enum(tool->params, PARAM_STYLE) != MASK_EDIT_STYLE_SHAPES) {
+            gwy_param_table_set_enum(tool->table, PARAM_STYLE, MASK_EDIT_STYLE_SHAPES);
+            id = PARAM_STYLE;
+        }
+    }
+
+    /* Then we can handle the changes specifically. */
+    if (id < 0 || id == PARAM_STYLE || id == PARAM_SHAPE || id == PARAM_TOOL) {
+        connect_selection(tool);
+        setup_layer(tool);
+        if (plain_tool->selection)
+            gwy_selection_clear(plain_tool->selection);
+    }
+}
+
+static void
+fill_nonsimple_changed(GwyToolMaskEditor *tool, GtkToggleButton *toggle)
+{
+    gwy_params_set_boolean(tool->params, PARAM_FILL_NONSIMPLE, gtk_toggle_button_get_active(toggle));
+}
+
+static void
+setup_layer(GwyToolMaskEditor *tool)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    MaskEditStyle style = gwy_params_get_enum(tool->params, PARAM_STYLE);
+    MaskEditShape shape = (style == MASK_EDIT_STYLE_DRAWING
+                           ? MASK_SHAPE_POINT
+                           : gwy_params_get_enum(tool->params, PARAM_SHAPE));
+    MaskEditTool drawtool = gwy_params_get_enum(tool->params, PARAM_TOOL);
+
+    if (!plain_tool->data_view)
+        return;
+
+    gwy_debug("setting up layer %s", g_type_name(tool->layer_types[shape]));
+    gwy_object_set_or_reset(plain_tool->layer, tool->layer_types[shape], "editable", TRUE, "focus", -1, NULL);
+    if (style == MASK_EDIT_STYLE_SHAPES) {
+        if (shape == MASK_SHAPE_LINE)
+            g_object_set(plain_tool->layer, "line-numbers", FALSE, "thickness", 1, NULL);
+    }
+    else {
+        if (drawtool == MASK_TOOL_PAINT_DRAW || drawtool == MASK_TOOL_PAINT_ERASE)
+            g_object_set(plain_tool->layer, "marker-radius", gwy_params_get_int(tool->params, PARAM_RADIUS), NULL);
+        else
+            g_object_set(plain_tool->layer, "draw-marker", FALSE, NULL);
+    }
+
+    gwy_selection_set_max_objects(plain_tool->selection, 1);
+}
+
+static GwyDataField*
+ensure_mask(GwyPlainTool *plain_tool)
+{
+    if (!plain_tool->mask_field) {
+        GwyDataField *mask = gwy_data_field_new_alike(plain_tool->data_field, TRUE);
+        gwy_container_pass_object(plain_tool->container, gwy_app_get_mask_key_for_id(plain_tool->id), mask);
+    }
+    g_assert(plain_tool->mask_field);
+    return plain_tool->mask_field;
+}
+
+static void
+run_action(GwyToolMaskEditor *tool, GtkButton *button)
+{
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    MaskEditAction action = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(button), "action"));
+    GwyDataField *field = plain_tool->data_field;
+    GwyDataField *mask = plain_tool->mask_field;
+    gint gsamount = gwy_params_get_int(tool->params, PARAM_GSAMOUNT);
+    GwyDistanceTransformType dist_type = gwy_params_get_enum(tool->params, PARAM_DIST_TYPE);
+    gboolean prevent_merge = gwy_params_get_boolean(tool->params, PARAM_PREVENT_MERGE);
+    gboolean from_border = gwy_params_get_boolean(tool->params, PARAM_FROM_BORDER);
+    gboolean fill_nonsimple = gwy_params_get_boolean(tool->params, PARAM_FILL_NONSIMPLE);
+    GQuark quark;
+
+    g_return_if_fail(action == ACTION_FILL ? field : mask);
+
+    quark = gwy_app_get_mask_key_for_id(plain_tool->id);
+    gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+
+    if (action == ACTION_FILL) {
+        mask = ensure_mask(plain_tool);
+        gwy_data_field_fill(mask, 1.0);
+    }
+    else if (action == ACTION_REMOVE)
+        gwy_container_remove(plain_tool->container, quark);
+    else if (action == ACTION_INVERT)
+        gwy_data_field_grains_invert(mask);
+    else if (action == ACTION_GROW)
+        gwy_data_field_grains_grow(mask, gsamount, dist_type, prevent_merge);
+    else if (action == ACTION_SHRINK)
+        gwy_data_field_grains_shrink(mask, gsamount, dist_type, from_border);
+    else if (action == ACTION_FILL_VOIDS)
+        gwy_data_field_fill_voids(mask, fill_nonsimple);
+    else {
+        g_assert_not_reached();
+    }
+
+    if (action != ACTION_REMOVE)
+        gwy_data_field_data_changed(plain_tool->mask_field);
+
+    gwy_params_save_to_settings(tool->params);
+    gwy_plain_tool_log_add(plain_tool);
+}
+
+typedef enum {
+    MASK_COUNT,
+    MASK_FILL,
+    MASK_EXTRACT,
+    MASK_UNEXTRACT,
+} MaskPixelOp;
+
+static inline void
+mask_pixel_op(gdouble *field, gint i,
+              gdouble *values, gint *j,
+              MaskPixelOp op)
+{
+    if (op == MASK_EXTRACT)
+        values[(*j)++] = field[i];
+    else if (op == MASK_UNEXTRACT)
+        field[i] = values[(*j)++];
+    else if (op == MASK_FILL)
+        field[i] = *values;
+    else
+        (*j)++;
+}
+
+/* Width is always positive; height can be negative to indicate line direction. */
+static void
+gwy_data_field_general_linear_area_operation(GwyDataField *dfield,
+                                             gint col, gint row,
+                                             gint width, gint height,
+                                             gdouble *data,
+                                             const gboolean is_4_connected,
+                                             const MaskPixelOp op)
+{
+    gboolean is_const = (op == MASK_COUNT || op == MASK_EXTRACT);
+    gint i, j, q, xres, yres;
+    gdouble *d;
+
+    xres = gwy_data_field_get_xres(dfield);
+    yres = gwy_data_field_get_yres(dfield);
+    col = CLAMP(col, 0, xres-1);
+    row = CLAMP(row, 0, yres-1);
+    width = CLAMP(width, 0, xres-col);
+    height = (height >= 0 ? CLAMP(height, 0, yres-row) : CLAMP(height, -row, 0));
+    d = (is_const ? (gdouble*)gwy_data_field_get_data_const(dfield) : gwy_data_field_get_data(dfield));
+
+    j = 0;
+    if (ABS(height) >= width) {
+        q = width/2;
+        if (height > 0) {
+            for (i = 0; i < height-1; i++) {
+                mask_pixel_op(d, (row + i)*xres + col + q/height, data, &j, op);
+                if (is_4_connected && q/height != (q + width)/height) {
+                    if (q % height >= height/2)
+                        mask_pixel_op(d, (row + i)*xres + col + q/height+1, data, &j, op);
+                    else
+                        mask_pixel_op(d, (row + i+1)*xres + col + q/height, data, &j, op);
+                }
+                q += width;
+            }
+            mask_pixel_op(d, (row + i)*xres + col + q/height, data, &j, op);
+        }
+        else {
+            height = ABS(height);
+            for (i = 0; i < height-1; i++) {
+                mask_pixel_op(d, (row - i)*xres + col + q/height, data, &j, op);
+                if (is_4_connected && q/height != (q + width)/height) {
+                    if (q % height >= height/2)
+                        mask_pixel_op(d, (row - i)*xres + col + q/height+1, data, &j, op);
+                    else
+                        mask_pixel_op(d, (row - i-1)*xres + col + q/height, data, &j, op);
+                }
+                q += width;
+            }
+            mask_pixel_op(d, (row - i)*xres + col + q/height, data, &j, op);
+        }
+    }
+    else {
+        q = height/2;
+        for (i = 0; i < width-1; i++) {
+            mask_pixel_op(d, (row + q/width)*xres + col + i, data, &j, op);
+            if (is_4_connected && q/width != (q + height)/width) {
+                if (q % width >= width/2)
+                    mask_pixel_op(d, (row + q/width + 1)*xres + col + i, data, &j, op);
+                else
+                    mask_pixel_op(d, (row + q/width)*xres + col + i+1, data, &j, op);
+            }
+            q += height;
+        }
+        mask_pixel_op(d, (row + q/width)*xres + col + i, data, &j, op);
+    }
+
+    if (!is_const)
+        gwy_data_field_invalidate(dfield);
+}
+
+/* 8-continuous lines. */
+static gint
+gwy_data_field_get_linear_area_size(gint width, gint height)
+{
+    return MAX(ABS(width), ABS(height));
+}
+
+static void
+gwy_data_field_linear_area_fill(GwyDataField *dfield,
+                                gint col, gint row,
+                                gint width, gint height,
+                                gdouble value)
+{
+    gwy_data_field_general_linear_area_operation(dfield, col, row, width, height, &value, FALSE, MASK_FILL);
+}
+
+static void
+gwy_data_field_linear_area_extract(GwyDataField *dfield,
+                                   gint col, gint row,
+                                   gint width, gint height,
+                                   gdouble *values)
+{
+    gwy_data_field_general_linear_area_operation(dfield, col, row, width, height, values, FALSE, MASK_EXTRACT);
+}
+
+static void
+gwy_data_field_linear_area_unextract(GwyDataField *dfield,
+                                     gint col, gint row,
+                                     gint width, gint height,
+                                     const gdouble *values)
+{
+    gwy_data_field_general_linear_area_operation(dfield, col, row, width, height, (gdouble*)values,
+                                                 FALSE, MASK_UNEXTRACT);
+}
+
+/* 4-continuous lines. */
+static gint
+gwy_data_field_get_clinear_area_size(gint width, gint height)
+{
+    return ABS(width) + ABS(height) - 1;
+}
+
+static void
+gwy_data_field_clinear_area_fill(GwyDataField *dfield,
+                                gint col, gint row,
+                                gint width, gint height,
+                                gdouble value)
+{
+    gwy_data_field_general_linear_area_operation(dfield, col, row, width, height, &value, TRUE, MASK_FILL);
+}
+
+static void
+gwy_data_field_clinear_area_extract(GwyDataField *dfield,
+                                   gint col, gint row,
+                                   gint width, gint height,
+                                   gdouble *values)
+{
+    gwy_data_field_general_linear_area_operation(dfield, col, row, width, height, values, TRUE, MASK_EXTRACT);
+}
+
+static void
+gwy_data_field_clinear_area_unextract(GwyDataField *dfield,
+                                      gint col, gint row,
+                                      gint width, gint height,
+                                      const gdouble *values)
+{
+    gwy_data_field_general_linear_area_operation(dfield, col, row, width, height, (gdouble*)values,
+                                                 TRUE, MASK_UNEXTRACT);
+}
+
+static void
+gwy_tool_mask_editor_selection_finished(GwyPlainTool *plain_tool)
+{
+    GwyToolMaskEditor *tool = GWY_TOOL_MASK_EDITOR(plain_tool);
+    MaskEditStyle style = gwy_params_get_enum(tool->params, PARAM_STYLE);
+    MaskEditTool drawtool = gwy_params_get_enum(tool->params, PARAM_TOOL);
+    MaskEditShape shape = gwy_params_get_enum(tool->params, PARAM_SHAPE);
+    MaskEditLogicalOp mode = gwy_params_get_enum(tool->params, PARAM_MODE);
+    gboolean lines_4_connected = gwy_params_get_boolean(tool->params, PARAM_LINES_4_CONNECTED);
+    GwySelection *selection = plain_tool->selection;
+    GwyDataField *mask = plain_tool->mask_field;
+    FieldFillFunc fill_func = NULL;
+    FieldExtractFunc extract_func = NULL;
+    FieldUnextractFunc unextract_func = NULL;
+    FieldSizeFunc size_func = NULL;
+    gboolean log_it_anyway = FALSE;
+    gint col, row, width, height;
+    GQuark quark;
+    gdouble sel[4];
+    gint isel[4];
+
+    g_return_if_fail(plain_tool->data_field);
+
+    tool->drawing_started = FALSE;
+    if (!gwy_selection_get_object(selection, 0, sel))
+        return;
+
+    isel[0] = floor(gwy_data_field_rtoj(plain_tool->data_field, sel[0]));
+    isel[1] = floor(gwy_data_field_rtoi(plain_tool->data_field, sel[1]));
+
+    if (style == MASK_EDIT_STYLE_DRAWING) {
+        if (drawtool == MASK_TOOL_PAINT_DRAW || drawtool == MASK_TOOL_PAINT_ERASE) {
+            gwy_plain_tool_log_add(plain_tool);
+            /* The mask has been already modified. */
+            gwy_selection_clear(selection);
+            return;
+        }
+        bucket_fill(tool, isel[0], isel[1]);
+        if (plain_tool->mask_field)
+            gwy_data_field_data_changed(plain_tool->mask_field);
+        return;
+    }
+
+    if (shape == MASK_SHAPE_RECTANGLE)
+        fill_func = gwy_data_field_area_fill;
+    else if (shape == MASK_SHAPE_ELLIPSE) {
+        fill_func = (FieldFillFunc)gwy_data_field_elliptic_area_fill;
+        extract_func = (FieldExtractFunc)gwy_data_field_elliptic_area_extract;
+        unextract_func = gwy_data_field_elliptic_area_unextract;
+        size_func = gwy_data_field_get_elliptic_area_size;
+    }
+    else if (shape == MASK_SHAPE_LINE) {
+        if (lines_4_connected) {
+            fill_func = gwy_data_field_clinear_area_fill;
+            extract_func = gwy_data_field_clinear_area_extract;
+            unextract_func = gwy_data_field_clinear_area_unextract;
+            size_func = gwy_data_field_get_clinear_area_size;
+        }
+        else {
+            fill_func = gwy_data_field_linear_area_fill;
+            extract_func = gwy_data_field_linear_area_extract;
+            unextract_func = gwy_data_field_linear_area_unextract;
+            size_func = gwy_data_field_get_linear_area_size;
+        }
+    }
+    else {
+        g_return_if_reached();
+    }
+
+    isel[2] = floor(gwy_data_field_rtoj(plain_tool->data_field, sel[2]));
+    isel[3] = floor(gwy_data_field_rtoi(plain_tool->data_field, sel[3]));
+    if (shape == MASK_SHAPE_LINE) {
+        if (isel[2] < isel[0]) {
+            GWY_SWAP(gdouble, isel[0], isel[2]);
+            GWY_SWAP(gdouble, isel[1], isel[3]);
+        }
+    }
+    else {
+        GWY_ORDER(gdouble, isel[0], isel[2]);
+        GWY_ORDER(gdouble, isel[1], isel[3]);
+    }
+    col = isel[0];
+    row = isel[1];
+    width = isel[2] - isel[0];
+    height = isel[3] - isel[1];  /* This one can be negative for lines. */
+    gwy_debug("(%d,%d) (%d,%d)", col, row, width, height);
+
+    quark = gwy_app_get_mask_key_for_id(plain_tool->id);
+    if (mode == MASK_EDIT_OP_SET) {
+        gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+        mask = ensure_mask(plain_tool);
+        gwy_data_field_clear(mask);
+        fill_func(mask, col, row, width, height, 1.0);
+    }
+    else if (mode == MASK_EDIT_OP_ADD && (!mask || gwy_data_field_get_min(mask) < 1.0)) {
+        gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+        mask = ensure_mask(plain_tool);
+        fill_func(mask, col, row, width, height, 1.0);
+    }
+    else if (mode == MASK_EDIT_OP_REMOVE && mask && gwy_data_field_get_max(mask) > 0.0) {
+        gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+        fill_func(mask, col, row, width, height, 0.0);
+        if (!(gwy_data_field_get_max(mask) > 0.0)) {
+            gwy_container_remove(plain_tool->container, quark);
+            mask = NULL;
+        }
+    }
+    else if (mode == MASK_EDIT_OP_INTERSECT && mask && gwy_data_field_get_max(mask) > 0.0) {
+        gdouble *data;
+        gint n;
+
+        gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+        gwy_data_field_clamp(mask, 0.0, 1.0);
+        if (shape == MASK_SHAPE_RECTANGLE)
+            gwy_data_field_area_add(mask, col, row, width, height, 1.0);
+        else {
+            n = size_func(width, height);
+            data = g_new(gdouble, n);
+            extract_func(mask, col, row, width, height, data);
+            while (n)
+                data[--n] += 1.0;
+            unextract_func(mask, col, row, width, height, data);
+            g_free(data);
+        }
+        gwy_data_field_add(mask, -1.0);
+        gwy_data_field_clamp(mask, 0.0, 1.0);
+        if (!(gwy_data_field_get_max(mask) > 0.0)) {
+            gwy_container_remove(plain_tool->container, quark);
+            log_it_anyway = TRUE;
+            mask = NULL;
+        }
+    }
+
+    gwy_selection_clear(selection);
+    if (mask) {
+        gwy_data_field_data_changed(mask);
+    }
+    if (mask || log_it_anyway) {
+        gwy_params_save_to_settings(tool->params);
+        gwy_plain_tool_log_add(plain_tool);
+    }
+}
+
+static void
+bucket_fill(GwyToolMaskEditor *tool, gint j, gint i)
+{
+    MaskEditTool drawtool = gwy_params_get_enum(tool->params, PARAM_TOOL);
+    GwyPlainTool *plain_tool = GWY_PLAIN_TOOL(tool);
+    GwyDataField *mask;
+    gint xres, yres, k, gno;
+    gint *g, *grains = NULL;
+    gboolean draw;
+    gdouble *data;
+    GQuark quark;
+
+    plain_tool = GWY_PLAIN_TOOL(tool);
+    mask = plain_tool->mask_field;
+    if (!mask) {
+        if (drawtool != MASK_TOOL_FILL_DRAW)
+            return;
+        quark = gwy_app_get_mask_key_for_id(plain_tool->id);
+        gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+        mask = ensure_mask(plain_tool);
+        gwy_data_field_fill(mask, 1.0);
+        goto end;
+    }
+
+    xres = gwy_data_field_get_xres(mask);
+    yres = gwy_data_field_get_yres(mask);
+    if (i < 0 || i >= yres || j < 0 || j >= xres)
+        return;
+
+    if (drawtool == MASK_TOOL_FILL_DRAW)
+        draw = TRUE;
+    else if (drawtool == MASK_TOOL_FILL_ERASE)
+        draw = FALSE;
+    else {
+        g_return_if_reached();
+    }
+
+    data = gwy_data_field_get_data(mask);
+    if ((data[i*xres + j] && draw) || (!data[i*xres + j] && !draw))
+        return;
+
+    quark = gwy_app_get_mask_key_for_id(plain_tool->id);
+    gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+
+    g = grains = g_new0(gint, xres*yres);
+    if (draw)
+        gwy_data_field_grains_invert(mask);
+    gwy_data_field_number_grains(mask, grains);
+    gno = grains[i*xres + j];
+
+    for (k = xres*yres; k; k--, data++, g++) {
+        if (*g == gno)
+            *data = 0.0;
+    }
+    if (draw)
+        gwy_data_field_grains_invert(mask);
+
+    g_free(grains);
+end:
+    gwy_params_save_to_settings(tool->params);
+    gwy_plain_tool_log_add(plain_tool);
+}
+
+/* FIXME: This is woefully inefficient. */
+static void
+gwy_data_field_paint_wide_line(GwyDataField *dfield,
+                               gint col, gint row,
+                               gint width, gint height,
+                               gdouble radius, gdouble value)
+{
+    gint i, q;
+
+    if (!width && !height) {
+        gwy_data_field_circular_area_fill(dfield, col, row, radius, value);
+        return;
+    }
+
+    if (ABS(height) >= width) {
+        q = width/2;
+        if (height > 0) {
+            for (i = 0; i <= height; i++) {
+                gwy_data_field_circular_area_fill(dfield, col + q/height, row + i, radius, value);
+                q += width;
+            }
+        }
+        else {
+            height = ABS(height);
+            for (i = 0; i <= height; i++) {
+                gwy_data_field_circular_area_fill(dfield, col + q/height, row - i, radius, value);
+                q += width;
+            }
+        }
+    }
+    else {
+        q = height/2;
+        for (i = 0; i <= width; i++) {
+            gwy_data_field_circular_area_fill(dfield, col+i, row + q/width, radius, value);
+            q += height;
+        }
+    }
+}
+
+static void
+gwy_tool_mask_editor_selection_changed(GwyPlainTool *plain_tool,
+                                       G_GNUC_UNUSED gint hint)
+{
+    GwyToolMaskEditor *tool = GWY_TOOL_MASK_EDITOR(plain_tool);
+    GwyDataField *mask = plain_tool->mask_field;
+    GwyDataField *field = plain_tool->data_field;
+    MaskEditStyle style = gwy_params_get_enum(tool->params, PARAM_STYLE);
+    MaskEditTool drawtool = gwy_params_get_enum(tool->params, PARAM_TOOL);
+    gint radius = gwy_params_get_int(tool->params, PARAM_RADIUS);
+    GwySelection *selection = plain_tool->selection;
+    GQuark quark;
+    gint xres, yres;
+    gdouble sel[2];
+    gdouble fillvalue, r;
+    gint isel[2];
+
+    gwy_debug("selection %s", selection ? g_type_name(G_TYPE_FROM_INSTANCE(selection)) : "(null)");
+
+    if (style != MASK_EDIT_STYLE_DRAWING || !field || !selection || !gwy_selection_get_object(selection, 0, sel)) {
+        tool->drawing_started = FALSE;
+        return;
+    }
+
+    if (drawtool == MASK_TOOL_PAINT_DRAW)
+        fillvalue = 1.0;
+    else if (drawtool == MASK_TOOL_PAINT_ERASE)
+        fillvalue = 0.0;
+    else
+        return;
+
+    isel[0] = floor(gwy_data_field_rtoj(plain_tool->data_field, sel[0]));
+    isel[1] = floor(gwy_data_field_rtoi(plain_tool->data_field, sel[1]));
+
+    quark = gwy_app_get_mask_key_for_id(plain_tool->id);
+    xres = gwy_data_field_get_xres(plain_tool->data_field);
+    yres = gwy_data_field_get_yres(plain_tool->data_field);
+
+    r = radius - 0.5;
+    if (isel[0] >= 0 && isel[0] < xres && isel[1] >= 0 && isel[1] < yres) {
+        if (!tool->drawing_started) {
+            gwy_app_undo_qcheckpointv(plain_tool->container, 1, &quark);
+            mask = ensure_mask(plain_tool);
+            gwy_data_field_circular_area_fill(mask, isel[0], isel[1], r, fillvalue);
+        }
+        else {
+            gint xy[4];
+
+            xy[0] = tool->oldisel[0];
+            xy[1] = tool->oldisel[1];
+            xy[2] = isel[0];
+            xy[3] = isel[1];
+            if (xy[2] < xy[0]) {
+                GWY_SWAP(gdouble, xy[0], xy[2]);
+                GWY_SWAP(gdouble, xy[1], xy[3]);
+            }
+            xy[2] -= xy[0];
+            xy[3] -= xy[1];
+            gwy_data_field_paint_wide_line(mask, xy[0], xy[1], xy[2], xy[3], r, fillvalue);
+        }
+        gwy_data_field_data_changed(mask);
+        tool->oldisel[0] = isel[0];
+        tool->oldisel[1] = isel[1];
+        tool->drawing_started = TRUE;
+    }
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,266 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2014-09-18 10:10+0400\n"
+"PO-Revision-Date: 2014-09-18 10:14+0300\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: settings.xml:6(title)
+msgid "Settings"
+msgstr "Настройки"
+
+#: settings.xml:7(para)
+msgid ""
+"Gwyddion module functions remember parameters values between invocations and "
+"also between individual sessions. The place where all the values are stored "
+"is called settings. The settings include a few program-wide parameters as "
+"well."
+msgstr ""
+"Функции модулей в Gwyddion запоминают значения параметров между вызовами и "
+"между сеансами работы с программой. Место хранения этих параметров "
+"называется настройками. Настройки также содержат некоторое количество "
+"параметров, относящихся к основной программе."
+
+#: settings.xml:13(para)
+msgid ""
+"The permanent storage for the settings is the file <filename>settings</"
+"filename> in a user's directory, this usually means under <filename>~/."
+"gwyddion</filename> (Unix) or <filename>Documents and Settings\\gwyddion</"
+"filename> (MS Windows). The file is only read when Gwyddion starts and "
+"written when it terminates. You should keep this in mind if you want to do "
+"some manual modifications. Unknown entries in the settings are ignored but "
+"preserved."
+msgstr ""
+"Постоянным хранилищем настроек является файл <filename>settings</filename> в "
+"каталоге пользователя, что обычно означает каталог <filename>~/.gwyddion</"
+"filename> (в Unix) или <filename>Documents and Settings\\gwyddion</filename> "
+"(в MS Windows). Этот файл читается только при старте программы и "
+"записывается при завершении её работы. Следует иметь это в виду если вы "
+"собираетесь исправить что-то в нём вручную. Неизвестные настройки в этом "
+"файле игнорируются, но сохраняются."
+
+#: settings.xml:22(para)
+msgid ""
+"The settings file starts with a magic header line "
+"<informalexample><programlisting>Gwyddion Settings 1.0</programlisting></"
+"informalexample> followed by lines with individual parameters and values "
+"(that form, technically, a serialised <type>GwyContainer</type>). Gwyddion "
+"writes the entries in the alphabetical order but this is not a requirement "
+"and you do not have to keep the order when modifying the file."
+msgstr ""
+"Файл настроек начинается с магической строки заголовка "
+"<informalexample><programlisting>Gwyddion Settings 1.0</programlisting></"
+"informalexample> за которой следуют строки с отдельными параметрами и "
+"значениями (которые формируют, технически, переведённый в последовательный "
+"вид <type>GwyContainer</type>). Gwyddion записывает элементы в алфавитном "
+"порядке, но это не является обязательным требованием и вам не нужно "
+"сохранять этот порядок при модификации файла."
+
+#: settings.xml:32(para)
+msgid ""
+"Each parameter line has the form <informalexample><programlisting>"
+"\"<replaceable>key</replaceable>\" <replaceable>type</"
+"replaceable><replaceable>value</replaceable></programlisting></"
+"informalexample> Typical module settings keys start with <literal>/module/"
+"<replaceable>modulename</replaceable></literal>, although in a few cases the "
+"module name part is not actually the module name, either because several "
+"modules share settings or for historical reasons. Program-wide setting keys "
+"start with <literal>/app/</literal>. All possible value types are listed in "
+"the following table."
+msgstr ""
+"Каждая строка параметров записывается в форме "
+"<informalexample><programlisting>\"<replaceable>key</replaceable>\" "
+"<replaceable>type</replaceable> <replaceable>value</replaceable></"
+"programlisting></informalexample> Типичные ключи настроек модуля начинаются "
+"с <literal>/module/<replaceable>modulename</replaceable></literal>, хотя в "
+"некоторых случаях часть имени модуля не является по сути именем, либо потому "
+"что несколько модулей разделяют общие настройки, либо по причинам "
+"исторического характера. Ключи настройки самой программы начинаются с "
+"<literal>/app/</literal>. Все возможные типы значений перечислены в "
+"следующей таблице."
+
+#: settings.xml:50(entry) settings.xml:118(entry)
+msgid "Type"
+msgstr "Тип"
+
+#: settings.xml:51(entry) settings.xml:119(entry)
+msgid "Description"
+msgstr "Описание"
+
+#: settings.xml:56(entry) settings.xml:125(entry) settings.xml:136(entry)
+msgid "boolean"
+msgstr "boolean"
+
+#: settings.xml:58(literal) settings.xml:127(literal)
+#: settings.xml:138(literal)
+msgid "True"
+msgstr "True"
+
+#: settings.xml:59(literal)
+msgid "False"
+msgstr "False"
+
+#: settings.xml:57(entry)
+msgid "Logical value that can be either <placeholder-1/> or <placeholder-2/>."
+msgstr ""
+"Логическое значение, может быть либо <placeholder-1/>, либо <placeholder-2/>."
+
+#: settings.xml:63(entry)
+msgid "char"
+msgstr "char"
+
+#: settings.xml:68(replaceable)
+msgid "XX"
+msgstr "XX"
+
+#: settings.xml:68(literal)
+msgid "0x<placeholder-1/>"
+msgstr "0x<placeholder-1/>"
+
+#: settings.xml:64(entry)
+msgid ""
+"Single character. Normal characters are represented directly using a single "
+"character. Special characters are represented using the hexadecimal notation "
+"as <placeholder-1/>. This parameter type is not actually used much by "
+"modules."
+msgstr ""
+"Один символ. Обычные символы представлены напрямую одним символом. "
+"Специальные символы представлены в шестнадцатеричной нотации как "
+"<placeholder-1/>. Этот тип параметров практически не используется в модулях."
+
+#: settings.xml:73(entry)
+msgid "int32"
+msgstr "int32"
+
+#: settings.xml:74(entry)
+msgid ""
+"Signed 32bit integer. Gwyddion writes them in decimal notation but reads "
+"also other notations such as hexadecimal."
+msgstr ""
+"32битное целое со знаком. Gwyddion записывает их в десятичной нотации, но "
+"читает также другие виды, например, шестнадцатеричную."
+
+#: settings.xml:80(entry)
+msgid "int64"
+msgstr "int64"
+
+#: settings.xml:81(entry)
+msgid ""
+"Signed 64bit integer. Gwyddion writes them in decimal notation but reads "
+"also other notations such as hexadecimal."
+msgstr ""
+"64битное целое со знаком. Gwyddion записывает их в десятичной нотации, но "
+"читает также другие виды, например, шестнадцатеричную."
+
+#: settings.xml:87(entry)
+msgid "double"
+msgstr "double"
+
+#: settings.xml:90(literal)
+msgid "1.23e-4"
+msgstr "1.23e-4"
+
+#: settings.xml:88(entry)
+msgid ""
+"Floating point number. They can be in the scientific format, e.g. "
+"<placeholder-1/>. They are represented in the standard C/POSIX locale, i.e. "
+"decimal dot is used (not comma or other separators)."
+msgstr ""
+"Число с плавающей точкой. Может быть в научном представлении, т.е. "
+"<placeholder-1/>. Они представлены в стандартной локали C/POSIX, т.е. "
+"десятичным разделителем является точка (а не запятая или что-нибудь другое)."
+
+#: settings.xml:96(entry) settings.xml:147(entry)
+msgid "string"
+msgstr "string"
+
+#: settings.xml:97(entry)
+msgid ""
+"String of characters in double quotes, generally UTF-8 encoded. Special "
+"characters, including contained double quotes, are escaped using the "
+"standard backslash notation."
+msgstr ""
+"Строка символов в двойных кавычках, в общем случае в кодировке UTF-8. "
+"Специальные символы, включая вложенные двойные кавычки, экранируются "
+"используя стандартную нотацию с обратной чертой."
+
+#: settings.xml:107(para)
+msgid ""
+"Some potentially useful program-wide options that can be modified by editing "
+"the settings file:"
+msgstr ""
+"Некоторые потенциально полезные общепрограммные настройки, которые можно "
+"изменить в файле настроек:"
+
+#: settings.xml:117(entry)
+msgid "Key"
+msgstr "Ключ"
+
+#: settings.xml:124(entry)
+msgid "/app/restore-tool-position"
+msgstr "/app/restore-tool-position"
+
+#: settings.xml:126(entry)
+msgid ""
+"If set to <placeholder-1/>, Gwyddion restores not only size of tool dialogs "
+"but also their positions (if possible). For well-behaved window managers "
+"this is more likely to be annoying than helpful but in MS Windows you might "
+"want to try enabling it."
+msgstr ""
+"Если установлено в <placeholder-1/>, Gwyddion восстанавливает не только "
+"размеры диалогов инструментов, но и их размещение на экране (если это "
+"получается). Для хороших оконных менеджеров это скорей раздражает, чем "
+"помогает, но в MS Windows может оказаться полезным включить эту настройку."
+
+#: settings.xml:135(entry)
+msgid "/app/3d/axes/disable"
+msgstr "/app/3d/axes/disable"
+
+#: settings.xml:139(link)
+msgid "OpenGL 3D views"
+msgstr "окнах трёхмерного просмотра OpenGL"
+
+#: settings.xml:137(entry)
+msgid ""
+"If set to <placeholder-1/>, axis labels will never be drawn on "
+"<placeholder-2/>, even if enabled. This can help with certain troublesome 3D "
+"driver/card/GtkGLExt combinations in which Gwyddion is likely to crash when "
+"it tries to draw the axes."
+msgstr ""
+"Если установлено в <placeholder-1/>, подписи осей не будут рисоваться в "
+"<placeholder-2/>, даже если они включены. Это может помочь с некоторыми "
+"проблемными комбинациями видеодрайвера/видеокарты/GtkGLExt, с которыми "
+"Gwyddion падает при попытке отрисовки этих осей."
+
+#: settings.xml:146(entry)
+msgid "/app/help/user-guide-base"
+msgstr "/app/help/user-guide-base"
+
+#: settings.xml:151(literal)
+msgid "\"http://gwyddion.net/documentation/user-guide-en\""
+msgstr "\"http://gwyddion.net/documentation/user-guide-en\""
+
+#: settings.xml:154(literal)
+msgid "\"/home/yeti/docs/gwyddion-user-guide-xhtml-en-2014-09-17\""
+msgstr "\"/home/yeti/docs/gwyddion-user-guide-xhtml-en-2014-09-17\""
+
+#: settings.xml:148(entry)
+msgid ""
+"Base location of the user guide for help. If not set, the default on-line "
+"location is used, i.e. something like <placeholder-1/>, depending on the "
+"language. If you want to use a local copy of the HTML guide, set this "
+"setting to directory name, for instance <placeholder-2/>."
+msgstr ""
+"Место размещения руководства пользователя для работы справочной системы. "
+"Если не задано, будет использоваться значение по умолчанию, указывающее на "
+"онлайновую версию, т.е., нечто вроде <placeholder-1/>, в зависисмости от "
+"языка. Если вы хотите использовать локальную версию руководства пользователя "
+"в формате HTML, установите это значение в название каталога, например, "
+"<placeholder-2/>."

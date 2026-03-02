@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='data-browser'>
+  <title>Navigateur de Données</title>
+  <indexterm><primary>navigateur de données</primary></indexterm>
+  <para>
+    Le navigateur de données se présente sous la forme d'une fenêtre affichant
+    la structure du fichier sélectionné. Il présente le contenu tel que Gwyddion
+    se le représente, l'organisation de celui-ci peut donc changer sensiblement
+    de celui donné par le logiciel original.
+  </para>
+  <para>
+    Gwyddion supporte un nombre quelconque de donnéeS bi-dimensionnelles pour un
+    fichier donné. En fonction du contexte, ceux-ci sont généralement appelés
+    images ou champs de données dans ce guide (les images seules sont aussi
+    parfois appelées canaux bien que d'autres types de données soient aussi
+    constituées de canaux). 
+    Les dimensions des images dans un
+    fichier peuvent varier, de même que que les dimensions ou les valeurs
+    peuvent être des quantités physiques arbitraires.
+  </para>
+  <para>
+    De plus, des données uni-dimensionnelles réprésentées sous forme de graphes
+    ou de spectres peuvent être présent dans un même fichier. Le navigateur de
+    données est ainsi un outil permettant d'afficher et de gérer tous les
+    données disponibles dans un fichier.
+  </para>
+  <informalfigure id='fig-data-browser'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='data_browser.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Navigateur de données affichant différentes images.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <sect2 id='data-browser-operating'>
+    <title>Contrôler le navigateur</title>
+    <para>
+      Comme le navigateur affiche en permanence la structure du fichier
+      sélectionné, son contenu change lorsque vous passez d'une fenêtre à une
+      autre, pouvant aussi montrer des données de fichiers différents.
+      Il n'y a aucune différence entre les fichiers Gwyddion natifs
+      (<filename>.gwy</filename>) et les autres types de fichier. Lorsqu'un
+      fichier est chargé, sa structure est affichée comme s'il s'agissait d'un
+      fichier Gwyddion.
+    </para>
+    <para>
+      Le navigateur de données comporte plusieurs onglets, un pour chaque type de
+      données que peut contenir un fichier :
+      <itemizedlist>
+        <listitem><guilabel>Images</guilabel></listitem>
+        <listitem><guilabel>Graphes</guilabel></listitem>
+        <listitem><guilabel>Spectres</guilabel></listitem>
+        <listitem><guilabel>Volume</guilabel></listitem>
+        <listitem><guilabel>XYZ</guilabel></listitem>
+      </itemizedlist>
+      Chaque liste donne les noms des données ainsi que certaines propriétés
+      supplémentaires en fonction du type de données. Les noms peuvent être
+      modifiés en double-cliquant dessus.
+    </para>
+    <para>
+      Les images, graphes, spectres, données volumiques ou données XYZ peuvent être supprimés, 
+      dupliqués ou extraits individuellement vers un nouveau fichier Gwyddion 
+      natif à l'aide des boutons situés en bas du navigateur. Il est aussi
+      possible de les copier vers un nouveau fichier en faisant glisser une 
+      ligne du navigateur vers une fenêtre quelconque du fichier ciblé. Pour
+      renommer un élément, sélectionnez-le puis pressez la touche 
+      To rename a data item, select it and press <keycap>Entrée</keycap> ou 
+      faites un triple clic dessus avec la souris.
+    </para>
+    <para>
+      Le bouton fermer situé en haut à droite du navigateur permet de fermer le
+      fichier courant, en annulant toutes les modifications non enregistrées.
+      Un fichier sera aussi fermé lorsque toutes les fenêtres qui lui sont
+      associées sont fermées.
+    </para>
+    <para>
+      Si le navigateur de données est fermé, vous pouvez l'ouvrir en utilisant
+      le menu
+      <menuchoice>
+        <guimenu>Info</guimenu>
+        <guimenuitem>Navigateur de Données</guimenuitem>
+      </menuchoice>.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-images'>
+    <title>Images</title>
+    <para>
+      La liste des images montre des vignettes de chaque image, des cases à
+      cocher permettant de choisir la visibilité d'une image (c'est-à-dire son affichage
+      à l'écran), ainsi que le nom des images. La présence d'une
+      <link linkend='presentations-masks'>présentation</link>, d'un
+      <link linkend='presentations-masks'>masque</link>
+      ou d'une <link linkend='caldata'>calibration</link> est indiquée à droite
+      du nom par les lettres suivantes :
+      <itemizedlist>
+        <listitem><guilabel>M</guilabel> – masque</listitem>
+        <listitem><guilabel>P</guilabel> – présentation</listitem>
+        <listitem><guilabel>C</guilabel> – calibration</listitem>
+      </itemizedlist>
+    </para>
+  </sect2>
+  <sect2 id='data-browser-graphs'>
+    <title>Graphes</title>
+    <para>
+      La liste des graphes affiche des cases à cocher contrôlant la visibilité
+      des graphes, ainsi que le nom de ceux-ci. Le nombre de courbes d'un graphe
+      donné est affiché à droite de son nom.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-spectra'>
+    <title>Spectres</title>
+    <para>
+      La liste des spectres affiche le nom des spectres ainsi que le nombre de
+      points présents dans ceux-ci. Il n'y a pas de cases à cocher permettant de
+      contrôler la visibilité car les spectres ponctuels sont affichés et
+      traités uniquement en relation avec les données bi-dimensionnelles à
+      l'aide de
+      <link linkend='single-point-spectra'>l'outil spectroscopie</link>.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-volume'>
+    <title>Volume</title>
+    <para>
+      L'onglet volume affiche le nom des donnes et le nombre de niveaux selon la
+      The volume data list shows the data name and the number of levels in the
+      direction <xi:include href="eqi-z.xml"/>, c'est-à-dire perpendiculairement
+      à la section affichée dans la fenêtre.  La lettre <guilabel>Z</guilabel>
+      placée après le nombre de niveaux indique la présence d'une calibration
+      selon l'axe <xi:include href="eqi-z.xml"/>.
+    </para>
+  </sect2>
+  <sect2 id='data-browser-xyz'>
+    <title>XYZ</title>
+    <para>
+      La liste des données XYZ affiche le nom des données ainsi que le nombre de 
+      points présents dans les données.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

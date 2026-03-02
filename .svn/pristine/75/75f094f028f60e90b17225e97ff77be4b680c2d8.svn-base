@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<book id="index" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <title>Gwyddion Library Reference Manual</title>
+    <xi:include href="releaseinfo.xml"/>
+  </bookinfo>
+
+  <para>
+    This library contains basic classes and interfaces not directly related
+    to GUI or data processing, and various utility functions.
+  </para>
+  <xi:include href="xml/gwyddionenums.xml"/>
+  <xi:include href="xml/gwyserializable.xml"/>
+  <xi:include href="xml/gwycontainer.xml"/>
+  <xi:include href="xml/gwymacros.xml"/>
+  <xi:include href="xml/gwyddion.xml"/>
+  <xi:include href="xml/gwythreads.xml"/>
+  <xi:include href="xml/gwyentities.xml"/>
+  <xi:include href="xml/gwymath.xml"/>
+  <xi:include href="xml/gwymathfallback.xml"/>
+  <xi:include href="xml/gwynlfit.xml"/>
+  <xi:include href="xml/gwynlfitpreset.xml"/>
+  <xi:include href="xml/gwyfdcurvepreset.xml"/>
+  <xi:include href="xml/gwyexpr.xml"/>
+  <xi:include href="xml/gwysiunit.xml"/>
+  <xi:include href="xml/gwysivalueformat.xml"/>
+  <xi:include href="xml/gwyutils.xml"/>
+  <xi:include href="xml/gwyversion.xml"/>
+  <xi:include href="xml/gwyenum.xml"/>
+  <xi:include href="xml/gwyinventory.xml"/>
+  <xi:include href="xml/gwyrandgenset.xml"/>
+  <xi:include href="xml/gwyresource.xml"/>
+  <xi:include href="xml/gwystringlist.xml"/>
+  <xi:include href="xml/gwyresults.xml"/>
+  <xi:include href="xml/gwymd5.xml"/>
+  <xi:include href="xml/gwydebugobjects.xml"/>
+  <!-- API INDICES BEGIN -->
+  <index id="api-index-all">
+    <title>Index of all symbols</title>
+    <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-deprec">
+    <title>Index of deprecated symbols</title>
+    <xi:include href="xml/api-index-deprecated.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-1">
+    <title>Index of new symbols in 2.1</title>
+    <xi:include href="xml/api-index-2.1.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-4">
+    <title>Index of new symbols in 2.4</title>
+    <xi:include href="xml/api-index-2.4.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-5">
+    <title>Index of new symbols in 2.5</title>
+    <xi:include href="xml/api-index-2.5.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-7">
+    <title>Index of new symbols in 2.7</title>
+    <xi:include href="xml/api-index-2.7.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-8">
+    <title>Index of new symbols in 2.8</title>
+    <xi:include href="xml/api-index-2.8.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-9">
+    <title>Index of new symbols in 2.9</title>
+    <xi:include href="xml/api-index-2.9.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-11">
+    <title>Index of new symbols in 2.11</title>
+    <xi:include href="xml/api-index-2.11.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-12">
+    <title>Index of new symbols in 2.12</title>
+    <xi:include href="xml/api-index-2.12.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-22">
+    <title>Index of new symbols in 2.22</title>
+    <xi:include href="xml/api-index-2.22.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-23">
+    <title>Index of new symbols in 2.23</title>
+    <xi:include href="xml/api-index-2.23.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-25">
+    <title>Index of new symbols in 2.25</title>
+    <xi:include href="xml/api-index-2.25.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-26">
+    <title>Index of new symbols in 2.26</title>
+    <xi:include href="xml/api-index-2.26.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-35">
+    <title>Index of new symbols in 2.35</title>
+    <xi:include href="xml/api-index-2.35.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-36">
+    <title>Index of new symbols in 2.36</title>
+    <xi:include href="xml/api-index-2.36.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-37">
+    <title>Index of new symbols in 2.37</title>
+    <xi:include href="xml/api-index-2.37.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-38">
+    <title>Index of new symbols in 2.38</title>
+    <xi:include href="xml/api-index-2.38.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-39">
+    <title>Index of new symbols in 2.39</title>
+    <xi:include href="xml/api-index-2.39.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-42">
+    <title>Index of new symbols in 2.42</title>
+    <xi:include href="xml/api-index-2.42.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-43">
+    <title>Index of new symbols in 2.43</title>
+    <xi:include href="xml/api-index-2.43.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-44">
+    <title>Index of new symbols in 2.44</title>
+    <xi:include href="xml/api-index-2.44.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-45">
+    <title>Index of new symbols in 2.45</title>
+    <xi:include href="xml/api-index-2.45.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-46">
+    <title>Index of new symbols in 2.46</title>
+    <xi:include href="xml/api-index-2.46.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-47">
+    <title>Index of new symbols in 2.47</title>
+    <xi:include href="xml/api-index-2.47.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-48">
+    <title>Index of new symbols in 2.48</title>
+    <xi:include href="xml/api-index-2.48.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-49">
+    <title>Index of new symbols in 2.49</title>
+    <xi:include href="xml/api-index-2.49.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-50">
+    <title>Index of new symbols in 2.50</title>
+    <xi:include href="xml/api-index-2.50.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-51">
+    <title>Index of new symbols in 2.51</title>
+    <xi:include href="xml/api-index-2.51.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-52">
+    <title>Index of new symbols in 2.52</title>
+    <xi:include href="xml/api-index-2.52.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-53">
+    <title>Index of new symbols in 2.53</title>
+    <xi:include href="xml/api-index-2.53.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-54">
+    <title>Index of new symbols in 2.54</title>
+    <xi:include href="xml/api-index-2.54.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-59">
+    <title>Index of new symbols in 2.59</title>
+    <xi:include href="xml/api-index-2.59.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-60">
+    <title>Index of new symbols in 2.60</title>
+    <xi:include href="xml/api-index-2.60.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-61">
+    <title>Index of new symbols in 2.61</title>
+    <xi:include href="xml/api-index-2.61.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-62">
+    <title>Index of new symbols in 2.62</title>
+    <xi:include href="xml/api-index-2.62.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-63">
+    <title>Index of new symbols in 2.63</title>
+    <xi:include href="xml/api-index-2.63.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-2-64">
+    <title>Index of new symbols in 2.64</title>
+    <xi:include href="xml/api-index-2.64.xml"><xi:fallback /></xi:include>
+  </index>
+  <!-- API INDICES END -->
+</book>

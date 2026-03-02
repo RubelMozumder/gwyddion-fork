@@ -1,0 +1,624 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Gwyddion-user-guide\n"
+"POT-Creation-Date: 2019-09-11 22:39+0200\n"
+"PO-Revision-Date: 2016-03-30 23:55+0100\n"
+"Last-Translator: François Riguet <francheu@caramail.com>\n"
+"Language-Team: François RIGUET <francheu@caramail.com>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: wavelet-haar.svg:242(tspan) wavelet-daubechies4.svg:242(tspan)
+#: wavelet-daubechies20.svg:354(tspan)
+msgid "Scaling function and wavelet"
+msgstr "Fonction d'échelle et ondelette"
+
+#: wavelet-haar.svg:472(tspan) wavelet-daubechies4.svg:662(tspan)
+#: wavelet-daubechies20.svg:886(tspan)
+msgid "Fourier coefficient amplitudes"
+msgstr "Amplitudes des coefficients de Fourier"
+
+#: wavelet-haar.svg:482(tspan) wavelet-daubechies4.svg:672(tspan)
+#: wavelet-daubechies20.svg:896(tspan)
+msgid "scaling function"
+msgstr "fonction d'échelle"
+
+#: wavelet-haar.svg:525(tspan) wavelet-daubechies4.svg:779(tspan)
+#: wavelet-daubechies20.svg:1059(tspan)
+msgid "wavelet"
+msgstr "ondelette"
+
+#: waveform.svg:138(tspan)
+msgid "Cosine"
+msgstr "Cosinus"
+
+#: waveform.svg:141(title) waveform.svg:512(title) waveform.svg:517(tspan)
+#: waveform.svg:889(title)
+msgid "cosine waveform"
+msgstr "onde cosinus"
+
+#: waveform.svg:275(title) waveform.svg:649(title) waveform.svg:652(tspan)
+#: waveform.svg:1023(title)
+msgid "sine waveform"
+msgstr "onde sinus"
+
+#: waveform.svg:509(tspan)
+msgid "Inverse cosh"
+msgstr "arcosh"
+
+#: waveform.svg:886(tspan)
+msgid "Flat top"
+msgstr "Plateau"
+
+#: voids-connectivity.svg:29(format) unrotate-symmetries.svg:30(format)
+#: step-edge.svg:188(format) profile-interpolation.svg:70(format)
+#: imgexport-lateral.svg:23(format) imgexport-gaps.svg:23(format)
+#: imgexport-fmscales.svg:23(format) imgexport-dimensions.svg:23(format)
+#: boundary-length.svg:29(format)
+msgid "image/svg+xml"
+msgstr "image/svg+xml"
+
+#: voids-connectivity.svg:192(tspan)
+#, no-wrap
+msgid "Simply connected mask"
+msgstr "Masque à connexion simple"
+
+#: voids-connectivity.svg:259(tspan)
+#, no-wrap
+msgid "Mask with simply connected voids"
+msgstr "Masque avec vides à connexion simple"
+
+#: voids-connectivity.svg:283(tspan)
+#, no-wrap
+msgid "Mask with non-simply connected voids"
+msgstr "Masque avec vides à connexion multiple"
+
+#: unrotate-symmetries.svg:105(text)
+#, no-wrap
+msgid "Parallel"
+msgstr "Parallèle"
+
+#: unrotate-symmetries.svg:169(text)
+#, no-wrap
+msgid "Triangular"
+msgstr "Triangulaire"
+
+#: unrotate-symmetries.svg:210(text)
+#, no-wrap
+msgid "Square"
+msgstr "Carré"
+
+#: unrotate-symmetries.svg:251(text)
+#, no-wrap
+msgid "Rhombic"
+msgstr "Rhombique"
+
+#: unrotate-symmetries.svg:316(text)
+#, no-wrap
+msgid "Hexagonal"
+msgstr "Hexagonal"
+
+#: step-edge.svg:217(tspan)
+#, no-wrap
+msgid "Step"
+msgstr "Saut"
+
+#: step-edge.svg:285(tspan) step-edge.svg:346(tspan)
+#, no-wrap
+msgid "Edge"
+msgstr "Bord"
+
+#: profile-interpolation.svg:130(tspan)
+#, no-wrap
+msgid "Natural resolution profile"
+msgstr "Profil à résolution naturelle"
+
+#: profile-interpolation.svg:141(tspan)
+#, no-wrap
+msgid "High resolution profile"
+msgstr "Profil à haute résolution"
+
+#: profile-interpolation.svg:730(tspan) profile-interpolation.svg:1396(tspan)
+#: profile-interpolation.svg:2484(tspan)
+msgid "z [nm]"
+msgstr "z [nm]"
+
+#: profile-interpolation.svg:741(tspan)
+msgid "Round interpolation, natural resolution"
+msgstr "Interpolation arrondie, résolution naturelle"
+
+#: profile-interpolation.svg:1407(tspan)
+msgid "Round interpolation, high resolution"
+msgstr "Interpolation arrondie, haute résolution"
+
+#: profile-interpolation.svg:2495(tspan)
+msgid "x [nm]"
+msgstr "x [nm]"
+
+#: profile-interpolation.svg:2506(tspan)
+msgid "Key interpolation, high resolution"
+msgstr "Interpolaton Key, haute résolution"
+
+#: imgexport-lateral.svg:798(tspan)
+#, no-wrap
+msgid "Inset scale bar"
+msgstr "Barre d'échelle"
+
+#: imgexport-lateral.svg:809(tspan)
+#, no-wrap
+msgid "Rulers"
+msgstr "Échelle extérieure"
+
+#: imgexport-gaps.svg:415(tspan)
+#, no-wrap
+msgid "Title gap"
+msgstr "Écart du titre"
+
+#: imgexport-gaps.svg:520(tspan)
+#, no-wrap
+msgid "False color gap"
+msgstr "Écart de l'échelle de couleur"
+
+#: imgexport-gaps.svg:567(tspan)
+#, no-wrap
+msgid "Inset horizontal gap"
+msgstr "Écart horizontal de la barre d'échelle"
+
+#: imgexport-gaps.svg:578(tspan)
+#, no-wrap
+msgid "Vertical gap"
+msgstr "Écart vertical"
+
+#: imgexport-gaps.svg:600(tspan)
+#, no-wrap
+msgid "Channel title"
+msgstr "Titre du canal"
+
+#: imgexport-fmscales.svg:597(tspan)
+#, no-wrap
+msgid "Linear mapping"
+msgstr "Échelle linéaire"
+
+#: imgexport-fmscales.svg:1121(tspan)
+#, no-wrap
+msgid "Adaptive mapping"
+msgstr "Échelle adaptative"
+
+#: imgexport-fmscales.svg:1132(tspan)
+#, no-wrap
+msgid "Presentation"
+msgstr "Présentation"
+
+#: imgexport-dimensions.svg:425(tspan)
+#, no-wrap
+msgid "Line thickness"
+msgstr "Épaisseur des lignes"
+
+#: imgexport-dimensions.svg:456(tspan)
+#, no-wrap
+msgid "Font size"
+msgstr "Taille de la police"
+
+#: imgexport-dimensions.svg:483(tspan)
+#, no-wrap
+msgid "Tick length"
+msgstr "Longueur des graduations"
+
+#: imgexport-dimensions.svg:510(tspan)
+#, no-wrap
+msgid "Outline thickness"
+msgstr "Épaisseur du contour"
+
+#: gaussian-psdf.svg:270(tspan)
+msgid "W"
+msgstr "W"
+
+#: gaussian-psdf.svg:272(tspan)
+msgid "[nm"
+msgstr "[nm"
+
+#: gaussian-psdf.svg:274(tspan) gaussian-psdf.svg:282(tspan)
+#: gaussian-hhcf.svg:258(tspan) gaussian-acf.svg:272(tspan)
+msgid "]"
+msgstr "]"
+
+#: gaussian-psdf.svg:278(tspan)
+msgid "K"
+msgstr "K"
+
+#: gaussian-psdf.svg:279(tspan) gaussian-hhcf.svg:263(tspan)
+#: gaussian-acf.svg:277(tspan)
+msgid "x"
+msgstr "x"
+
+#: gaussian-psdf.svg:280(tspan)
+msgid "[μm"
+msgstr "[μm"
+
+#: gaussian-psdf.svg:292(tspan)
+msgid "evaluated PSDF"
+msgstr "PSDF évaluée"
+
+#: gaussian-psdf.svg:453(tspan)
+msgid "gaussian PSDF fit"
+msgstr "ajustement gaussienne PSDF"
+
+#: gaussian-hhcf.svg:256(tspan)
+msgid "H [nm"
+msgstr "H [nm"
+
+#: gaussian-hhcf.svg:262(tspan) gaussian-acf.svg:276(tspan)
+msgid "τ"
+msgstr "τ"
+
+#: gaussian-hhcf.svg:264(tspan) gaussian-acf.svg:278(tspan)
+msgid "[nm]"
+msgstr "[nm]"
+
+#: gaussian-hhcf.svg:274(tspan)
+msgid "evaluated HHCF"
+msgstr "HHCF évaluée"
+
+#: gaussian-hhcf.svg:335(tspan)
+msgid "gaussian HHCF fit"
+msgstr "ajustement gaussienne HHCF"
+
+#: gaussian-acf.svg:270(tspan)
+msgid "G [nm"
+msgstr "G [nm"
+
+#: gaussian-acf.svg:288(tspan)
+msgid "evaluated ACF"
+msgstr "ACF évaluée"
+
+#: gaussian-acf.svg:349(tspan)
+msgid "gaussian ACF fit"
+msgstr "ajustement gaussienne ACF"
+
+#: fitfunc-two-gaussians-psdf.svg:63(tspan)
+msgid "√2/T₁"
+msgstr "√2/T₁"
+
+#: fitfunc-two-gaussians-psdf.svg:68(tspan)
+msgid "√2/T₂"
+msgstr "√2/T₂"
+
+#: fitfunc-two-gaussians-psdf.svg:75(tspan)
+msgid "Area = σ₁²+σ₂²"
+msgstr "Aire = σ₁²+σ₂²"
+
+#: fitfunc-two-gaussians-psdf.svg:84(title)
+#: fitfunc-two-gaussians-psdf.svg:89(tspan)
+msgid "Two Gaussians (PSDF)"
+msgstr "Deux gaussiennes (PSDF)"
+
+#: fitfunc-square-wave.svg:48(tspan)
+msgid "b"
+msgstr "b"
+
+#: fitfunc-square-wave.svg:53(tspan)
+msgid "t"
+msgstr "t"
+
+#: fitfunc-square-wave.svg:63(tspan)
+msgid "s"
+msgstr "s"
+
+#: fitfunc-square-wave.svg:68(tspan)
+msgid "s+T"
+msgstr "s+T"
+
+#: fitfunc-square-wave.svg:73(tspan)
+msgid "s+2T"
+msgstr "s+2T"
+
+#: fitfunc-square-wave.svg:78(tspan)
+msgid "s+3T"
+msgstr "s+3T"
+
+#: fitfunc-square-wave.svg:99(title) fitfunc-square-wave.svg:104(tspan)
+msgid "Square wave"
+msgstr "Onde carrée"
+
+#: fitfunc-smooth-slanted-step.svg:48(tspan)
+#: fitfunc-smooth-bent-step.svg:48(tspan)
+#: fitfunc-boltzmann-bent-step.svg:46(tspan)
+msgid "y₀+h/2"
+msgstr "y₀+h/2"
+
+#: fitfunc-smooth-slanted-step.svg:53(tspan)
+#: fitfunc-smooth-bent-step.svg:53(tspan) fitfunc-parabolic-step.svg:53(tspan)
+#: fitfunc-lorentzian.svg:53(tspan) fitfunc-gaussian.svg:53(tspan)
+#: fitfunc-exponential.svg:53(tspan) fitfunc-boltzmann-bent-step.svg:51(tspan)
+msgid "y₀"
+msgstr "y₀"
+
+#: fitfunc-smooth-slanted-step.svg:58(tspan)
+#: fitfunc-smooth-bent-step.svg:58(tspan)
+#: fitfunc-boltzmann-bent-step.svg:56(tspan)
+msgid "y₀−h/2"
+msgstr "y₀−h/2"
+
+#: fitfunc-smooth-slanted-step.svg:63(tspan)
+#: fitfunc-smooth-bent-step.svg:63(tspan)
+#: fitfunc-boltzmann-bent-step.svg:61(tspan)
+msgid "x₀−w"
+msgstr "x₀−w"
+
+#: fitfunc-smooth-slanted-step.svg:68(tspan)
+#: fitfunc-smooth-bent-step.svg:68(tspan) fitfunc-parabolic-step.svg:73(tspan)
+#: fitfunc-lorentzian.svg:68(tspan) fitfunc-gaussian.svg:68(tspan)
+#: fitfunc-boltzmann-bent-step.svg:66(tspan)
+msgid "x₀"
+msgstr "x₀"
+
+#: fitfunc-smooth-slanted-step.svg:73(tspan)
+#: fitfunc-smooth-bent-step.svg:73(tspan)
+#: fitfunc-boltzmann-bent-step.svg:71(tspan)
+msgid "x₀+w"
+msgstr "x₀+w"
+
+#: fitfunc-smooth-slanted-step.svg:94(title)
+#: fitfunc-smooth-slanted-step.svg:99(tspan)
+msgid "Smooth slanted step"
+msgstr "Marche inclinée"
+
+#: fitfunc-smooth-bent-step.svg:94(title)
+#: fitfunc-smooth-bent-step.svg:99(tspan)
+msgid "Smooth bent step"
+msgstr "Marche déformée"
+
+#: fitfunc-sinc.svg:53(tspan) fitfunc-power.svg:53(tspan)
+msgid "a"
+msgstr "a"
+
+#: fitfunc-sinc.svg:58(tspan)
+msgid "−πb"
+msgstr "−πb"
+
+#: fitfunc-sinc.svg:68(tspan)
+msgid "πb"
+msgstr "πb"
+
+#: fitfunc-sinc.svg:87(title) fitfunc-sinc.svg:92(tspan)
+msgid "Sinc"
+msgstr "Sinc"
+
+#: fitfunc-power.svg:58(tspan)
+msgid "a+b"
+msgstr "a+b"
+
+#: fitfunc-power.svg:75(tspan)
+msgid "c &gt; 1"
+msgstr "c &gt; 1"
+
+#: fitfunc-power.svg:78(tspan)
+msgid "1 &gt; c &gt; 0"
+msgstr "1 &gt; c &gt; 0"
+
+#: fitfunc-power.svg:81(tspan)
+msgid "c &lt; 0"
+msgstr "c &lt; 0"
+
+#: fitfunc-power.svg:90(title) fitfunc-power.svg:95(tspan)
+msgid "Power"
+msgstr "Puissance"
+
+#: fitfunc-parabolic-step.svg:48(tspan)
+msgid "y₀−s/2"
+msgstr "y₀−s/2"
+
+#: fitfunc-parabolic-step.svg:58(tspan)
+msgid "y₀+s/2"
+msgstr "y₀+s/2"
+
+#: fitfunc-parabolic-step.svg:63(tspan)
+msgid "y₀+h"
+msgstr "y₀+h"
+
+#: fitfunc-parabolic-step.svg:68(tspan)
+msgid "x₀−w/2"
+msgstr "x₀−w/2"
+
+#: fitfunc-parabolic-step.svg:78(tspan)
+msgid "x₀+w/2"
+msgstr "x₀+w/2"
+
+#: fitfunc-parabolic-step.svg:101(title) fitfunc-parabolic-step.svg:106(tspan)
+msgid "Parabolic step"
+msgstr "Porte parabolique"
+
+#: fitfunc-lorentzian.svg:58(tspan)
+msgid "y₀+a/b²"
+msgstr "y₀+a/b²"
+
+#: fitfunc-lorentzian.svg:63(tspan)
+msgid "x₀−b"
+msgstr "x₀−b"
+
+#: fitfunc-lorentzian.svg:73(tspan)
+msgid "x₀+b"
+msgstr "x₀+b"
+
+#: fitfunc-lorentzian.svg:92(title) fitfunc-lorentzian.svg:97(tspan)
+msgid "Lorentzian"
+msgstr "Lorentzienne"
+
+#: fitfunc-gaussian-rpsdf.svg:53(tspan)
+msgid "σ²T/√2 e"
+msgstr "σ²T/√2 e"
+
+#: fitfunc-gaussian-rpsdf.svg:53(tspan)
+msgid "-1/2"
+msgstr "-1/2"
+
+#: fitfunc-gaussian-rpsdf.svg:63(tspan) fitfunc-gaussian-psdf.svg:63(tspan)
+msgid "√2/T"
+msgstr "√2/T"
+
+#: fitfunc-gaussian-rpsdf.svg:70(tspan) fitfunc-gaussian-psdf.svg:70(tspan)
+#: fitfunc-exponential-rpsdf.svg:70(tspan)
+#: fitfunc-exponential-psdf.svg:70(tspan)
+msgid "Area = σ²"
+msgstr "Aire = σ²"
+
+#: fitfunc-gaussian-rpsdf.svg:79(title) fitfunc-gaussian-rpsdf.svg:84(tspan)
+msgid "Gaussian (RPSDF)"
+msgstr "Gaussienne (RPSDF)"
+
+#: fitfunc-gaussian-psdf.svg:53(tspan)
+msgid "σ²T/2√π"
+msgstr "σ²T/2√π"
+
+#: fitfunc-gaussian-psdf.svg:77(title) fitfunc-gaussian-psdf.svg:82(tspan)
+msgid "Gaussian (PSDF)"
+msgstr "Gaussienne (PSDF)"
+
+#: fitfunc-gaussian-hhcf.svg:53(tspan) fitfunc-exponential-hhcf.svg:53(tspan)
+msgid "2σ²"
+msgstr "2σ²"
+
+#: fitfunc-gaussian-hhcf.svg:63(tspan) fitfunc-gaussian-acf.svg:63(tspan)
+msgid "T/√2"
+msgstr "T/√2"
+
+#: fitfunc-gaussian-hhcf.svg:76(title) fitfunc-gaussian-hhcf.svg:81(tspan)
+msgid "Gaussian (HHCF)"
+msgstr "Gaussienne (HHCF)"
+
+#: fitfunc-gaussian-acf.svg:53(tspan) fitfunc-exponential-acf.svg:53(tspan)
+msgid "σ²"
+msgstr "σ²"
+
+#: fitfunc-gaussian-acf.svg:74(title) fitfunc-gaussian-acf.svg:79(tspan)
+msgid "Gaussian (ACF)"
+msgstr "Gaussienne (ACF)"
+
+#: fitfunc-gaussian.svg:58(tspan) fitfunc-exponential.svg:58(tspan)
+msgid "y₀+a"
+msgstr "y₀+a"
+
+#: fitfunc-gaussian.svg:63(tspan)
+msgid "x₀−b/√2"
+msgstr "x₀−b/√2"
+
+#: fitfunc-gaussian.svg:73(tspan)
+msgid "x₀+b/√2"
+msgstr "x₀+b/√2"
+
+#: fitfunc-gaussian.svg:92(title) fitfunc-gaussian.svg:97(tspan)
+msgid "Gaussian"
+msgstr "Gaussienne"
+
+#: fitfunc-exponential-rpsdf.svg:53(tspan)
+msgid "2σ²T/√27"
+msgstr "2σ²T/√27"
+
+#: fitfunc-exponential-rpsdf.svg:63(tspan)
+msgid "1/(√2T)"
+msgstr "1/(√2T)"
+
+#: fitfunc-exponential-rpsdf.svg:77(title)
+#: fitfunc-exponential-rpsdf.svg:82(tspan)
+msgid "Exponential (RPSDF)"
+msgstr "Exponentielle (RPSDF)"
+
+#: fitfunc-exponential-psdf.svg:53(tspan)
+msgid "σ²T/π"
+msgstr "σ²T/π"
+
+#: fitfunc-exponential-psdf.svg:63(tspan)
+msgid "1/T"
+msgstr "1/T"
+
+#: fitfunc-exponential-psdf.svg:77(title)
+#: fitfunc-exponential-psdf.svg:82(tspan)
+msgid "Exponential (PSDF)"
+msgstr "Exponentielle (PSDF)"
+
+#: fitfunc-exponential-hhcf.svg:63(tspan) fitfunc-exponential-acf.svg:63(tspan)
+msgid "T"
+msgstr "T"
+
+#: fitfunc-exponential-hhcf.svg:76(title)
+#: fitfunc-exponential-hhcf.svg:81(tspan)
+msgid "Exponential (HHCF)"
+msgstr "Exponentielle (HHCF)"
+
+#: fitfunc-exponential-acf.svg:74(title) fitfunc-exponential-acf.svg:79(tspan)
+msgid "Exponential (ACF)"
+msgstr "Exponentielle (ACF)"
+
+#: fitfunc-exponential.svg:68(tspan)
+msgid "-b"
+msgstr "-b"
+
+#: fitfunc-exponential.svg:81(title) fitfunc-exponential.svg:86(tspan)
+msgid "Exponential"
+msgstr "Exponentielle"
+
+#: fitfunc-boltzmann-bent-step.svg:92(title)
+#: fitfunc-boltzmann-bent-step.svg:97(tspan)
+#, fuzzy
+msgid "Boltzmann bent step"
+msgstr "Marche déformée"
+
+#: boundary-length.svg:713(tspan)
+#, no-wrap
+msgid "(a)"
+msgstr "(a)"
+
+#: boundary-length.svg:723(tspan)
+#, no-wrap
+msgid "(b1)"
+msgstr "(b1)"
+
+#: boundary-length.svg:733(tspan)
+#, no-wrap
+msgid "(b2)"
+msgstr "(b2)"
+
+#: boundary-length.svg:743(tspan)
+#, no-wrap
+msgid "(c)"
+msgstr "(c)"
+
+#: boundary-length.svg:753(tspan)
+#, no-wrap
+msgid "(d)"
+msgstr "(d)"
+
+#: boundary-length.svg:763(tspan)
+#, no-wrap
+msgid "(e)"
+msgstr "(e)"
+
+#: boundary-length.svg:773(tspan)
+#, no-wrap
+msgid "grain"
+msgstr "grain"
+
+#: boundary-length.svg:783(tspan)
+#, no-wrap
+msgid "polygonal shape"
+msgstr "forme polygonale"
+
+#: boundary-length.svg:794(tspan)
+#, no-wrap
+msgid "L = 6 + 6√2"
+msgstr "L = 6 + 6√2"
+
+#: boundary-length.svg:814(tspan)
+#, no-wrap
+msgid "length"
+msgstr "longueur"
+
+#. Put one translator per line, in the form of NAME <EMAIL>, YEAR1, YEAR2
+#: boundary-length.svg:0(None)
+msgid "translator-credits"
+msgstr "François RIGUET <francheu@caramail.com>, 2009, 2014."

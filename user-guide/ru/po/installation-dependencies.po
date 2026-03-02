@@ -1,0 +1,552 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion user guide ru\n"
+"POT-Creation-Date: 2023-10-14 14:22+0400\n"
+"PO-Revision-Date: 2023-10-14 14:28+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: Daniil Bratashov (dn2010@gmail.com)\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: installation-dependencies.xml:6(title)
+msgid "Build Dependencies"
+msgstr "Зависимости при сборке"
+
+#: installation-dependencies.xml:7(para)
+msgid ""
+"The following table lists packages required to build <application>Gwyddion</"
+"application> from source code. If your operating system has separate "
+"development packages for libraries you need them too. The table does not "
+"include common software compilation prerequisites like the C compiler or the "
+"<command>make</command> utility. Operating system specifics are described in "
+"following sections dedicated to building on particular operating systems."
+msgstr ""
+"В следующей таблице перечислены пакеты, которые нужны для сборки "
+"<application>Gwyddion</application> из исходного кода. Если в вашей "
+"операционной системе пакеты разработки для библиотек поставляются отдельно, "
+"их также нужно установить. Таблица не включает в себя обязательные вещи, "
+"необходимые для сборки, такие как компилятор C или программу <command>make</"
+"command>. Зависящие от операционной системы вещи описаны в следующих "
+"разделах, посвящённых сборке в определённых операционных системах."
+
+#: installation-dependencies.xml:16(para)
+msgid ""
+"Minimum required versions are listed for some packages. If no specific "
+"version is listed, the minimum version is so old that it did not seem useful "
+"to determine it exactly. Specific environments may be listed in the "
+"Dependency column, meaning the package is useful only in this environment."
+msgstr ""
+"Минимальные требуемые версии указаны для некоторых пакетов. Если особой "
+"версии не указано, подразумевается, что минимально требуемая версия "
+"настолько стара, что её не нужно точно указывать. Особые версии окружения "
+"могут быть указаны в столбце зависимостей, что означает что этот пакет будет "
+"полезен только в определенном окружении."
+
+#: installation-dependencies.xml:28(entry)
+msgid "Package"
+msgstr "Пакет"
+
+#: installation-dependencies.xml:29(entry)
+msgid "Version"
+msgstr "Версия"
+
+#: installation-dependencies.xml:30(entry)
+msgid "Dependency"
+msgstr "Необходимость"
+
+#: installation-dependencies.xml:31(entry)
+msgid "Required for, Notes"
+msgstr "Для чего нужно и замечания"
+
+#: installation-dependencies.xml:36(ulink)
+msgid "pkg-config"
+msgstr "pkg-config"
+
+#: installation-dependencies.xml:37(entry)
+msgid "0.16"
+msgstr "0.16"
+
+#: installation-dependencies.xml:38(emphasis)
+#: installation-dependencies.xml:46(emphasis)
+#: installation-dependencies.xml:55(emphasis)
+#: installation-dependencies.xml:65(emphasis)
+#: installation-dependencies.xml:75(emphasis)
+#: installation-dependencies.xml:83(emphasis)
+msgid "Required"
+msgstr "Требуется"
+
+#: installation-dependencies.xml:39(entry)
+msgid ""
+"Tracking the locations and compiler and linker flags of the various packages."
+msgstr ""
+"Отслеживание местоположений, флагов компилятора и редактора связей для "
+"различных пакетов."
+
+#: installation-dependencies.xml:44(ulink)
+msgid "GTK+ 2"
+msgstr "GTK+ 2"
+
+#: installation-dependencies.xml:45(entry)
+msgid "2.18.0"
+msgstr "2.18.0"
+
+#: installation-dependencies.xml:47(entry)
+msgid ""
+"Gwyddion user interface. This entry implies the dependencies of GTK+ itself, "
+"such as GLib, Gdk-Pixbuf, Pango or Cairo."
+msgstr ""
+"Интерфейс пользователя Gwyddion. Этот элемент также подразумевает все "
+"зависимости самой GTK+, такие как: GLib, Gdk-Pixbuf, Pango и Cairo."
+
+#: installation-dependencies.xml:53(ulink)
+msgid "GLib"
+msgstr "GLib"
+
+#: installation-dependencies.xml:54(entry)
+msgid "2.32.0"
+msgstr "2.32.0"
+
+#: installation-dependencies.xml:56(entry)
+msgid ""
+"Everything. GLib is a base library also required by GTK+, but Gwyddion needs "
+"a slightly newer version than strictly required by GTK+."
+msgstr ""
+"Всё. Glib нужна для работы GTK+, но Gwyddion требует чуть более новую "
+"версию, чем строго требуется для GTK+."
+
+#: installation-dependencies.xml:63(ulink)
+msgid "Pango"
+msgstr "Pango"
+
+#: installation-dependencies.xml:64(entry)
+msgid "1.10"
+msgstr "1.10"
+
+#: installation-dependencies.xml:66(entry)
+msgid ""
+"All text rendering. This entry implies pangocairo, which is an optional "
+"component of Pango and in principle can be disabled. However, it is normally "
+"included in Pango packages."
+msgstr ""
+"Вся отрисовка текста. Этот элемент подразумевает pangocairo, который "
+"является опциональным компонентом Pango и в принципе может быть отключен. "
+"Однако, обычно его включают в пакеты Pango."
+
+#: installation-dependencies.xml:73(ulink)
+msgid "Cairo"
+msgstr "Cairo"
+
+#: installation-dependencies.xml:74(entry)
+msgid "1.2"
+msgstr "1.2"
+
+#: installation-dependencies.xml:76(entry)
+msgid "All drawing within GTK+. Version at least 1.6 is recommended."
+msgstr ""
+"Всё рисование в GTK+. Рекомендуется использовать версию по крайней мере 1.6."
+
+#: installation-dependencies.xml:81(ulink)
+msgid "FFTW3"
+msgstr "FFTW3"
+
+#: installation-dependencies.xml:82(entry)
+#: installation-dependencies.xml:138(entry)
+msgid "3.1"
+msgstr "3.1"
+
+#: installation-dependencies.xml:84(entry)
+msgid ""
+"Integral transforms, power spectrum, convolution, deconvolution and "
+"correlation operations. If OpenMP is enabled and FFTW3 with OpenMP support "
+"is found Gwyddion will be able to utilise multithreaded FFT."
+msgstr ""
+"Интегральные преобразования, спектр мощности, свёртка, деконволюция и "
+"операции корреляции. Если OpenMP включен и обнаружена поддержка FFTW3 с "
+"поддержкой OpenMP, Gwyddion может использовать многопоточное быстрое "
+"преобразование Фурье."
+
+#: installation-dependencies.xml:92(ulink)
+msgid "GtkGLExt"
+msgstr "GtkGLExt"
+
+#: installation-dependencies.xml:93(entry)
+#: installation-dependencies.xml:102(entry)
+msgid "1.0"
+msgstr "1.0"
+
+#: installation-dependencies.xml:94(entry)
+#: installation-dependencies.xml:103(entry)
+#: installation-dependencies.xml:112(entry)
+#: installation-dependencies.xml:122(entry)
+#: installation-dependencies.xml:131(entry)
+#: installation-dependencies.xml:139(entry)
+#: installation-dependencies.xml:150(entry)
+#: installation-dependencies.xml:159(entry)
+#: installation-dependencies.xml:172(entry)
+#: installation-dependencies.xml:186(entry)
+#: installation-dependencies.xml:202(entry)
+#: installation-dependencies.xml:210(entry)
+#: installation-dependencies.xml:218(entry)
+#: installation-dependencies.xml:227(entry)
+#: installation-dependencies.xml:235(entry)
+#: installation-dependencies.xml:245(entry)
+#: installation-dependencies.xml:253(entry)
+#: installation-dependencies.xml:261(entry)
+#: installation-dependencies.xml:271(entry)
+#: installation-dependencies.xml:281(entry)
+#: installation-dependencies.xml:291(entry)
+#: installation-dependencies.xml:299(entry)
+#: installation-dependencies.xml:308(entry)
+msgid "Optional"
+msgstr "Опционально"
+
+#: installation-dependencies.xml:95(entry)
+msgid ""
+"OpenGL 3D data views. This entry implies the dependencies of GtkGLExt "
+"itself, such as the platform OpenGL libraries and headers."
+msgstr ""
+"Окна трёхмерного просмотра на основе OpenGL. Также подразумеваются "
+"зависимости самой GtkGLExt, такие как системные библиотеки и заголовочные "
+"файлы OpenGL."
+
+#: installation-dependencies.xml:101(ulink)
+msgid "libunique"
+msgstr "libunique"
+
+#: installation-dependencies.xml:105(link)
+#: installation-dependencies.xml:336(link)
+msgid "Remote control"
+msgstr "Дистанционное управление"
+
+#: installation-dependencies.xml:104(entry)
+msgid "<placeholder-1/> based on D-BUS or whatever technology is currently in."
+msgstr ""
+"<placeholder-1/>, основанное на D-BUS или то технологии, которая включена в "
+"настоящее время."
+
+#: installation-dependencies.xml:110(ulink)
+msgid "Python"
+msgstr "Python"
+
+#: installation-dependencies.xml:111(entry)
+msgid "2.4"
+msgstr "2.4"
+
+#: installation-dependencies.xml:113(entry)
+msgid ""
+"Pygwy, the Gwyddion Python scripting interface. Not just the interpreter is "
+"required to build pygwy, but also the Python headers and development "
+"libraries."
+msgstr ""
+"Pygwy, интерфейс написания Python-скриптов в Gwyddion. Для сборки pygwy "
+"нужен не только интерпретатор Python, но также его заголовочные файлы и "
+"библиотеки разработчика."
+
+#: installation-dependencies.xml:120(ulink)
+msgid "PyGTK2"
+msgstr "PyGTK2"
+
+#: installation-dependencies.xml:121(entry)
+msgid "2.10"
+msgstr "2.10"
+
+#: installation-dependencies.xml:123(entry)
+msgid ""
+"Pygwy, the Gwyddion Python scripting interface. You need PyGTK2 including "
+"the compile-time parts, i.e. codegen, to build pygwy."
+msgstr ""
+"Pygwy, скриптовый интерфейс к Gwyddion на основе Python. Чтобы собрать pygwy "
+"потребуются части PyGTK2, участвующие в процессе компиляции, т.е. сodegen."
+
+#: installation-dependencies.xml:129(ulink)
+msgid "GtkSourceView 2"
+msgstr "GtkSourceView 2"
+
+#: installation-dependencies.xml:132(entry)
+msgid "Syntax highlighting in the Python scripting console."
+msgstr "Подсветка синтаксиса в командной строке оболочки Python."
+
+#: installation-dependencies.xml:137(ulink)
+msgid "OpenMP"
+msgstr "OpenMP"
+
+#: installation-dependencies.xml:140(entry)
+msgid ""
+"Speedup of various computation using OpenMP multithread parallelisation. "
+"OpenMP is a standard, not specific software, but an additional package may "
+"be needed to enable it in your C compiler."
+msgstr ""
+"Ускорение различных расчётов с использованием распараллеливания с помощью "
+"OpenMP. OpenMP не является отдельным программным обеспечением, но "
+"дополнительный пакет может понадобиться чтобы включить его поддержку в вашем "
+"компиляторе языка C."
+
+#: installation-dependencies.xml:148(ulink)
+msgid "zlib"
+msgstr "zlib"
+
+#: installation-dependencies.xml:151(entry)
+msgid ""
+"Import of SPML data files and import of gzip-compressed data from other file "
+"formats (Createc, NRRD, RHK SM4 PRM metadata)."
+msgstr ""
+"Импорт файлов данных в формате SPML и импорт данных, сжатых gzip, в "
+"некоторых других форматах (Createc, NRRD, метаданные RHK SM4 PRM)."
+
+#: installation-dependencies.xml:157(ulink)
+#: installation-dependencies.xml:178(link)
+#: installation-dependencies.xml:192(link)
+msgid "libzip"
+msgstr "libzip"
+
+#: installation-dependencies.xml:158(entry)
+msgid "0.11"
+msgstr "0.11"
+
+#: installation-dependencies.xml:165(link)
+#: installation-dependencies.xml:170(ulink)
+#: installation-dependencies.xml:194(link)
+msgid "minizip"
+msgstr "minizip"
+
+#: installation-dependencies.xml:160(entry)
+msgid ""
+"Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC SPMxFormat, "
+"Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT and JPK force data files which "
+"use ZIP compression. Alternatively, <placeholder-1/> can be used. Only one "
+"of the ZIP libraries is needed."
+msgstr ""
+"Импорт файлов данных APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC "
+"SPMxFormat, Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT и данных силовых "
+"кривых JPK, которые используют сжатие ZIP. В качестве альтернативы можно "
+"использовать <placeholder-1/>. Требуется только одна из библиотек для работы "
+"с ZIP."
+
+#: installation-dependencies.xml:173(entry)
+msgid ""
+"Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC SPMxFormat, "
+"Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT and JPK force data files which "
+"use ZIP compression. This is an alternative to <placeholder-1/>. Mnizip "
+"versions change often; versions 1, 2 and 3 should be OK. Only one of the ZIP "
+"libraries is needed."
+msgstr ""
+"Импорт файлов данных APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC "
+"SPMxFormat, Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT и данных силовых "
+"кривых JPK, которые используют сжатие ZIP. Версии minizip меняются часто; "
+"версии 1, 2 и 3 должны работать. Это альтернативный вариант вместо "
+"<placeholder-1/>. Требуется только одна из библиотек для работы с ZIP."
+
+#: installation-dependencies.xml:184(ulink)
+msgid "zziplib"
+msgstr "zziplib"
+
+#: installation-dependencies.xml:187(entry)
+msgid ""
+"Import of APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC SPMxFormat, "
+"Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT and JPK force data files which "
+"use ZIP compression. This is a fallback alternative to <placeholder-1/> and "
+"<placeholder-2/> which are preferred. Only one of the ZIP libraries is "
+"needed."
+msgstr ""
+"Импорт файлов данных APE DAX, NanoObserver, NanoScanTech, OpenGPS, ATC "
+"SPMxFormat, Sensofar PLUX, ZON, numpy NPZ, Matlab 5 MAT и данных силовых "
+"кривых JPK, которые используют сжатие ZIP. Это резервный альтернативный "
+"вариант вместо <placeholder-1/> и <placeholder-2/>, которые являются "
+"предпочтительными. Требуется только одна из библиотек для работы с ZIP."
+
+#: installation-dependencies.xml:200(ulink)
+msgid "bzip2"
+msgstr "bzip2"
+
+#: installation-dependencies.xml:203(entry)
+msgid "Import of bzip2-compressed data from NRRD."
+msgstr "Импорт данных, сжатых bzip2, из NRRD."
+
+#: installation-dependencies.xml:208(ulink)
+msgid "LibXML2"
+msgstr "LibXML2"
+
+#: installation-dependencies.xml:211(entry)
+msgid "Import of SPML, APE DAX and Anasys XML data files."
+msgstr "Импорт файлов данных SPML, APE DAX и Anasys XML."
+
+#: installation-dependencies.xml:216(ulink)
+msgid "HDF5"
+msgstr "HDF5"
+
+#: installation-dependencies.xml:217(entry)
+msgid "1.8.13"
+msgstr "1.8.13"
+
+#: installation-dependencies.xml:219(entry)
+msgid ""
+"Import of Asylum Research Ergo, Shilps Lucent, Matlab 7 MAT and generic HDF5 "
+"data files."
+msgstr ""
+"Импорт файлов  Asylum Research Ergo, Shilps Lucent, Matlab 7 MAT и простых "
+"файлов данных в формате HDF5."
+
+#: installation-dependencies.xml:225(ulink)
+msgid "JANSSON"
+msgstr "JANSSON"
+
+#: installation-dependencies.xml:228(entry)
+msgid "Import of Park PS-PPT data files."
+msgstr "Импорт файлов данных Park PS-PPT."
+
+#: installation-dependencies.xml:233(ulink)
+msgid "libpng"
+msgstr "libpng"
+
+#: installation-dependencies.xml:236(entry)
+msgid ""
+"Export of height fields to 16bit greyscale PNG images and import from 16bit "
+"PNG images. For common 8bit images, you just need PNG support in Gdk-Pixbuf."
+msgstr ""
+"Эспорт полей высот в 16битные изображения PNG в градациях серого и импорт "
+"16битных изображений PNG. Для обычных 8битных изображений нужна только "
+"поддержка PNG в Gdk-Pixbuf."
+
+#: installation-dependencies.xml:243(ulink)
+msgid "libwebp"
+msgstr "libwebp"
+
+#: installation-dependencies.xml:246(entry)
+msgid "WebP format support for image export."
+msgstr "Поддержка формата WebP при экспорте изображений."
+
+#: installation-dependencies.xml:251(ulink)
+msgid "jpegxl"
+msgstr ""
+
+#: installation-dependencies.xml:254(entry)
+msgid "JPEG-XL format support for image export."
+msgstr "Поддержка формата JPEG-XL при экспорте изображений."
+
+#: installation-dependencies.xml:259(ulink)
+msgid "WebP pixbuf loader"
+msgstr "Загрузчик pixbuf формата WebP"
+
+#: installation-dependencies.xml:262(entry)
+msgid ""
+"WebP format support for image import. This is a run-time dependency. It does "
+"not matter if you have the pixbuf loader during Gwyddion compilation."
+msgstr ""
+"Поддержка формата WebP для импорта изображений. Это зависимость времени "
+"исполнения. Не имеет значения, был ли доступен загрузчик pixbuf во время "
+"компилляции Gwyddion."
+
+#: installation-dependencies.xml:269(ulink)
+msgid "HEIF pixbuf loader"
+msgstr "загрузчик pixbuf формата HEIF"
+
+#: installation-dependencies.xml:272(entry)
+msgid ""
+"High Efficiency Image File Format support for image import. This is a run-"
+"time dependency. It does not matter if you have the pixbuf loader during "
+"Gwyddion compilation."
+msgstr ""
+"Поддержка High Efficiency Image File Format при импорте изображений. Это "
+"зависимость времени исполнения. Вне зависимости от того, был ли доступен "
+"этот загрузчик при компиляции Gwyddion, он будет работать при наличии его в "
+"системе."
+
+#: installation-dependencies.xml:279(ulink)
+msgid "JPEG-XL pixbuf loader"
+msgstr "Загрузчик pixbuf формата JPEG-XL"
+
+#: installation-dependencies.xml:282(entry)
+msgid ""
+"JPEG-XL format support for image import. This is a run-time dependency. It "
+"does not matter if you have the pixbuf loader during Gwyddion compilation."
+msgstr ""
+"Поддержка формата JPEG-XL для импорта изображений. Это зависимость времени "
+"исполнения. Не имеет значения, был ли доступен загрузчик pixbuf во время "
+"компилляции Gwyddion."
+
+#: installation-dependencies.xml:289(ulink)
+msgid "OpenEXR"
+msgstr "OpenEXR"
+
+#: installation-dependencies.xml:292(entry)
+msgid "Import and export of OpenEXR HDR images."
+msgstr "Импорт и экспорт изображений OpenEXR HDR."
+
+#: installation-dependencies.xml:297(entry)
+msgid "C++ compiler"
+msgstr "компилятор C++"
+
+#: installation-dependencies.xml:300(entry)
+msgid ""
+"Import and export of OpenEXR HDR images and import of other high-depth "
+"images."
+msgstr ""
+"Импорт и экспорт изображений OpenEXR HDR и импорт других изображений с "
+"большой глубиной цвета."
+
+#: installation-dependencies.xml:306(ulink)
+msgid "cfitsio"
+msgstr "cfitsio"
+
+#: installation-dependencies.xml:309(entry)
+msgid "Import of Flexible Image Transport System (FITS) files."
+msgstr "Импорт файлов Flexible Image Transport System (FITS)."
+
+#: installation-dependencies.xml:314(ulink)
+msgid "desktop-file-utils"
+msgstr "desktop-file-utils"
+
+#: installation-dependencies.xml:316(entry)
+msgid "Optional, Unix"
+msgstr "Опционально, Unix"
+
+#: installation-dependencies.xml:317(entry)
+msgid ""
+"Basic desktop integration to Freedesktop-conforming environments, such as "
+"file associations and installation of Gwyddion to the desktop environments "
+"menus."
+msgstr ""
+"Основная интеграция в окружение рабочего стола на соответствующих стандартам "
+"Freedesktop окружениях, такая как установка Gwyddion в меню и ассоциации "
+"типов файлов."
+
+#: installation-dependencies.xml:324(ulink)
+msgid "gtk-mac-integration"
+msgstr "gtk-mac-integration"
+
+#: installation-dependencies.xml:326(entry)
+msgid "Optional, OS X"
+msgstr "Опционально, OS X"
+
+#: installation-dependencies.xml:327(entry)
+msgid "OS X platform integration such as the global menu."
+msgstr "Интеграция в среду OS X, например, использование глобального меню."
+
+#: installation-dependencies.xml:332(ulink)
+msgid "libXmu"
+msgstr "libXmu"
+
+#: installation-dependencies.xml:334(entry)
+msgid "Obsolete, X11"
+msgstr "Устарело, X11"
+
+#: installation-dependencies.xml:335(entry)
+msgid ""
+"<placeholder-1/> on X11. This is a standard X Window System library and "
+"everyone having X probably has its runtime files. However, since the "
+"modularisation of X in Xorg 7.0, it is distributed separately and therefore "
+"you might not have its development files installed."
+msgstr ""
+"<placeholder-1/> на системах X11. Это стандартная библиотека X Window System "
+"и при наличии в системе X, эта библиотека скорее всего также имеется. Тем не "
+"менее, после разделения X на модули начиная с Xorg 7.0 она распространяется "
+"отдельно, и файлы для разработки с её помощью могут быть не установлены."
+
+#~ msgid "Import of Ergo data files."
+#~ msgstr "Импорт файлов данных Ergo."

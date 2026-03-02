@@ -1,0 +1,1862 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-docs\n"
+"POT-Creation-Date: 2023-10-14 14:31+0400\n"
+"PO-Revision-Date: 2023-05-26 19:11+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <ru@li.org>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.3.1\n"
+
+#: grains.xml:6(title)
+msgid "Grain Analysis"
+msgstr "Анализ зёрен"
+
+#: grains.xml:7(primary) grains.xml:19(primary) grains.xml:41(primary)
+#: grains.xml:64(primary) grains.xml:105(primary) grains.xml:209(primary)
+#: grains.xml:309(primary)
+msgid "grain marking"
+msgstr "выделение зёрен"
+
+#: grains.xml:8(para)
+msgid ""
+"There are several grain-related algorithms implemented in Gwyddion. First of "
+"all, simple thresholding algorithms can be used (height, slope or curvature "
+"thresholding). These procedures can be very efficient namely within particle "
+"analysis (to mark particles located on flat surface)."
+msgstr ""
+"В Gwyddion реализовано несколько алгоритмов для работы с зёрнами. Прежде "
+"всего, можно использовать простые пороговые алгоритмы (порог по высоте, "
+"наклону и кривизне). Эти процедуры могут быть очень эффективны для анализа "
+"частиц (чтобы пометить частицы лежащие на ровной поверхности)."
+
+#: grains.xml:15(title)
+msgid "Thresholding <gwy:icon name=\"grains\"/>"
+msgstr "По порогу <gwy:icon name=\"grains\"/>"
+
+#: grains.xml:20(secondary) grains.xml:42(secondary)
+msgid "threshold"
+msgstr "порог"
+
+#: grains.xml:24(guimenu) grains.xml:47(guimenu) grains.xml:69(guimenu)
+#: grains.xml:87(guimenu) grains.xml:110(guimenu) grains.xml:214(guimenu)
+#: grains.xml:314(guimenu) grains.xml:437(guimenu) grains.xml:461(guimenu)
+#: grains.xml:478(guimenu) grains.xml:507(guimenu) grains.xml:1079(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: grains.xml:25(guisubmenu) grains.xml:48(guisubmenu)
+#: grains.xml:70(guisubmenu) grains.xml:88(guisubmenu)
+#: grains.xml:111(guisubmenu) grains.xml:215(guisubmenu)
+#: grains.xml:315(guisubmenu) grains.xml:438(guisubmenu)
+#: grains.xml:462(guisubmenu) grains.xml:479(guisubmenu)
+#: grains.xml:508(guisubmenu) grains.xml:1080(guisubmenu)
+msgid "Grains"
+msgstr "Зёрна"
+
+#: grains.xml:26(guimenuitem)
+msgid "Mark by Threshold"
+msgstr "Пометить по порогу"
+
+#: grains.xml:29(para)
+msgid ""
+"Thresholding is the basic grain marking method. Height, slope and curvature "
+"thresholding is implemented within this module. The results of each "
+"individual thresholding methods can be merged together using logical "
+"operators."
+msgstr ""
+"Выделение по порогу это основной метод выделения зёрен. В этом модуле "
+"реализованы пороги по высоте, наклону и кривизне. Результаты отдельных "
+"пороговых методов можно объединять вместе используя логические операторы."
+
+#: grains.xml:37(title)
+msgid "Otsu's Method <gwy:icon name=\"grains_otsu\"/>"
+msgstr "Метод Оцу <gwy:icon name=\"grains_otsu\"/>"
+
+#: grains.xml:43(tertiary)
+msgid "Otsu's method"
+msgstr "метод Оцу"
+
+#: grains.xml:49(guimenuitem)
+msgid "Mark by Otsu's"
+msgstr "Пометить по методу Оцу"
+
+#: grains.xml:52(para)
+msgid ""
+"The automated Otsu's thresholding method classifies the data values into two "
+"classes, minimising the intra-class variances within both. It is most "
+"suitable for images that contain two relatively well defined value levels."
+msgstr ""
+"Автоматический метод Оцу выделения зёрен по порогу классифицирует значения "
+"данных в два класса, минимизируя дисперсию внутри класса для обоих. Метод "
+"хорошо подходит для изображений, которые содержат два относительно хорошо "
+"определённых диапазона значений."
+
+#: grains.xml:60(title)
+msgid "Edge Detection <gwy:icon name=\"grains_edge\"/>"
+msgstr "Пометить по краю <gwy:icon name=\"grains_edge\"/>"
+
+#: grains.xml:65(secondary)
+msgid "edge-based"
+msgstr "основанный на поиске границы"
+
+#: grains.xml:71(guimenuitem)
+msgid "Mark by Edge Detection"
+msgstr "Пометить по краю"
+
+#: grains.xml:74(para)
+msgid ""
+"Another grain marking function is based on edge detection (local curvature). "
+"The image is processed with a difference-of-Gaussians filter of a given size "
+"and thresholding is then performed on this filtered image instead of the "
+"original."
+msgstr ""
+" Другой вариант функции выделения зёрен  основан на обнаружении краёв "
+"(локальной кривизне функции высоты). Изображение обрабатывается фильтром "
+"<quote>разница гауссианов<\\quote> заданного размера и детекция порога затем "
+"применяется к обработанному фильтром изображению вместо исходного."
+
+#: grains.xml:82(title)
+msgid "Remove Edge-Touching <gwy:icon name=\"grains_edge_remove\"/>"
+msgstr "Удалить у границы <gwy:icon name=\"grains_edge_remove\"/>"
+
+#: grains.xml:89(guimenuitem)
+msgid "Remove Edge-Touching"
+msgstr "Удалить у границы"
+
+#: grains.xml:92(para)
+msgid ""
+"Grains that touch image edges can be removed using this function. It is "
+"useful if such grains are considered incomplete and must be excluded from "
+"analysis. Several other other functions that may be useful for modification "
+"of grain shapes after marking are performed by the <link linkend=\"mask-"
+"editor\">Mask Editor</link> tool."
+msgstr ""
+"Зёрна, которые касаются границ изображения, можно удалить используя эту "
+"функцию. Это может быть полезно в том случае, когда эти зёрна нужно "
+"рассматривать как неполные и их нужно исключить из анализа. Некоторые другие "
+"функции, которые можно использовать для модификации формы зерён после их "
+"выделения, вызываются из инструмента <link linkend=\"mask-editor\">Редактор "
+"маски</link>."
+
+#: grains.xml:101(title)
+msgid "Watershed <gwy:icon name=\"grains_water\"/>"
+msgstr "Пометить по водоразделу <gwy:icon name=\"grains_water\"/>"
+
+#: grains.xml:106(secondary)
+msgid "watershed"
+msgstr "водораздел"
+
+#: grains.xml:112(guimenuitem)
+msgid "Mark by Watershed"
+msgstr "Пометить по водоразделу"
+
+#: grains.xml:115(para)
+msgid ""
+"For more complicated data structures the effectiveness of thresholding "
+"algorithms can be very poor. For these data a <emphasis>watershed algorithm</"
+"emphasis> can be used more effectively for grain or particle marking."
+msgstr ""
+"Для более сложных структур данных эффективность пороговых алгоритмов может "
+"оказаться весьма плохой. Для этих данных выделение зёрен или частиц  более "
+"эффективно можно проводить с помощью <emphasis>алгоритма водораздела</"
+"emphasis>."
+
+#: grains.xml:121(para)
+msgid ""
+"The watershed algorithm is usually employed for local minima determination "
+"and image segmentation in image processing. As the problem of determining "
+"the grain positions can be understood as the problem of finding local "
+"extremes on the surface this algorithm can be used also for purposes of "
+"grain segmentation or marking. For convenience in the following we will "
+"treat the data inverted in the <include href=\"eqi-z.xml\"/> direction while "
+"describing the algorithm (i.e. the grain tops are forming local minima in "
+"the following text). We applied two stages of the grain analysis (see [<link "
+"linkend=\"grain-analysis-ref-1\">1</link>]):"
+msgstr ""
+"Алгоритм водораздела обычно задействуется для определения локальных "
+"минимумов и разделения изображения на сегменты в обработке изображений. "
+"Поскольку проблема определения положения зёрен может сводиться к проблеме "
+"нахождения локальных экстремумов на поверхности, этот алгоритм также можно "
+"использовать для нужд разделения и выделения зёрен. Для удобства в "
+"дальнейшем мы будем считать данные инвертированными в направлении <include "
+"href=\"eqi-z.xml\"/> при описании этого алгоритма (т.е. вершины зёрен "
+"формируют локальные минимумы в нижеследующем тексте). Мы применяем две "
+"стадии анализа зёрен (см. [<link linkend=\"grain-analysis-ref-1\">1</link>]):"
+
+#: grains.xml:136(guilabel) grains.xml:152(guilabel)
+msgid "Drop size"
+msgstr "Размер капли"
+
+#: grains.xml:141(guilabel) grains.xml:153(guilabel)
+msgid "Number of steps"
+msgstr "Число шагов"
+
+#: grains.xml:145(guilabel)
+msgid "Threshold"
+msgstr "Порог"
+
+#: grains.xml:134(listitem)
+msgid ""
+"Grain location phase: At each point of the inverted surface the virtual "
+"water drop was placed (amount of water is controlled by parameter "
+"<placeholder-1/>). In the case that the drop was not already in a local "
+"minimum it followed the steepest descent path to minimize its potential "
+"energy. As soon as the drop reached any local minimum it stopped here and "
+"rested on the surface. In this way it filled the local minimum partially by "
+"its volume (see figure below and its caption). This process was repeated "
+"several times (parameter <placeholder-2/>). As the result a system of lakes "
+"of different sizes filling the inverted surface depressions was obtained. "
+"Then the area of each of the lakes was evaluated and the smallest lakes are "
+"removed under assumption that they were formed in the local minima "
+"originated by noise (all lakes smaller than parameter <placeholder-3/> are "
+"removed). The larger lakes were used to identify the positions of the grains "
+"for segmentation in the next step. In this way the noise in the AFM data was "
+"eliminated. As a result"
+msgstr ""
+"Фаза обнаружения зёрен: В каждой точке инвертированной поверхности "
+"помещается виртуальная капля воды (количество воды регулируется параметром "
+"<placeholder-1/>). В случае, если капля не находится в локальном минимуме, "
+"она следует по пути наискорейшего спуска чтобы минимизировать свою "
+"потенциальную энергию. Как только капля достигает любого локального "
+"минимума, она остаётся там и покоится на поверхности. Подобным образом она "
+"частично заполняет объём локального минимума (см. рисунок ниже и его "
+"подпись). Этот процесс повторяется несколько раз (параметр <placeholder-2/"
+">). В результате получается система водоёмов различного размера, заполняющих "
+"впадины в инвертированной поверхности. После этого рассчитывается площадь "
+"каждого водоёма и наименьшие из них отбрасываются в предположении, что они "
+"формируются в локальных минимумах, образованных шумом (все водоёмы размером "
+"меньше, чем задано параметром <placeholder-3/>, удаляются). Большие водоёмы "
+"используются для определения положения зёрен для разделения на следующем "
+"шаге. Подобным образом можно устранить шум на данных АСМ."
+
+#: grains.xml:158(listitem)
+msgid ""
+"The drop reached the place previously marked as a concrete grain. In this "
+"case the drop was merged with the grain, i. e. it was marked as a part of "
+"the same grain."
+msgstr ""
+"Капля достигла места, ранее отмеченного как определённое зерно. В этом "
+"случае капля объединяется с зерном, т.е. помечается как часть того же зерна."
+
+#: grains.xml:163(listitem)
+msgid ""
+"The drop reached the place where no grain was found but a concrete grain was "
+"found in the closest neighbourhood of the drop. In this case the drop was "
+"merged with the grain again."
+msgstr ""
+"Капля достигла места, где нет зерна, но отмеченное зерно найдено в ближайшей "
+"окрестности капли. В этом случае капля снова объединяется с зерном."
+
+#: grains.xml:168(listitem)
+msgid ""
+"The drop reached the place where no grain was found and no grain was found "
+"even in the closest neighbourhood of the drop. In that case the drop was not "
+"marked at all."
+msgstr ""
+"Капля достигла места, где нет зёрен, и при этом зёрен не было даже в "
+"ближайшей окрестности капли. В этом случае капля никак не помечается."
+
+#: grains.xml:173(listitem)
+msgid ""
+"The drop reached the place where no grain was found but more than one "
+"concrete grain was found in the closest neighbourhood (e. g. two different "
+"grains were found in the neighbourhood). In this case the drop was marked as "
+"the grain boundary."
+msgstr ""
+"Капля достигла места, где нет зерна, но более одного отмеченного зерна "
+"найдено в ближайшей окрестности. (т.е. в окрестности нашлось два разных "
+"зерна). В этом случае капля помечается как граница зерна."
+
+#: grains.xml:179(listitem)
+msgid ""
+"The drop reached the place marked as grain boundary. In this case the drop "
+"was marked as the grain boundary too."
+msgstr ""
+"Капля достигла места, помеченного как граница зерна. В этом случае капля "
+"также помечается как граница зерна."
+
+#: grains.xml:149(listitem)
+msgid ""
+"Segmentation phase: The grains found in the step 1 were marked (each one by "
+"a different number). The water drops continued in falling to the surface and "
+"filling the local minima (amount of water is controlled by parameter "
+"<placeholder-1/>). Total number of steps of splashing a drop at every "
+"surface position is controlled by parameter <placeholder-2/>. As the grains "
+"were already identified and marked after the first step, the next five "
+"situations could happen as soon as the drop reached a local minimum. "
+"<placeholder-3/>"
+msgstr ""
+"Фаза разделения: Зёрна, найденные на первом шаге, помечаются (каждое своим "
+"уникальным номером). Капли воды продолжают падать на поверхность и заполнять "
+"локальные минимумы (количество воды регулируется параметром <placeholder-1/"
+">). Общее число шагов падения капли в каждую точку поверхности регулируется "
+"параметром <placeholder-2/>. Поскольку зёрна уже обнаружены и помечены после "
+"первого шага, следующие пять ситуаций возможны после достижения каплей "
+"локального минимума. <placeholder-3/>"
+
+#: grains.xml:186(para)
+msgid ""
+"In this way we can identify the grain positions and then determine the "
+"volume occupied by each grain separately. If features of interest are "
+"valleys rather than grains (hills), parameter <guilabel>Invert height</"
+"guilabel> can be used."
+msgstr ""
+"Таким путём мы определяем положения отдельных зёрен и затем определяем "
+"объём, занятый каждым зерном по отдельности. Если нас интересуют на "
+"поверхности не зёрна (выпуклости), а долины (впадины), можно использовать "
+"параметр <guilabel>Инвертировать высоту</guilabel>."
+
+#: grains.xml:197(caption)
+msgid ""
+"Image of grain-like surface structure (a) and corresponding results of "
+"height thresholding (b), curvature thresholding (c), and watershed (d) "
+"algorithm. Within watershed algorithm it is possible to segment image even "
+"further."
+msgstr ""
+"Изображение зернистой структуры поверхности (a) и соответствующие результаты "
+"порога по высоте (b), кривизне (c), и алгоритма водораздела (d). С помощью "
+"алгоритма водораздела можно разделить изображение на сегменты даже лучше."
+
+#: grains.xml:207(title)
+msgid "Segmentation"
+msgstr "Сегментация"
+
+#: grains.xml:210(secondary)
+msgid "segmentation"
+msgstr "сегментация"
+
+#: grains.xml:216(guimenuitem)
+msgid "Mark by Segmentation"
+msgstr "Пометить сегментацией"
+
+#: grains.xml:219(para)
+msgid ""
+"This function a different approach based on a <emphasis>watershed algorithm</"
+"emphasis>, in this case the classical Vincent algorithm for watershed in "
+"digital spaces [<link linkend=\"grain-analysis-ref-2\">2</link>], which is "
+"applied to a preprocessed image. Generally, the result is an image fully "
+"segmented to motifs, each pixel belonging to one or separating two of them. "
+"By default, the algorithm marks <emphasis>valleys</emphasis>. To mark upward "
+"grains, which is more common in AFM, use the option <guilabel>Invert height</"
+"guilabel>."
+msgstr ""
+"Эта функция реализует другой подход, основанный на <emphasis>алгоритме "
+"водораздела</emphasis>, в данном случае классический алгоритм Винсента для "
+"водораздела в цифровых пространствах  [<link linkend=\"grain-analysis-"
+"ref-2\">2</link>], который применяется к предобработанному изображению. В "
+"общем случае результатом будет изображение, полностью сегментированное на "
+"фрагменты, каждый пиксель либо принадлежит фрагменту, либо разделяет два "
+"соседних. По умолчанию алгоритм помечает <emphasis>впадины</emphasis>. Чтобы "
+"пометить направленные вверх зёрна, что встечается чаще на изображениях АСМ, "
+"можно использовать опцию <guilabel>Инвертировать высоту</guilabel>."
+
+#: grains.xml:230(para)
+msgid "The preprocessing has the following parameters:"
+msgstr "Для предобработки доступны следующие параметры:"
+
+#: grains.xml:236(guilabel)
+msgid "Gaussian smoothing"
+msgstr "Гауссово сглаживание"
+
+#: grains.xml:239(para)
+msgid ""
+"Dispersion of Gaussian smoothing filter applied to the data. A zero value "
+"means no smoothing."
+msgstr ""
+"Дисперсия гауссова сглаживающего фильтра, применяемого к изображению. "
+"Нулевое значение соответствует отсутствию сглаживания."
+
+#: grains.xml:247(guilabel)
+msgid "Add gradient"
+msgstr "Добавить градиент"
+
+#: grains.xml:250(para)
+msgid ""
+"Relative weight of local gradient added to the data. Large values mean areas "
+"with large local slope tend to become grain boundaries."
+msgstr ""
+"Относительный вес локального градиента, добавленного к данным. Большие "
+"значения соответствуют тому, что области с большими локальными уклонами "
+"будут стремиться стать границами зёрен."
+
+#: grains.xml:259(guilabel)
+msgid "Add curvature"
+msgstr "Добавить кривизну"
+
+#: grains.xml:262(para)
+msgid ""
+"Relative weight of local gradient added to the data. Large values mean "
+"locally concave areas with tend to become grain boundaries."
+msgstr ""
+"Относительный вес локальной кривизны, добавленной к данным. Большие значения "
+"соответствуют тому, что локальные вогнутые области будут стремиться стать "
+"границами зёрен."
+
+#: grains.xml:271(guilabel)
+msgid "Barrier level"
+msgstr "Высота барьера"
+
+#: grains.xml:274(para)
+msgid ""
+"Relative height level above which pixels are never assigned to any grain. If "
+"not 100%, this creates an exception to the full-segmentation property."
+msgstr ""
+"Относительный уровень высоты, выше которого пиксели никогда не присваиваются "
+"к любому из зёрен. Если не выставлено в 100%, эта настройка создаёт "
+"исключение для свойства полной сегментации."
+
+#: grains.xml:283(guilabel)
+msgid "Prefill level"
+msgstr "Уровень предзаполнения"
+
+#: grains.xml:286(para)
+msgid ""
+"Relative height level up to which the surface is prefilled, obliterating any "
+"details at the bottoms of deep valleys."
+msgstr ""
+"Относительный уровень высоты, до которого поверхность предзаполняется, "
+"затирая любые детали на дне глубоких впадин."
+
+#: grains.xml:294(guilabel)
+msgid "Prefill from minima"
+msgstr "Предварительно заполнять с минимумов"
+
+#: grains.xml:297(para)
+msgid ""
+"Relative height level up to which the surface is prefilled from each local "
+"minimum, obliterating any details at the bottoms of valleys."
+msgstr ""
+"Относительный уровень высоты, до которого поверхность предзаполняется из "
+"каждого локального минимума, затирая любые детали на дне впадин."
+
+#: grains.xml:307(title) grains.xml:316(guimenuitem)
+msgid "Logistic Regression"
+msgstr "Логистическая регрессия"
+
+#: grains.xml:310(secondary)
+msgid "logistic regression"
+msgstr "логистическая регрессия"
+
+#: grains.xml:319(para)
+msgid ""
+"To transfer segmentation from one image to another one with similar "
+"features, or from small chunk to complete large image, the logistic "
+"regression module can be used. It has two modes of operation, in training "
+"phase it requires the mask of grains to be present on the image, and train "
+"logistic regression for this mask. When the regression is trained, one can "
+"use it for the new images. In both modes it generates a feature vector from "
+"the current image, applying a number of filters to it. The available "
+"features include:"
+msgstr ""
+"Для того, чтобы перенести сегментацию с одного изображения на другое "
+"похожее, или с более мелкого фрагмента на полное большое изображение можно "
+"использовать модуль логистической регрессии. У модуля есть два режима "
+"работы, в режиме обучения ему нужна маска зёрен, которая должна "
+"присутствовать на изображении, и он обучает логистическую регрессию для этой "
+"маски. После обучения можно использовать этот модуль для выделения зёрен на "
+"новых изображениях. В обоих режимах работы модуль создаёт вектор признаков "
+"для каждой точки из точек текущего изображения, применяя к нему набор "
+"различных фильтров. На данный момент доступны следующие признаки:"
+
+#: grains.xml:332(guilabel)
+msgid "Gaussian blur"
+msgstr "Гауссово размытие"
+
+#: grains.xml:335(para)
+msgid ""
+"Gaussian filters with the length of 2, 4, 8 and so on. The number of "
+"gaussians can be selected by the user with <guilabel>Number of Gaussians</"
+"guilabel>"
+msgstr ""
+"Гауссовы фильтры с длиной в 2, 4, 8 и т.д. пикселей. Число гауссовых "
+"фильтров может быть выбрано с помощью опции <guilabel>Число гауссиан</"
+"guilabel>."
+
+#: grains.xml:344(guilabel)
+msgid "Sobel derivatives"
+msgstr "Производные Собеля"
+
+#: grains.xml:347(para)
+msgid "Sobel first derivative filters for X and Y directions."
+msgstr "Фильтры первых производных Собеля для направлений X и Y."
+
+#: grains.xml:354(guilabel)
+msgid "Laplacian"
+msgstr "Лапласиан"
+
+#: grains.xml:357(para)
+msgid "Laplacian sum of second deriatives operator."
+msgstr "Оператор Лапласа (суммы вторых производных)."
+
+#: grains.xml:364(guilabel)
+msgid "Hessian"
+msgstr "Гессиан"
+
+#: grains.xml:367(para)
+msgid ""
+"three elements of Hessian matrix of second derivatives, one for each of X- "
+"and Y-directions and one mixed."
+msgstr ""
+"три элемента матрицы вторых производных Гесса, по одной, реализующей двойное "
+"дифференцирование по направлениям X и Y и один со смешанной производной "
+"(поскольку диагональные элементы должны быть равны в данном случае)."
+
+#: grains.xml:374(para)
+msgid ""
+"All derivative filters if selected are applied to original image as well as "
+"to each of Gaussian-filtered if they present. Each feature layer is computed "
+"with the convolution operator and than normalized."
+msgstr ""
+"Все фильтры производных если их выбрать применяются как к оригинальному "
+"изображению, так и к каждому из уровней сглаживания гауссовыми фильтрами, "
+"если они включены. Каждый из слоёв признаков считается с помощью оператора "
+"свёртки и после этого нормализуется."
+
+#: grains.xml:380(para)
+msgid ""
+"<guilabel>Regularization parameter</guilabel> allows to regularize logistic "
+"regression, larger values means that parameters are more restricted from "
+"having very large values."
+msgstr ""
+"<guilabel>Параметр регуляризации</guilabel> позволяет регуляризовать "
+"логистическую регрессию, большее значение означает, что параметры регрессии "
+"более ограничены и не могут принимать очень большие значения."
+
+#: grains.xml:385(para)
+msgid ""
+"Note, that you need to have a mask on image for training, or the training "
+"will give zero results. The training phase can be very slow, especially for "
+"large images and large set of features selected. The training results are "
+"saved between the invocation, so they can be applied to other images. If the "
+"set of features is modified, one need to train logistic regression from the "
+"scratch."
+msgstr ""
+"Следует отметить, что для начала обучения необходима маска интересующих "
+"особенностей (зёрен) на исходном изображении, или в результате обучения "
+"получится нулевой результат. Фаза обучения может быть очень медленной и "
+"требовательной к памяти, особенно для больших изображений и большого числа "
+"признаков. Результаты обучения сохраняются между вызовами функции и могут "
+"применяться к новым изображениям. Если набор признаков меняется, то "
+"необходимо обучать регрессию заново с нуля."
+
+#: grains.xml:395(title) grains.xml:463(guimenuitem)
+msgid "Statistics"
+msgstr "Статистика"
+
+#: grains.xml:397(primary)
+msgid "statistics"
+msgstr "статистика"
+
+#: grains.xml:398(secondary)
+msgid "grains"
+msgstr "зёрна"
+
+#: grains.xml:401(primary) grains.xml:567(primary)
+msgid "mean"
+msgstr "среднее"
+
+#: grains.xml:402(secondary) grains.xml:406(secondary)
+#: grains.xml:410(secondary) grains.xml:414(secondary)
+#: grains.xml:418(secondary) grains.xml:422(secondary)
+#: grains.xml:426(secondary)
+msgid "of grains"
+msgstr "зёрен"
+
+#: grains.xml:405(primary) grains.xml:585(primary)
+msgid "rms"
+msgstr "ср. квадр."
+
+#: grains.xml:409(primary) grains.xml:551(primary) grains.xml:593(primary)
+msgid "minimum"
+msgstr "минимум"
+
+#: grains.xml:413(primary) grains.xml:559(primary) grains.xml:603(primary)
+msgid "maximum"
+msgstr "максимум"
+
+#: grains.xml:417(primary) grains.xml:576(primary)
+msgid "median"
+msgstr "срединное"
+
+#: grains.xml:421(primary)
+msgid "area"
+msgstr "площадь"
+
+#: grains.xml:425(primary)
+msgid "volume"
+msgstr "объём"
+
+#: grains.xml:428(para)
+msgid ""
+"Grain properties can be studied using several functions. The simplest of "
+"them is Grain Summary."
+msgstr ""
+"Свойства зёрен можно изучать с помощью нескольких функций. Простейшей из них "
+"является сводная информация о зёрнах"
+
+#: grains.xml:433(title)
+msgid "Grain Summary"
+msgstr "Сводная информация о зёрнах"
+
+#: grains.xml:434(primary)
+msgid "number of grains"
+msgstr "количество зёрен"
+
+#: grains.xml:439(guimenuitem)
+msgid "Summary"
+msgstr "Сводная информация"
+
+#: grains.xml:442(para)
+msgid ""
+"This function calculates the total number of marked grains, their total "
+"projected area, both as an absolute value and as a fraction of total data "
+"field area, total grain volumes, total length of grain boundaries and the "
+"mean area and equivalent square size of one grain. The mean size is "
+"calculated by averaging the equivalent square sides so its square is not, in "
+"general, equal to the mean area."
+msgstr ""
+"Эта функция рассчитывает общее число помеченных зёрен, их общую площадь "
+"(площадь проекции) как в виде абсолютного значения, так и в виде доли общей "
+"площади поля данных, общий объём зёрен, общую длину границ зёрен, среднюю "
+"площадь и сторону эквивалентного квадрата для отдельного зерна. Средний "
+"размер рассчитывается усреднением стороны эквивалентного квадрата, и его "
+"квадрат в общем случае не будет равным средней площади."
+
+#: grains.xml:450(para)
+msgid ""
+"Overall characteristics of the marked area can be also obtained with "
+"Statistical Quantities tool when its <guilabel>Use mask</guilabel> option is "
+"switched on. By inverting the mask the same information can be obtained also "
+"for the non-grain area."
+msgstr ""
+"Общие характеристики области под маской могут быть получены с помощью "
+"инструмента <quote>статистические величины</quote> когда включена опция "
+"<guilabel>Использовать маску</guilabel>. Если инвертировать маску та же "
+"информация может быть получена об областях вне зёрен."
+
+#: grains.xml:458(title)
+msgid "Grain Statistics"
+msgstr "Статистика"
+
+#: grains.xml:466(para)
+msgid ""
+"The grain statistics function displays the mean, median, standard deviation "
+"(rms) and inter-quartile range for all available grain quantities in one "
+"table."
+msgstr ""
+"Функция статистики зёрен показывает среднее, срединное, стандартное "
+"отклонение (среднеквадратичное) и межквартильный диапазон для всех доступных "
+"свойств зёрен в одной таблице."
+
+#: grains.xml:473(title)
+msgid "Grain Distributions <gwy:icon name=\"grains_graph\"/>"
+msgstr "Распределения зёрен <gwy:icon name=\"grains_graph\"/>"
+
+#: grains.xml:480(guimenuitem)
+msgid "Distributions"
+msgstr "Распределения"
+
+#: grains.xml:483(para)
+msgid ""
+"Grain Distributions is the most powerful and complex tool. It has two basic "
+"modes of operation: graph plotting and raw data export. In graph plotting "
+"mode selected characteristics of individual grains are calculated, gathered "
+"and summary graphs showing their distributions are plotted."
+msgstr ""
+"Распределения зёрен является наиболее мощным и сложным инструментом. Он "
+"работает в двух режимах: построение графиков и экспорт необработанных "
+"данных. В режиме построения графиков выбранные характеристики отдельных "
+"зёрен, рассчитываются, собираются, и строятся в виде суммарных графиков, "
+"показывающих их распределения."
+
+#: grains.xml:490(para)
+msgid ""
+"Raw data export is useful for experts who need for example to correlate "
+"properties of individual grains. In this mode selected grain characteristics "
+"are calculated and dumped to a text file table where each row corresponds to "
+"one grain and columns correspond to requested quantities. The order of the "
+"columns is the same as the relative order of the quantities in the dialogue; "
+"all values are written in base SI units, as is usual in "
+"<application>Gwyddion</application>."
+msgstr ""
+"Экспорт необработанных данных полезен для экспертов, которым нужно, "
+"например, рассчитывать корреляцию характеристик отдельных зёрен. В этом "
+"режиме выбранные характеристики зёрен рассчитываются и записываются в виде "
+"таблицы в текстовый файл, где каждая строка соответствует отдельному зерну, "
+"а столбцы соответствуют выбранным величинам. Порядок следования столбцов тот "
+"же, что и порядок следования величин в диалоговом окне; все величины "
+"записывается в единицах измерения СИ, что является общепринятым в "
+"<application>Gwyddion</application>."
+
+#: grains.xml:502(title)
+msgid "Grain Property Correlation <gwy:icon name=\"grain_correlation\"/>"
+msgstr "Корреляция свойств зёрен <gwy:icon name=\"grain_correlation\"/>"
+
+#: grains.xml:509(guimenuitem)
+msgid "Correlate"
+msgstr "Коррелировать"
+
+#: grains.xml:512(para)
+msgid ""
+"Grain correlation plots a graph of one selected graph quantity as the "
+"function of another grain quantity, visualizing correlations between them."
+msgstr ""
+"Корреляция зёрен строит график одной выбранной величины зёрен как функцию "
+"другой величины, показывая корреляции между ними."
+
+#: grains.xml:519(title)
+msgid "Grain Measurement Tool <gwy:icon name=\"grains_measure\"/>"
+msgstr "Инструмент измерения зёрен <gwy:icon name=\"grains_measure\"/>"
+
+#: grains.xml:522(para)
+msgid ""
+"The grain measurement tool is the interactive method to obtain the same "
+"information about individual grains as <link linkend=\"grain-distributions"
+"\">Grain Distributions</link> in raw mode. After selecting a grain on the "
+"data window with mouse, all the available quantities are displayed in the "
+"tool window."
+msgstr ""
+"Инструмент измерения зёрен является интерактивным способом получения той же "
+"информации об отдельных зёрнах, что и <link linkend=\"grain-distributions"
+"\">Распределения зёрен</link> в режиме экспорта необработанных данных. После "
+"выбора зерна мышью в окне данных, все доступные величины показываются в окне "
+"инструмента."
+
+#: grains.xml:529(para)
+msgid ""
+"Beside physical characteristics this tool also displays the grain number. "
+"Grain numbers corresponds to row numbers (counting from 1) in files exported "
+"by <link linkend=\"grain-distributions\">Grain Distributions</link>."
+msgstr ""
+"Помимо физических характеристик, этот инструмент также показывает номер "
+"зерна. Номера зёрен соответствуют номерам строк (начиная с 1) в файлах, "
+"экспортированных инструментом <link linkend=\"grain-distributions"
+"\">распределений зёрен</link>."
+
+#: grains.xml:538(title)
+msgid "Grain Properties"
+msgstr "Свойства зёрен"
+
+#: grains.xml:539(para)
+msgid ""
+"<link linkend=\"grain-distributions\">Grain Distributions</link> and <link "
+"linkend=\"grain-measure\">Grain measurement tool</link> can calculate the "
+"following grain properties:"
+msgstr ""
+"Инструменты <link linkend=\"grain-distributions\">распределений зёрен</link> "
+"и <link linkend=\"grain-measure\">измерения зёрен</link> могут рассчитывать "
+"следующие свойства зёрен:"
+
+#: grains.xml:546(term)
+msgid "Value-related properties"
+msgstr "Свойства значений"
+
+#: grains.xml:552(secondary) grains.xml:560(secondary)
+#: grains.xml:568(secondary) grains.xml:577(secondary)
+#: grains.xml:586(secondary)
+msgid "of a grain"
+msgstr "зерна"
+
+#: grains.xml:554(guilabel)
+msgid "Minimum"
+msgstr "Минимум"
+
+#: grains.xml:549(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, the "
+"minimum value (height) occurring inside the grain."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, "
+"минимальное значение (высота), найденное внутри зерна."
+
+#: grains.xml:562(guilabel)
+msgid "Maximum"
+msgstr "Максимум"
+
+#: grains.xml:557(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, the "
+"maximum value (height) occurring inside the grain."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, "
+"максимальное значение (высота), найденное внутри зерна."
+
+#: grains.xml:570(guilabel)
+msgid "Mean"
+msgstr "Среднее"
+
+#: grains.xml:565(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, the "
+"mean of all values occurring inside the grain, that is the mean grain height."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, "
+"среднее всех значений внутри зерна, средняя высота зерна."
+
+#: grains.xml:579(guilabel)
+msgid "Median"
+msgstr "Срединное"
+
+#: grains.xml:574(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/> the "
+"median of all values occurring inside the grain, that is the median grain "
+"height."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, "
+"срединное всех значений внутри зерна, срединная высота зерна."
+
+#: grains.xml:588(guilabel)
+msgid "RMS"
+msgstr "Ср. квадр."
+
+#: grains.xml:583(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/> the "
+"standard deviation of all values occurring inside the grain."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, "
+"стандартное отклонение для всех значений, встретившихся внутри зерна."
+
+#: grains.xml:594(secondary) grains.xml:604(secondary)
+msgid "on a grain boundary"
+msgstr "на границе зерна"
+
+#: grains.xml:596(guilabel)
+msgid "Minimum on boundary"
+msgstr "Минимум на границе"
+
+#: grains.xml:591(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, the "
+"minimum value (height) occurring on the inner grain boundary. This means "
+"within the set of pixels that lie inside the grain but at least one of their "
+"neighbours lies outside."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, "
+"минимальное значение (высота) найденное на внутренней границе зерна, т.е. "
+"внутри множества точек, лежащих внутри зерна, но по крайней мере одна из "
+"соседних точек которых лежит вне зерна."
+
+#: grains.xml:606(guilabel)
+msgid "Maximum on boundary"
+msgstr "Максимум на границе"
+
+#: grains.xml:601(listitem)
+msgid ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, the "
+"maximum value (height) occurring on the inner grain boundary, defined "
+"similarly to the minimum."
+msgstr ""
+"<indexterm><placeholder-1/><placeholder-2/></indexterm><placeholder-3/>, "
+"максимальное значение (высота) найденное на внутренней границе зерна, т.е. "
+"внутри множества точек, лежащих внутри зерна, но по крайней мере одна из "
+"соседних точек которых лежит вне зерна."
+
+#: grains.xml:614(term)
+msgid "Area-related properties"
+msgstr "Свойства площадей"
+
+#: grains.xml:618(guilabel)
+msgid "Projected area"
+msgstr "Площадь проекции"
+
+#: grains.xml:617(listitem)
+msgid "<placeholder-1/>, the projected (flat) area of the grain."
+msgstr "<placeholder-1/>, площадь проекции зерна на плоскость."
+
+#: grains.xml:622(guilabel)
+msgid "Equivalent square side"
+msgstr "Сторона эквивалентного квадрата"
+
+#: grains.xml:621(listitem)
+msgid ""
+"<placeholder-1/>, the side of the square with the same projected area as the "
+"grain."
+msgstr ""
+"<placeholder-1/>, сторона квадрата с той же площадью проекции, что и у зерна."
+
+#: grains.xml:627(guilabel)
+msgid "Equivalent disc radius"
+msgstr "Радиус эквивалентного диска"
+
+#: grains.xml:626(listitem)
+msgid ""
+"<placeholder-1/>, the radius of the disc with the same projected area as the "
+"grain."
+msgstr ""
+"<placeholder-1/>, радиус диска с той же площадью проекции, что и у зерна."
+
+#: grains.xml:632(guilabel)
+msgid "Surface area"
+msgstr "Площадь поверхности"
+
+#: grains.xml:634(link)
+msgid "statistical quantities"
+msgstr "статистические величины"
+
+#: grains.xml:631(listitem)
+msgid ""
+"<placeholder-1/>, the surface area of the grain, see <placeholder-2/> "
+"section for description of the surface area estimation method."
+msgstr ""
+"<placeholder-1/>, площадь поверхности зерна, см. раздел <placeholder-2/> для "
+"описания метода оценки площади поверхности."
+
+#: grains.xml:639(guilabel)
+msgid "Area of convex hull"
+msgstr "Площадь выпуклой оболочки"
+
+#: grains.xml:638(listitem)
+msgid ""
+"<placeholder-1/>, the projected area of grain convex hull. The convex hull "
+"area is slightly larger than the grain area even for grains that appear to "
+"be fairly convex due to pixelisation of the mask. The only grains with "
+"exactly the same area as their convex hulls are perfectly rectangular grains."
+msgstr ""
+"<placeholder-1/>, площадь проекции выпуклой оболочки зерна. Площадь выпуклой "
+"оболочки несколько больше площади зерна даже для достаточно выпуклых зёрен "
+"вследствие пикселизации маски. Точно такую же площадь зерна, как и площадь "
+"проекции выпуклой оболочки, будут иметь только зёрна в виде прямоугольников."
+
+#: grains.xml:650(term)
+msgid "Boundary-related properties"
+msgstr "Свойства границы"
+
+#: grains.xml:654(guilabel)
+msgid "Projected boundary length"
+msgstr "Длина границы проекции"
+
+#: grains.xml:653(listitem)
+msgid ""
+"<placeholder-1/>, the length of the grain boundary projected to the "
+"horizontal plane (that is not taken on the real three-dimensional surface). "
+"The method of boundary length estimation is described below."
+msgstr ""
+"<placeholder-1/>, длина проекции границы зерна на горизонтальную плоскость "
+"(а не на реальную трёхмерную поверхность). Метод оценки длины границы описан "
+"ниже."
+
+#: grains.xml:661(guilabel)
+msgid "Minimum bounding size"
+msgstr "Минимальный ограничивающий размер"
+
+#: grains.xml:660(listitem)
+msgid ""
+"<placeholder-1/>, the minimum dimension of the grain in the horizontal "
+"plane. It can be visualized as the minimum width of a gap in the horizontal "
+"plane the grain could pass through."
+msgstr ""
+"<placeholder-1/>, минимальный размер зерна в горизонтальной плоскости. Может "
+"быть показан как минимальная ширина зазора в горизонтальной плоскости, через "
+"который может пройти зерно."
+
+#: grains.xml:667(guilabel)
+msgid "Minimum bounding direction"
+msgstr "Направление минимального ограничивающего размера"
+
+#: grains.xml:666(listitem) grains.xml:678(listitem)
+msgid ""
+"<placeholder-1/>, the direction of the gap from the previous item. If the "
+"grain exhibits a symmetry that makes several directions to qualify, an "
+"arbitrary direction is chosen."
+msgstr ""
+"<placeholder-1/>, направление зазора из описания предыдущей величины. Если "
+"зерно обладает симметрией, при которой таких направлений несколько, "
+"выбирается одно из них."
+
+#: grains.xml:673(guilabel)
+msgid "Maximum bounding size"
+msgstr "Максимальный ограничивающий размер"
+
+#: grains.xml:672(listitem)
+msgid ""
+"<placeholder-1/>, the maximum dimension of the grain in the horizontal "
+"plane. It can be visualized as the maximum width of a gap in the horizontal "
+"plane the grain could fill up."
+msgstr ""
+"<placeholder-1/>, максимальный размер зерна в горизонтальной плоскости. "
+"Может быть показан как максимальная ширина зазора в горизонтальной "
+"плоскости, который можно заполнить зерном."
+
+#: grains.xml:679(guilabel)
+msgid "Maximum bounding direction"
+msgstr "Направление максимального ограничивающего размера"
+
+#: grains.xml:685(guilabel)
+msgid "Maximum inscribed disc radius"
+msgstr "Максимальный радиус вписанного диска"
+
+#: grains.xml:689(link)
+msgid "Mask Editor tool"
+msgstr "Инструмент редактирования маски"
+
+#: grains.xml:684(listitem)
+msgid ""
+"<placeholder-1/>, the radius of maximum disc that fits inside the grain. The "
+"entire full disc must fit, not just its boundary circle, which matters for "
+"grains with voids within. You can use <placeholder-2/> to fill voids in "
+"grains to get rid of voids."
+msgstr ""
+"<placeholder-1/>, радиус максимального диска, который помещается внутри "
+"зерна. Должен поместиться полный диск, а не ограничивающая его окружность, "
+"что имеет значение для зёрен с пустотами внутри. Можно использовать  "
+"<placeholder-2/> чтобы заполнить пустоты в зёрнах и избавиться от них."
+
+#: grains.xml:693(guilabel)
+msgid "Maximum inscribed disc centre x position"
+msgstr "Положение центра по x максимального вписанного диска"
+
+#: grains.xml:692(listitem)
+msgid ""
+"<placeholder-1/>, the horizontal coordinate of centre of the maximum "
+"inscribed disc. More precisely, of one such disc if it is not unique."
+msgstr ""
+"<placeholder-1/>, горизонтальная координата центра максимального вписанного "
+"диска. Точнее, одного такого диска, если он не уникален."
+
+#: grains.xml:698(guilabel)
+msgid "Maximum inscribed disc centre y position"
+msgstr "Положение центра по y максимального вписанного диска"
+
+#: grains.xml:697(listitem)
+msgid ""
+"<placeholder-1/>, the vertical coordinate of centre of the maximum inscribed "
+"disc. More precisely, of one such disc if it is not unique but of the same "
+"as in the previous item."
+msgstr ""
+"<placeholder-1/>, вертикальная координата центра максимального вписанного "
+"диска. Точнее, одного такого диска, если их несколько, и того же, что и у "
+"предыдущего элемента."
+
+#: grains.xml:704(guilabel)
+msgid "Minimum circumcircle radius"
+msgstr "Минимальный радиус описанной окружности"
+
+#: grains.xml:703(listitem)
+msgid "<placeholder-1/>, the radius of minimum circle that contains the grain."
+msgstr ""
+"<placeholder-1/>, радиус минимальной окружности, целиком содержащей зерно."
+
+#: grains.xml:708(guilabel)
+msgid "Minimum circumcircle centre x position"
+msgstr "Положение центра по x минимальной описанной окружности"
+
+#: grains.xml:707(listitem)
+msgid ""
+"<placeholder-1/>, the horizontal coordinate of centre of the minimum "
+"circumcircle."
+msgstr ""
+"<placeholder-1/>, горизонтальная координата центра минимальной описанной "
+"окружности."
+
+#: grains.xml:713(guilabel)
+msgid "Minimum circumcircle centre y position"
+msgstr "Положение центра по y минимальной описанной окружности"
+
+#: grains.xml:712(listitem)
+msgid ""
+"<placeholder-1/>, the vertical coordinate of centre of the minimum "
+"circumcircle."
+msgstr ""
+"<placeholder-1/>, вертикальная координата центра минимальной описанной "
+"окружности."
+
+#: grains.xml:718(guilabel)
+msgid "Mean radius"
+msgstr "Средний радиус"
+
+#: grains.xml:717(listitem)
+msgid ""
+"<placeholder-1/>, the mean distance from grain centre of mass to its "
+"boundary. This quantity is mostly meaningful only for convex or nearly-"
+"convex grains."
+msgstr ""
+"<placeholder-1/>, среднее расстояние от центра масс зерна до его границы. "
+"Это свойство в основном имеет смысл только для выпуклых или почти выпуклых "
+"зёрен."
+
+#: grains.xml:724(guilabel)
+msgid "Minimum Martin diameter"
+msgstr "Минимальный диаметр Мартина"
+
+#: grains.xml:723(listitem)
+msgid ""
+"<placeholder-1/>, the minimum length of a median line through the grain."
+msgstr ""
+"<placeholder-1/>, минимальная длина срединной линии, проходящей через зерно."
+
+#: grains.xml:728(guilabel)
+msgid "Direction of minimum Martin diameter"
+msgstr "Направление минимального диаметра Мартина"
+
+#: grains.xml:727(listitem) grains.xml:737(listitem)
+msgid ""
+"<placeholder-1/>, the direction of the line from the previous item. If the "
+"grain exhibits a symmetry that makes several directions to qualify, an "
+"arbitrary direction is chosen."
+msgstr ""
+"<placeholder-1/>, направление линии из предыдущего пункта. Если у зерна "
+"проявляется симметрия и таких направлений несколько, то из них произвольно "
+"выбирается одно."
+
+#: grains.xml:734(guilabel)
+msgid "Maximum Martin diameter"
+msgstr "Максимальный диаметр Мартина"
+
+#: grains.xml:733(listitem)
+msgid ""
+"<placeholder-1/>, the maximum length of a median line through the grain."
+msgstr ""
+"<placeholder-1/>, максимальная длина срединной линии, проходящей через зерно."
+
+#: grains.xml:738(guilabel)
+msgid "Direction of maximum Martin diameter"
+msgstr "Направление максимального диаметра Мартина"
+
+#: grains.xml:747(term)
+msgid "Volume-related properties"
+msgstr "Свойства объёмов"
+
+#: grains.xml:751(guilabel)
+msgid "Zero basis"
+msgstr "Объём между нулевой плоскостью и поверхностью"
+
+#: grains.xml:756(link)
+msgid "Fix Zero"
+msgstr "Исправить нуль"
+
+#: grains.xml:750(listitem)
+msgid ""
+"<placeholder-1/>, the volume between grain surface and the plane <include "
+"href=\"eqi-z-is-0.xml\"/>. Values below zero form negative volumes. The zero "
+"level must be set to a reasonable value (often <placeholder-2/> is "
+"sufficient) for the results to make sense, which is also the advantage of "
+"this method: one can use basis plane of his choice."
+msgstr ""
+"<placeholder-1/>, объём между поверхностью зерна и плоскостью <include href="
+"\"eqi-z-is-0.xml\"/>. Значения ниже нуля формируют отрицательные объёмы. "
+"Уровень нуля должен быть установлен на разумное значение чтобы получать "
+"вменяемые результаты (нередко достаточно <placeholder-2/>), что является "
+"достоинством этого метода: можно использовать базисную плоскость по выбору."
+
+#: grains.xml:761(guilabel)
+msgid "Grain minimum basis"
+msgstr "Объём между поверхностью и плоскостью, проходящей через минимум"
+
+#: grains.xml:760(listitem)
+msgid ""
+"<placeholder-1/>, the volume between grain surface and the plane <include "
+"href=\"eqi-z-is-z_min.xml\"/>, where <include href=\"eqi-z_min.xml\"/> is "
+"the minimum value (height) occuring in the grain. This method accounts for "
+"grain surrounding but it typically underestimates the volume, especially for "
+"small grains."
+msgstr ""
+"<placeholder-1/>, объём между поверхностью зерна и плоскостью <include href="
+"\"eqi-z-is-z_min.xml\"/>, где <include href=\"eqi-z_min.xml\"/> - "
+"минимальное значение (высота), найденное внутри зерна. Этот метод учитывает "
+"окружающую зерно поверхность, но обычно недооценивает объём, особенно для "
+"малых зёрен."
+
+#: grains.xml:770(guilabel)
+msgid "Laplacian backround basis"
+msgstr "Объём между поверхностью и фоном, вычисленным по Лапласу"
+
+#: grains.xml:774(link)
+msgid "Interpolate Data Under Mask"
+msgstr "Интерполировать данные под маской"
+
+#: grains.xml:776(link)
+msgid "Grain Remover"
+msgstr "удаления зёрен"
+
+#: grains.xml:769(listitem)
+msgid ""
+"<placeholder-1/>, the volume between grain surface and the basis surface "
+"formed by laplacian interpolation of surrounding values. In other words, "
+"this is the volume that would disappear after using <placeholder-2/> or "
+"<placeholder-3/> tool with Laplacian interpolation on the grain. This is the "
+"most sophisticated method, on the other hand it is the hardest to develop "
+"intuition for."
+msgstr ""
+"<placeholder-1/>, объём между поверхностью зерна и базовой поверхностью, "
+"образованной интерполяцией окружающей зерно поверхности по Лапласу. Другими "
+"словами, это объём. который исчезнет после использования инструментов "
+"<placeholder-2/> или <placeholder-3/> с лапласовой интерполяцией зерна. Это "
+"один из наиболее сложных методов, с другой стороны его результаты труднее "
+"всего предугадать."
+
+#: grains.xml:785(term)
+msgid "Position-related properties"
+msgstr "Свойства расположения"
+
+#: grains.xml:789(guilabel)
+msgid "Centre x position"
+msgstr "Положение центра по x"
+
+#: grains.xml:788(listitem)
+msgid ""
+"<placeholder-1/>, the horizontal coordinate of the grain centre. Since the "
+"grain area is defined as the area covered by the corresponding mask pixels, "
+"the centre of a single-pixel grain has half-integer coordinates, not integer "
+"ones. Data field origin offset (if any) is taken into account."
+msgstr ""
+"<placeholder-1/>, горизонтальная координата центра зерна. Поскольку площадь "
+"зерна определяется как площадь под соответствующими точками маски, центр "
+"зерна размером с пиксель будет иметь полуцелые координаты, не целые. "
+"Смещение начала координат поля данных учитывается (если оно есть)."
+
+#: grains.xml:797(guilabel)
+msgid "Centre y position"
+msgstr "Положение центра по y"
+
+#: grains.xml:796(listitem)
+msgid ""
+"<placeholder-1/>, the vertical coordinate of the grain centre. See above for "
+"the interpretation."
+msgstr ""
+"<placeholder-1/>, вертикальная координата центра зерна. Интерпретация "
+"описана выше."
+
+#: grains.xml:805(term)
+msgid "Slope-related properties"
+msgstr "Свойства наклонов"
+
+#: grains.xml:809(guilabel)
+msgid "Inclination θ"
+msgstr "Наклон θ"
+
+#: grains.xml:812(link) grains.xml:818(link)
+msgid "inclinations"
+msgstr "Наклоны"
+
+#: grains.xml:808(listitem)
+msgid ""
+"<placeholder-1/>, the deviation of the normal to the mean plane from the "
+"<include href=\"eqi-z.xml\"/>-axis, see <placeholder-2/> for details."
+msgstr ""
+"<placeholder-1/>, отклонение нормали к средней плоскости от оси <include "
+"href=\"eqi-z.xml\"/>, см. описание функции <placeholder-2/> для более "
+"подробной информации."
+
+#: grains.xml:816(guilabel)
+msgid "Inclination φ"
+msgstr "Наклон φ"
+
+#: grains.xml:815(listitem)
+msgid ""
+"<placeholder-1/>, the azimuth of the slope, as defined in <placeholder-2/>."
+msgstr ""
+"<placeholder-1/>, азимут наклона, как он был задан в определении функции "
+"<placeholder-2/>."
+
+#: grains.xml:824(term)
+msgid "Curvature-related properties"
+msgstr "Свойства, относящиеся к кривизне"
+
+#: grains.xml:828(guilabel)
+msgid "Curvature centre <include href=\"eqi-x.xml\"/>"
+msgstr "Центр кривизны по <include href=\"eqi-x.xml\"/>"
+
+#: grains.xml:827(listitem)
+msgid ""
+"<placeholder-1/>, the horizontal position of the centre of the quadratic "
+"surface fitted to the grain surface."
+msgstr ""
+"<placeholder-1/>, горизонтальное положение центра квадратичной поверхности, "
+"которой аппроксимируется поверхность зерна."
+
+#: grains.xml:833(guilabel)
+msgid "Curvature centre <include href=\"eqi-y.xml\"/>"
+msgstr "Центр кривизны по <include href=\"eqi-y.xml\"/>"
+
+#: grains.xml:832(listitem)
+msgid ""
+"<placeholder-1/>, the vertical position of the centre of the quadratic "
+"surface fitted to the grain surface."
+msgstr ""
+"<placeholder-1/>, вертикальное положение центра квадратичной поверхности, "
+"которой аппроксимируется поверхность зерна."
+
+#: grains.xml:838(guilabel)
+msgid "Curvature centre <include href=\"eqi-z.xml\"/>"
+msgstr "Центр кривизны по <include href=\"eqi-z.xml\"/>"
+
+#: grains.xml:837(listitem)
+msgid ""
+"<placeholder-1/>, the value at the centre of the quadratic surface fitted to "
+"the grain surface. Note this is the value at the fitted surface, not at the "
+"real grain surface."
+msgstr ""
+"<placeholder-1/>, значение в центре квадратичной поверхности, которой "
+"аппроксимируется поверхность зерна. Следует отметить, что это значение на "
+"аппроксимирующей поверхности, не на поверхности зерна."
+
+#: grains.xml:844(guilabel) grains.xml:855(guilabel)
+msgid "Curvature 1"
+msgstr "Кривизна 1"
+
+#: grains.xml:843(listitem)
+msgid ""
+"<placeholder-1/>, the smaller curvature (i.e. the inverse of the curvature "
+"radius) at the centre."
+msgstr ""
+"<placeholder-1/>, меньшая кривизна (т.е. значение, обратное радиусу "
+"кривизны) в центре."
+
+#: grains.xml:849(guilabel) grains.xml:859(guilabel)
+msgid "Curvature 2"
+msgstr "Кривизна 2"
+
+#: grains.xml:848(listitem)
+msgid ""
+"<placeholder-1/>, the larger curvature (i.e. the inverse of the curvature "
+"radius) at the centre."
+msgstr ""
+"<placeholder-1/>, большая кривизна (т.е. значение, обратное радиусу "
+"кривизны) в центре."
+
+#: grains.xml:854(guilabel)
+msgid "Curvature angle 1"
+msgstr "Угол кривизны 1"
+
+#: grains.xml:853(listitem) grains.xml:857(listitem)
+msgid "<placeholder-1/>, the direction corresponding to <placeholder-2/>."
+msgstr ""
+"<placeholder-1/>, направление, соответствующее радиусу <placeholder-2/>."
+
+#: grains.xml:858(guilabel)
+msgid "Curvature angle 2"
+msgstr "Угол кривизны 2"
+
+#: grains.xml:865(term)
+msgid "Moment-related properties"
+msgstr "Свойства, относящиеся к моментам"
+
+#: grains.xml:869(guilabel)
+msgid "Major semiaxis of equivalent ellipse"
+msgstr "Большая полуось эквивалентного эллипса"
+
+#: grains.xml:868(listitem)
+msgid ""
+"<placeholder-1/>, the length of the major semiaxis of an ellipse which has "
+"the same second order moments in the horizontal plane."
+msgstr ""
+"<placeholder-1/>, длина большей полуоси эллипса, у которого будет такой же "
+"угловой момент второго порядка в горизонтальной плоскости."
+
+#: grains.xml:876(guilabel)
+msgid "Minor semiaxis of equivalent ellipse"
+msgstr "Малая полуось эквивалентного эллипса"
+
+#: grains.xml:875(listitem)
+msgid ""
+"<placeholder-1/>, the length of the minor semiaxis of an ellipse which has "
+"the same second order moments in the horizontal plane."
+msgstr ""
+"<placeholder-1/>, длина меньшей полуоси эллипса, у которого будет такой же "
+"угловой момент второго порядка в горизонтальной плоскости."
+
+#: grains.xml:883(guilabel)
+msgid "Orientation of equivalent ellipse"
+msgstr "Ориентация эквивалентного эллипса"
+
+#: grains.xml:882(listitem)
+msgid ""
+"<placeholder-1/>, the direction of the major semiaxis of an ellipse which "
+"has the same second order moments in the horizontal plane. For a circular "
+"grain, the angle is set to zero by definition."
+msgstr ""
+"<placeholder-1/>, направление большей полуоси эллипса, у которого будет "
+"такой же угловой момент второго порядка в горизонтальной плоскости. Для "
+"круглого зерна, этот угол устанавливается в ноль по определению."
+
+#: grains.xml:900(caption)
+msgid "Maximum and minimum bounding dimensions and angles of a grain."
+msgstr "Максимальные и минимальные ограничивающие размеры зерна."
+
+#: grains.xml:905(para)
+msgid ""
+"<indexterm><primary>boundary length calculation</primary></indexterm> The "
+"grain boundary length is estimated by summing estimated contributions of "
+"each four-pixel configuration on the boundary. The contributions are "
+"displayed on the following figure for each type of configuration, where "
+"<include href=\"eqi-h_x.xml\"/> and <include href=\"eqi-h_y.xml\"/> are "
+"pixel dimension along corresponding axes and <include href=\"eqi-h.xml\"/> "
+"is the length of the pixel diagonal: <include href=\"eq-grain-boundary-pixel-"
+"diagonal.xml\"/> The contributions correspond one-to-one to lengths of "
+"segments of the boundary of a polygon approximating the grain shape. The "
+"construction of the equivalent polygonal shape can also be seen in the "
+"figure."
+msgstr ""
+"<indexterm><primary>расчёт длины границы</primary></indexterm> Длина границы "
+"зерна оценивается путём суммирования оценочного вклада каждой комбинации из "
+"четырёх точек границы. Вклады показаны на следующем рисунке для каждого вида "
+"конфигурации, где <include href=\"eqi-h_x.xml\"/> и <include href=\"eqi-h_y."
+"xml\"/> - размеры пикселей вдоль соответствующих осей и <include href=\"eqi-"
+"h.xml\"/> - длина диагонали пикселя: <include href=\"eq-grain-boundary-pixel-"
+"diagonal.xml\"/> Вклады соответствуют один в один длинам сегментов границы "
+"многоугольника, которым аппроксимируется форма зерна. Построение "
+"эквивалентной формы многоугольника также показано на этом рисунке."
+
+#: grains.xml:927(caption)
+msgid ""
+"Contributions of pixel configurations to the estimated boundary length "
+"(top). Grey squares represent pixels inside the grain, white squares "
+"represent outside pixels. The estimated contribution of each configuration "
+"is: (a) <include href=\"eqi-h-over-2.xml\"/>, (b1), (b2) <include href=\"eqi-"
+"h.xml\"/>, (c) <include href=\"eqi-h_y.xml\"/>, (d) <include href=\"eqi-h_x."
+"xml\"/>, (e) <include href=\"eqi-h-over-2.xml\"/>. Cases (b1) and (b2) "
+"differ only in the visualization of the polygonal shape segments, the "
+"estimated boundary lengths are identical. The bottom part of the figure "
+"illustrates how the segments join to form the polygon."
+msgstr ""
+"Вклад конфигураций пикселей в оцениваемую длину поверхности (сверху). Серые "
+"квадраты представляют пиксели внутри зерна, белые - внешние пиксели. "
+"Оценочный вклад каждой конфигурации: (a) <include href=\"eqi-h-over-2.xml\"/"
+">, (b1), (b2) <include href=\"eqi-h.xml\"/>, (c) <include href=\"eqi-h_y.xml"
+"\"/>, (d) <include href=\"eqi-h_x.xml\"/>, (e) <include href=\"eqi-h-over-2."
+"xml\"/>. Случаи (b1) и (b2) отличаются только формой сегментов-"
+"многоугольников, оценочные длины поверхности одинаковы. Нижняя часть рисунка "
+"показывает, как сегменты объединяются, чтобы образовать многоугольник."
+
+#: grains.xml:944(para)
+msgid ""
+"<indexterm><primary>volume calculation</primary></indexterm> The grain "
+"volume is, after subtracting the basis, estimated as the volume of exactly "
+"the same body whose upper surface is used for <link linkend=\"fig-surface-"
+"area-vertices\">surface area calculation</link>. Note for the volume between "
+"vertices this is equivalent to the classic two-dimensional trapezoid "
+"integration method. However, we calculate the volume under a mask centred on "
+"vertices, therefore their contribution to the integral is distributed "
+"differently as shown in the following figure."
+msgstr ""
+"<indexterm><primary>расчёт объёма</primary></indexterm> Объём зерна после "
+"вычета основания, оценивается как объём точно такой же фигуры, верхняя "
+"поверхность которой использовалась для <link linkend=\"fig-surface-area-"
+"vertices\">расчёта площади поверхности</link>. Следует отметить, что для "
+"объёма, ограниченного многогранником, метод эквивалентен классическому "
+"двумерному методу интегрирования с помощью трапеций. Однако, мы рассчитываем "
+"объём под маской с центрами на гранях фигуры, поэтому их вклад в интеграл "
+"распределён иначе, как показано на рисунке ниже."
+
+#: grains.xml:963(caption)
+msgid ""
+"Contributions of individual pixels to the volume of single pixel (grey)."
+msgstr "Вклад отдельных пикселей в объём одного пикселя (серого)."
+
+#: grains.xml:969(para)
+msgid ""
+"Curvature-related properties of individual grains are calculated identically "
+"to the global curvature calculated by <link linkend=\"curvature\">Curvature</"
+"link>. See its description for some discussion."
+msgstr ""
+"Относящиеся к кривизне значения для отдельных зёрен считаются так же, как и "
+"общая кривизна, рассчитываемая функцией <link linkend=\"curvature"
+"\">Кривизна</link>. См. описание функции для более подробной информации."
+
+#: grains.xml:983(caption)
+msgid "Maximum inscribed disc and minimum circumcircle of a grain."
+msgstr "Максимальный вписанный диск и минимальная описанная окружность зерна."
+
+#: grains.xml:988(para)
+msgid ""
+"Inscribed discs and circumcircles of grains can be visualized using "
+"<menuchoice><guimenu>Data Process</guimenu><guisubmenu>Grains</"
+"guisubmenu><guimenuitem>Select Inscribed Discs</guimenuitem></menuchoice> "
+"and <menuchoice><guimenu>Data Process</guimenu><guisubmenu>Grains</"
+"guisubmenu><guimenuitem>Select Circumscribed Circles</guimenuitem></"
+"menuchoice>. These functions create circular selections representing the "
+"corresponding disc or circle for each grain that can be subsequently "
+"displayed using <link linkend=\"selection-manager\">Selection Manager tool</"
+"link>."
+msgstr ""
+"Вписанные диски и описанные окружности зёрен можно визуализировать используя "
+"функции <menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Зёрна</"
+"guisubmenu><guimenuitem>Выбрать вписанные диски</guimenuitem></menuchoice> и "
+"<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Зёрна</"
+"guisubmenu><guimenuitem>Выбрать описанные окружности</guimenuitem></"
+"menuchoice>. Эти функции создают круговые выделенные области, представляющие "
+"соответствующие диски или окружности для каждого зерна. которые затем можно "
+"показать с помощью <link linkend=\"tool-selection-manager\">инструмента "
+"Менеджер выделенных областей</link>."
+
+#: grains.xml:1014(caption)
+msgid "Determination of Martin's diameter at given angle."
+msgstr "Определение диаметра Мартина для заданного угла."
+
+#: grains.xml:1019(para)
+msgid ""
+"The Martin's diameter is the length of the unique line through the grain in "
+"given direction which which divides the grain area into two equal parts "
+"(median line). This quantity is mostly useful for grains that are still "
+"relatively close to convex. For reference we should note that if the grain "
+"is highly non-convex and the median line intersects the grain several times, "
+"Gwyddion sums the lengths of the segments actually lying inside the grain "
+"(the other option would be to simply take the distance between the first and "
+"last intersection)."
+msgstr ""
+"Диаметр Мартина это длина особой линии, проходящей через зерно в заданном "
+"направлении, которая делит площадь зерна на две равные части (срединная "
+"линия). Эта величина в основном полезна для зёрен которые являются более или "
+"менее выпуклыми. Для справки мы должны отметить, что если зерно является "
+"сильно не-выпуклым и срединная линия пересекает его несколько раз, Gwyddion "
+"суммирует длины сегментов, которые лежат внутри зерна (другим вариантом "
+"могло бы быть просто взять расстояние между первым и последним пересечением)."
+
+#: grains.xml:1031(title)
+msgid "Grain Filtering <gwy:icon name=\"grains_remove\"/>"
+msgstr "Фильтр зёрен <gwy:icon name=\"grains_remove\"/>"
+
+#: grains.xml:1034(para)
+msgid ""
+"Marked grains can be filtered by thresholding by any of the available grain "
+"quantities using <menuchoice><guimenu>Data Process</"
+"guimenu><guisubmenu>Grains</guisubmenu><guimenuitem>Filter</guimenuitem></"
+"menuchoice> menu choice. The module can be used for basic operations, such "
+"as removal of tiny grains using a pixel area threshold, as well as complex "
+"filtering using logical expressions involving several grain quantities."
+msgstr ""
+"Помеченные зёрна можно фильтровать по порогу любой из доступных для зёрен "
+"величин используя меню <menuchoice><guimenu>Обработка данных</"
+"guimenu><guisubmenu>Зёрна</guisubmenu><guimenuitem>Фильтр</guimenuitem></"
+"menuchoice>. Этот модуль можно использовать для основных операций, таких как "
+"удаление слишком мелких зёрен используя порог площади в пикселях, а также "
+"для сложной фильтрации, использующей логические операции над несколькими "
+"величинами, относящимися к параметрам зёрен."
+
+#: grains.xml:1046(para)
+msgid ""
+"The filter retains grains that satisfy the condition specified as "
+"<guilabel>Keep grains satisfying</guilabel> and removes all other grains. "
+"The condition is expressed as a logical expression of one to three "
+"individual thresholding conditions, denoted <varname>A</varname>, "
+"<varname>B</varname> and <varname>C</varname>. The simplest expression is "
+"just <varname>A</varname>, stating that quantity <varname>A</varname> must "
+"lie within given thresholds."
+msgstr ""
+"Фильтр сохраняет зёрна, которые удовлетворяют условию, заданному как "
+"<guilabel>Оставлять зёрна, удовлетворяющие</guilabel> и удаляет все "
+"остальные. Условие задаётся как логическое выражение, содержащее от одного "
+"до трёх пороговых условий, обозначенных как  <varname>A</varname>, "
+"<varname>B</varname> и <varname>C</varname>. Простейшее условие это просто "
+"<varname>A</varname>, означающее, что величина <varname>A</varname> должна "
+"лежать между заданными порогами."
+
+#: grains.xml:1055(para)
+msgid ""
+"Each condition consits of lower and upper thresholds for one grain quantity, "
+"for instance pixel area or minimum value. The values must lie within the "
+"interval [lower,upper] to satisfy the condition and thus retain the grains. "
+"Note it is possible to choose the lower threshold larger than the upper "
+"threshold. In this case the condition is inverted, i.e. the grain is "
+"retained if the value lies outside [upper,lower]."
+msgstr ""
+"Каждое условие состоит из верхнего и нижнего порога для одной величины, "
+"относящейся к зёрнам, например, площади в пикселях или значению минимума. "
+"Значения должны лежать в диапазоне [нижний,верхний] чтобы удовлетворить "
+"условию и тем самым сохранить это зерно. Следует отметить, что можно выбрать "
+"нижний порог больше верхнего. В этом случае условие инвертируется, т.е. "
+"зерно сохраняется если значение лежит вне диапазона  [нижний,верхний]."
+
+#: grains.xml:1064(para)
+msgid ""
+"Individual grain quantities are assigned to <varname>A</varname>, "
+"<varname>B</varname> and <varname>C</varname> by selecting the quantity in "
+"the list and clicking on the corresponding button in <guilabel>Set selected "
+"as</guilabel>. The currently selected set of quantities is displayed in the "
+"<guilabel>Condition A</guilabel>, <guilabel>Condition B</guilabel> and "
+"<guilabel>Condition C</guilabel> headers."
+msgstr ""
+"Отдельные величины для зёрен присваиваются <varname>A</varname>, <varname>B</"
+"varname> и <varname>C</varname> выбором величины из списка и нажатием на "
+"соответствующую кнопку в <guilabel>Установить выбранное как</guilabel>. "
+"Текущий выбранный набор величин показан в заголовках <guilabel>Условие A</"
+"guilabel>, <guilabel>Условие B</guilabel> и <guilabel>Условие C</guilabel>."
+
+#: grains.xml:1076(title)
+msgid "Grain Number Extraction"
+msgstr "Извлечение номеров зёрен"
+
+#: grains.xml:1081(guimenuitem)
+msgid "Exract Numbers"
+msgstr "Извлечь номера"
+
+#: grains.xml:1084(para)
+msgid ""
+"When images with marked grains are further processed in other software, it "
+"can be useful to clearly identify which region corresponds has which grain "
+"number assigned in Gwyddion. This function creates an image where each pixel "
+"contains the corresponding grain number. Hence, even though the data are "
+"still floating point numbers all the values are in fact integers."
+msgstr ""
+"Когда изображения с выделенными зёрнами в дальнейшем обрабатываются в другом "
+"программном обеспечении, может оказаться полезным в явном виде определь "
+"какой номер зерна присвоен какой области в Gwyddion. Эта функция создаёт "
+"избражение, где каждый пиксель содержит соответствующий номер зерна. "
+"Следовательно, хотя данные при этом по прежнему будут представлены "
+"вещественными числами, они будут на самом деле целыми."
+
+#: grains.xml:1093(title)
+msgid "Grain Leveling"
+msgstr "Выравнивание зёрен"
+
+#: grains.xml:1094(primary)
+msgid "grain leveling"
+msgstr "выравнивание зёрен"
+
+#: grains.xml:1095(para)
+msgid ""
+"Grains can be aligned vertically using <menuchoice><guimenu>Data Process</"
+"guimenu><guisubmenu>Grains</guisubmenu><guimenuitem>Level Grains</"
+"guimenuitem></menuchoice>. This function vertically shifts each grain to "
+"make a certain height-related quantity of all grains equal. Typically, the "
+"grain minimum values are aligned but other choices are possible."
+msgstr ""
+"Зёрна можно выровнять по вертикали используя функцию "
+"<menuchoice><guimenu>Обработка данных</guimenu><guisubmenu>Зёрна</"
+"guisubmenu><guimenuitem>Выровнять зёрна</guimenuitem></menuchoice>. Эта "
+"функция сдвигает каждое зерно таким образом, чтобы сделать одну из связанных "
+"с высотой величин всех зёрен одинаковой. Обычно выравниваются минимальные "
+"значения внутри зерна, но возможны другие варианты."
+
+#: grains.xml:1106(para)
+msgid ""
+"Data between grains are also vertically shifted. The shifts are interpolated "
+"from the grain shifts using the Laplace equation, leading to a smooth "
+"transition of the shifts between the grains (though with no regard to other "
+"possible surface features)."
+msgstr ""
+"Данные между зёрнами также сдвигаются по вертикали. Эти сдвиги "
+"интерполируются из сдвигов зёрен используя уравнение Лапласа, что приводит к "
+"плавным переходам сдвигов между зёрнами (хотя и не принимая во внимания "
+"другие особенности поверхности)."
+
+#: grains.xml:1114(title)
+msgid "References"
+msgstr "Источники"
+
+#: grains.xml:1115(para)
+msgid ""
+"[1] P. Klapetek, I. Ohlídal, D. Franta, A. Montaigne-Ramil, A. Bonanni, D. "
+"Stifter, H. Sitter: Atomic force microscopy characterization of ZnTe "
+"epitaxial films. Acta Physica Slovaca 53 (2003) 223–230, <ulink url=\"http://"
+"dx.doi.org/10.1143/JJAP.42.4706\">doi:10.1143/JJAP.42.4706</ulink>"
+msgstr ""
+"[1] P. Klapetek, I. Ohlídal, D. Franta, A. Montaigne-Ramil, A. Bonanni, D. "
+"Stifter, H. Sitter: Atomic force microscopy characterization of ZnTe "
+"epitaxial films. Acta Physica Slovaca 53 (2003) 223–230, <ulink url=\"http://"
+"dx.doi.org/10.1143/JJAP.42.4706\">doi:10.1143/JJAP.42.4706</ulink>"
+
+#: grains.xml:1121(para)
+msgid ""
+"[2] Luc Vincent and Pierre Soille: Watersheds in digital spaces: an "
+"efficient algorithm based on immersion simulations. IEEE Transactions on "
+"Pattern Analysis and Machine Intelligence, 13 (1991) 583–598, <ulink url="
+"\"http://dx.doi.org/10.1109/34.87344\">doi:10.1109/34.87344</ulink>"
+msgstr ""
+"[2] Luc Vincent and Pierre Soille: Watersheds in digital spaces: an "
+"efficient algorithm based on immersion simulations. IEEE Transactions on "
+"Pattern Analysis and Machine Intelligence, 13 (1991) 583–598, <ulink url="
+"\"http://dx.doi.org/10.1109/34.87344\">doi:10.1109/34.87344</ulink>"
+
+#~ msgid ""
+#~ "<placeholder-1/><placeholder-2/><placeholder-3/> Grain Leveling grain "
+#~ "leveling Grains can be aligned vertically using Data Process Grains Level "
+#~ "Grains . This function vertically shifts each grain to make a certain "
+#~ "height-related quantity of all grains equal. Typically, the grain minimum "
+#~ "values are aligned but other choices are possible. Data between grains "
+#~ "are also vertically shifted. The shifts are interpolated from the grain "
+#~ "shifts using the Laplace equation, leading to a smooth transition of the "
+#~ "shifts between the grains (though with no regard to other possible "
+#~ "surface features). References [1] P. Klapetek, I. Ohldoi:10.1143/"
+#~ "JJAP.42.4706 [2] Luc Vincent and Pierre Soille: Watersheds in digital "
+#~ "spaces: an efficient algorithm based on immersion simulations. IEEE "
+#~ "Transactions on Pattern Analysis and Machine Intelligence, 13 (1991) "
+#~ "583doi:10.1109/34.87344"
+#~ msgstr ""
+#~ "<placeholder-1/><placeholder-2/><placeholder-3/> Выравнивание зёрен "
+#~ "выравнивание зёрен Зёрна могут выравниваться по вертикали используя "
+#~ "функцию Обработка данных Зёрна Выровнять зёрна. Эта функция смещает "
+#~ "каждое зерно по вертикали таким образом, чтобы сделать определенную "
+#~ "связанную с высотой величину одинаковой для всех зёрен. Обычно "
+#~ "выравниваются значения минимума для зёрен, но возможно выбрать другие "
+#~ "варианты. Данные между зёрнами также смещаются по вертикали. Сдвиги "
+#~ "интерполируются на основе сдвигов отдельных зёрен используя уравнение "
+#~ "лапласа, что приводит к гладкому переходу сдвигов между зёрнами (хотя при "
+#~ "этом не учитываются другие возможные особенности поверхности). Ссылки: "
+#~ "[1] P. Klapetek, I. Ohldoi:10.1143/JJAP.42.4706 [2] Luc Vincent and "
+#~ "Pierre Soille: Watersheds in digital spaces: an efficient algorithm based "
+#~ "on immersion simulations. IEEE Transactions on Pattern Analysis and "
+#~ "Machine Intelligence, 13 (1991) 583doi:10.1109/34.87344"
+
+#~ msgid "Otsu's Method"
+#~ msgstr "Метод Оцу"
+
+#~ msgid ""
+#~ "[1] <ulink url=\"http://klapetek.cz/download.html\"> Petr Klapetek, Ivan "
+#~ "Ohlídal, Daniel Franta, Alberto Montaigne-Ramil, Alberta Bonanni, David "
+#~ "Stifter and Helmut Sitter: Acta Physica Slovaca, 3 (223-230) 2003 </ulink>"
+#~ msgstr ""
+#~ "[1] <ulink url=\"http://klapetek.cz/download.html\"> Petr Klapetek, Ivan "
+#~ "Ohlídal, Daniel Franta, Alberto Montaigne-Ramil, Alberta Bonanni, David "
+#~ "Stifter and Helmut Sitter: Acta Physica Slovaca, 3 (223-230) 2003 </ulink>"
+
+#~ msgid ""
+#~ "[2] Luc Vincent and Pierre Soille: IEEE Transactions on Pattern Analysis "
+#~ "and Machine Intelligence, 13 (583–598) 1991"
+#~ msgstr ""
+#~ "[2] Luc Vincent and Pierre Soille: IEEE Transactions on Pattern Analysis "
+#~ "and Machine Intelligence, 13 (583–598) 1991"
+
+#~ msgid ""
+#~ "Watershed <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_grains_water-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Водораздел <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_grains_water-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Grain Distributions <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_grains_graph-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Распределения зёрен <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_grains_graph-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Grain Measurement Tool "
+#~ "<guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_grains_measure-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Инструмент измерения зёрен "
+#~ "<guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_grains_measure-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid ""
+#~ "Grain Filtering <guiicon><inlinemediaobject><imageobject><imagedata "
+#~ "fileref=\"gwy_grains_remove-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+#~ msgstr ""
+#~ "Фильтр зёрен <guiicon><inlinemediaobject><imageobject><imagedata fileref="
+#~ "\"gwy_grains_remove-24.png\" format=\"PNG\"/></imageobject></"
+#~ "inlinemediaobject></guiicon>"
+
+#~ msgid "Distance Transform"
+#~ msgstr "Преобразование расстояния"
+
+#~ msgid "distance transform"
+#~ msgstr "преобразование расстояния"
+
+#~ msgid ""
+#~ "The distance transform assigns to each pixel its distance to the grain "
+#~ "(mask) boundary. It is, in a certain sense, complementary to the "
+#~ "watershed. The distance transform can perform the transform using true "
+#~ "Euclidean distance <include href=\"eq-distance-euclidean.xml\"/> as well "
+#~ "as classical simple distances such as the city-block (4-neigbourhood) "
+#~ "<include href=\"eq-distance-cityblock.xml\"/> and chessboard (8-"
+#~ "neigbourhood) <include href=\"eq-distance-chessboard.xml\"/> distances "
+#~ "that are useful mainly for didactic purposes. In addition, octagonal "
+#~ "distances are available that are calculated by taking the cityblock and "
+#~ "chessboard distance steps alternatively, obtaining ‘48’ and ‘84’ variants "
+#~ "depending on which step is taken first. Finally, an octagonal distance "
+#~ "without any specifier is available that is the average of the two "
+#~ "variants."
+#~ msgstr ""
+#~ "Преобразование расстояния присваивает каждому пикселю его расстояние до "
+#~ "границы зерна (маски). Оно является в какой-то степени дополняющим "
+#~ "алгоритм водораздела. Преобразование расстояния может выполняться "
+#~ "используя настоящее эвклидово расстояние <include href=\"eq-distance-"
+#~ "euclidean.xml\"/>, а также классические простые определения расстояний, "
+#~ "такие как расстояние на сетке кварталов (соседние 4) <include href=\"eq-"
+#~ "distance-cityblock.xml\"/> и на шахматной доске (соседние 8) <include "
+#~ "href=\"eq-distance-chessboard.xml\"/>, которые могут быть полезны в "
+#~ "основном в учебных целях. В дополнение, восьмигранные расстояния могут "
+#~ "рассчитываться используя шаги на квартальной сетке и шахматной доске "
+#~ "попеременно, получая варианты ‘48’ и ‘84’ в зависимости от того, какой "
+#~ "шаг будет выбран первым. И наконец, доступно октагональное расстояние без "
+#~ "уточнения которое будет средним из двух вариантов."
+
+#~ msgid ""
+#~ "If the transform is applied to grain interiors the distance is zero "
+#~ "outside grains and increases towards the grain ‘centres’. Conversely, it "
+#~ "can be applied to the exteriors and it is then highest for pixels "
+#~ "farthest from any grain. It is also possible to calculate signed two-side "
+#~ "transform which is the difference of the two transforms, i.e. it is "
+#~ "positive inside grains and negative outside."
+#~ msgstr ""
+#~ "Если оно применяется к внутренней части зёрен, расстояние равно нулю "
+#~ "снаружи зерна и увеличивается по мере приближения к \"центру\" зерна. Оно "
+#~ "может применяться наоборот, к внешней части по отношению к зёрнам и "
+#~ "значение будет большим для наиболее удалённых от любого зерна пикселей. "
+#~ "Также можно рассчитать знаковое двухстороннее преобразование, равное "
+#~ "разности двух предыдущих, т.е. оно положительно внутри зерна и "
+#~ "отрицательно снаружи."
+
+#~ msgid ""
+#~ "Option <guilabel>Shrink from border</guilabel> controls the handling of "
+#~ "borders. When it is enabled, image boundaries are considerd to be also "
+#~ "grain (or non-grain) boundaries. Pixels on the image edge thus cannot "
+#~ "receive large values. When it is disabled, the grains (or non-grains) are "
+#~ "effectively infinitely large outside the image. So pixels close to the "
+#~ "boundary can receive large distance values."
+#~ msgstr ""
+#~ "Опция <guilabel>Ужать от границы</guilabel> управляет обработкой границ "
+#~ "изображения. При включенной, границы изображения также рассматриваются "
+#~ "как границы зёрен (или пустого пространства). Пиксели на краях "
+#~ "изображения при этом не могут приобретать больших значений. При "
+#~ "выключенной опции, зёрна (или пустое пространство) оказываются как-бы "
+#~ "бесконечно большими вне изображения. И пиксели вблизи границы могут "
+#~ "приобретать большие значения расстояния."
+
+#~ msgid ""
+#~ "Euclidean distance transform example: the soruce mask shown as white on "
+#~ "black, interior distance transform, exterior transform (with inverted "
+#~ "greyscale for comparison) and the signed transform."
+#~ msgstr ""
+#~ "Пример преобразования в эвклидово расстояние: исходная маска показана "
+#~ "белым по чёрному, внутреннее преобразование расстояния, внешнее (с "
+#~ "перевёрнутой шкалой серого для сравнения) и преобразование со знаком."
+
+#~ msgid "Euclidean Distance Transform"
+#~ msgstr "Преобразование в эвклидово расстояние"
+
+#~ msgid ""
+#~ "The Euclidean distance transform assigns to each pixel its distance to "
+#~ "the grain (mask) boundary. It is, in a certain sense, complementary to "
+#~ "the watershed."
+#~ msgstr ""
+#~ "Преобразование в евклидово расстояние присваивает каждому пикселю его "
+#~ "расстояние до границы либо зерна, либо маски. Оно в некотором смысле "
+#~ "дополняет алгоритм водораздела."
+
+#~ msgid ""
+#~ "This function can also remove all grains that touch image sides which is "
+#~ "useful if such grains are considered incomplete and must be excluded from "
+#~ "analysis."
+#~ msgstr ""
+#~ "Эта функция также может удалить все зёрна, которые касаются края "
+#~ "изображения, что может быть полезно если эти зёрна считаются неполными и "
+#~ "требуется исключить их из анализа"
+
+#~ msgid "watershed grain marking"
+#~ msgstr "выделение зёрен по водоразделу"
+
+#~ msgid ""
+#~ "<placeholder-1/>, the vertical coordinate of center of the minimum "
+#~ "circumcircle. More precisely, of one such circle if it is not unique but "
+#~ "of the same as in the previous item."
+#~ msgstr ""
+#~ "<placeholder-1/>, вертикальная координата центра минимальной описанной "
+#~ "окружности. Точнее, одной такой окружности, если их несколько, и той же, "
+#~ "что и у предыдущего элемента."

@@ -1,0 +1,159 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-user-guide\n"
+"POT-Creation-Date: 2022-01-07 00:33+0400\n"
+"PO-Revision-Date: 2022-01-07 18:32+0400\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Last-Translator: \n"
+"Language-Team: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-SourceCharset: utf8\n"
+
+#: curve-maps-data-processing.xml:6(title)
+#: curve-maps-data-processing.xml:7(primary)
+msgid "Curve Maps Data Processing"
+msgstr "Обработка данных карт кривых"
+
+#: curve-maps-data-processing.xml:8(para)
+msgid "Curve maps are formed by bundles of curves measured on a regular grid, so the data processing tasks are either connected to extracting the individual curve data, or to automatically processing the curves in every point to create a map of some evaluated quantity."
+msgstr "Карты кривых формируются наборами кривых, измеренных в узлах правильной сетки, таким образом, задачи обработки данных связаны либо с извлечением данных отдельной кривой, либо с автоматической обработкой кривых в каждой точке для создания карты некоторой рассчитанной величины."
+
+#: curve-maps-data-processing.xml:14(para)
+msgid "Basic curve map operations include simple tasks available as a set of menu entries <menuchoice><guimenu>Curve Maps</guimenu><guimenuitem>Basic operations</guimenuitem></menuchoice>. This includes functions for cropping, flipping, rotating curve maps, as well as for changing their physical scale, having the same meaning as for the 2D data. Such functions are useful for any type of curve maps. In contrast to this, many functions are suitable only for some particular curve map types, namely for maps of force-distance curves that many SPMs can produce."
+msgstr "Основные операции с картами кривых включают в себя простые задачи, доступные как набор пунктов меню <menuchoice><guimenu>Карты кривых</guimenu><guimenuitem>Базовые действия</guimenuitem></menuchoice>. Они включают в себя операции по обрезке, перевороту и повороту карты кривых, а также изменения их масштаба в физических единицах измерения, которые используются подобно своим эквивалентам для двумерных данных. Такие функции полезны для любого типа карт кривых. В противоположность этому, ряд функций подходят только для определенных типов карт кривых, а именно массивов кривых сила-расстояние, которые могут генерировать многие виды СЗМ."
+
+#: curve-maps-data-processing.xml:28(para)
+msgid "Note that at present the curve map functions typically do not store undo data as the size of a typical curve map is already very large."
+msgstr "Следует отметить, что в настоящее время функции работы с картами кривых обычно не сохраняют данные для отката операций поскольку типичная карта кривых и так очень большая."
+
+#: curve-maps-data-processing.xml:33(title)
+msgid "Crop <gwy:icon name=\"crop\"/>"
+msgstr "Обрезка <gwy:icon name=\"crop\"/>"
+
+#: curve-maps-data-processing.xml:38(guimenu)
+#: curve-maps-data-processing.xml:116(guimenu)
+#: curve-maps-data-processing.xml:139(guimenu)
+#: curve-maps-data-processing.xml:156(guimenu)
+#: curve-maps-data-processing.xml:176(guimenu)
+#: curve-maps-data-processing.xml:200(guimenu)
+msgid "Curve Maps"
+msgstr "Карты кривых"
+
+#: curve-maps-data-processing.xml:39(guimenuitem)
+#: curve-maps-data-processing.xml:117(guimenuitem)
+#: curve-maps-data-processing.xml:140(guimenuitem)
+msgid "Basic operations"
+msgstr "Основные операции"
+
+#: curve-maps-data-processing.xml:40(guimenuitem)
+msgid "Crop"
+msgstr "Кадрировать"
+
+#: curve-maps-data-processing.xml:43(para)
+msgid "The module cuts the curve map in lateral directions that can be entered either in pixels or in physical dimensions. With <guilabel>Keep lateral offsets</guilabel> option enabled, the top left corner coordinates of the resulting image correspond to the top left corner of the selection, otherwise the top left corner coordinates are set to <xi:include href=\"eqi-coords-0-0.xml\"/>."
+msgstr "Модуль обрезает карту кривых в пространственных направлениях, размеры могут быть заданы как в пикселях, так и в физических размерах. С включенной опцией <guilabel>Сохранять пространственные смещения</guilabel>, координаты верхнего левого угла полученного в результате изображения будут соответствовать координатам верхнего левого угла выделенной области, в противном случае координаты верхнего левого угла буду установлены в <xi:include href=\"eqi-coords-0-0.xml\"/>."
+
+#: curve-maps-data-processing.xml:53(title)
+msgid "Flip <gwy:icon name=\"flip_horizontally\"/><gwy:icon name=\"flip_vertically\"/><gwy:icon name=\"rotate_180\"/>"
+msgstr "Перевернуть <gwy:icon name=\"flip_horizontally\"/><gwy:icon name=\"flip_vertically\"/><gwy:icon name=\"rotate_180\"/>"
+
+#: curve-maps-data-processing.xml:60(primary)
+#: curve-maps-data-processing.xml:64(primary)
+#: curve-maps-data-processing.xml:68(primary)
+msgid "flip"
+msgstr "перевернуть"
+
+#: curve-maps-data-processing.xml:61(secondary)
+msgid "horizontally"
+msgstr "горизонтально"
+
+#: curve-maps-data-processing.xml:65(secondary)
+msgid "vertically"
+msgstr "вертикально"
+
+#: curve-maps-data-processing.xml:69(secondary)
+msgid "both"
+msgstr "оба"
+
+#: curve-maps-data-processing.xml:71(para)
+msgid "Flip the data horizontally (i.e. about the vertical axis), vertically (i.e. about the horizontal axis) or in both axes with <menuchoice><guimenu>Curve Maps</guimenu><guisubmenu>Basic Operations</guisubmenu><guimenuitem>Flip Horizontally</guimenuitem></menuchoice>, <guimenuitem>Flip Vertically</guimenuitem> or <guimenuitem>Flip Both Axes</guimenuitem>, respectively."
+msgstr "Можно перевернуть массив данных горизонтально (т.е. относительно вертикальной оси), вертикально (т.е. относительно горизонтальной оси) или в обоих направлениях с помощью <menuchoice><guimenu>Карты кривых</guimenu><guisubmenu>Базовые действия</guisubmenu><guimenuitem>Отразить горизонтально</guimenuitem></menuchoice>, <guimenuitem>Отразить вертикально</guimenuitem> или <guimenuitem>Перевернуть обе оси</guimenuitem>, соответственно."
+
+#: curve-maps-data-processing.xml:88(title)
+msgid "Rotation by multiples of 90° <gwy:icon name=\"rotate_90_cw\"/><gwy:icon name=\"rotate_90_ccw\"/>"
+msgstr "Поворот на угол, кратный 90°<gwy:icon name=\"rotate_90_cw\"/><gwy:icon name=\"rotate_90_ccw\"/>"
+
+#: curve-maps-data-processing.xml:94(primary)
+msgid "rotation"
+msgstr "поворот"
+
+#: curve-maps-data-processing.xml:95(secondary)
+msgid "by multiple of 90°"
+msgstr "на угол, кратный прямому"
+
+#: curve-maps-data-processing.xml:97(para)
+msgid "Rotation of data by 90 degrees is done using one of the basic rotation functions: <menuchoice><guimenu>Curve Maps</guimenu><guisubmenu>Basic Operations</guisubmenu><guimenuitem>Rotate Clockwise</guimenuitem></menuchoice>, <guimenuitem>Rotate Anticlockwise</guimenuitem> ."
+msgstr "Поворот данных на угол, кратный прямому, выполняется с помощью одной из основных функций поворота: <menuchoice><guimenu>Карты кривых</guimenu><guisubmenu>Базовые действия</guisubmenu><guimenuitem>Повернуть по часовой</guimenuitem></menuchoice>, <guimenuitem>Повернуть против часовой</guimenuitem> ."
+
+#: curve-maps-data-processing.xml:111(title)
+msgid "Dimensions and Units <gwy:icon name=\"data_measure\"/>"
+msgstr "Размеры и единицы измерения <gwy:icon name=\"data_measure\"/>"
+
+#: curve-maps-data-processing.xml:118(guimenuitem)
+msgid "Dimensions and Units"
+msgstr "Размеры и единицы измерения"
+
+#: curve-maps-data-processing.xml:121(para)
+msgid "The module changes physical dimensions of curve maps. This is useful for the correction of raw data that have been imported with wrong physical scales or as a simple manual recalibration of dimensions and values. Apart of different methods for determining the scaling factors (matching pixel size of another data set, setting the scale directly or setting the physical dimensions), the module can be also used to set the lateral offsets. Finally, it can be also used to set the lateral scale units if this was not done while loading the file."
+msgstr "Этот модуль изменяет физические размеры карт кривых. Это полезно чтобы исправить сырые данные, которые были импортированы с неправильными физическими размерами или в качестве простой ручной перекалибровки размеров и единиц измерения. Помимо различных методов для определения множителей масштабирования (соответствия размеру пикселя другого набора данных, задания масштаба напрямую или задания физических размеров), модуль также можно использовать для задания пространственных смещений. Наконец, он также может использоваться для задания единиц измерения пространственных смещений если это не было сделано в ходе загрузки файла."
+
+#: curve-maps-data-processing.xml:134(title)
+#: curve-maps-data-processing.xml:141(guimenuitem)
+msgid "Remove Segments"
+msgstr "Удалить сегменты"
+
+#: curve-maps-data-processing.xml:144(para)
+msgid "The module removes any curve map segmentation. Segments are formed by marks on datasets in each pixel of the curve map and can be used e.g. for splitting the force-distance curve into an approach and a retract part in the force-distance data processing modules. Using this module all such marks are deleted."
+msgstr "Этот модуль убирает любое разделение карты кривых на сегменты. Сегменты формируются разметкой набора данных в каждом пикселе карты кривых и могут использоваться, например, для разделения кривой сила-расстояние на участки, соответствующие подводу и отводу для модулей обработки силовых кривых. Используя данный модуль все эти отметки можно удалить."
+
+#: curve-maps-data-processing.xml:153(title)
+msgid "Align"
+msgstr "Выровнять"
+
+#: curve-maps-data-processing.xml:157(guimenuitem)
+msgid "Align..."
+msgstr "Выровнять..."
+
+#: curve-maps-data-processing.xml:160(para)
+msgid "The module performs alignment of the curves in the 'z' direction, where 'z' can mean height, but also any other variable on which the spectra are dependent, like voltage in a IV characteristics. A typical use is aligning the Force-Distance curves measured on a sample with large topography variations, obtaining the topography and shifting all the curves to start at the same z level."
+msgstr "Этот модуль выполняет выравнивание кривых вдоль оси Z, где Z может обозначать высоту, а также любую другую переменную, от которой зависят спектры, например, напряжение в вольтамперных характеристиках. Типовое использование этой функции это выравнивание кривых сила-расстояние снятых на образце с большим изменением высоты, для сдвигания всех кривых после получения топографии таким образом, чтобы они начинались на одном уровне Z."
+
+#: curve-maps-data-processing.xml:171(title)
+#: curve-maps-data-processing.xml:177(guimenuitem)
+msgid "Extract Curves"
+msgstr "Извлечь кривые"
+
+#: curve-maps-data-processing.xml:180(para)
+msgid "The module extracts individual curves as a graph, displayed in the <link linkend=\"graph-windows\">graph window</link>. As there is no hierarchy in the data forming the curve map, it is necessary to select <guilabel>Abscissa</guilabel> (the independent variable) and <guilabel>Ordinate</guilabel> (the dependent variable) to do so. Typically, for a force-distance curve, the <guilabel>Abscissa</guilabel> will be something related to height or probe-sample separation and <guilabel>Ordinate</guilabel> will be something related to force. Multiple curves can be extracted by clicking on the <guilabel>Extract Multiple</guilabel> option."
+msgstr "Этот модуль извлекает отдельные кривые в виде графика, который будет показан в <link linkend=\"graph-windows\">окне графика</link>. Поскольку в данных, формирующих карту кривых отсутствует иерархическое упорядочивание, необходимо выбрать <guilabel>Абсциссу</guilabel> (независимую переменную) и <guilabel>Ординату</guilabel> (зависимую переменную) чтобы так сделать. Обычно для кривых сила-расстояние <guilabel>Абсциссой</guilabel> будет некоторая величина относящаяся к высоте или расстоянию от зонда до поверхности, а <guilabel>Ординатой</guilabel> некая величина, связанная с силой. Можно одновременно извлекать много кривых включением опции <guilabel>Извлечь несколько</guilabel>"
+
+#: curve-maps-data-processing.xml:195(title)
+#: curve-maps-data-processing.xml:201(guimenuitem)
+msgid "Cut to Segments"
+msgstr "Разделить на сегменты"
+
+#: curve-maps-data-processing.xml:204(para)
+msgid "The module can be used to either create segments on the curve map or to extract these segments. Segments are the key prerequisite for some of the curve map analysis functions. For example, they can represent the approach and retract part of force-distance data. The module uses a <guilabel>Curve</guilabel> selected by the user and applies some method (selected by <guilabel>Mode</guilabel> parameter) to detect how to split (or mark) the data. For the mentioned case of force-distance measurements the most logical split would be based on the height, segmenting the curve to an approach, hold and retract part as shown here."
+msgstr "Этот модуль можно использовать либо для создания сегментов на карте кривых, либо для извлечения этих сегментов. Сегменты являются ключевым предусловием для некоторых функций анализа карт кривых. Например, они могут представлять участки кривых сила-расстояние, соответствующие области подвода к образцу и отвода зонда от него. Модуль использует <guilabel>Кривую</guilabel> выбранную пользователем и применяет некоторый метод (выбранный параметром <guilabel>Режим</guilabel>) для того, чтобы разделить (или разметить) данные. Для вышеупомянутого случая измерений силовых кривых наиболее логичным разбиением будет основанное на высоте. Здесь показано сегментирование кривой на участки соответствующие подводу, удержанию и отводу."
+
+#: curve-maps-data-processing.xml:219(caption)
+msgid "Screenshot of Cut to Segments module, showing typical segmentation settings for force-distance data."
+msgstr "Снимок экрана модуля разделения на сегменты, показывающий типовые настройки сегментации для данных в формате сила-расстояние."
+
+#: curve-maps-data-processing.xml:225(para)
+msgid "The <guilabel>Output type</guilabel> can be set to mark the segments only, which is the most typical application. Here, the curve map is not altered, only positions of segments for each individual pixel are added. This is the mode which should be selected to prepare data for curve map processing modules that use segmented data. The second option is to extract some segments, including the selection of which curves should be kept. This can be also used to shrink the data size significantly, keeping only what is needed."
+msgstr "<guilabel>Тип вывода</guilabel> может быть задан чтобы только размечать сегменты, что чаще всего и требуется от данного модуля. В этом случае какрта кривых не меняется, только добавляются положения сегментов для каждого индивидуального пикселя. Этот режим следует выбирать для подготовки данных перед работой модулей обработки карт кривых, которые используют данные, разделенные на сегменты. Второй вариант это извлечь определенные сегменты, включая выбор того, какие кривые необходимо оставить. Это также можно использовать если необходимо значительно уменьшить размер данных, сохранияя только необходимую их часть."

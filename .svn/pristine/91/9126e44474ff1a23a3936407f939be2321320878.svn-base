@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="6.3499999mm"
+   height="6.3499999mm"
+   viewBox="0 0 22.499999 22.499999"
+   id="svg8235"
+   version="1.1"
+   inkscape:version="0.92.1 unknown"
+   sodipodi:docname="gwy_level_triangle-24.svg">
+  <defs
+     id="defs8237">
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient8308"
+       id="linearGradient8314"
+       x1="383.79593"
+       y1="544.1178"
+       x2="360.2847"
+       y2="520.60657"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.91711505,0,0,0.91711505,7.3336455,214.72289)" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient8308">
+      <stop
+         style="stop-color:#0c1e2d;stop-opacity:1"
+         offset="0"
+         id="stop8310" />
+      <stop
+         id="stop8351"
+         offset="0.5"
+         style="stop-color:#4696db;stop-opacity:1" />
+      <stop
+         style="stop-color:#c3ddf3;stop-opacity:1"
+         offset="1"
+         id="stop8312" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.6175628"
+     inkscape:cx="-17.376917"
+     inkscape:cy="17.152855"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata8240">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-337.28741,-691.71021)">
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:url(#linearGradient8314);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.93750006;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
+       id="rect8276"
+       width="21.5625"
+       height="21.5625"
+       x="337.75616"
+       y="692.17896" />
+    <path
+       sodipodi:type="star"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.50000012;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
+       id="path8353"
+       sodipodi:sides="3"
+       sodipodi:cx="-6.9927492"
+       sodipodi:cy="-15.496084"
+       sodipodi:r1="8.4450436"
+       sodipodi:r2="8.4450436"
+       sodipodi:arg1="0.52359878"
+       sodipodi:arg2="1.5707963"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0.05"
+       d="m 0.31871757,-11.516488 -14.64170257,0.433875 7.5561854,-13.188873 z"
+       transform="rotate(-132.93201,327.18886,266.71786)"
+       inkscape:transform-center-x="-2.4492461"
+       inkscape:transform-center-y="-2.643661" />
+  </g>
+</svg>

@@ -1,0 +1,66 @@
+--- hdf5-1.10.8.orig/configure.ac	2021-10-22 16:43:33.000000000 +0200
++++ hdf5-1.10.8/configure.ac	2022-08-09 12:22:12.245310969 +0200
+@@ -312,6 +312,9 @@ while test -n "$hname"; do
+   test "$hname_tmp" = "$hname" && break
+ done
+ 
++dnl Make sure the Win32 API adaptation header is included.
++AC_DEFINE([HAVE_WIN32_API], [1], [Define if we have the Win32 API])
++
+ ##
+ ## Enable/disable sanitizer checks for clang compilers, initially address sanitizer
+ ##
+@@ -502,13 +502,14 @@ AC_CHECK_SIZEOF([long double])
+ ##
+ HAVE_FLOAT128=0
+ HAVE_QUADMATH=0
+-FLT128_DIG=0
+-LDBL_DIG=0
++FLT128_DIG=33
++LDBL_DIG=21
+ 
+ AC_CHECK_SIZEOF([__float128])
+ AC_CHECK_SIZEOF([_Quad])
+ AC_CHECK_HEADERS([quadmath.h], [HAVE_QUADMATH=1], [])
+-PAC_FC_LDBL_DIG
++dnl PAC_FC_LDBL_DIG
++AC_MSG_CHECKING([for maximum decimal precision in C])
+ 
+ AC_SUBST([PAC_C_MAX_REAL_PRECISION])
+ 
+--- hdf5-1.10.8.orig/src/H5private.h	2022-08-09 13:12:18.000000000 +0200
++++ hdf5-1.10.8/src/H5private.h	2022-08-09 13:29:23.959040931 +0200
+@@ -48,7 +48,6 @@
+ #endif
+ #include <unistd.h>
+ #include <sys/types.h>
+-#include <sys/wait.h>
+ #endif
+ 
+ /* Include the Pthreads header, if necessary */
+@@ -292,6 +292,11 @@
+ #define H5_ATTR_FALLTHROUGH     /*void*/
+ #endif
+ 
++/* MingGW GCC produces lots of spurious warnings for functions with
++ * the format attribute. */
++#undef H5_ATTR_FORMAT
++#define H5_ATTR_FORMAT(X, Y, Z) /*void*/
++
+ /*
+  * Networking headers used by the mirror VFD and related tests and utilities.
+  */
+--- hdf5-1.10.8.orig/src/H5win32defs.h	2021-10-21 15:42:56.000000000 +0200
++++ hdf5-1.10.8/src/H5win32defs.h	2022-08-09 13:55:54.043945064 +0200
+@@ -50,11 +50,7 @@ typedef __int64         h5_stat_size_t;
+ /* Note that the variadic HDopen macro is using a VC++ extension
+  * where the comma is dropped if nothing is passed to the ellipsis.
+  */
+-#ifndef H5_HAVE_MINGW
+-#define HDopen(S, F, ...) Wopen_utf8(S, F, __VA_ARGS__)
+-#else
+ #define HDopen(S, F, ...) Wopen_utf8(S, F, ##__VA_ARGS__)
+-#endif
+ #define HDread(F, M, Z)       _read(F, M, Z)
+ #define HDremove(S)           Wremove_utf8(S)
+ #define HDrmdir(S)            _rmdir(S)

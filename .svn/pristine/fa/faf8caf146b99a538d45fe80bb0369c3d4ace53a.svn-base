@@ -1,0 +1,50 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-user-guide\n"
+"POT-Creation-Date: 2022-01-07 00:34+0400\n"
+"PO-Revision-Date: 2023-05-06 08:17+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.2.2\n"
+"X-Poedit-SourceCharset: utf8\n"
+
+#: curve-maps.xml:6(title)
+msgid "Curve Maps"
+msgstr "Карты кривых"
+
+#: curve-maps.xml:7(primary)
+msgid "curve maps"
+msgstr "карты кривых"
+
+#: curve-maps.xml:8(para)
+msgid "Curve maps are bundles of curves measured in points of a regular grid. While the grid is regular, like in <link linkend=\"data-windows\">image</link> and <link linkend=\"volume-data\">volume</link> data, curves in each bundle can have different numbers of points. Some bundles can even be empty (no data were measured in the corresponding point). Curve maps also usually comprise several data series, for instance height and force, whereas in other types of data each physical quantity is a separate data item."
+msgstr "Карты кривых это наборы кривых измеренные в точках на регулярной сетке. В то время, как сетка является регулярной, как в данных <link linkend=\"data-windows\">изображений</link> и <link linkend=\"volume-data\">объёмных данных</link>, кривые в каждом наборе могут иметь различное количество точек. Некоторые наборы могут быть даже пустыми (данные не измерялись в соответствующей точке). Карты кривых обычно также объединяют несколько наборов данных вместе, например, высоту и силу, в то время как в других типах данных каждая физическая величина представлена отдельным элементом данных."
+
+#: curve-maps.xml:17(para)
+msgid "Containing a bundle of curves in every point means that also the independent variable is one of the curves. For example, the force-distance curve bundle contains the force values and distance values. In most of the modules using curve maps one needs to choose which variable is dependent and which independent (sometimes the module can guess it)."
+msgstr "То, что они содержат набор кривых в каждой точке означает также, что независимая переменная будет одной из кривых. Например, набор кривых сила-расстояние содержит значения силы и значения расстояний. В большинстве модулей, использующих карты кривых, необходимо выбрать какая из переменных будет зависимой и какая независимой (иногда модуль может угадать это самостоятельно)."
+
+#: curve-maps.xml:24(para)
+msgid "An important concept is also the segmentation of the curve bundles. In some cases it is useful to have some marks on the bundle, e.g. to separate the approach and retract part of a force-distance curve. Such marks form segments which are then used by data processing modules. Segments are individual to curve bundles, so each bundle can use only one set of marks. Segments can be loaded from manufacturer's file format, or created in Gwyddion."
+msgstr "Важной идеей также является сегментация наборов кривых. В некоторых случаях может быть полезно иметь некоторую разметку в данном наборе, например, чтобы разделить части кривой сила-расстояние, соответствующие подводу к образцу и отводу зонда. Такие отметки формируют сегменты, которые затем могут использоваться модулями обработки данных. Сегменты являются индивидуальными для набора кривых, следовательно каждый набор может использовать только один набор отметок. Сегменты могут загружаться из формата файла производителя прибора или создаваться внутри Gwyddion."
+
+#. TODO show some nice data
+#. <informalfigure id='fig-curve-maps-window'>
+#. <mediaobject>
+#. <imageobject>
+#. <imagedata fileref='curve-maps-window.png' format='PNG'/>
+#. </imageobject>
+#. <caption>
+#. A volume data window displaying the associated two-dimensional preview
+#. data.
+#. </caption>
+#. </mediaobject>
+#. </informalfigure>
+#: curve-maps.xml:45(para)
+msgid "Button <guibutton>Change Preview</guibutton> near the top of the window can be used to change the preview image. The preview can either be calculated as a summary quantity for one of the curves characterising data along the invisible <xi:include href=\"eqi-z.xml\"/> direction (minimum, maximum, mean, …), or alternatively just any two-dimensional data of the same dimensions can be shown as the preview."
+msgstr "Кнопка <guibutton>Изменить изображение предпросмотра</guibutton> вблизи верхней части окна может использоваться для изменения изображения предпросмотра. Изображение предпросмотра может либо рассчитываться как некоторая интегральная характеристика кривой, характеризующая данные вдоль невидимого направления <xi:include href=\"eqi-z.xml\"/> (минимум, максимум, среднее, ...) или, как вариант, любой набор двумерных данных такого же размера может быть показан как изображение предпросмотра."

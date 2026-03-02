@@ -1,0 +1,337 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-01-03 20:18+0400\n"
+"PO-Revision-Date: 2021-01-03 20:19+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: tools.xml:6(title)
+msgid "Tools"
+msgstr "Инструменты"
+
+#: tools.xml:7(primary)
+msgid "Toolbox"
+msgstr "Область инструментов"
+
+#: tools.xml:8(para)
+msgid ""
+"Functions from <guimenu>Data Process</guimenu> menu and button panel either "
+"execute immediately or after asking for parameters and settings in a dialog "
+"box. Tools, accessible from <guilabel>Tools</guilabel> button panel, work "
+"differently. Once selected, they remain active and always follow the current "
+"data window until one switches to another tool. In other words one can "
+"switch data windows freely while using a tool and it always shows "
+"information from or operates on the current data. Tools also differ by "
+"working with <link linkend=\"selections\">selections</link>, e.g. points, "
+"lines or rectangles, on data windows. Nevertheless functionally they perform "
+"similar tasks as <guimenu>Data Process</guimenu> functions – value reading, "
+"leveling, statistics, correction, etc."
+msgstr ""
+"Функции из меню <guimenu>Обработка данных</guimenu> и панели кнопок "
+"выполняются или сразу, или после запроса пользователя о параметрах и "
+"настройках в диалоговом окне. Инструменты, доступные на панели кнопок "
+"<guilabel>Инструменты</guilabel> работают по другому. После выбора, они "
+"остаются активными и всегда следуют за текущим окном данных пока "
+"пользователь не переключится на другой инструмент. Другими словами, при "
+"использовании инструмента можно свободно переключать окна данных и он всегда "
+"будет показывать информацию из окна с текущими данными или оперировать с "
+"ними. Инструменты также отличаются работой с <link linkend=\"selections"
+"\">выделенными областями</link>, т.е. точками, линиями и прямоугольниками на "
+"окнах данных. Тем не менее, они выполняют те же задачи, что и функции меню "
+"<guimenu>Обработка данных</guimenu> — считывают значения, выравнивают, "
+"подсчитывают статистику, корректируют ошибки и т.п."
+
+#: tools.xml:143(para)
+msgid ""
+"Tools can be launched only from <guilabel>Tools</guilabel> button panel "
+"located in the main window. Gwyddion includes these tools:"
+msgstr ""
+"Инструменты можно запустить только с одноимённой панели кнопок, "
+"расположенной в главном окне. Gwyddion включает в себя следующие инструменты:"
+
+#: tools.xml:150(link)
+msgid "Read Value"
+msgstr "Считать значение"
+
+#: tools.xml:154(para)
+msgid "Reads values at the position of mouse click."
+msgstr "Считывает значения в месте щелчка мыши."
+
+#: tools.xml:161(link)
+msgid "Distance"
+msgstr "Расстояние"
+
+#: tools.xml:165(para)
+msgid ""
+"Measures distances – similarly to Read value this tool enables user to "
+"measure horizontal, vertical and Euclidean distance and angle between points "
+"in the data field. In addition it displays the difference of data values "
+"between points."
+msgstr ""
+"Измеряет расстояния. Подобно инструменту чтения значений он позволяет "
+"измерить горизонтальное, вертикальное и евклидово расстояние и угол между "
+"точками поля данных. В дополнение он показывает разницу значений между "
+"точками."
+
+#: tools.xml:175(link)
+msgid "Profiles Along Axes"
+msgstr "Профили вдоль осей"
+
+#: tools.xml:179(para)
+msgid ""
+"Extracts horizontal and/or vertical scan line profiles from the image and "
+"puts them to separate graphs. These graphs can be further processed with "
+"commands from the <guimenu>Graph</guimenu> menu."
+msgstr ""
+"Извлекает горизонтальные и/или вертикальные профили изображения и помещает "
+"их в отдельные графики. Эти графики можно дальше обрабатывать командами из "
+"меню <guimenu>График</guimenu>."
+
+#: tools.xml:188(link)
+msgid "Profile"
+msgstr "Профиль"
+
+#: tools.xml:192(para)
+msgid ""
+"Extracts profiles along arbitrary lines from the image and puts them to "
+"separate graphs. These graphs can be further processed with commands from "
+"the <guimenu>Graph</guimenu> menu."
+msgstr ""
+"Извлекает профили изображения вдоль произвольной линии и помещает их в "
+"отдельные графики. Эти графики можно дальше обрабатывать командами из меню "
+"<guimenu>График</guimenu>."
+
+#: tools.xml:201(link)
+msgid "Radial Profiles"
+msgstr "Радиальные профили"
+
+#: tools.xml:205(para)
+msgid ""
+"Extracts radial (angularly averaged) profiles from the image and puts them "
+"to separate graphs. These graphs can be further processed with commands from "
+"the <guimenu>Graph</guimenu> menu."
+msgstr ""
+"Извлекает радиальные (усреднённые по углу) профили изображения и помещает их "
+"в отдельные графики. Эти графики можно дальше обрабатывать командами из меню "
+"<guimenu>График</guimenu>."
+
+#: tools.xml:214(link)
+msgid "Spectro"
+msgstr "Спектроскопия"
+
+#: tools.xml:218(para)
+msgid "Views and extracts single point spectroscopy data."
+msgstr "Просматривает и извлекает данные спектроскопии в точках."
+
+#: tools.xml:225(link)
+msgid "Statistical Quantities"
+msgstr "Статистические величины"
+
+#: tools.xml:229(para)
+msgid ""
+"Computes basic statistical quantities (RMS, Ra, minimum, maximum, projected "
+"and surface area, etc.) from a selection of full data field. It can also "
+"calculate them only on the masked area, or even combine these two types of "
+"selection of area of interest."
+msgstr ""
+"Рассчитывает основные статистические величины (среднеквадратичное "
+"отклонение, Ra, минимум, максимум, площади поверхности и проекции, и т.п.) "
+"для выделенных областей и полных полей данных. Также может рассчитывать их "
+"только для области под маской или комбинировать эти два способа выбора "
+"интересующей области."
+
+#: tools.xml:239(link)
+msgid "Statistical Functions"
+msgstr "Статистические функции"
+
+#: tools.xml:243(para)
+msgid ""
+"Computes basic statistical functions (distribution of heights or slopes, "
+"autocorrelation function, power spectrum density function, etc.) from a "
+"selection of full data field."
+msgstr ""
+"Рассчитывает основные статистические функции (распределения высот и "
+"наклонов, функцию автокорреляции, функцию спектральной плотности мощности и "
+"т.п.) на выделенной области или полном поле данных."
+
+#: tools.xml:252(link)
+msgid "Row/Column Statistics"
+msgstr "Статистика по столбцам/строкам"
+
+#: tools.xml:256(para)
+msgid ""
+"Somewhat complementary to 1D statistical functions, this tool plots "
+"characteristics such as mean, median or surface length for each row (column)."
+msgstr ""
+"В некоторой степени дополняя одномерные статистические функции, этот "
+"инструмент строит характеристики, такие как среднее, срединное или длина "
+"поверхности для каждой строки (столбца)."
+
+#: tools.xml:265(link)
+msgid "Correlation Length"
+msgstr "Длина корреляции"
+
+#: tools.xml:269(para)
+msgid ""
+"Quick estimation of autocorrelation length <xi:include href=\"eqi-T.xml\"/> "
+"from scan lines using several common methods."
+msgstr ""
+"Быстрая оценка длины автокорреляции <xi:include href=\"eqi-T.xml\"/> на "
+"основе линий сканирования с использованием нескольких распространенных "
+"методов."
+
+#: tools.xml:278(link)
+msgid "Roughness"
+msgstr "Шероховатость"
+
+#: tools.xml:282(para)
+msgid "Evaluates standardized one-dimensional roughness parameters."
+msgstr "Рассчитывает стандартизированные одномерные параметры шероховатости."
+
+#: tools.xml:289(link)
+msgid "Three Point Level"
+msgstr "Выравнивание по трём точкам"
+
+#: tools.xml:293(para)
+msgid ""
+"Levels data by plane obtained by clicking on three points within data "
+"window. The three values can be averaged over a small area around the "
+"selected point."
+msgstr ""
+"Выравнивает данные с помощью плоскости, полученной щелчком мышью по трём "
+"точкам в окне данных. Три значения затем могут быть усреднены по небольшой "
+"области вокруг выбранной точки."
+
+#: tools.xml:302(link)
+msgid "Path Level"
+msgstr "Выровнять вдоль линии"
+
+#: tools.xml:306(para)
+msgid ""
+"Row leveling tool equalizing the height along a set of arbitrary straight "
+"lines."
+msgstr ""
+"Инструмент выравнивания строк путём выравнивания высот вдоль набора "
+"произвольных прямых линий."
+
+#: tools.xml:314(link)
+msgid "Crop"
+msgstr "Кадрирование"
+
+#: tools.xml:318(para)
+msgid "Cuts part of the data."
+msgstr "Отрезает часть данных."
+
+#: tools.xml:325(link)
+msgid "Mask Editor"
+msgstr "Редактор маски"
+
+#: tools.xml:329(para)
+msgid ""
+"Manual editing of masks: creation, exclusion, intersection, inversion, "
+"growing and shrinking, …"
+msgstr ""
+"Редактирование масок вручную: создание, исключение, пересечение, инверсия, "
+"нарастание и уменьшение, ..."
+
+#: tools.xml:337(link)
+msgid "Grain Measurement"
+msgstr "Измерение зерна"
+
+#: tools.xml:341(para)
+msgid "Measures individual grain parameters."
+msgstr "Измеряет параметры отдельного зерна."
+
+#: tools.xml:348(link)
+msgid "Grain Remover"
+msgstr "Удаление зерна"
+
+#: tools.xml:352(para)
+msgid ""
+"Removes continuous parts of the mask by clicking on mask point and/or "
+"interpolates (removes) data under a continuous part of mask."
+msgstr ""
+"Удаляет непрерывные части маски нажатием на точку маски и/или интерполирует "
+"(удаляет) данные под непрерывной частью маски."
+
+#: tools.xml:360(link)
+msgid "Spot Remover"
+msgstr "Удаление пятен"
+
+#: tools.xml:364(para)
+msgid ""
+"Manually removes spots. Select a point on a data window, mark an area to "
+"interpolate on the zoomed view and remove the defect using chosen "
+"interpolation method."
+msgstr ""
+"Удаляет пятна вручную. После выбора точки в окне данных, пометьте область, "
+"которую нужно интерполировать на увеличенном виде и удалите дефект используя "
+"выбранный метод интерполяции."
+
+#: tools.xml:373(link)
+msgid "Color Range"
+msgstr "Диапазон цвета"
+
+#: tools.xml:377(para)
+msgid ""
+"Stretches color range or changes false color mapping type. It enables the "
+"user to change the false color representation range (by default from data "
+"minimum to data maximum)."
+msgstr ""
+"Растягивает диапазон цвета или меняет способ отображения шкалы псевдоцвета. "
+"Позволяет пользователю изменить диапазон представления псевдоцвета (по "
+"умолчанию от минимума до максимума данных)."
+
+#: tools.xml:386(link)
+msgid "Filter"
+msgstr "Фильтр"
+
+#: tools.xml:390(para)
+msgid ""
+"Basic filters – mean, median, conservative denoise, minimum, maximum and "
+"similar simple filters to reduce noise in the data."
+msgstr ""
+"Основные фильтры — среднее, срединное, выборочная уборка шума, минимум. "
+"максимум и подобные простые фильтры, уменьшающие шум данных."
+
+#: tools.xml:398(link)
+msgid "Selection Manager"
+msgstr "Менеджер выбранных объектов"
+
+#: tools.xml:402(para)
+msgid ""
+"Displays selections for an image channel and copies them to other images or "
+"files."
+msgstr ""
+"Показывает выбранные объекты для канала изображений и копирует их на другие "
+"изображения и файлы."
+
+#: tools.xml:409(para)
+msgid ""
+"Tool dialogs can be closed (or more precisely hidden, as the current tool is "
+"still active even if its dialog is not visible), beside activating the "
+"<guibutton>Hide</guibutton> button, by pressing <keycap>Esc</keycap> or "
+"clicking the tool's button in the toolbox again."
+msgstr ""
+"Диалоговые окна инструментов могут быть закрыты (точнее, скрыты, поскольку "
+"текущий инструмент остаётся активен даже если его диалоговое окно не "
+"показывается) помимо нажатия на кнопку <guibutton>Скрыть</guibutton> "
+"нажатием клавиши <keycap>Esc</keycap> или повторным нажатием на кнопку "
+"инструмента в панели инструментов."
+
+#~ msgid "Polynomial Line Level"
+#~ msgstr "Выравнивание полиномиальной линии"
+
+#~ msgid "Levels rows or columns by fitting and subtracting polynomials."
+#~ msgstr ""
+#~ "Выравнивает строки и столбцы аппроксимацией полиномом и его вычетом."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

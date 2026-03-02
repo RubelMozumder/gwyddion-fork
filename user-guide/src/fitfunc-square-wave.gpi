@@ -1,0 +1,36 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+name = 'fitfunc-square-wave'
+set samples 1201
+set lmargin at screen 0.06
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+b = -1.0
+s = 0.8
+t = 1.0
+T = 2.0
+
+f1(x) = sin(2*pi*(x-s)/T)
+f2(x) = abs(f1(x))**0.001 * (f1(x) >= 0.0 ? 1 : -1)
+f(x) = 0.5*(f2(x)*(t - b) + (t + b))
+M = t - b
+
+unset grid
+set key top right Left reverse samplen 1.5
+set xtics out nomirror ('0' 0 0, 's' s 0, 's+T' s+T 0, 's+2T' s+2*T 0, 's+3T' s+3*T 0)
+set ytics out nomirror ('b' b 0, 't' t 0)
+set xrange [-2:8]
+set yrange [b-0.1*M:t+0.3*M]
+set arrow from -2,b to 8,b nohead ls 10
+set arrow from -2,t to 8,t nohead ls 10
+set arrow from s,b-0.1*M to s,b nohead ls 10
+set arrow from s+T,b-0.1*M to s+T,b nohead ls 10
+set arrow from s+2*T,b-0.1*M to s+2*T,b nohead ls 10
+set arrow from s+3*T,b-0.1*M to s+3*T,b nohead ls 10
+set output name.'.svg'
+
+plot \
+    f(x) with lines title 'Square wave' linestyle 8
+

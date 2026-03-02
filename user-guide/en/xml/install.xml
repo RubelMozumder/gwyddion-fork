@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: install.xml 22370 2019-08-06 16:42:19Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<chapter id='installation' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Installation</title>
+  <para>
+    <application>Gwyddion</application> source code and executables can be
+    downloaded from the
+    <ulink url='http://gwyddion.net/download.php'>download web page</ulink>
+    of the project, or alternatively from raw
+    <ulink url='http://sourceforge.net/projects/gwyddion/files/'>SourceForge.net download page</ulink>.
+    The installation varies depending on the operating system and the various
+    installation methods will be described in the following sections.
+  </para>
+  <para>
+    To play with Gwyddion you might also want to download the
+    <ulink url='http://gwyddion.net/download.php#sample-files'>sample
+      <application>Gwyddion</application> files</ulink>.
+    They are in native <application>Gwyddion</application> format
+    and represent typical AFM data.
+  </para>
+  <xi:include href='installation-unix.xml'/>
+  <xi:include href='installation-ms-windows.xml'/>
+</chapter>
+<!-- vim: set ts=2 sw=2 et : -->

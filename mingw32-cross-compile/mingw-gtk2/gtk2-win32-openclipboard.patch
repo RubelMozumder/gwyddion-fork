@@ -1,0 +1,144 @@
+--- gtk+-2.24.31/gdk/win32/gdkselection-win32.c.openclipboard	2016-01-19 20:03:55.000000000 +0100
++++ gtk+-2.24.31/gdk/win32/gdkselection-win32.c	2017-03-04 09:30:53.697286066 +0100
+@@ -294,8 +294,8 @@ gdk_selection_owner_set_for_display (Gdk
+   else
+     hwnd = NULL;
+ 
+-  if (!API_CALL (OpenClipboard, (hwnd)))
+-    return FALSE;
++  if (!_gdk_win32_open_clipboard (hwnd))
++      return FALSE;
+ 
+   _ignore_destroy_clipboard = TRUE;
+   GDK_NOTE (DND, g_print ("... EmptyClipboard()\n"));
+@@ -420,8 +420,8 @@ gdk_selection_convert (GdkWindow *reques
+       gboolean has_png = FALSE;
+       gboolean has_bmp = FALSE;
+ 
+-      if (!API_CALL (OpenClipboard, (GDK_WINDOW_HWND (requestor))))
+-	return;
++      if (!_gdk_win32_open_clipboard (GDK_WINDOW_HWND (requestor)))
++        return;
+ 
+       targets = g_new (GdkAtom, CountClipboardFormats ());
+       ntargets = 0;
+@@ -524,8 +524,8 @@ gdk_selection_convert (GdkWindow *reques
+        * contents of the clipboard. Get the clipboard data, and store
+        * it for later.
+        */
+-      if (!API_CALL (OpenClipboard, (GDK_WINDOW_HWND (requestor))))
+-	return;
++      if (!_gdk_win32_open_clipboard (GDK_WINDOW_HWND (requestor)))
++        return;
+ 
+       if ((hdata = GetClipboardData (CF_UNICODETEXT)) != NULL)
+ 	{
+@@ -569,8 +569,8 @@ gdk_selection_convert (GdkWindow *reques
+     }
+   else if (selection == GDK_SELECTION_CLIPBOARD && target == _image_bmp)
+     {
+-      if (!API_CALL (OpenClipboard, (GDK_WINDOW_HWND (requestor))))
+-	return;
++      if (!_gdk_win32_open_clipboard (GDK_WINDOW_HWND (requestor)))
++        return;
+ 
+       if ((hdata = GetClipboardData (CF_DIB)) != NULL)
+         {
+@@ -746,8 +746,8 @@ gdk_selection_convert (GdkWindow *reques
+       gchar *mapped_target_name;
+       UINT fmt = 0;
+ 
+-      if (!API_CALL (OpenClipboard, (GDK_WINDOW_HWND (requestor))))
+-	return;
++      if (!_gdk_win32_open_clipboard (GDK_WINDOW_HWND (requestor)))
++        return;
+ 
+       mapped_target_name = get_mapped_gdk_atom_name (target);
+ 
+@@ -860,6 +860,33 @@ gdk_selection_property_get (GdkWindow  *
+   return prop->length;
+ }
+ 
++gboolean
++_gdk_win32_open_clipboard (HWND new_owner)
++{
++  guint8 tries;
++
++  /* msdn: "OpenClipboard fails if another window has the clipboard
++   * open" There doesn't seem to be an event when the clipboard is
++   * free again. Since multiple applications may watch and open it
++   * simultaneously we do our best effort here with this horrible
++   * blocking retry loop...
++   */
++
++  /* try 15 * 1/10s = 1.5s */
++  for (tries = 0; tries < 15; tries++)
++    {
++      if (OpenClipboard (new_owner))
++        return TRUE;
++
++      GDK_NOTE (DND, g_print ("_gdk_win32_open_clipboard: try %d, error %d\n",
++                              tries, GetLastError ()));
++
++      g_usleep (G_USEC_PER_SEC / 10);
++    }
++
++  return FALSE;
++}
++
+ void
+ _gdk_selection_property_delete (GdkWindow *window)
+ {
+@@ -1189,7 +1216,7 @@ gdk_win32_selection_add_targets (GdkWind
+       hwnd = GDK_WINDOW_HWND (owner);
+     }
+ 
+-  if (!API_CALL (OpenClipboard, (hwnd)))
++  if (!_gdk_win32_open_clipboard (hwnd))
+     return;
+ 
+   /* We have a very simple strategy: If some kind of pixmap image
+--- gtk+-2.24.31/gdk/win32/gdkdisplay-win32.c.openclipboard	2015-12-28 16:42:28.000000000 +0100
++++ gtk+-2.24.31/gdk/win32/gdkdisplay-win32.c	2017-03-04 09:26:27.711710958 +0100
+@@ -376,8 +376,13 @@ inner_clipboard_window_procedure (HWND
+         GdkEvent *event;
+         GdkWindow *owner;
+ 
+-        success = OpenClipboard (hwnd);
+-        g_return_val_if_fail (success, 0);
++        /* We acually fail, but return 0 anyway? */
++        if (!_gdk_win32_open_clipboard (hwnd)) {
++            /* clear error to avoid confusing SetClipboardViewer() return */
++            SetLastError (0);
++            return 0;
++        }
++
+         hwndOwner = GetClipboardOwner ();
+         owner = gdk_win32_window_lookup_for_display (_gdk_display, hwndOwner);
+         if (owner == NULL)
+--- gtk+-2.24.31/gdk/win32/gdkproperty-win32.c.openclipboard	2016-01-19 20:03:55.000000000 +0100
++++ gtk+-2.24.31/gdk/win32/gdkproperty-win32.c	2017-03-04 09:27:24.421046778 +0100
+@@ -202,11 +202,8 @@ gdk_property_change (GdkWindow    *windo
+ 
+       if (type == _utf8_string)
+ 	{
+-	  if (!OpenClipboard (GDK_WINDOW_HWND (window)))
+-	    {
+-	      WIN32_API_FAILED ("OpenClipboard");
++          if (!_gdk_win32_open_clipboard (GDK_WINDOW_HWND (window)))
+ 	      return;
+-	    }
+ 
+ 	  wcptr = g_utf8_to_utf16 ((char *) data, nelements, NULL, &wclen, &err);
+           if (err != NULL)
+--- gtk+-2.24.31/gdk/win32/gdkprivate-win32.h.openclipboard	2016-03-05 16:59:43.000000000 +0100
++++ gtk+-2.24.31/gdk/win32/gdkprivate-win32.h	2017-03-04 09:20:33.458462892 +0100
+@@ -294,6 +294,8 @@ void	_gdk_win32_adjust_client_rect   (Gd
+ 
+ void    _gdk_selection_property_delete (GdkWindow *);
+ 
++gboolean _gdk_win32_open_clipboard      (HWND new_owner);
++
+ void    _gdk_dropfiles_store (gchar *data);
+ 
+ void    _gdk_wchar_text_handle    (GdkFont       *font,

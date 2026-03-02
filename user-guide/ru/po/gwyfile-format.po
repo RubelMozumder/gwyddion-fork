@@ -1,0 +1,2242 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-documentation\n"
+"POT-Creation-Date: 2023-05-04 09:58+0400\n"
+"PO-Revision-Date: 2023-05-04 10:01+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: ru <dn2010@km.ru>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: gwyfile-format.xml:6(title)
+msgid "Format of Gwyddion Files"
+msgstr "Формат файлов Gwyddion"
+
+#: gwyfile-format.xml:7(para)
+msgid ""
+"A <application>Gwyddion</application> native data file (GWY) consists of a "
+"tree-like structure of serialized objects. Generally, these objects can be "
+"of various kind and contain other embedded objects (hence the tree-like "
+"structure). It can be instructive to play with <ulink url=\"http://gwyddion."
+"net/gwydump.php\"><command>gwydump</command></ulink>, a simple file "
+"structure visualizer available in on the project's web, for a while and "
+"examine the contents of various files. If you plan to read and/or write GWY "
+"files in independent software, have also a look at <ulink url=\"http://"
+"libgwyfile.sourceforge.net/\">libgwyfile</ulink>, a small standalone "
+"embeddable library for GWY file handling."
+msgstr ""
+"Файл данных собственного формата <application>Gwyddion</application> (GWY) "
+"состоит из древовидной структуры объектов, переведённых в последовательный "
+"вид. В общем случае эти объекты могут быть различного вида и включать в себя "
+"другие объекты (вследствие древовидной структуры). В понимании работы может "
+"сильно помочь <ulink url=\"http://gwyddion.net/gwydump.php"
+"\"><command>gwydump</command></ulink>, простой демонстратор структуры файла, "
+"который доступен на сайте проекта, если с ним поработать какое-то время и "
+"посмотреть содержимое различных файлов. Если вы планируете читать и/или "
+"писать файлы GWY в другом программном обеспечении, можно также взглянуть на "
+"<ulink url=\"http://libgwyfile.sourceforge.net/\">libgwyfile</ulink>, "
+"небольшую самостоятельную встраиваемую библиотеку для работы с файлами GWY."
+
+#: gwyfile-format.xml:20(title)
+msgid "The Two Layers"
+msgstr "Два слоя"
+
+#: gwyfile-format.xml:29(emphasis)
+msgid "generic GWY file format"
+msgstr "общий формат файла GWY"
+
+#: gwyfile-format.xml:25(listitem)
+msgid ""
+"The physical structuring of the files: byte order, data kinds and their "
+"representation, how the sizes of various bits of data are determined, how "
+"data objects are nested to form the tree, etc. It is called the "
+"<placeholder-1/> in libgwyfile. It can be in principle used for something "
+"completely different than SPM data by some completely unrelated software – "
+"and would be still called the GWY file format."
+msgstr ""
+"Физическое представление файлов: порядок байтов, типы данных и их "
+"представление, как определяются размеры различных частей блока данных, как "
+"объекты с данными представляются в виде вложенного дерева, и т.д. Называется "
+"<placeholder-1/> в libgwyfile. Можно использовать этот формат для чего-то "
+"полностью отличающегося от данных СЗМ в каком-то совершенно другом "
+"программном обеспечении – и всё равно это будет называться формат файла GWY."
+
+#: gwyfile-format.xml:38(type) gwyfile-format.xml:376(type)
+#: gwyfile-format.xml:436(type) gwyfile-format.xml:472(type)
+#: gwyfile-format.xml:1122(type) gwyfile-format.xml:1335(type)
+#: gwyfile-format.xml:1464(type)
+msgid "GwyDataField"
+msgstr "GwyDataField"
+
+#: gwyfile-format.xml:40(emphasis)
+msgid "Gwyddion GWY file format"
+msgstr "формат файла Gwyddion GWY"
+
+#: gwyfile-format.xml:34(listitem)
+msgid ""
+"The representation of particular SPM data by Gwyddion, specifying further "
+"conventions on top of the physical structure and interpretation. For "
+"instance we describe that images are stored as objects called <placeholder-1/"
+"> that have resolutions stored this way, image data stored that way, etc. "
+"Libgwyfile calls it the <placeholder-2/>."
+msgstr ""
+"Представление конкретных данных СЗМ в Gwyddion, задающее дальнейшие условия "
+"поверх физической структуры и интерпретации. Например, мы описываем, что "
+"изображения сохраняются как объекты, называемые <placeholder-1/>, в которых "
+"разрешения сохраняются таким образом, данные изображения сохраняются таким "
+"образом, и т.д. В libgwyfile это называется <placeholder-2/>."
+
+#: gwyfile-format.xml:21(para)
+msgid ""
+"This file format description specifies in fact two different things that are "
+"sometimes useful to distinguish: <placeholder-1/> In should be usually quite "
+"clear where we talk about the generic format and where about specific "
+"Gwyddion data objects (occassionally it will be explicitly noted). We will "
+"start with the physical file structure."
+msgstr ""
+"Это описание формата файла задаёт на самом деле две различные вещи, которые "
+"иногда полезно различать: <placeholder-1/> Обычно должно быть достаточно "
+"понятно, когда мы говорим об общем формате, и когда о специфичных для "
+"Gwyddion объектах данных (иногда это будет явно указано). Мы начнём с "
+"физической структуры файла."
+
+#: gwyfile-format.xml:49(title)
+msgid "Byte Order"
+msgstr "Порядок байтов"
+
+#: gwyfile-format.xml:50(para)
+msgid ""
+"All data are stored in little-endian (also known as LSB or Intel) byte order."
+msgstr ""
+"Все данные хранятся в формате младший байт сначала (little-endian, также "
+"известный как LSB или Intel)."
+
+#: gwyfile-format.xml:56(title)
+msgid "File Header"
+msgstr "Заголовок файла"
+
+#: gwyfile-format.xml:57(para)
+msgid ""
+"The file header consists of four bytes (magic number) with the values of "
+"ASCII characters <literal>GWYP</literal>."
+msgstr ""
+"Заголовок файла состоит из четырёх байтов (магическое число) со значениями "
+"символов ASCII <literal>GWYP</literal>."
+
+#: gwyfile-format.xml:61(para)
+msgid ""
+"This is the new file format; an older version of file format with magic "
+"header <literal>GWYO</literal> also exists. It will not be discussed here as "
+"it is mostly extinct nowadays."
+msgstr ""
+"Это новый формат файла, также существует более старая версия формата с "
+"заголовком <literal>GWYO</literal>. Она не будет здесь обсуждаться, "
+"поскольку в настоящее время практически перестала использоваться."
+
+#: gwyfile-format.xml:68(title)
+msgid "File Data"
+msgstr "Данные файла"
+
+#: gwyfile-format.xml:69(para)
+msgid ""
+"The rest of a Gwyddion file consists of a serialized <link linkend=\"gwyfile-"
+"top-level-container\"><type>GwyContainer</type></link> object that contains "
+"all the data. This top-level object is stored exactly the same way as any "
+"other object, that is as described in the next section."
+msgstr ""
+"Остальная часть файла Gwyddion состоит из переведённых в последовательную "
+"форму (сериализованных) объектов <link linkend=\"gwyfile-top-level-container"
+"\"><type>GwyContainer</type></link>, которые содержат все данные. Они "
+"сохраняются точно так же, как и любые другие объекты, что описано в "
+"следующей секции."
+
+#: gwyfile-format.xml:76(para)
+msgid "A generic GWY file can have some other object as the top-level object."
+msgstr ""
+"В общем случае файл GWY может содержать какой-то другой объект в качестве "
+"объекта верхнего уровня."
+
+#: gwyfile-format.xml:81(title)
+msgid "Object Layout"
+msgstr "Размещение объекта"
+
+#: gwyfile-format.xml:86(constant) gwyfile-format.xml:123(constant)
+#: gwyfile-format.xml:148(constant) gwyfile-format.xml:162(constant)
+#: gwyfile-format.xml:244(constant) gwyfile-format.xml:283(constant)
+msgid "NUL"
+msgstr "NUL"
+
+#: gwyfile-format.xml:85(listitem)
+msgid ""
+"Type name, stored as a <placeholder-1/>-terminated string of ASCII "
+"characters. In a Gwyddion file this is the type name in GObject type system. "
+"Generally the name should be a valid C identifier."
+msgstr ""
+"Имя типа, сохранённое в виде завершенной <placeholder-1/> строки символов "
+"ASCII. Это имя типа в системе типов GObject. В общем случае имя должно быть "
+"правильным идентификатором языка C."
+
+#: gwyfile-format.xml:91(listitem)
+msgid ""
+"Serialized data size, stored as an unsigned 32bit integer. It does not "
+"include the size of the type name and the size of self."
+msgstr ""
+"Размер переведённых в последовательную форму данных в виде 32-битного целого "
+"без знака. Не включает в себя размер имени типа и размер себя."
+
+#: gwyfile-format.xml:95(listitem)
+msgid ""
+"Component list. Components are named parts of object data, each of "
+"particular data type: an atomic type, an array of atomic types, or again an "
+"object. They are stored in no particular order and file readers must not "
+"assume any specific component order."
+msgstr ""
+"Список компонентов. Компоненты — это именованные части данных объекта, "
+"каждая из которых относится к определенному типу данных: атомарному типу, "
+"массиву атомарных типов или снова объекту. Они хранятся в произвольном "
+"порядке, и программы чтения файлов не должны предполагать какой-либо "
+"определенный порядок компонентов."
+
+#: gwyfile-format.xml:82(para)
+msgid ""
+"An object consists of three parts (in the following order): <placeholder-1/> "
+"The number of components is not explicitly stored. It is implied by the "
+"total serialized data size. The components take together exactly this many "
+"bytes; there is no padding."
+msgstr ""
+"Объект состоит из трёх частей (в следующем порядке): <placeholder-1/> Число "
+"компонент в явном виде не хранится, оно подразумевается общим размером "
+"данных, переведённых в последовательную форму. Компоненты занимают вместе "
+"ровно столько байтов, выравнивание не используется."
+
+#: gwyfile-format.xml:112(literal) gwyfile-format.xml:480(type)
+#: gwyfile-format.xml:1151(type) gwyfile-format.xml:1368(type)
+#: gwyfile-format.xml:1501(type) gwyfile-format.xml:1679(type)
+msgid "GwyContainer"
+msgstr "GwyContainer"
+
+#: gwyfile-format.xml:111(caption)
+msgid "Object layout illustrated for a <placeholder-1/>."
+msgstr "Схема размещения объекта на примере <placeholder-1/>."
+
+#: gwyfile-format.xml:118(title)
+msgid "Components"
+msgstr "Компоненты"
+
+#: gwyfile-format.xml:122(listitem)
+msgid "Name, stored as a <placeholder-1/>-terminated UTF-8 encoded string."
+msgstr ""
+"Имя, сохраненное в виде завершенной <placeholder-1/> строки в кодировке "
+"UTF-8."
+
+#: gwyfile-format.xml:126(listitem)
+msgid ""
+"Type, stored as a single unsigned byte (character). The table of possible "
+"component types is presented below."
+msgstr ""
+"Тип, сохранённый как один байт без знака (символ). Таблица возможных типов "
+"компонент представлена ниже."
+
+#: gwyfile-format.xml:130(listitem)
+msgid "Data, stored as whatever is appropriate for a particular type."
+msgstr ""
+"Данные, сохранённые в формате, который подходит для определённого типа."
+
+#: gwyfile-format.xml:119(para)
+msgid ""
+"Each component consists of three parts (in the following order): "
+"<placeholder-1/> Components are often called items in libgwyfile and "
+"Gwyddion libraries."
+msgstr ""
+"Каждый компонент состоит из трёх частей (в следующем порядке): "
+"<placeholder-1/> Компоненты нередко называются элементы (items) в libgwyfile "
+"и библиотеках Gwyddion."
+
+#: gwyfile-format.xml:144(link)
+msgid "the type table"
+msgstr "таблица типов"
+
+#: gwyfile-format.xml:142(listitem)
+msgid ""
+"If the type is atomic and fixed-size the number of bytes to skip is given by "
+"<placeholder-1/>."
+msgstr ""
+"Если тип является атомарным и имеет фиксированный размер число байт, которые "
+"нужно пропустить, задаёт <placeholder-1/>."
+
+#: gwyfile-format.xml:146(listitem)
+msgid ""
+"For strings, you have to skip after the terminating <placeholder-1/> "
+"character."
+msgstr ""
+"Для строк необходимо пропустить после завершающего символа <placeholder-1/>."
+
+#: gwyfile-format.xml:150(listitem)
+msgid ""
+"If the type is an object you need to read its name and size, and the size "
+"then tells you exactly how many bytes to skip further."
+msgstr ""
+"Если тип является объектом, необходимо прочесть его имя и размер, и размер "
+"тогда говорит сколько байт нужно пропустить дальше."
+
+#: gwyfile-format.xml:157(link)
+msgid "atomic type size"
+msgstr "размер атомарного типа"
+
+#: gwyfile-format.xml:154(listitem)
+msgid ""
+"If the type is an array of simple atomic types then read the array length "
+"and then multiply the <placeholder-1/> with the length. This gives the "
+"number of bytes to skip."
+msgstr ""
+"Если тип это массив простых атомарных типов, тогда необходимо прочитать "
+"длину массива и затем умножить <placeholder-1/> на длину. Это даёт число "
+"байт, которое необходимо пропустить."
+
+#: gwyfile-format.xml:160(listitem)
+msgid ""
+"For an array of strings, read the array length and repeat string skipping "
+"(move past <placeholder-1/>) according to the array length."
+msgstr ""
+"Для массива строк, необходимо прочитать длину массива и повторить пропуск "
+"строки (перемещение за <placeholder-1/>) в соответствии с длиной массива."
+
+#: gwyfile-format.xml:165(listitem)
+msgid ""
+"Finally, the most complex scenario is an array of objects when you need to "
+"read the array length and then repeat the object skipping the specified "
+"number of times."
+msgstr ""
+"Наконец, наиболее сложный сценарий это массив объектов, где нужно прочесть "
+"длину массива и затем повторить пропуск объекта заданное число раз."
+
+#: gwyfile-format.xml:136(para)
+msgid ""
+"Component size is not explicitly represented – it is implied by its type and "
+"contents. Skipping an unknown (or uninteresting) component while reading a "
+"GWY file can be done by first reading the component name and type. Then "
+"there are several possibilities: <placeholder-1/>"
+msgstr ""
+"Размер компонента не представлен в явном виде – он задается его типом данных "
+"и содержимым. Пропуск неизвестного (или не интересующего нас) компонента в "
+"процессе чтения файла GWY может быть реализован тем, что сначала читается "
+"имя компонента и его тип. После это есть несколько возможных сценариев: "
+"<placeholder-1/>"
+
+#: gwyfile-format.xml:179(literal) gwyfile-format.xml:525(literal)
+#: gwyfile-format.xml:587(varname) gwyfile-format.xml:1186(literal)
+#: gwyfile-format.xml:1284(varname) gwyfile-format.xml:1536(literal)
+#: gwyfile-format.xml:1560(varname) gwyfile-format.xml:1641(varname)
+msgid "xres"
+msgstr "xres"
+
+#: gwyfile-format.xml:179(literal) gwyfile-format.xml:539(literal)
+#: gwyfile-format.xml:1207(literal) gwyfile-format.xml:1566(literal)
+msgid "xreal"
+msgstr "xreal"
+
+#: gwyfile-format.xml:180(literal) gwyfile-format.xml:569(literal)
+#: gwyfile-format.xml:990(literal) gwyfile-format.xml:1403(literal)
+#: gwyfile-format.xml:1596(literal)
+msgid "si_unit_xy"
+msgstr "si_unit_xy"
+
+#: gwyfile-format.xml:177(caption)
+msgid ""
+"Illustration of representation of three components, integer <placeholder-1/"
+">, floating point <placeholder-2/> and nested object <placeholder-3/>. They "
+"would simply follow one another in the file."
+msgstr ""
+"Иллюстрация представления трёх компонент, целочисленного <placeholder-1/>, с "
+"плавающей точкой <placeholder-2/> и вложенного объекта <placeholder-3/>. Они "
+"просто будут следовать друг за другом в файле."
+
+#: gwyfile-format.xml:187(title)
+msgid "Data Types"
+msgstr "Типы данных"
+
+#: gwyfile-format.xml:188(para)
+msgid "Available atomic data types are listed in following table:"
+msgstr "Доступные атомарные типы данных приведены в нижеследующей таблице:"
+
+#: gwyfile-format.xml:197(entry) gwyfile-format.xml:273(entry)
+#: gwyfile-format.xml:369(entry) gwyfile-format.xml:519(entry)
+#: gwyfile-format.xml:614(entry) gwyfile-format.xml:648(entry)
+#: gwyfile-format.xml:843(entry) gwyfile-format.xml:950(entry)
+#: gwyfile-format.xml:977(entry) gwyfile-format.xml:1037(entry)
+#: gwyfile-format.xml:1108(entry) gwyfile-format.xml:1180(entry)
+#: gwyfile-format.xml:1321(entry) gwyfile-format.xml:1397(entry)
+#: gwyfile-format.xml:1450(entry) gwyfile-format.xml:1530(entry)
+#: gwyfile-format.xml:1670(entry) gwyfile-format.xml:1703(entry)
+#: gwyfile-format.xml:1732(entry) gwyfile-format.xml:1769(entry)
+msgid "Type"
+msgstr "Тип"
+
+#: gwyfile-format.xml:198(entry) gwyfile-format.xml:274(entry)
+msgid "Character"
+msgstr "Символ"
+
+#: gwyfile-format.xml:199(entry)
+msgid "Size"
+msgstr "Размер"
+
+#: gwyfile-format.xml:200(entry) gwyfile-format.xml:275(entry)
+msgid "Note"
+msgstr "Примечание"
+
+#: gwyfile-format.xml:205(entry) gwyfile-format.xml:390(entry)
+#: gwyfile-format.xml:397(entry) gwyfile-format.xml:628(entry)
+#: gwyfile-format.xml:711(entry) gwyfile-format.xml:718(entry)
+#: gwyfile-format.xml:732(entry) gwyfile-format.xml:747(entry)
+#: gwyfile-format.xml:762(entry) gwyfile-format.xml:777(entry)
+#: gwyfile-format.xml:793(entry) gwyfile-format.xml:807(entry)
+#: gwyfile-format.xml:814(entry) gwyfile-format.xml:1137(entry)
+#: gwyfile-format.xml:1354(entry) gwyfile-format.xml:1478(entry)
+#: gwyfile-format.xml:1492(entry)
+msgid "boolean"
+msgstr "булев"
+
+#: gwyfile-format.xml:206(literal)
+msgid "b"
+msgstr "b"
+
+#: gwyfile-format.xml:207(entry) gwyfile-format.xml:215(entry)
+msgid "1 byte"
+msgstr "1 байт"
+
+#: gwyfile-format.xml:208(entry)
+msgid "Zero is false, nonzero (normally 1) is true."
+msgstr "Ноль это false, не ноль (обычно 1) это true"
+
+#: gwyfile-format.xml:213(entry)
+msgid "character"
+msgstr "символ"
+
+#: gwyfile-format.xml:214(literal)
+msgid "c"
+msgstr "c"
+
+#: gwyfile-format.xml:219(entry) gwyfile-format.xml:413(entry)
+#: gwyfile-format.xml:526(entry) gwyfile-format.xml:533(entry)
+#: gwyfile-format.xml:785(entry) gwyfile-format.xml:800(entry)
+#: gwyfile-format.xml:821(entry) gwyfile-format.xml:871(entry)
+#: gwyfile-format.xml:900(entry) gwyfile-format.xml:908(entry)
+#: gwyfile-format.xml:915(entry) gwyfile-format.xml:923(entry)
+#: gwyfile-format.xml:1044(entry) gwyfile-format.xml:1187(entry)
+#: gwyfile-format.xml:1194(entry) gwyfile-format.xml:1201(entry)
+#: gwyfile-format.xml:1537(entry) gwyfile-format.xml:1544(entry)
+#: gwyfile-format.xml:1551(entry) gwyfile-format.xml:1629(entry)
+#: gwyfile-format.xml:1739(entry)
+msgid "32bit integer"
+msgstr "32битное целое"
+
+#: gwyfile-format.xml:220(literal)
+msgid "i"
+msgstr "i"
+
+#: gwyfile-format.xml:221(entry)
+msgid "4 bytes"
+msgstr "4 байта"
+
+#: gwyfile-format.xml:225(entry)
+msgid "64bit integer"
+msgstr "64битное целое"
+
+#: gwyfile-format.xml:226(literal)
+msgid "q"
+msgstr "q"
+
+#: gwyfile-format.xml:227(entry) gwyfile-format.xml:233(entry)
+msgid "8 bytes"
+msgstr "8 байт"
+
+#: gwyfile-format.xml:231(entry) gwyfile-format.xml:422(entry)
+#: gwyfile-format.xml:429(entry) gwyfile-format.xml:444(entry)
+#: gwyfile-format.xml:451(entry) gwyfile-format.xml:458(entry)
+#: gwyfile-format.xml:465(entry) gwyfile-format.xml:540(entry)
+#: gwyfile-format.xml:547(entry) gwyfile-format.xml:554(entry)
+#: gwyfile-format.xml:562(entry) gwyfile-format.xml:725(entry)
+#: gwyfile-format.xml:740(entry) gwyfile-format.xml:755(entry)
+#: gwyfile-format.xml:770(entry) gwyfile-format.xml:879(entry)
+#: gwyfile-format.xml:886(entry) gwyfile-format.xml:893(entry)
+#: gwyfile-format.xml:1051(entry) gwyfile-format.xml:1058(entry)
+#: gwyfile-format.xml:1208(entry) gwyfile-format.xml:1215(entry)
+#: gwyfile-format.xml:1222(entry) gwyfile-format.xml:1229(entry)
+#: gwyfile-format.xml:1237(entry) gwyfile-format.xml:1245(entry)
+#: gwyfile-format.xml:1567(entry) gwyfile-format.xml:1574(entry)
+#: gwyfile-format.xml:1581(entry) gwyfile-format.xml:1589(entry)
+msgid "double"
+msgstr "вещественное двойной точности"
+
+#: gwyfile-format.xml:232(literal)
+msgid "d"
+msgstr "d"
+
+#: gwyfile-format.xml:234(entry)
+msgid ""
+"Finite IEEE 754 double precision floating point number, i.e. files must not "
+"contain infinities and not-a-numbers."
+msgstr ""
+"Конечное число с плавающей точкой двойной точности по стандарту IEEE 754, т."
+"е. файлы не должны содержать бесконечных чисел и нечисловых значений (NaN)."
+
+#: gwyfile-format.xml:240(entry) gwyfile-format.xml:383(entry)
+#: gwyfile-format.xml:406(entry) gwyfile-format.xml:662(entry)
+#: gwyfile-format.xml:683(entry) gwyfile-format.xml:690(entry)
+#: gwyfile-format.xml:697(entry) gwyfile-format.xml:704(entry)
+#: gwyfile-format.xml:864(entry) gwyfile-format.xml:984(entry)
+#: gwyfile-format.xml:1130(entry) gwyfile-format.xml:1144(entry)
+#: gwyfile-format.xml:1347(entry) gwyfile-format.xml:1361(entry)
+#: gwyfile-format.xml:1471(entry) gwyfile-format.xml:1485(entry)
+#: gwyfile-format.xml:1677(entry) gwyfile-format.xml:1710(entry)
+msgid "string"
+msgstr "строка"
+
+#: gwyfile-format.xml:241(literal) gwyfile-format.xml:284(literal)
+msgid "s"
+msgstr "s"
+
+#: gwyfile-format.xml:242(entry) gwyfile-format.xml:250(entry)
+msgid "variable"
+msgstr "переменный"
+
+#: gwyfile-format.xml:243(entry)
+msgid "<placeholder-1/>-terminated and UTF-8 encoded."
+msgstr "<placeholder-1/>-завершенная и кодированная в UTF-8"
+
+#: gwyfile-format.xml:248(entry)
+msgid "object"
+msgstr "объект"
+
+#: gwyfile-format.xml:249(literal)
+msgid "o"
+msgstr "o"
+
+#: gwyfile-format.xml:251(entry)
+msgid "Nested serialized object as described above."
+msgstr ""
+"Вложенный переведённый в последовательную форму объект, как описано выше"
+
+#: gwyfile-format.xml:259(para)
+msgid ""
+"Each atomic type except boolean has its array counterpart. The type "
+"character of array types is the same as of the corresponding atomic type, "
+"except it is uppercase. An array is stored as unsigned 32bit integer "
+"representing the number of items, followed by the item values. The number of "
+"items must be positive; empty arrays are not stored. Array data types are "
+"listed in following table:"
+msgstr ""
+"Каждый атомарный тип, кроме булевого (boolean) имеет своего двойника в виде "
+"массива. Символ типа для всех массивов тот же, что и для атомарного типа, "
+"только он написан в верхнем регистре. Массивы хранятся как 32-битная длина "
+"массива без знака (число элементов), затем значения элементов. Число "
+"элементов должно быть положительным, пустые массивы не сохраняются. Список "
+"типов данных для массивов приведён в следующей таблице:"
+
+#: gwyfile-format.xml:280(entry)
+msgid "array of characters"
+msgstr "массив символов"
+
+#: gwyfile-format.xml:281(literal)
+msgid "C"
+msgstr "C"
+
+#: gwyfile-format.xml:282(entry)
+msgid ""
+"In general neither <placeholder-1/>-terminated nor UTF-8 encoded "
+"(<placeholder-2/> is used for text strings)."
+msgstr ""
+"В общем случае ни <placeholder-1/>-завершенная, ни кодированная в UTF-8 "
+"(<placeholder-2/> используется для текстовых строк)."
+
+#: gwyfile-format.xml:289(entry) gwyfile-format.xml:1015(entry)
+#: gwyfile-format.xml:1558(entry) gwyfile-format.xml:1637(entry)
+msgid "array of 32bit integers"
+msgstr "массив 32битных целых"
+
+#: gwyfile-format.xml:290(literal)
+msgid "I"
+msgstr "I"
+
+#: gwyfile-format.xml:294(entry)
+msgid "array of 64bit integers"
+msgstr "массив 64битных целых"
+
+#: gwyfile-format.xml:295(literal)
+msgid "Q"
+msgstr "Q"
+
+#: gwyfile-format.xml:299(entry) gwyfile-format.xml:584(entry)
+#: gwyfile-format.xml:850(entry) gwyfile-format.xml:857(entry)
+#: gwyfile-format.xml:998(entry) gwyfile-format.xml:1080(entry)
+#: gwyfile-format.xml:1281(entry) gwyfile-format.xml:1418(entry)
+#: gwyfile-format.xml:1611(entry) gwyfile-format.xml:1747(entry)
+msgid "array of doubles"
+msgstr "массив вещественных чисел двойной точности"
+
+#: gwyfile-format.xml:300(literal)
+msgid "D"
+msgstr "D"
+
+#: gwyfile-format.xml:304(entry) gwyfile-format.xml:1622(entry)
+#: gwyfile-format.xml:1647(entry) gwyfile-format.xml:1776(entry)
+msgid "array of strings"
+msgstr "массив строк"
+
+#: gwyfile-format.xml:305(literal)
+msgid "S"
+msgstr "S"
+
+#: gwyfile-format.xml:309(entry)
+msgid "array of objects"
+msgstr "массив объектов"
+
+#: gwyfile-format.xml:310(literal)
+msgid "O"
+msgstr "O"
+
+#: gwyfile-format.xml:311(entry)
+msgid "Uppercase Oh, not zero."
+msgstr "Буква O в верхнем регистре, не ноль"
+
+#: gwyfile-format.xml:324(literal) gwyfile-format.xml:583(literal)
+#: gwyfile-format.xml:1003(varname) gwyfile-format.xml:1007(literal)
+#: gwyfile-format.xml:1079(literal) gwyfile-format.xml:1280(literal)
+#: gwyfile-format.xml:1417(literal) gwyfile-format.xml:1610(literal)
+#: gwyfile-format.xml:1746(literal)
+msgid "data"
+msgstr "data"
+
+#: gwyfile-format.xml:322(caption)
+msgid ""
+"Array component layout illustrated for an array of doubles called "
+"<placeholder-1/>."
+msgstr ""
+"Размещение компонентов массива показано для массива чисел типа double "
+"названного <placeholder-1/>."
+
+#: gwyfile-format.xml:330(title)
+msgid "Top-Level <type>GwyContainer</type>"
+msgstr "<type>GwyContainer</type> верхнего уровня"
+
+#: gwyfile-format.xml:331(para)
+msgid ""
+"<type>GwyContainer</type> is a general dictionary-like data object that can "
+"hold arbitrary components of arbitrary types. This permits incorporating "
+"unforeseen data structures into GWY files in a relatively sane manner."
+msgstr ""
+"<type>GwyContainer</type> это общий похожий на словарь объект данных который "
+"может содержать произвольные компоненты произвольных типов. Это позволяет "
+"достаточно разумно включать непредусмотренные заранее структуры данных в "
+"файлы GWY."
+
+#: gwyfile-format.xml:336(para)
+msgid ""
+"The names (keys) of data objects in a <type>GwyContainer</type> representing "
+"a Gwyddion GWY file strongly resemble UNIX file names, i.e. they have the "
+"form of <literal>/</literal>-separated paths and form a sort of tree-like "
+"structure. For instance the title of the first image, numbered 0, is stored "
+"under the key <literal>/0/data/title</literal>. Note that some data or "
+"information is found under keys that may not seem logical; the reason is "
+"usually historical."
+msgstr ""
+"Имена (ключи) объектов в <type>GwyContainer</type>, представляющем файл "
+"Gwyddion GWY сильно напоминают имена файлов в UNIX, т.е. они записываются в "
+"виде разделённых символом <literal>/</literal> путей и образуют похожую на "
+"древовидную структуру. Например, название первого изображения, под номером "
+"0, сохраняется с ключом <literal>/0/data/title</literal>. Следует отметить, "
+"что некоторые данные и дополнительная информация сохраняются под ключами с "
+"нелогичными названиями, обычно это происходит по историческим причинам."
+
+#: gwyfile-format.xml:344(para)
+msgid ""
+"The following sections describe the organisation of interesting data and "
+"information in the top-level <type>GwyContainer</type>. The list is not "
+"necessarily complete. However, since all data items in the file specify "
+"consistently their name, type and size in bytes it is always possible to "
+"skip unknown data types or data you are not interested in and extract only "
+"the desired data items."
+msgstr ""
+"Следующие разделы описывают организацию интересующик нас данных и информации "
+"в <type>GwyContainer</type> верхнего уровня. Этот список не обязательно "
+"будет полным. Однако, поскольку все элементы данных в файле единообразно "
+"указывают свои имена, тип и размер в байтах всегда можно пропустить "
+"неизвестные типы данных или те типы данных, которые не нужны, и извлекать "
+"только требуемые."
+
+#: gwyfile-format.xml:353(title)
+msgid "Images"
+msgstr "Изображения"
+
+#: gwyfile-format.xml:354(para)
+msgid ""
+"The following table summarises the common keys of image-related data in the "
+"top-level container for image number 0. For other images, the number 0 has "
+"to be replaced with the corresponding image number. Note that images are "
+"often numbered sequentially, starting from 0. However, they can have any "
+"numbers and the set of images numbers does not have to be contiguous."
+msgstr ""
+"Следующая таблица содержит общие ключи данных, относящихся к изображениям в "
+"контейнере верхнего уровня для изображения номер 0. Для других изображений "
+"число 0 должно быть заменено на соответствующий номер изображения. Следует "
+"отметить, что изображения нередко нумеруются последовательно начиная с 0. "
+"Однако, они могут иметь любые номера и множество номеров изображений не "
+"обязательно должно быть последовательно и непрерывно."
+
+#: gwyfile-format.xml:368(entry) gwyfile-format.xml:613(entry)
+#: gwyfile-format.xml:949(entry) gwyfile-format.xml:1107(entry)
+#: gwyfile-format.xml:1320(entry) gwyfile-format.xml:1449(entry)
+#: gwyfile-format.xml:1669(entry)
+msgid "Key"
+msgstr "Ключ"
+
+#: gwyfile-format.xml:370(entry) gwyfile-format.xml:520(entry)
+#: gwyfile-format.xml:615(entry) gwyfile-format.xml:649(entry)
+#: gwyfile-format.xml:844(entry) gwyfile-format.xml:951(entry)
+#: gwyfile-format.xml:978(entry) gwyfile-format.xml:1038(entry)
+#: gwyfile-format.xml:1109(entry) gwyfile-format.xml:1181(entry)
+#: gwyfile-format.xml:1322(entry) gwyfile-format.xml:1398(entry)
+#: gwyfile-format.xml:1451(entry) gwyfile-format.xml:1531(entry)
+#: gwyfile-format.xml:1671(entry) gwyfile-format.xml:1704(entry)
+#: gwyfile-format.xml:1733(entry) gwyfile-format.xml:1770(entry)
+msgid "Meaning"
+msgstr "Значение"
+
+#: gwyfile-format.xml:375(literal)
+msgid "/0/data"
+msgstr "/0/data"
+
+#: gwyfile-format.xml:377(entry)
+msgid "Channel data."
+msgstr "Данные канала."
+
+#: gwyfile-format.xml:382(literal)
+msgid "/0/data/title"
+msgstr "/0/data/title"
+
+#: gwyfile-format.xml:384(entry)
+msgid "Channel title, as shown in the data browser."
+msgstr "Имя канала, как оно показывается в просмотре данных"
+
+#: gwyfile-format.xml:389(literal)
+msgid "/0/data/visible"
+msgstr "/0/data/visible"
+
+#: gwyfile-format.xml:391(entry)
+msgid ""
+"Whether the image should be displayed in a window when the file is loaded."
+msgstr "Должно ли изображение показываться в окне при открытии файла данных"
+
+#: gwyfile-format.xml:396(literal)
+msgid "/0/data/realsquare"
+msgstr "/0/data/realsquare"
+
+#: gwyfile-format.xml:400(guilabel) gwyfile-format.xml:1495(guilabel)
+msgid "Physically square"
+msgstr "Равные масштабы осей"
+
+#: gwyfile-format.xml:401(guilabel) gwyfile-format.xml:1496(guilabel)
+msgid "Pixelwise square"
+msgstr "Квадратные пиксели"
+
+#: gwyfile-format.xml:398(entry) gwyfile-format.xml:1493(entry)
+msgid ""
+"Whether the image should be displayed as <placeholder-1/> (as opposed to "
+"<placeholder-2/>)."
+msgstr ""
+"Должно ли изображение показываться в окне в режиме <placeholder-1/> (или, "
+"наоборот, в режиме <placeholder-2/>)."
+
+#: gwyfile-format.xml:405(literal)
+msgid "/0/base/palette"
+msgstr "/0/base/palette"
+
+#: gwyfile-format.xml:407(entry)
+msgid "Name of the false color gradient used to display the image."
+msgstr "Имя градиента псевдоцвета используемого при отображении изображения."
+
+#: gwyfile-format.xml:412(literal)
+msgid "/0/base/range-type"
+msgstr "/0/base/range-type"
+
+#: gwyfile-format.xml:416(link)
+msgid "Color range tool"
+msgstr "инструментом <quote>диапазон псевдоцвета</quote>"
+
+#: gwyfile-format.xml:417(type)
+msgid "GwyLayerBasicRangeType"
+msgstr "GwyLayerBasicRangeType"
+
+#: gwyfile-format.xml:414(entry)
+msgid ""
+"False color mapping type (as set by the <placeholder-1/>), the value is from "
+"<placeholder-2/> enum."
+msgstr ""
+"Тип отображения псевдоцвета (как задано <placeholder-1/>), значение из "
+"множества <placeholder-2/>."
+
+#: gwyfile-format.xml:421(literal)
+msgid "/0/base/min"
+msgstr "/0/base/min"
+
+#: gwyfile-format.xml:423(entry)
+msgid "Minimum value for user-set display range."
+msgstr ""
+"Минимальное значение для заданного пользователем отображаемого диапазона."
+
+#: gwyfile-format.xml:428(literal)
+msgid "/0/base/max"
+msgstr "/0/base/max"
+
+#: gwyfile-format.xml:430(entry)
+msgid "Maximum value for user-set display range."
+msgstr ""
+"Максимальное значение для заданного пользователем отображаемого диапазона."
+
+#: gwyfile-format.xml:435(literal)
+msgid "/0/mask"
+msgstr "/0/mask"
+
+#: gwyfile-format.xml:437(entry)
+msgid ""
+"Mask data. The pixel dimensions of this data field must match those of the "
+"image data."
+msgstr ""
+"Данные маски. Размеры в пикселях этого поля данных должны соответствовать "
+"данным изображения."
+
+#: gwyfile-format.xml:443(literal)
+msgid "/0/mask/red"
+msgstr "/0/mask/red"
+
+#: gwyfile-format.xml:445(entry)
+msgid "Red component of the mask color."
+msgstr "Красный компонент цвета маски."
+
+#: gwyfile-format.xml:450(literal)
+msgid "/0/mask/green"
+msgstr "/0/mask/green"
+
+#: gwyfile-format.xml:452(entry)
+msgid "Green component of the mask color."
+msgstr "Зелёный компонент цвета маски."
+
+#: gwyfile-format.xml:457(literal)
+msgid "/0/mask/blue"
+msgstr "/0/mask/blue"
+
+#: gwyfile-format.xml:459(entry)
+msgid "Blue component of the mask color."
+msgstr "Синий компонент цвета маски."
+
+#: gwyfile-format.xml:464(literal)
+msgid "/0/mask/alpha"
+msgstr "/0/mask/alpha"
+
+#: gwyfile-format.xml:466(entry)
+msgid "Alpha (opacity) component of the mask color."
+msgstr "Компонент Alpha (прозрачность) цвета маски."
+
+#: gwyfile-format.xml:471(literal)
+msgid "/0/show"
+msgstr "/0/show"
+
+#: gwyfile-format.xml:473(entry)
+msgid ""
+"Presentation data. The pixel dimensions of this data field must match those "
+"of the image data."
+msgstr ""
+"Данные презентации. Размеры в пикселях этого поля данных должны "
+"соответствовать данным изображения."
+
+#: gwyfile-format.xml:479(literal)
+msgid "/0/meta"
+msgstr "/0/meta"
+
+#: gwyfile-format.xml:481(entry)
+msgid ""
+"Channel metadata. The keys are directly the names as displayed in the "
+"metadata browser and the string values are the values."
+msgstr ""
+"Метаданные канала. Ключи это имена, которые будут отображаться в окне "
+"просмотра метаданных, строковые значения – значения данных."
+
+#: gwyfile-format.xml:487(literal)
+msgid "/0/data/log"
+msgstr "/0/data/log"
+
+#: gwyfile-format.xml:488(type) gwyfile-format.xml:1159(type)
+#: gwyfile-format.xml:1376(type) gwyfile-format.xml:1509(type)
+msgid "GwyStringList"
+msgstr "GwyStringList"
+
+#: gwyfile-format.xml:491(replaceable) gwyfile-format.xml:870(literal)
+#: gwyfile-format.xml:1162(replaceable) gwyfile-format.xml:1379(replaceable)
+#: gwyfile-format.xml:1512(replaceable)
+msgid "type"
+msgstr "тип"
+
+#: gwyfile-format.xml:491(replaceable) gwyfile-format.xml:1162(replaceable)
+#: gwyfile-format.xml:1379(replaceable) gwyfile-format.xml:1512(replaceable)
+msgid "function"
+msgstr "function"
+
+#: gwyfile-format.xml:491(replaceable) gwyfile-format.xml:1162(replaceable)
+#: gwyfile-format.xml:1379(replaceable) gwyfile-format.xml:1512(replaceable)
+msgid "param"
+msgstr "param"
+
+#: gwyfile-format.xml:491(replaceable) gwyfile-format.xml:1162(replaceable)
+#: gwyfile-format.xml:1379(replaceable) gwyfile-format.xml:1512(replaceable)
+msgid "value"
+msgstr "value"
+
+#: gwyfile-format.xml:491(replaceable) gwyfile-format.xml:1162(replaceable)
+#: gwyfile-format.xml:1379(replaceable) gwyfile-format.xml:1512(replaceable)
+msgid "time"
+msgstr "time"
+
+#: gwyfile-format.xml:491(literal) gwyfile-format.xml:1162(literal)
+#: gwyfile-format.xml:1379(literal) gwyfile-format.xml:1512(literal)
+msgid ""
+"<placeholder-1/>::<placeholder-2/>(<placeholder-3/>=<placeholder-4/>, "
+"…)@<placeholder-5/>"
+msgstr ""
+"<placeholder-1/>::<placeholder-2/>(<placeholder-3/>=<placeholder-4/>, "
+"…)@<placeholder-5/>"
+
+#: gwyfile-format.xml:489(entry)
+msgid ""
+"Channel log as a list of string log entries. They have the format "
+"<placeholder-1/>."
+msgstr "Журнал работы с каналом. Он имеет формат <placeholder-1/>."
+
+#: gwyfile-format.xml:495(replaceable) gwyfile-format.xml:500(replaceable)
+msgid "foo"
+msgstr "foo"
+
+#: gwyfile-format.xml:495(literal)
+msgid "/0/select/<placeholder-1/>"
+msgstr "/0/select/<placeholder-1/>"
+
+#: gwyfile-format.xml:496(type)
+msgid "GwySelection"
+msgstr "GwySelection"
+
+#: gwyfile-format.xml:496(entry)
+msgid ""
+"a <link linkend=\"gwyfile-GwySelection\"><placeholder-1/></link> subclass"
+msgstr ""
+"подкласс <link linkend=\"gwyfile-GwySelection\"><placeholder-1/></link>"
+
+#: gwyfile-format.xml:501(link)
+msgid "selection manager"
+msgstr "менеджер выделенного"
+
+#: gwyfile-format.xml:497(entry)
+msgid ""
+"Selection data. Each kind of selection has (usually) a different object type "
+"and is stored under a different name; the specific name <placeholder-1/> is "
+"the same as shown in the <placeholder-2/>."
+msgstr ""
+"Данные выделенных объектов. Каждый тип выделения имеет (обычно) отдельный "
+"тип объекта и сохраняется под отдельным именем; конкретное имя "
+"<placeholder-1/> будет тем же, что показано в <placeholder-2/>."
+
+#: gwyfile-format.xml:508(para)
+msgid ""
+"Channels are represented as <type>GwyDataField</type> objects. The "
+"components of a <type>GwyDataField</type> are summarised in the following "
+"table:"
+msgstr ""
+"Каналы представлены как объекты <type>GwyDataField</type>. Компоненты "
+"<type>GwyDataField</type> представлены в следующей таблице:"
+
+#: gwyfile-format.xml:518(entry) gwyfile-format.xml:647(entry)
+#: gwyfile-format.xml:842(entry) gwyfile-format.xml:976(entry)
+#: gwyfile-format.xml:1036(entry) gwyfile-format.xml:1179(entry)
+#: gwyfile-format.xml:1396(entry) gwyfile-format.xml:1529(entry)
+#: gwyfile-format.xml:1702(entry) gwyfile-format.xml:1731(entry)
+#: gwyfile-format.xml:1768(entry)
+msgid "Component"
+msgstr "Компонент"
+
+#: gwyfile-format.xml:527(entry) gwyfile-format.xml:1188(entry)
+#: gwyfile-format.xml:1538(entry)
+msgid "Horizontal size in pixels."
+msgstr "Горизонтальный размер в пикселях."
+
+#: gwyfile-format.xml:532(literal) gwyfile-format.xml:587(varname)
+#: gwyfile-format.xml:1193(literal) gwyfile-format.xml:1284(varname)
+#: gwyfile-format.xml:1543(literal) gwyfile-format.xml:1560(varname)
+#: gwyfile-format.xml:1641(varname)
+msgid "yres"
+msgstr "yres"
+
+#: gwyfile-format.xml:534(entry) gwyfile-format.xml:1195(entry)
+#: gwyfile-format.xml:1545(entry)
+msgid "Vertical size in pixels."
+msgstr "Вертикальный размер в пикселях."
+
+#: gwyfile-format.xml:541(entry) gwyfile-format.xml:1209(entry)
+#: gwyfile-format.xml:1568(entry)
+msgid "Horizontal dimension in physical units."
+msgstr "Горизонтальный размер в физических единицах."
+
+#: gwyfile-format.xml:546(literal) gwyfile-format.xml:1214(literal)
+#: gwyfile-format.xml:1573(literal)
+msgid "yreal"
+msgstr "yreal"
+
+#: gwyfile-format.xml:548(entry) gwyfile-format.xml:1216(entry)
+#: gwyfile-format.xml:1575(entry)
+msgid "Vertical dimension in physical units."
+msgstr "Вертикальный размер в физических единицах."
+
+#: gwyfile-format.xml:553(literal) gwyfile-format.xml:1228(literal)
+#: gwyfile-format.xml:1580(literal)
+msgid "xoff"
+msgstr "xoff"
+
+#: gwyfile-format.xml:555(entry) gwyfile-format.xml:1230(entry)
+#: gwyfile-format.xml:1582(entry)
+msgid ""
+"Horizontal offset of the top-left corner in physical units. It usually "
+"occurs only if non-zero."
+msgstr ""
+"Горизонтальное смещение верхнего левого угла в физических единицах. Обычно "
+"записывается только если не равно нулю."
+
+#: gwyfile-format.xml:561(literal) gwyfile-format.xml:1236(literal)
+#: gwyfile-format.xml:1588(literal)
+msgid "yoff"
+msgstr "yoff"
+
+#: gwyfile-format.xml:563(entry) gwyfile-format.xml:1238(entry)
+#: gwyfile-format.xml:1590(entry)
+msgid ""
+"Vertical offset of the top-left corner in physical units. It usually occurs "
+"only if non-zero."
+msgstr ""
+"Вертикальное смещение верхнего левого угла в физических единицах. Обычно "
+"записывается только если не равно нулю."
+
+#: gwyfile-format.xml:570(type) gwyfile-format.xml:577(type)
+#: gwyfile-format.xml:669(type) gwyfile-format.xml:676(type)
+#: gwyfile-format.xml:991(type) gwyfile-format.xml:1066(type)
+#: gwyfile-format.xml:1073(type) gwyfile-format.xml:1253(type)
+#: gwyfile-format.xml:1260(type) gwyfile-format.xml:1267(type)
+#: gwyfile-format.xml:1274(type) gwyfile-format.xml:1404(type)
+#: gwyfile-format.xml:1411(type) gwyfile-format.xml:1597(type)
+#: gwyfile-format.xml:1604(type)
+msgid "GwySIUnit"
+msgstr "GwySIUnit"
+
+#: gwyfile-format.xml:571(entry)
+msgid "Unit of lateral dimensions."
+msgstr "Единица измерения горизонтальных размеров."
+
+#: gwyfile-format.xml:576(literal) gwyfile-format.xml:1266(literal)
+#: gwyfile-format.xml:1410(literal)
+msgid "si_unit_z"
+msgstr "si_unit_z"
+
+#: gwyfile-format.xml:578(entry) gwyfile-format.xml:1074(entry)
+#: gwyfile-format.xml:1275(entry) gwyfile-format.xml:1412(entry)
+msgid "Unit of data values."
+msgstr "Единица измерения значений данных."
+
+#: gwyfile-format.xml:585(entry)
+msgid ""
+"Field data, stored as a flat array of size <placeholder-1/> × <placeholder-2/"
+">, from top to bottom and from left to right."
+msgstr ""
+"Данные поля, сохранённые как плоский массив размера <placeholder-1/"
+">×<placeholder-2/>, сверху вниз и слева направо."
+
+#: gwyfile-format.xml:597(title)
+msgid "Graphs"
+msgstr "Графики"
+
+#: gwyfile-format.xml:598(para)
+msgid ""
+"The following table summarises the common keys of graph-related data in the "
+"top-level container for graph number 1. For other graphs, the number 1 has "
+"to be replaced with the corresponding graph number. Note that graphs are "
+"often numbered sequentially, starting from 1, however, they can have any "
+"numbers positive and the set of graph numbers does not have to be "
+"contiguous. The number 0 in the prefix of graph keys is a historical relic "
+"that does not mean anything and it is always 0."
+msgstr ""
+"Следующая таблица содержит общие ключи данных, относящихся к графикам в "
+"контейнере верхнего уровня для графика номер 1. Для других графиков число 1 "
+"должно быть заменено на соответствующий номер графика. Следует отметить, что "
+"графики нередко нумеруются последовательно начиная с единицы, но они могут "
+"иметь любые положительные номера, не обязательно последовательные. Число 0 в "
+"префиксе номеров графика является историческим артефактом, ничего сейчас не "
+"значит и всегда должно быть 0."
+
+#: gwyfile-format.xml:620(literal)
+msgid "/0/graph/graph/1"
+msgstr "/0/graph/graph/1"
+
+#: gwyfile-format.xml:621(type)
+msgid "GwyGraphModel"
+msgstr "GwyGraphModel"
+
+#: gwyfile-format.xml:622(entry)
+msgid "Graph model object data."
+msgstr "Данные объекта Graph model"
+
+#: gwyfile-format.xml:627(literal)
+msgid "/0/graph/graph/1/visible"
+msgstr "/0/graph/graph/1/visible"
+
+#: gwyfile-format.xml:629(entry)
+msgid ""
+"Whether the graph should be displayed in a window when the file is loaded."
+msgstr "Должен ли график отображаться при открытии файла."
+
+#: gwyfile-format.xml:637(para)
+msgid ""
+"Graphs are represented as <type>GwyGraphModel</type> objects. The components "
+"of a <type>GwyGraphModel</type> are summarised in the following table:"
+msgstr ""
+"Графики представлены как объекты <type>GwyGraphModel</type>. Компоненты "
+"<type>GwyGraphModel</type> сведены в следующую таблицу:"
+
+#: gwyfile-format.xml:654(literal)
+msgid "curves"
+msgstr "curves"
+
+#: gwyfile-format.xml:655(type)
+msgid "GwyGraphCurveModel"
+msgstr "GwyGraphCurveModel"
+
+#: gwyfile-format.xml:655(entry)
+msgid ""
+"array of <link linkend=\"gwyfile-GwyGraphCurveModel\"><placeholder-1/></"
+"link>s"
+msgstr ""
+"массив из <link linkend=\"gwyfile-GwyGraphCurveModel\"><placeholder-1/></"
+"link>"
+
+#: gwyfile-format.xml:656(entry)
+msgid "Individual graph curves."
+msgstr "Отдельные кривые графиков."
+
+#: gwyfile-format.xml:661(literal) gwyfile-format.xml:983(literal)
+msgid "title"
+msgstr "title"
+
+#: gwyfile-format.xml:663(entry)
+msgid "Graph title as displayed in the data browser."
+msgstr "Название графика как оно отображается в окне просмотра данных."
+
+#: gwyfile-format.xml:668(literal)
+msgid "x_unit"
+msgstr "x_unit"
+
+#: gwyfile-format.xml:670(entry)
+msgid "Unit of the abscissa."
+msgstr "Единицы абсциссы."
+
+#: gwyfile-format.xml:675(literal)
+msgid "y_unit"
+msgstr "y_unit"
+
+#: gwyfile-format.xml:677(entry)
+msgid "Unit of the ordinate."
+msgstr "Единицы ординаты."
+
+#: gwyfile-format.xml:682(literal)
+msgid "top_label"
+msgstr "top_label"
+
+#: gwyfile-format.xml:684(entry)
+msgid "Label on the top axis."
+msgstr "Подпись верхней оси."
+
+#: gwyfile-format.xml:689(literal)
+msgid "bottom_label"
+msgstr "bottom_label"
+
+#: gwyfile-format.xml:691(entry)
+msgid "Label on the bottom axis."
+msgstr "Подпись нижней оси."
+
+#: gwyfile-format.xml:696(literal)
+msgid "left_label"
+msgstr "left_label"
+
+#: gwyfile-format.xml:698(entry)
+msgid "Label on the left axis."
+msgstr "Подпись левой оси."
+
+#: gwyfile-format.xml:703(literal)
+msgid "right_label"
+msgstr "right_label"
+
+#: gwyfile-format.xml:705(entry)
+msgid "Label on the right axis."
+msgstr "Подпись правой оси."
+
+#: gwyfile-format.xml:710(literal)
+msgid "x_is_logarithmic"
+msgstr "x_is_logarithmic"
+
+#: gwyfile-format.xml:712(entry)
+msgid "Whether the abscissa has a logarithmic scale."
+msgstr "Логарифмический масштаб абсциссы."
+
+#: gwyfile-format.xml:717(literal)
+msgid "y_is_logarithmic"
+msgstr "y_is_logarithmic"
+
+#: gwyfile-format.xml:719(entry)
+msgid "Whether the ordinate has a logarithmic scale."
+msgstr "Логарифмический масштаб ординаты."
+
+#: gwyfile-format.xml:724(literal)
+msgid "x_min"
+msgstr "x_min"
+
+#: gwyfile-format.xml:726(entry)
+msgid "User-set minimum value of the abscissa."
+msgstr "Заданное пользователем минимальное значение абсциссы."
+
+#: gwyfile-format.xml:731(literal)
+msgid "x_min_set"
+msgstr "x_min_set"
+
+#: gwyfile-format.xml:733(entry)
+msgid ""
+"Whether user-set minimum value of the abscissa should be used (otherwise the "
+"range is determined automatically)."
+msgstr ""
+"Нужно ли использовать заданное пользователем минимальное значение абсциссы "
+"(или диапазон определяется автоматически)."
+
+#: gwyfile-format.xml:739(literal)
+msgid "x_max"
+msgstr "x_max"
+
+#: gwyfile-format.xml:741(entry)
+msgid "User-set maximum value of the abscissa."
+msgstr "Заданное пользователем максимальное значение абсциссы."
+
+#: gwyfile-format.xml:746(literal)
+msgid "x_max_set"
+msgstr "x_max_set"
+
+#: gwyfile-format.xml:748(entry)
+msgid ""
+"Whether user-set maximum value of the abscissa should be used (otherwise the "
+"range is determined automatically)."
+msgstr ""
+"Нужно ли использовать заданное пользователем максимальное значение абсциссы "
+"(или диапазон определяется автоматически)."
+
+#: gwyfile-format.xml:754(literal)
+msgid "y_min"
+msgstr "y_min"
+
+#: gwyfile-format.xml:756(entry)
+msgid "User-set minimum value of the ordinate."
+msgstr "Заданное пользователем минимальное значение ординаты."
+
+#: gwyfile-format.xml:761(literal)
+msgid "y_min_set"
+msgstr "y_min_set"
+
+#: gwyfile-format.xml:763(entry)
+msgid ""
+"Whether user-set minimum value of the ordinate should be used (otherwise the "
+"range is determined automatically)."
+msgstr ""
+"Нужно ли использовать заданное пользователем минимальное значение ординаты "
+"(или диапазон определяется автоматически)."
+
+#: gwyfile-format.xml:769(literal)
+msgid "y_max"
+msgstr "y_max"
+
+#: gwyfile-format.xml:771(entry)
+msgid "User-set maximum value of the ordinate."
+msgstr "Заданное пользователем максимальное значение ординаты."
+
+#: gwyfile-format.xml:776(literal)
+msgid "y_max_set"
+msgstr "y_max_set"
+
+#: gwyfile-format.xml:778(entry)
+msgid ""
+"Whether user-set maximum value of the ordinate should be used (otherwise the "
+"range is determined automatically)."
+msgstr ""
+"Нужно ли использовать заданное пользователем максимальное значение ординаты "
+"(или диапазон определяется автоматически)."
+
+#: gwyfile-format.xml:784(literal)
+msgid "grid-type"
+msgstr "grid-type"
+
+#: gwyfile-format.xml:788(type)
+msgid "GwyGraphGridType"
+msgstr "GwyGraphGridType"
+
+#: gwyfile-format.xml:786(entry)
+msgid "Type of grid shown. The value is from <placeholder-1/> enum."
+msgstr "Тип отображаемой сетки. Значение из множества <placeholder-1/>."
+
+#: gwyfile-format.xml:792(literal)
+msgid "label.has_frame"
+msgstr "label.has_frame"
+
+#: gwyfile-format.xml:794(entry)
+msgid "Whether the graph key has a frame."
+msgstr "Отображать рамку вокруг легенды."
+
+#: gwyfile-format.xml:799(literal)
+msgid "label.frame_thickness"
+msgstr "label.frame_thickness"
+
+#: gwyfile-format.xml:801(entry)
+msgid "Width of graph key frame."
+msgstr "Толщина рамки легенды."
+
+#: gwyfile-format.xml:806(literal)
+msgid "label.reverse"
+msgstr "label.reverse"
+
+#: gwyfile-format.xml:808(entry)
+msgid "Whether to reverse the graph key."
+msgstr "Отображать легенду в обратном порядке."
+
+#: gwyfile-format.xml:813(literal)
+msgid "label.visible"
+msgstr "label.visible"
+
+#: gwyfile-format.xml:815(entry)
+msgid "Whether the graph key is visible."
+msgstr "нужно ли отображать легенду."
+
+#: gwyfile-format.xml:820(literal)
+msgid "label.position"
+msgstr "label.position"
+
+#: gwyfile-format.xml:824(type)
+msgid "GwyGraphLabelPosition"
+msgstr "GwyGraphLabelPosition"
+
+#: gwyfile-format.xml:822(entry)
+msgid ""
+"The position (corner) where the graph key is places. The value is from "
+"<placeholder-1/> enum."
+msgstr ""
+"Расположение (угол) в котором будет помещена легенда. Значение из множества "
+"<placeholder-1/>."
+
+#: gwyfile-format.xml:831(para)
+msgid ""
+"Graph curves are represented as <type>GwyGraphCurveModel</type> objects. The "
+"components of a <type>GwyGraphCurveModel</type> are summarised in the "
+"following table:"
+msgstr ""
+"Кривые графиков представлены как объекты <type>GwyGraphCurveModel</type>. "
+"Компоненты <type>GwyGraphCurveModel</type> сведены в следующую таблицу:"
+
+#: gwyfile-format.xml:849(literal) gwyfile-format.xml:859(literal)
+msgid "xdata"
+msgstr "xdata"
+
+#: gwyfile-format.xml:852(literal) gwyfile-format.xml:856(literal)
+msgid "ydata"
+msgstr "ydata"
+
+#: gwyfile-format.xml:851(entry)
+msgid "Abscissa points. The number of points must match <placeholder-1/>."
+msgstr "Точки абсциссы. Число точек должно соответствовать <placeholder-1/>."
+
+#: gwyfile-format.xml:858(entry)
+msgid "Ordinate points. The number of points must match <placeholder-1/>."
+msgstr "Точки ординаты. Число точек должно соответствовать <placeholder-1/>."
+
+#: gwyfile-format.xml:863(literal)
+msgid "description"
+msgstr "description"
+
+#: gwyfile-format.xml:865(entry)
+msgid "Curve description (name)."
+msgstr "Описание кривой (имя)."
+
+#: gwyfile-format.xml:874(type)
+msgid "GwyGraphCurveType"
+msgstr "GwyGraphCurveType"
+
+#: gwyfile-format.xml:872(entry)
+msgid ""
+"Curve mode (points, lines, etc.) The value is from <placeholder-1/> enum."
+msgstr ""
+"Режим отображения кривой (точки, линии и т.п.) Значение из множества "
+"<placeholder-1/>."
+
+#: gwyfile-format.xml:878(literal)
+msgid "color.red"
+msgstr "color.red"
+
+#: gwyfile-format.xml:880(entry)
+msgid "Red component of the curve color."
+msgstr "Красный компонент цвета кривой."
+
+#: gwyfile-format.xml:885(literal)
+msgid "color.green"
+msgstr "color.green"
+
+#: gwyfile-format.xml:887(entry)
+msgid "Green component of the curve color."
+msgstr "Зелёный компонент цвета кривой."
+
+#: gwyfile-format.xml:892(literal)
+msgid "color.blue"
+msgstr "color.blue"
+
+#: gwyfile-format.xml:894(entry)
+msgid "Blue component of the curve color."
+msgstr "Синий компонент цвета кривой."
+
+#: gwyfile-format.xml:899(literal)
+msgid "point_type"
+msgstr "point_type"
+
+#: gwyfile-format.xml:903(type)
+msgid "GwyGraphPointType"
+msgstr "GwyGraphPointType"
+
+#: gwyfile-format.xml:901(entry)
+msgid ""
+"Type of symbols representing data points. The value is from <placeholder-1/> "
+"enum."
+msgstr ""
+"Тип символов, представляющих точки данных. Значение из множества "
+"<placeholder-1/>."
+
+#: gwyfile-format.xml:907(literal)
+msgid "point_size"
+msgstr "point_size"
+
+#: gwyfile-format.xml:909(entry)
+msgid "Size of symbols representing data points."
+msgstr "Размер символов, представляющих точки данных."
+
+#: gwyfile-format.xml:914(literal)
+msgid "line_type"
+msgstr "line_type"
+
+#: gwyfile-format.xml:918(type)
+msgid "GwyGraphLineType"
+msgstr "GwyGraphLineType"
+
+#: gwyfile-format.xml:916(entry)
+msgid ""
+"Type of lines connecting data points. The value is from <placeholder-1/> "
+"enum."
+msgstr ""
+"Тип линий, соединяющих точки данных. Значение из множества <placeholder-1/>."
+
+#: gwyfile-format.xml:922(literal)
+msgid "line_size"
+msgstr "line_size"
+
+#: gwyfile-format.xml:924(entry)
+msgid "Width of lines connecting data points."
+msgstr "Толщина линии, соединяющей точки данных."
+
+#: gwyfile-format.xml:934(title)
+msgid "Spectra"
+msgstr "Спектры"
+
+#: gwyfile-format.xml:935(para)
+msgid ""
+"The following table summarises the common keys of spectra-related data in "
+"the top-level container for spectra set number 0. For other spectra, the "
+"number 0 has to be replaced with the corresponding spectra set number. Note "
+"that spectra sets are often numbered sequentially, starting from 0, however, "
+"they can have any numbers and the set of spectra set numbers does not have "
+"to be contiguous."
+msgstr ""
+"Следующая таблица содержит общие ключи данных, относящихся к спектроскопии в "
+"контейнере верхнего уровня для набора спектров номер 0. Для других спектров "
+"число 0 надо заменить соответствующим номером набора спектров. Следует "
+"отметить. что наборы спектров нередко нумеруются последовательно начиная с "
+"0, хотя они могут иметь любые номера, которые не обязательно должны идти "
+"последовательно."
+
+#: gwyfile-format.xml:956(literal)
+msgid "/sps/0"
+msgstr "/sps/0"
+
+#: gwyfile-format.xml:957(type)
+msgid "GwySpectra"
+msgstr "GwySpectra"
+
+#: gwyfile-format.xml:958(entry)
+msgid "Spectra data."
+msgstr "Данные спектроскопии."
+
+#: gwyfile-format.xml:966(para)
+msgid ""
+"Sets of spectra of one kind are represented as <type>GwySpectra</type> "
+"objects. The components of a <type>GwySpectra</type> are summarised in the "
+"following table:"
+msgstr ""
+"Наборы спектров одного типа представлены как объекты <type>GwySpectra</"
+"type>. Компоненты <type>GwySpectra</type> сведены в следующую таблицу:"
+
+#: gwyfile-format.xml:985(entry)
+msgid "Spectra title as displayed in the data browser."
+msgstr "Название спектров как оно отображается в окне просмотра данных."
+
+#: gwyfile-format.xml:992(entry)
+msgid "Unit of spectrum position coordinates."
+msgstr "Единицы измерения координат места, где снимались спектры."
+
+#: gwyfile-format.xml:997(literal)
+msgid "coords"
+msgstr "coords"
+
+#: gwyfile-format.xml:999(entry)
+msgid ""
+"Coordinates of points where the spectra were taken, in physical units. Each "
+"spectrum takes two items: for the horizontal and vertical coordinate. The "
+"number of coordinates must match the number of curves in <placeholder-1/>."
+msgstr ""
+"Координаты точек, где снимались спектры, в физических единицах. Каждый "
+"спектр занимает два элемента: горизонтальную и вертикальную координату. "
+"Количество координат должно соответствовать числу кривых в <placeholder-1/>."
+
+#: gwyfile-format.xml:1008(type) gwyfile-format.xml:1290(type)
+msgid "GwyDataLine"
+msgstr "GwyDataLine"
+
+#: gwyfile-format.xml:1008(entry)
+msgid "array of <link linkend=\"gwyfile-GwyDataLine\"><placeholder-1/></link>s"
+msgstr ""
+"массив из <link linkend=\"gwyfile-GwyDataLine\"><placeholder-1/></link>"
+
+#: gwyfile-format.xml:1009(entry)
+msgid "Individual spectra curves."
+msgstr "Отдельные кривые спектров."
+
+#: gwyfile-format.xml:1014(literal)
+msgid "selected"
+msgstr "selected"
+
+#: gwyfile-format.xml:1016(entry)
+msgid "Indices of selected spectra curves."
+msgstr "Индексы выбранных кривых спектров."
+
+#: gwyfile-format.xml:1024(para)
+msgid ""
+"Individual curves in spectra are represented as <type>GwyDataLine</type> "
+"objects. The <type>GwyDataLine</type> object is a one-dimensional "
+"counterpart of <type>GwyDataField</type> and is used also for other regular "
+"one-dimensional data. The components of a <type>GwyDataLine</type> are "
+"summarised in the following table:"
+msgstr ""
+"Отдельные кривые в спектрах представлены как объекты <type>GwyDataLine</"
+"type>. Объект <type>GwyDataLine</type> является одномерным аналогом "
+"<type>GwyDataField</type> и используется также для других одномерных данных. "
+"Компоненты <type>GwyDataLine</type> сведены в следующую таблицу:"
+
+#: gwyfile-format.xml:1043(literal) gwyfile-format.xml:1082(varname)
+msgid "res"
+msgstr "res"
+
+#: gwyfile-format.xml:1045(entry)
+msgid "Number of data points."
+msgstr "Число точек данных."
+
+#: gwyfile-format.xml:1050(literal)
+msgid "real"
+msgstr "real"
+
+#: gwyfile-format.xml:1052(entry)
+msgid "Length in physical units."
+msgstr "Длина в физических единицах."
+
+#: gwyfile-format.xml:1057(literal)
+msgid "off"
+msgstr "off"
+
+#: gwyfile-format.xml:1059(entry)
+msgid ""
+"Offset of the begining in physical units. It usually occurs only if non-zero."
+msgstr ""
+"Смещение начала в физических единицах. Обычно записывается только если не "
+"равно нулю."
+
+#: gwyfile-format.xml:1065(literal) gwyfile-format.xml:1252(literal)
+msgid "si_unit_x"
+msgstr "si_unit_x"
+
+#: gwyfile-format.xml:1067(entry)
+msgid "Unit of abscissa."
+msgstr "Единицы измерения абсциссы."
+
+#: gwyfile-format.xml:1072(literal) gwyfile-format.xml:1259(literal)
+msgid "si_unit_y"
+msgstr "si_unit_y"
+
+#: gwyfile-format.xml:1081(entry)
+msgid "Line data, stored as an array of <placeholder-1/>, from left to right."
+msgstr "Данные линии, сохранённые как массив <placeholder-1/>, слева направо ."
+
+#: gwyfile-format.xml:1092(title)
+msgid "Volume data"
+msgstr "Объёмные данные"
+
+#: gwyfile-format.xml:1093(para)
+msgid ""
+"The following table summarises the common keys of volume-related data in the "
+"top-level container for volume data number 0. For other volume data, the "
+"number 0 has to be replaced with the corresponding volume data number. Note "
+"that volume data are often numbered sequentially, starting from 0, however, "
+"they can have any numbers and the set of volume data numbers does not have "
+"to be contiguous."
+msgstr ""
+"Следующая таблица сводит воедино общие ключи для объёмных данных в "
+"контейнере верхнего уровня для объёмных данных с номером 0. Для других "
+"объёмных данных, число 0 должно быть заменено соответствующим номером "
+"объёмных данных. Следует отметить, что объёмные данные обычно нумеруются "
+"последовательно, начиная с 0, однако, они могут иметь любые номера и "
+"множество номеров объёмных данных не обязательно должно быть непрерывным."
+
+#: gwyfile-format.xml:1114(literal)
+msgid "/brick/0"
+msgstr "/brick/0"
+
+#: gwyfile-format.xml:1115(type)
+msgid "GwyBrick"
+msgstr "GwyBrick"
+
+#: gwyfile-format.xml:1116(entry)
+msgid "Volume data."
+msgstr "Объёмные данные."
+
+#: gwyfile-format.xml:1121(literal)
+msgid "/brick/0/preview"
+msgstr "/brick/0/preview"
+
+#: gwyfile-format.xml:1123(entry)
+msgid ""
+"Two-dimensional data shown when the volume data are displayed in a window."
+msgstr "Двумерные данные, демонстрируемые при показе объёмных данных в окне."
+
+#: gwyfile-format.xml:1129(literal)
+msgid "/brick/0/title"
+msgstr "/brick/0/title"
+
+#: gwyfile-format.xml:1131(entry)
+msgid "Volume data title, as shown in the data browser."
+msgstr "Имя объёмных данных, как оно показывается в браузере данных"
+
+#: gwyfile-format.xml:1136(literal)
+msgid "/brick/0/visible"
+msgstr "/brick/0/visible"
+
+#: gwyfile-format.xml:1138(entry)
+msgid ""
+"Whether the volume data should be displayed in a window when the file is "
+"loaded."
+msgstr "Следует ли отображать объёмные данные в окне при загрузке файлов."
+
+#: gwyfile-format.xml:1143(literal)
+msgid "/brick/0/preview/palette"
+msgstr "/brick/0/preview/palette"
+
+#: gwyfile-format.xml:1145(entry) gwyfile-format.xml:1362(entry)
+#: gwyfile-format.xml:1486(entry)
+msgid "Name of the false color gradient used to display the preview data."
+msgstr ""
+"Имя градиента псевдоцвета используемого при отображении изображения "
+"предпросмотра."
+
+#: gwyfile-format.xml:1150(literal)
+msgid "/brick/0/meta"
+msgstr "/brick/0/meta"
+
+#: gwyfile-format.xml:1152(entry)
+msgid ""
+"Volume data metadata. The keys are directly the names as displayed in the "
+"metadata browser and the string values are the values."
+msgstr ""
+"Метаданные объёмных данных. Ключи это имена, которые будут отображаться в "
+"окне просмотра метаданных, строковые значения – значения данных."
+
+#: gwyfile-format.xml:1158(literal)
+msgid "/brick/0/log"
+msgstr "/brick/0/log"
+
+#: gwyfile-format.xml:1160(entry) gwyfile-format.xml:1377(entry)
+#: gwyfile-format.xml:1510(entry)
+msgid ""
+"Volume data log as a list of string log entries. They have the format "
+"<placeholder-1/>."
+msgstr "Журнал работы с объёмными данными. Он имеет формат <placeholder-1/>."
+
+#: gwyfile-format.xml:1169(para)
+msgid ""
+"Volume data are represented as <type>GwyBrick</type> objects. The components "
+"of a <type>GwyBrick</type> are summarised in the following table:"
+msgstr ""
+"Объёмные данные представлены как объекты <type>GwyBrick</type>. Компоненты "
+"<type>GwyBrick</type> представлены в следующей таблице:"
+
+#: gwyfile-format.xml:1200(literal) gwyfile-format.xml:1284(varname)
+#: gwyfile-format.xml:1294(varname)
+msgid "zres"
+msgstr "zres"
+
+#: gwyfile-format.xml:1202(entry)
+msgid "Depth (number of levels) in pixels."
+msgstr "Глубина (число уровней) в пикселях."
+
+#: gwyfile-format.xml:1221(literal)
+msgid "zreal"
+msgstr "zreal"
+
+#: gwyfile-format.xml:1223(entry)
+msgid "Depthwise dimension in physical units."
+msgstr "Размер глубины в физических единицах."
+
+#: gwyfile-format.xml:1244(literal)
+msgid "zoff"
+msgstr "zoff"
+
+#: gwyfile-format.xml:1246(entry)
+msgid ""
+"Depthwise offset of the top-left corner in physical units. It usually occurs "
+"only if non-zero."
+msgstr ""
+"Смещение по глубине верхнего левого угла в физических единицах. Обычно "
+"записывается только если не равно нулю."
+
+#: gwyfile-format.xml:1254(entry) gwyfile-format.xml:1405(entry)
+#: gwyfile-format.xml:1598(entry)
+msgid "Unit of horizontal lateral dimensions."
+msgstr "Единица измерения горизонтальных размеров."
+
+#: gwyfile-format.xml:1261(entry)
+msgid "Unit of vertical lateral dimensions."
+msgstr "Единица измерения вертикальных пространственных размеров."
+
+#: gwyfile-format.xml:1268(entry)
+msgid "Unit of depthwise dimensions."
+msgstr "Единица измерения размеров по глубине."
+
+#: gwyfile-format.xml:1273(literal)
+msgid "si_unit_w"
+msgstr "si_unit_w"
+
+#: gwyfile-format.xml:1282(entry)
+msgid ""
+"Field data, stored as a flat array of size <placeholder-1/> × <placeholder-2/"
+"> × <placeholder-3/>, from the zeroth to the last plane, top to bottom and "
+"from left to right."
+msgstr ""
+"Данные поля, сохранённые как плоский массив размера <placeholder-1/"
+">×<placeholder-2/>×<placeholder-3/>, с нулевой до последней плоскости, "
+"сверху вниз и слева направо."
+
+#: gwyfile-format.xml:1289(literal)
+msgid "calibration"
+msgstr "calibration"
+
+#: gwyfile-format.xml:1291(entry)
+msgid ""
+"Calibration of the <xi:include href=\"eqi-z.xml\"/> axis to represent non-"
+"linear sampling in this dimension. The number of points must be equal to "
+"<placeholder-1/>. This component is present only if non-linear sampling is "
+"used."
+msgstr ""
+"Калибровка оси <xi:include href=\"eqi-z.xml\"/>, представляющая нелинейные "
+"отсчёты шкалы в этом направлении. Число точек должно быть равно "
+"<placeholder-1/>. Этот компонент присутствует только если используется "
+"нелинейная дискретизация вдоль этой оси."
+
+#: gwyfile-format.xml:1305(title)
+msgid "XYZ data"
+msgstr "Данные XYZ"
+
+#: gwyfile-format.xml:1306(para)
+msgid ""
+"The following table summarises the common keys of XYZ-related data in the "
+"top-level container for XYZ data number 0. For other XYZ data, the number 0 "
+"has to be replaced with the corresponding XYZ data number. Note that XYZ "
+"data are often numbered sequentially, starting from 0, however, they can "
+"have any numbers and the set of XYZ data numbers does not have to be "
+"contiguous."
+msgstr ""
+"Следующая таблица сводит воедино общие ключи для данных XYZ в контейнере "
+"верхнего уровня для таких данных с номером 0. Для других данных XYZ, число 0 "
+"должно быть заменено соответствующим номером блока такого типа данных. "
+"Следует отметить, что данные XYZ  обычно нумеруются последовательно, начиная "
+"с 0, однако, они могут иметь любые номера и множество номеров блоков данных "
+"не обязательно должно быть непрерывным."
+
+#: gwyfile-format.xml:1327(literal)
+msgid "/xyz/0"
+msgstr "/xyz/0"
+
+#: gwyfile-format.xml:1328(type)
+msgid "GwySurface"
+msgstr "GwySurface"
+
+#: gwyfile-format.xml:1329(entry)
+msgid "XYZ data."
+msgstr "Данные XYZ."
+
+#: gwyfile-format.xml:1334(literal)
+msgid "/xyz/0/preview"
+msgstr "/xyz/0/preview"
+
+#: gwyfile-format.xml:1340(link)
+msgid "re-created and updated when the data are displayed"
+msgstr "создаётся заново и обновляется при показе данных"
+
+#: gwyfile-format.xml:1336(entry)
+msgid ""
+"Regularised preview shown when the XYZ data are displayed in a window. Note "
+"that although XYZ previews are stored in GWY files, they are commonly "
+"<placeholder-1/> so it is rarely useful to add them when you are writing a "
+"GWY file."
+msgstr ""
+"Растеризованное изображение предпросомтра которое показывается при "
+"отображении данных XYZ в окне. Следует отметить, что хотя изображения "
+"предпросмотра сохраняются в файлах GWY, они обычно являются <placeholder-1/> "
+"так что добавлять их при записи файла GWY редко будет полезным занятием."
+
+#: gwyfile-format.xml:1346(literal)
+msgid "/xyz/0/title"
+msgstr "/xyz/0/title"
+
+#: gwyfile-format.xml:1348(entry) gwyfile-format.xml:1472(entry)
+msgid "XYZ data title, as shown in the data browser."
+msgstr "Имя данных XYZ, как оно показывается в окне браузера данных."
+
+#: gwyfile-format.xml:1353(literal)
+msgid "/xyz/0/visible"
+msgstr "/xyz/0/visible"
+
+#: gwyfile-format.xml:1355(entry) gwyfile-format.xml:1479(entry)
+msgid ""
+"Whether the XYZ data should be displayed in a window when the file is loaded."
+msgstr "Следует ли отображать данные XYZ в окне при загрузке файлов."
+
+#: gwyfile-format.xml:1360(literal)
+msgid "/xyz/0/preview/palette"
+msgstr "/xyz/0/preview/palette"
+
+#: gwyfile-format.xml:1367(literal)
+msgid "/xyz/0/meta"
+msgstr "/xyz/0/meta"
+
+#: gwyfile-format.xml:1369(entry)
+msgid ""
+"XYZ data metadata. The keys are directly the names as displayed in the "
+"metadata browser and the string values are the values."
+msgstr ""
+"Метаданные данных XYZ. Ключи это имена, которые будут отображаться в окне "
+"просмотра метаданных, строковые значения – значения данных."
+
+#: gwyfile-format.xml:1375(literal)
+msgid "/xyz/0/log"
+msgstr "/xyz/0/log"
+
+#: gwyfile-format.xml:1386(para)
+msgid ""
+"XYZ data are represented as <type>GwySurface</type> objects. The components "
+"of a <type>GwySurface</type> are summarised in the following table:"
+msgstr ""
+"Данные XYZ представлены как объекты <type>GwySurface</type>. Компоненты "
+"<type>GwySurface</type> представлены в следующей таблице:"
+
+#: gwyfile-format.xml:1422(varname) gwyfile-format.xml:1423(varname)
+#: gwyfile-format.xml:1424(varname)
+msgid "x"
+msgstr "x"
+
+#: gwyfile-format.xml:1422(varname) gwyfile-format.xml:1423(varname)
+#: gwyfile-format.xml:1424(varname)
+msgid "y"
+msgstr "y"
+
+#: gwyfile-format.xml:1422(varname) gwyfile-format.xml:1423(varname)
+#: gwyfile-format.xml:1424(varname)
+msgid "z"
+msgstr "z"
+
+#: gwyfile-format.xml:1419(entry)
+msgid ""
+"XYZ data, stored as a flat array of whose size is a multiple of 3. Each XYZ "
+"triplet is stored together, leading to the following data order: "
+"<placeholder-1/>₀, <placeholder-2/>₀, <placeholder-3/>₀, <placeholder-4/>₁, "
+"<placeholder-5/>₁, <placeholder-6/>₁, <placeholder-7/>₂, <placeholder-8/>₂, "
+"<placeholder-9/>₂, etc."
+msgstr ""
+"Данные XYZ, сохранённые как плоский массив с длиной кратной 3. Каждый "
+"триплет XYZ сохраняется вместе, что приводит к следующему порядку следования "
+"данных: <placeholder-1/>₀, <placeholder-2/>₀, <placeholder-3/>₀, "
+"<placeholder-4/>₁, <placeholder-5/>₁, <placeholder-6/>₁, <placeholder-7/>₂, "
+"<placeholder-8/>₂, <placeholder-9/>₂, и т.д."
+
+#: gwyfile-format.xml:1434(title)
+msgid "Curve map data"
+msgstr "Данные карты кривых"
+
+#: gwyfile-format.xml:1435(para)
+msgid ""
+"The following table summarises the common keys of curve map related data in "
+"the top-level container for XYZ data number 0. For other curve map data, the "
+"number 0 has to be replaced with the corresponding curve map data number. "
+"Note that curve map data are often numbered sequentially, starting from 0, "
+"however, they can have any numbers and the set of curve map data numbers "
+"does not have to be contiguous."
+msgstr ""
+"Следующая таблица обобщает общие ключи для данных, относящихся к карте "
+"кривых в контейнере верхнего уровня для элемента данных номер 0. Для других "
+"карт кривых, номер 0 нужно заменить на соответствующий номер карты кривых. "
+"Следует отметить, что карты кривых обычно нумеруются последовательно, "
+"начиная с 0, однако, они могут иметь любые индексы и множество номеров карт "
+"кривых не обязательно должно быть непрерывным."
+
+#: gwyfile-format.xml:1456(literal)
+msgid "/lawn/0"
+msgstr "/lawn/0"
+
+#: gwyfile-format.xml:1457(type)
+msgid "GwyLawn"
+msgstr "GwyLawn"
+
+#: gwyfile-format.xml:1458(entry)
+msgid "Curve map data."
+msgstr "Данные карты кривых."
+
+#: gwyfile-format.xml:1463(literal)
+msgid "/lawn/0/preview"
+msgstr "/lawn/0/preview"
+
+#: gwyfile-format.xml:1465(entry)
+msgid "Image preview shown when the curve map data are displayed in a window."
+msgstr ""
+"Изображение предпросмотра, которое отображается когда данные карты кривых "
+"показываются в окне."
+
+#: gwyfile-format.xml:1470(literal)
+msgid "/lawn/0/title"
+msgstr "/lawn/0/title"
+
+#: gwyfile-format.xml:1477(literal)
+msgid "/lawn/0/visible"
+msgstr "/lawn/0/visible"
+
+#: gwyfile-format.xml:1484(literal)
+msgid "/lawn/0/preview/palette"
+msgstr "/lawn/0/preview/palette"
+
+#: gwyfile-format.xml:1491(literal)
+msgid "/lawn/0/preview/realsquare"
+msgstr "/lawn/0/preview/realsquare"
+
+#: gwyfile-format.xml:1500(literal)
+msgid "/lawn/0/meta"
+msgstr "/lawn/0/meta"
+
+#: gwyfile-format.xml:1502(entry)
+msgid ""
+"Curve map data metadata. The keys are directly the names as displayed in the "
+"metadata browser and the string values are the values."
+msgstr ""
+"Метаданные карты кривых. Ключи это имена, которые будут отображаться в окне "
+"просмотра метаданных, строковые значения – значения данных."
+
+#: gwyfile-format.xml:1508(literal)
+msgid "/lawn/0/log"
+msgstr "/lawn/0/log"
+
+#: gwyfile-format.xml:1519(para)
+msgid ""
+"Curve map data are represented as <type>GwyLawn</type> objects. The "
+"components of a <type>GwyLawn</type> are summarised in the following table:"
+msgstr ""
+"Данные карты кривых представлены как объекты <type>GwyLawn</type>. "
+"Компоненты type>GwyLawn</type> расписаны в следующей таблице:"
+
+#: gwyfile-format.xml:1550(literal) gwyfile-format.xml:1606(varname)
+#: gwyfile-format.xml:1614(varname) gwyfile-format.xml:1624(varname)
+msgid "ncurves"
+msgstr "ncurves"
+
+#: gwyfile-format.xml:1552(entry)
+msgid "The number of curves in each pixel."
+msgstr "Количество кривых в каждом пикселе."
+
+#: gwyfile-format.xml:1557(literal) gwyfile-format.xml:1617(varname)
+msgid "curvelengths"
+msgstr "curvelengths"
+
+#: gwyfile-format.xml:1559(entry)
+msgid ""
+"Array of size <placeholder-1/> × <placeholder-2/> containing the sample "
+"counts in each pixel (in the usual image order). The sample counts can be "
+"zero."
+msgstr ""
+"Массив размером <placeholder-1/> × <placeholder-2/> содержащий количество "
+"отсчётов в каждом пикселе (в обычном для изображений порядке). Количество "
+"отсчётов может быть нулевым."
+
+#: gwyfile-format.xml:1603(literal)
+msgid "si_units_curves"
+msgstr "si_units_curves"
+
+#: gwyfile-format.xml:1604(entry)
+msgid ""
+"array of <link linkend=\"gwyfile-GwySIUnit\"><placeholder-1/></link> objects"
+msgstr ""
+"массив объектов <link linkend=\"gwyfile-GwySIUnit\"><placeholder-1/></link>"
+
+#: gwyfile-format.xml:1605(entry)
+msgid "Units of curve data, as an array with <placeholder-1/> items."
+msgstr ""
+"Единицы измерения данных кривых, как массив с <placeholder-1/> элементов."
+
+#: gwyfile-format.xml:1612(entry)
+msgid ""
+"Concatenated curve data, stored as a flat array of whose size is a multiple "
+"of the number of curves (<placeholder-1/>). The data are stored in the usual "
+"image order. First all curves in the top left pixel are concatenated and "
+"stored, then the all curves in the next pixel, etc. Reading and writing this "
+"item requires the use of <placeholder-2/> for correct indexing."
+msgstr ""
+"Объединенные данные кривых, сохраненные как плоский массив, размер которого "
+"кратен числу кривых (<placeholder-1/>). Данные сохраняются в обычном для "
+"изображений порядке. Сначала объединяются и сохраняются все кривые в верхнем "
+"левом пикселе, затем все в следующем пикселе справа и т.д. Чтение и запись "
+"этого элемента требует использовать <placeholder-2/> для правильной "
+"индексации."
+
+#: gwyfile-format.xml:1621(literal)
+msgid "curve_labels"
+msgstr "curve_labels"
+
+#: gwyfile-format.xml:1623(entry)
+msgid "Optional array with <placeholder-1/> items specifying curve labels."
+msgstr ""
+"Опциональный массив с числом элементов <placeholder-1/> задающий метки "
+"кривых."
+
+#: gwyfile-format.xml:1628(literal) gwyfile-format.xml:1641(varname)
+#: gwyfile-format.xml:1649(varname)
+msgid "nsegments"
+msgstr "nsegments"
+
+#: gwyfile-format.xml:1632(varname) gwyfile-format.xml:1636(literal)
+msgid "segments"
+msgstr "segments"
+
+#: gwyfile-format.xml:1630(entry)
+msgid ""
+"The number of segments each curve is split into – if curves are segmented. "
+"In such case item <placeholder-1/> should specify the segmentation."
+msgstr ""
+"Число сегментов, на которые будет разбита каждая из кривых – если кривые "
+"делятся на сегменты. В этом случае элемент <placeholder-1/> должен задавать "
+"сегментацию."
+
+#: gwyfile-format.xml:1638(entry)
+msgid ""
+"Segmentation of each curve, given as start and end indices of each segment "
+"in each curve. The array size is <placeholder-1/> × <placeholder-2/> × "
+"2<placeholder-3/>. Segments do not have to exactly partition the curve; they "
+"can overlap or leave holes."
+msgstr ""
+"Сегментация каждой кривой, задаваемая как стартовый и конечный индекс для "
+"каждого сегмента в каждой кривой. Размер массива <placeholder-1/> × "
+"<placeholder-2/> × 2<placeholder-3/>. Сегменты не должны точно делить "
+"кривую, они могут пересекаться и между ними могут быть неиспользуемые части "
+"кривой."
+
+#: gwyfile-format.xml:1646(literal)
+msgid "segment_labels"
+msgstr "segment_labels"
+
+#: gwyfile-format.xml:1648(entry)
+msgid "Optional array with <placeholder-1/> items specifying segment labels."
+msgstr ""
+"Опциональный массив с числом элементов <placeholder-1/> задающий метки "
+"сегментов."
+
+#: gwyfile-format.xml:1658(title)
+msgid "Other Items"
+msgstr "Другие элементы"
+
+#: gwyfile-format.xml:1659(para)
+msgid ""
+"The main <type>GwyContainer</type> contains also items that do not pertain "
+"to any specific channel, graph or other data type."
+msgstr ""
+"Основной <type>GwyContainer</type> также содержит элементы, которые не "
+"относятся ни к одному из отдельных каналов, графиков или данных других типов."
+
+#: gwyfile-format.xml:1676(literal)
+msgid "/filename"
+msgstr "/filename"
+
+#: gwyfile-format.xml:1678(entry)
+msgid ""
+"The name of file the <placeholder-1/> is currently associated with. If it "
+"was saved to a file then the item contains the corresponding file name. "
+"Otherwise it contains the name of file from which the data were loaded or "
+"imported. It may also be unset, for instance for newly created synthetic "
+"data."
+msgstr ""
+"Имя файла, с которым <placeholder-1/> в данный момент связан. Если он был "
+"сохранён в файл, то этот элемент содержит соответствующее имя файла. В "
+"противном случае данный элемент содержит имя файла, из которого данные были "
+"загружены или импортированы. Элемент может быть не задан, например, в случае "
+"только что созданных синтетических данных."
+
+#: gwyfile-format.xml:1692(title)
+msgid "Auxiliary Objects"
+msgstr "Вспомогательные объекты"
+
+#: gwyfile-format.xml:1693(para)
+msgid ""
+"The components of a <type>GwySIUnit</type> are summarised in the following "
+"table:"
+msgstr "Компоненты <type>GwySIUnit</type> представлены в следующей таблице:"
+
+#: gwyfile-format.xml:1709(literal)
+msgid "unitstr"
+msgstr "unitstr"
+
+#: gwyfile-format.xml:1712(literal)
+msgid "\"A\""
+msgstr "\"A\""
+
+#: gwyfile-format.xml:1713(literal)
+msgid "\"m^-1\""
+msgstr "\"m^-1\""
+
+#: gwyfile-format.xml:1711(entry)
+msgid ""
+"Textual representation of the unit, e.g. <placeholder-1/> or <placeholder-2/"
+"> (as base SI unit, prefixes are ignored)."
+msgstr ""
+"Текстовое представление единицы измерения, например, <placeholder-1/> или "
+"<placeholder-2/> (как базовые единицы СИ, префиксы игнорируются)."
+
+#: gwyfile-format.xml:1720(para)
+msgid ""
+"The components of a <type>GwySelection</type> are summarised in the "
+"following table. Some selection types can have other data members; refer to "
+"the documentation of specific selection classes for how to interpret the "
+"data."
+msgstr ""
+"Компоненты <type>GwySelection</type> сведены в следующую таблицу. Некоторые "
+"типы выделенного могут содержать другие элементы данных; обратитесь к "
+"документации к конкретному типу выделенного о том, как интерпретировать "
+"данные."
+
+#: gwyfile-format.xml:1738(literal)
+msgid "max"
+msgstr "max"
+
+#: gwyfile-format.xml:1742(function)
+msgid "gwy_selection_set_max_objects()"
+msgstr "gwy_selection_set_max_objects()"
+
+#: gwyfile-format.xml:1740(entry)
+msgid ""
+"Maximum number of objects the selection can hold (this is the number set by "
+"<placeholder-1/>)."
+msgstr ""
+"Максимальное число объектов. которое может быть в выделенном (число, "
+"установленное <placeholder-1/>)."
+
+#: gwyfile-format.xml:1748(entry)
+msgid ""
+"Selection data. The number of items that form one selection object is "
+"determined by the selection type."
+msgstr ""
+"Данные выделения. Число элементов, которые формируют один объект выделения "
+"определяется типом выбранного."
+
+#: gwyfile-format.xml:1757(para)
+msgid ""
+"The components of a <type>GwyStringList</type> are summarised in the "
+"following table. Note that if <type>GwyStringList</type>s are used to "
+"represent logs, the strings have a specific structure described above."
+msgstr ""
+"Компоненты типа <type>GwyStringList</type> сведены в следующую таблицу. Если "
+"<type>GwyStringList</type> используется для представления журнала, строки "
+"будут иметь определённую структуру, описанную выше."
+
+#: gwyfile-format.xml:1775(literal)
+msgid "strings"
+msgstr "strings"
+
+#: gwyfile-format.xml:1777(entry)
+msgid "List of string items."
+msgstr "Список строковых элементов."
+
+#~ msgid ""
+#~ "An object consists of three parts (in the following order): "
+#~ "<placeholder-1/>"
+#~ msgstr ""
+#~ "Объект состоит из трёх частей (в следующем порядке): <placeholder-1/>"
+
+#~ msgid ""
+#~ "Skipping a unknown (or uinteresting) component while reading a GWY file "
+#~ "can be done by first reading the component name and type. If the type is "
+#~ "atomic then you know the number of bytes to skip according to <link "
+#~ "linkend=\"gwyfile-data-types\">the type table</link>. If the type is an "
+#~ "array of atomic types you need to read the array length and then multiply "
+#~ "the atomic type size with the length. If the type is an object you need "
+#~ "to read its name and size, and the size then tells you exactly how many "
+#~ "bytes to skip further. Finally, the most complex scenario is an array of "
+#~ "objects when you need to read the array length and then repeat the object "
+#~ "skipping the specified number of times."
+#~ msgstr ""
+#~ "Пропуск неизвестного (или не интересующего) компонента при чтении файла "
+#~ "GWY можно осуществить сначала прочитав имя и тип компонента. Если тип "
+#~ "является атомарным, то сразу известно, сколько байт нужно пропустить "
+#~ "согласно <link linkend=\"gwyfile-data-types\">таблице типов</link>. Если "
+#~ "тип является массивом элементов атомарного типа необходимо прочесть длину "
+#~ "массива и затем умножить размер атомарного элемента на длину массива. "
+#~ "Если тип является объектом, необходимо прочитать его длину и размер и "
+#~ "размер при этом точно скажет, сколько байт после него необходимо "
+#~ "пропустить. И, наконец, наиболее сложным случаем будет массив объектов, "
+#~ "где нужно прочитать его длину и затем повторить пропуск объектов заданное "
+#~ "число раз."
+
+#~ msgid "Not <placeholder-1/>-terminated"
+#~ msgstr "Не <placeholder-1/>-завершенный"
+
+#~ msgid "Channels"
+#~ msgstr "Каналы"
+
+#~ msgid "a <placeholder-1/> subclass"
+#~ msgstr "подкласс <placeholder-1/>"
+
+#~ msgid ""
+#~ "First of all, we will describe physical file structure without regard to "
+#~ "possible interpretation of contained data."
+#~ msgstr ""
+#~ "Прежде всего, мы описываем физическую структуру файла безотносительно "
+#~ "возможной интерпретации содержимого."

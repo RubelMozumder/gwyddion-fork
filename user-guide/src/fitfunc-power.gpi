@@ -1,0 +1,38 @@
+set term svg size 260,160 enhanced font 'DejaVu Sans,7' lw 0.7
+load 'style.gpi'
+
+name = 'fitfunc-power'
+set samples 201
+set lmargin at screen 0.10
+set rmargin at screen 0.995
+set bmargin at screen 0.13
+set tmargin at screen 0.99
+a = 1
+b = 1
+c1 = 1.5
+c2 = 0.5
+c3 = -0.4
+
+f1(x) = a + b*x**c1
+f2(x) = a + b*x**c2
+f3(x) = a + b*x**c3
+M = f1(3)
+
+unset grid
+set key top left Left reverse samplen 1.5
+set xtics out nomirror ('0' 0 0, '1' 1 0)
+set ytics out nomirror ('0' 0 0, 'a' a 0, 'a+b' a+b 0)
+set xrange [0:3]
+set yrange [0:1.1*M]
+set arrow from 1,0 to 1,a+b nohead ls 10
+set arrow from 0,a+b to 1,a+b nohead ls 10
+set label at first 2.5,f1(2.5)+0.13*M 'c > 1' center
+set label at first 2.5,f2(2.5)+0.08*M '1 > c > 0' center
+set label at first 2.5,f2(2.5)-0.2*M 'c < 0' center
+set output name.'.svg'
+
+plot \
+    f1(x) with lines title 'Power' linestyle 1, \
+    f2(x) with lines notitle 'Power' linestyle 1, \
+    f3(x) with lines notitle 'Power' linestyle 1
+

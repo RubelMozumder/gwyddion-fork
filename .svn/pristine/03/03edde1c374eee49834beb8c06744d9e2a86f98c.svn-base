@@ -1,0 +1,439 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='mfm'>
+  <title>Magnetic force microscopy</title>
+  <para>
+    In MFM measurements we collect information about stray field distribution
+    above sample, typically in one layer in fixed height above sample during
+    one measurement.  Together with this signal, we collect also topography,
+    similarily to all the other SPM techniques.
+  </para>
+  <para>
+    The functions specific to MFM can be found in the
+    <menuchoice>
+      <guimenu>Data Processing</guimenu>
+      <guisubmenu>SPM Modes</guisubmenu>
+      <guisubmenu>Magnetic</guisubmenu>
+    </menuchoice>.
+    The individual modules and data processing algorithms discussed in the
+    following paragraphs can be split into several categories:
+  </para>
+  <itemizedlist>
+    <listitem>
+      utility functions, such as conversion of different quantities to
+      force gradient,
+    </listitem>
+    <listitem>
+      modules for simulation of the MFM response on different samples (e.g.
+      perpendicular media or a thin film stripe with electrical current),
+    </listitem>
+    <listitem>
+      probe analysis modules based on use of known samples, and
+    </listitem>
+    <listitem>
+      sets of functions for handling multiple channel data, e.g. data measured
+      with opposite tip magnetisation.
+    </listitem>
+  </itemizedlist>
+  <para>
+    The last category includes general functions such as
+    <link linkend='data-arithmetic'>data arithmetic</link> which can add
+    subtract images and generally combine them using arithmetic expressions or
+    <link linkend='mutual-crop'>mutual crop</link> which cuts images to the
+    common sub-region (and is often a prerequsite for multi-data operations).
+  </para>
+  <para>
+    Addition and subtraction of measurements performed with two different
+    probe magnetisation directions was proposed as the means of
+    potential improvement of the process of splitting the magnetic and other
+    contributions [<link linkend='mfm-ref-cambel11'>Cambel11</link>].
+    If measurements with different current direction are also available,
+    we have four possible variants of how the electrostatic and magnetic
+    forces are mutually oriented.  All four can be comined to using data
+    arithmetic to supress the noise in the data
+  </para>
+  <sect2 id='mfm-data-conversion'>
+    <title>
+      Conversion to force gradient
+    </title>
+    <para>
+      Function
+      <menuchoice>
+        <guimenuitem>Recalculate to Force Gradient</guimenuitem>
+      </menuchoice>
+      performs conversion of various measured quantities to force gradient.
+      The input image must correspond to one of the quantities for which the
+      conversion is implemented, phase, frequency shift or amplitude (in Volts
+      or metres).  The type of input data is automatically determined and
+      indicated by the input quantity choice in the upper part.
+    </para>
+    <para>
+      The conversion requires entering instrumental parameters, which differ
+      depending on the input data and may include the sprint constant, quality
+      factor or base amplitude.
+    </para>
+    <informalfigure id='fig-recalculate'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-recalculate.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of MFM data conversion module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='mfm-field-simulation'>
+    <title>Simulation of the stray field and MFM response</title>
+    <para>
+      Several modules, differing by the algorithm used, simulate the stray
+      field distribution in a plane above sample surface.
+      None of them works with a general medium — e.g. using Poisson equation to
+      solve the magnetic field distribution from the samle volume magnetisation
+      — as this seems to be too computationally demanding for a general package
+      like Gwyddion (at least for now).  The modules are set up to simulate a
+      few typical cases described in literature, where there are enough
+      assumptions about sample magnetisation to make the stray field calculable
+      by simple methods.
+    </para>
+    <para>
+      The module for handling <emphasis>perpendicular media</emphasis> is based
+      on works of H. Hug [<link linkend='mfm-ref-hug98'>Hug98</link>]
+      and S. Vock
+      [<link linkend='mfm-ref-vock11'>Vock11</link>][<link linkend='mfm-ref-vock14'>Vock14</link>].
+      The field distribution is calculated on the basis of known magnetisation
+      distribution in a layer; in the <xi:include href='eqi-z.xml'/> direction
+      the magnetisation is constant for each position in the layer and changes
+      only when we go in lateral directions. Initially, magnetisation is
+      described as binary image (up/down magnetisation, defined by mask) and
+      domain walls of given thickness can be added to it. The calculation is
+      then done in Fourier space. Apart of the magnetic field distribution also
+      results of using simple analytically known probe transfer functions can
+      be provided (point charge, bar), and numerical derivatives of the
+      resulting forces can be computed.
+    </para>
+    <para>
+      Assuming the surface charge distribution
+      <xi:include href='eqi-plus-sigma-x-y.xml'/>
+      at the top surface of the medium and opposite charge
+      <xi:include href='eqi-minus-sigma-x-y.xml'/>
+      at the bottom surface we can use Fourier analysis to get the field
+      distribution. First we convert the surface charges to the Fourier
+      space:
+      <xi:include href="eq-mfm-surface-charge-Fourier.xml"/>
+    </para>
+    <para>
+      Optionally we can even assume that in between of the domains there are
+      Bloch walls of some width <xi:include href='eqi-delta-w.xml'/>,
+      convolving <xi:include href='eqi-sigma-x-y.xml'/>
+      prior to the calculation with blurring operator
+      <xi:include href="eq-mfm-blurring-operator.xml"/>
+      where the wall width can be expressed via exchange stiffness constant
+      <xi:include href='eqi-A.xml'/>
+      and uniaxial anisotropy constant <xi:include href='eqi-K_u.xml'/> as
+      <xi:include href="eq-mfm-wall-width.xml"/>
+    </para>
+    <para>
+      Then we can calculate the Fourier components of the stray field in height
+      <xi:include href='eqi-z.xml'/>,
+      generated from top surface and bottom surface of film of thickness
+      <xi:include href='eqi-d.xml'/>
+      as
+      <xi:include href="eq-mfm-stray-field-Fourier.xml"/>
+      Via inverse Fourier transform we can then get the magnetic stray field
+      above the sample:
+      <xi:include href="eq-mfm-stray-field.xml"/>
+      While still staying in the Fourier space, we can also calculate the force
+      acting on a simple bar probe of cross-section
+      <xi:include href='eqi-b_x-times-b_y.xml'/>,
+      length <xi:include href='eqi-L.xml'/>
+      and magnetisation <xi:include href='eqi-M_t.xml'/>,
+      by multiplying the stray field components
+      length <xi:include href='eqi-A_Hz-to-z-d.xml'/>
+      via the analytical force transfer function:
+      <xi:include href="eq-mfm-analytical-force-transfer.xml"/>
+    </para>
+    <informalfigure id='fig-mfm-perpendicular-dialogue'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-perpendicular-dialogue.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the perpendicular media simulation module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      Since Gwyddion is not just able to handle measured data, but also to
+      synthetise many different <link linkend='synthetic'>artificial
+      surfaces</link>, there are many ways how to
+      play with the perpendicular media module, creating various fields on more
+      or less realistic samples.  The following figure shows few examples of
+      such simulated masks and resulting data.
+    </para>
+    <informalfigure id='fig-mfm-perpendicular-apps'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-perpendicular-apps.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Result of data synthetic modules used for MFM perpendicular media
+          simulation: columnar film, fractal roughness, Ising model domains,
+          grating, doughnuts.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      For <emphasis>parallell media</emphasis> the range of potential
+      calculations is much smaller — based on an analytical model the field
+      above left and right direction oriented stripes (similar to a hard-disc)
+      can be computed.  This is based on
+      [<link linkend='mfm-ref-rugar90'>Rugar90</link>], giving the following
+      equations for individual transitions
+      <xi:include href='eq-mfm-parallel-stripes.xml'/>
+      where
+      <xi:include href='eqi-M_r.xml'/>,
+      is the remanent magnetization of the magnetic layer,
+      <xi:include href='eqi-z.xml'/> the tip-sample separation,
+      <xi:include href='eqi-a.xml'/> is the transition area width, and
+      <xi:include href='eqi-d.xml'/> the layer thickness.
+    </para>
+    <para>
+      The stripes do not have to be of equal size. As a result, field
+      intensities in
+      <xi:include href='eqi-x.xml'/> and <xi:include href='eqi-z.xml'/>
+      axes can be plotted, or the force in
+      <xi:include href='eqi-z.xml'/> based on known probe transfer functions
+      (the same as for the perpendicular media) can be computed.  Its
+      derivatives can be computed as well (numerically).
+    </para>
+    <informalfigure id='fig-mfm-parallel-dialogue'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-parallel-dialogue.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the parallel media simulation module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      Similarily, analytical expressions can be used to simulate the current
+      above a thin line with a electrical current passing through it.
+      The <emphasis>current line</emphasis> module can be used for this, which
+      is based on the equation given by
+      [<link linkend='mfm-ref-saida03'>Saida03</link>]:
+      <xi:include href='eq-mfm-current-line.xml'/>
+      for a stripe of width
+      <xi:include href='eqi-w.xml'/>
+      in which the current
+      <xi:include href='eqi-I.xml'/>
+      is flowing.
+    </para>
+    <para>
+      As all the simulation modules can be used also to add the result to
+      existing data, by calling module multiple times we can also simulate
+      a planar coil (or, more precisely, two lines with opposite directions of
+      the current).  This is demonstrated in the following figures.
+    </para>
+    <informalfigure id='fig-mfm-current-dialogue'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-current-dialogue.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the current line simulation module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <informalfigure id='fig-mfm-current-parallel-lines'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-current-parallel-lines.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Stray field distribution above two parallel current lines with
+          opposite current direction.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para id='mfm-field-shift'>
+      The algorithms for stray field calculation via Fourier transform can be
+      also used to shift the field from one layer height to another.
+      This works if we move further from the sample (blurring the data), but it
+      does not work much when getting closer to the sample (the calculation
+      diverges).
+      Based on [<link linkend='mfm-ref-hug98'>Hug98</link>] the procedure is as
+      follows:
+      <orderedlist>
+        <listitem>
+          The field <xi:include href='eqi-H_z-of-vec-r.xml'/>
+          is processed by Fourier transform to get its spectral representation
+          <xi:include href='eqi-A_Hz-of-vec-k.xml'/>,
+        </listitem>
+        <listitem>
+          Spectral components are multiplied by the factor
+          <xi:include href='eqi-exp-of-kd.xml'/>
+          where
+          <xi:include href='eqi-d.xml'/>
+          is the distance between the two planes (positive or negative),
+        </listitem>
+        <listitem>
+          Inverse Fourier transform is used to get back the field values in
+          real space.
+        </listitem>
+      </orderedlist>
+      One can play with this algorithm in the <emphasis>field shift</emphasis>
+      module as illustrated in the following figure.
+    </para>
+    <informalfigure id='fig-mfm-shift-dialogue'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-shift-dialogue.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the field shift module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para id='mfm-field-find-shift'>
+      The same approach can be used for reverse operation — estmating the
+      height difference between two data sets. Here a simple brute
+      force search technique is used to find the shift in z direction that
+      leads to best match between the two MFM responses.
+      The user interface is shown in Fig. 8. Potential application is in
+      searching for the real lift height difference
+      instead of the reported one, however there are still potential caveats in
+      real data if there are parasitic interactions.
+    </para>
+    <informalfigure id='fig-mfm-find-shift-dialogue'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='mfm-find-shift-dialogue.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of the field shift estimation module.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='mfm-resolution-transfer'>
+    <title>Probe resolution and transfer function</title>
+    <para>
+      Several ways have been proposed how to handle the issue of resolution of
+      MFM probes. It is possible to analyse profiles across the perpendicular
+      sample or utilise the power spectrum for probe resolution, e.g. by
+      attempting to find where the power spectrum vanishes to noise level.
+      See <link linkend='transfer-function-guess'>Transfer Function
+      Guess</link> for the transfer function estimation method currently
+      implemented in Gwyddion.  This technique is not, in fact, specific to MFM
+      and can be used universally for transfer function TF (or point spread
+      function, PSF) estimation in any SPM regime, provided that the ideal
+      sample response can be recorded or simulated.
+      The mathematical and algorithmic details on how the magnetic data are treated
+      in the transfer function modules
+      can be found in Ref. <link linkend='mfm-ref-necas19'>Nečas19</link>.
+
+    </para>
+  </sect2>
+
+  <sect2 id='mfm-toolchain'>
+    <title>
+      Quantitative MFM toolchain example
+    </title>
+    <para>
+      To illustrate the whole procedure of obtaining quantitative MFM results we provide
+      here an example of the transform function estimation on a known sample and
+      data processing of data obtained on an unknown sample, based on this transfer function.
+    </para>
+    <para>
+      The starting point is to use the data measured on a known sample. Here a multilayer sample manufactured
+      by IFW Dresden is used, for which the stray field above sample can be computed on basis of the
+      known domains distribution and known sample properties. Together with this, the <quote>unknown</quote> test sample data,
+      provided by National Physical Laboratory are in the same
+      <ulink url="https://sourceforge.net/projects/gwyddion/files/sample-data/user-guide-examples/qmfm_input.gwy/download">
+      input file</ulink> available for download.
+    </para>
+    <para>
+      To go step by step and get the same results as provided in the
+      <ulink url="https://sourceforge.net/projects/gwyddion/files/sample-data/user-guide-examples/qmfm_user_guide_example_v2.gwy/download">
+      processed file</ulink>, the following procedure has to be done:
+      <orderedlist>
+        <listitem>
+           Convert calibration sample MFM phase data to MFM force gradient using
+           <link linkend='mfm-data-conversion'>Recalculate to Force Gradient</link> with <xi:include href='eqi-k.xml'/> 3.3 N/m and Q factor 226.
+        </listitem>
+        <listitem>
+           Add mask at 50% of the value using <link linkend='grain-threshold'>thresholding</link>.
+        </listitem>
+        <listitem>
+           Calculate the effective magnetic charge using
+           <link linkend='mfm-field-simulation'>Perpendicular Media Stray field</link> with
+           130 nm film thickness, 500 kA/m magnetic charge, 12 pJ/m exchange constant,
+           400 kJ/m³ uniaxial anisotropy, 0 deg cantilever angle and output <xi:include href='eqi-M_eff.xml'/>.
+        </listitem>
+        <listitem>
+           Calculate the TTF using <link linkend='transfer-function-guess'>Transfer Function Guess</link>
+           with Wiener filter method, 65×65 TTF size and Welch window.
+        </listitem>
+        <listitem>
+           Convert MFM phase data of the test sample to MFM force gradient using <link linkend='mfm-data-conversion'>Recalculate to Force Gradient</link>
+           with <xi:include href='eqi-k.xml'/> 3.3 N/m and Q factor 226.
+        </listitem>
+        <listitem>
+           Scale the TTF to the pixel size of the test sample.
+        </listitem>
+        <listitem>
+           Use <link linkend='dimensions-and-units'>Dimensions and Units</link> to match exactly the pixel size of the test sample measurements.
+        </listitem>
+        <listitem>
+           Deconvolve the cropped TTF from MFM force gradient on test sample using <link linkend='deconvolve'>Deconvolve</link>,
+           using the maxium of L-curve curvature for obtaining best sigma.
+        </listitem>
+        <listitem>
+           Divide the resulting effective magnetic charge by 2 to get the stray field <xi:include href='eqi-H_z.xml'/>
+           using <link linkend='data-arithmetic'>Arithmetic</link>.
+        </listitem>
+     </orderedlist>
+   </para>
+  </sect2>
+
+  <sect2 id='mfm-ref'>
+    <title>References</title>
+    <para id='mfm-ref-hug98'>
+      [Hug98] H. J. Hug, B. Stiefel, P. J. A. van Schendel, A. Moser, R. Hofer,
+      S. Martin, H.-J. Gutherodt, S. Porthun, L. Abelmann, J. C. Lodder, G.
+      Bochi and R. C. O’Handley: J. Appl. Phys. (1999) Vol. 83, No. 11
+    </para>
+    <para id='mfm-ref-vock11'>
+      [Vock11] S. Vock, Z Sasvari, C. Bran, F. Rhein, U. Wolff, N. S. Kiselev,
+      A. N. Bogdanov, L. Schiltz, O. Hellwig and V. Neu: IEEE Trans. on
+      Magnetics, 47 (2011) 2352
+    </para>
+    <para id='mfm-ref-vock14'>
+      [Vock14] S. Vock, C. hengst, M. Wolf, K. Tschulik, M. Uhlemann, Z.
+      Sasvari, D. Makarov, O. G. Schmidt, L Schultz and V. Neu: Appl. Phys.
+      Lett 105 (2014) 172409
+    </para>
+    <para id='mfm-ref-rugar90'>
+      [Rugar90] D. Rugar, H. J. Mamin, P. Guethner, S. E. Lambert, J. E. Stern
+      et al.: J. Appl. Phys. 68 (1990) 1169
+    </para>
+    <para id='mfm-ref-saida03'>
+      [Saida03] D. Saida, T. Takahashi: Jpn. J. Appl. Phys. 42 (2003) Pt. 1,
+      No. 7B
+    </para>
+    <para id='mfm-ref-cambel11'>
+      [Cambel11] V. Cambel, D. Gregusova, P. Elias, J. Fedor, I. Kostic, J.
+      Manka, P. Ballo: Journal of Electrical Engineering, 62 (2011) 37–43
+    </para>
+    <para id='mfm-ref-necas19'>
+      [Necas19] D. Nečas, P. Klapetek, V. Neu, M. Havlíček, R. Puttock, O. Kazakova,
+      X. Hu, L. Zajíčková, Scientific Report, 9 (2019) 3880
+    </para>
+  </sect2>
+
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

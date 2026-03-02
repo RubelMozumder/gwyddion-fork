@@ -1,0 +1,293 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: installation-dependencies.xml 11699 2010-12-21 14:22:10Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-dependencies'>
+  <title>Dépendances de compilation</title>
+  <para>
+    Le tableau suivant liste les paquets nécessaires à la compilation de
+    <application>Gwyddion</application> à partir du code source. Si votre
+    système d'exploitation possède des paquets de développement séparés, alors
+    ceux-ci seront nécessaires. Le tablean ne donne pas les outils communs de
+    compilation comme un compilateur C ou <command>make</command>. Les outils
+    spécifiques à un système d'exploitation sont décrits dans les sections
+    dédiées à la compilation sur un système particulier.
+  </para>
+  <para>
+    Les versions minimales nécessaires sont données pour certains paquets. Si 
+    aucune version n'est précisée, cela signifie que la version minimale est
+    si ancienne qu'il n'a pas semblé nécessaire de la déterminer de manière 
+    exacte. Certains environnements spécifiques peuvent être listés dans la 
+    colonne dépendances, ce qui veut dire que ce paquet n'est utile qu'à 
+    l'intérieur de cet environnement.
+  </para>
+  <informaltable id='table-installation-dependencies'>
+    <tgroup cols='4' align='left'>
+    <?dblatex lllX?>
+      <thead>
+        <row>
+          <entry>Paquet</entry>
+          <entry>Version</entry>
+          <entry>Dépendance</entry>
+          <entry>Nécessaire pour, notes</entry>
+        </row>
+      </thead>
+      <tbody valign='top'>
+        <row id='dependency-pkg-config'>
+          <entry><ulink url='https://www.freedesktop.org/wiki/Software/pkg-config/'>pkg-config</ulink></entry>
+          <entry>0.16</entry>
+          <entry><emphasis role='strong'>Nécessaire</emphasis></entry>
+          <entry>
+            Suivi des paramètres du compilateur et de l'éditeur de liens pour 
+            divers paquet.
+          </entry>
+        </row>
+        <row id='dependency-gtk'>
+          <entry><ulink url='https://www.gtk.org/'>GTK+ 2</ulink></entry>
+          <entry>2.18.0</entry>
+          <entry><emphasis role='strong'>Nécessaire</emphasis></entry>
+          <entry>
+            Interface utilisateur de Gwyddion. Cette entrée implique les 
+            dépendances de GTK+ lui-même, telles que GLib, Gdk-Pixbuf, Pango ou 
+            Cairo. 
+          </entry>
+        </row>
+        <row id='dependency-glib'>
+          <entry><ulink url='https://www.gtk.org/'>GLib</ulink></entry>
+          <entry>2.32.0</entry>
+          <entry><emphasis role='strong'>Nécessaire</emphasis></entry>
+          <entry>
+            Tout.  GLib est une librairie de base aussi nécessaire pour GTK+,
+             mais Gwyddion a besoin d'une version légèrement plus récente que 
+             celle strictement requise par GTK+.
+          </entry>
+        </row>
+        <row id='dependency-pango'>
+          <entry><ulink url='https://www.pango.org/'>Pango</ulink></entry>
+          <entry>1.10</entry>
+          <entry><emphasis role='strong'>Nécessaire</emphasis></entry>
+          <entry>
+            Pour le rendu de texte. Cette entrée implique pangocairo, 
+            qui est un composant facultatif de Pango
+            et qui peut être en principe désactivé. Il est toutefois normalement
+            inclus dans les paquets Pango.
+          </entry>
+        </row>
+        <row id='dependency-cairo'>
+          <entry><ulink url='https://www.cairographics.org/'>Cairo</ulink></entry>
+          <entry>1.2</entry>
+          <entry><emphasis role='strong'>Nécessaire</emphasis></entry>
+          <entry>
+            Tous les dessins dans GTK+. La version
+            1.6 au minimum est recommandée.
+          </entry>
+        </row>
+         <row id='dependency-fftw'>
+          <entry><ulink url='http://www.fftw.org/'>FFTW3</ulink></entry>
+          <entry>3.1</entry>
+          <entry><emphasis role='strong'>Nécessaire</emphasis></entry>
+          <entry>
+            Transformées, spectre de puissance, convolution, déconvolution 
+            et opérations de corrélation.
+            Si OpenMP est activé et que le support d'OpenMP pour FFTW3 est trouvé, 
+            Gwyddion sera capable de faire des FFT en multi-processeurs.
+          </entry>
+        </row>
+       <row id='dependency-gtkxlext'>
+          <entry><ulink url='https://projects-old.gnome.org/gtkglext/'>GtkGLExt</ulink></entry>
+          <entry>1.0</entry>
+          <entry>Facultatif</entry>
+          <entry>
+            Affichage des données en 3D OpenGL. Cette entrée implique les 
+            dépendances de GtkGLExt lui-même, tels que les librairies et 
+            fichiers d'en-têtes de la plateforme OpenGL.
+          </entry>
+        </row>
+        <row id='dependency-unique'>
+          <entry><ulink url='http://www.gnome.org/~ebassi/source/'>libunique</ulink></entry>
+          <entry>1.0</entry>
+          <entry>Facultatif</entry>
+          <entry>
+            <link linkend='remote-control'>Contrôle à distance</link> basé sur
+            D-BUS ou toute autre technologie contenue dans ce paquet.
+          </entry>
+        </row>
+        <row id='dependency-python'>
+          <entry><ulink url='https://www.python.org/'>Python</ulink></entry>
+          <entry>2.4</entry>
+          <entry>Facultatif</entry>
+          <entry>
+            Pygwy, l'interface de script Python de Gwyddion. L'interpréteur est
+            nécessaire pour compiler Pygwy, ainsi que les en-têtes Python et les
+            librairies de développement.
+          </entry>
+        </row>
+        <row id='dependency-pygtk2'>
+          <entry><ulink url='https://www.pygtk.org/'>PyGTK2</ulink></entry>
+          <entry>2.10</entry>
+          <entry>Facultatif</entry>
+          <entry>
+            Pygwy, l'interface de script Python de Gwyddion. Il vous faudra
+            PyGTK2 incluant ses dépendances de compilation, c'est-à-dire codegen,
+            pour compiler pygwy.
+          </entry>
+        </row>
+        <row id='dependency-gtksourceview'>
+          <entry><ulink url='https://gtksourceview.sourceforge.net/'>GtkSourceView 2</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Coloration syntaxique pour la console de script Python.
+          </entry>
+        </row>
+        <row id='dependency-zlib'>
+          <entry><ulink url='http://www.zlib.net/'>zlib</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Import des fichiers SPML et des données compressées au format gzip
+            pour d'autres types de fichiers (Createc, NRRD, métadonnées RHK SM4 
+            PRM).
+          </entry>
+        </row>
+        <row id='dependency-minizip'>
+          <entry><ulink url='http://www.zlib.net/'>minizip</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Import des fichiers APE DAX, NanoObserver, NanoScanTech, OpenGPS, 
+            ATC SPMxFormat, Sensofar PLUX et JPK force.
+            La librairie <link linkend='dependency-libzip'>libzip</link> peut 
+            aussi être utilisée en remplacement. Seule une des deux librairies 
+            est nécessaire.
+          </entry>
+        </row>
+        <row id='dependency-libzip'>
+          <entry><ulink url='https://libzip.org/'>libzip</ulink></entry>
+          <entry>0.11</entry>
+          <entry>Facultatif</entry>
+          <entry>
+            Import des fichiers APE DAX, NanoObserver, NanoScanTech, OpenGPS, 
+            ATC SPMxFormat, Sensofar PLUX et JPK force. 
+            Il s'agit d'une alternative à
+            <link linkend='dependency-minizip'>minizip</link>.
+            Seule une des deux librairies est nécessaire.
+         </entry>
+        </row>
+        <row id='dependency-bzip2'>
+          <entry><ulink url='http://www.bzip.org/'>bzip2</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Import des données compressées au format bzip2 des fichiers NRRD.
+          </entry>
+        </row>
+        <row id='dependency-libxml2'>
+          <entry><ulink url='http://xmlsoft.org/'>LibXML2</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Import des fichiers SPML et APE DAX.
+          </entry>
+        </row>
+        <row id='dependency-png'>
+          <entry><ulink url='http://www.libpng.org/pub/png/'>libpng</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Export des données en images PNG 16 bits (en niveaux de gris) et
+            import des images PNG 16 bits. Vous n'avez besoin que du support de
+            Gdk-Pixbuf pour les images PNG 8 bits.
+          </entry>
+        </row>
+        <row id='dependency-webp'>
+          <entry><ulink url='https://webmproject.org/'>libwebp</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Support du format WebP pour l'export d'image.
+          </entry>
+        </row>
+        <row id='dependency-gdk-pixbuf-webp'>
+          <entry><ulink url='https://github.com/aruiz/webp-pixbuf-loader'>chargeur WebP pixbuf</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Impart des données au format image WebP. Il s'agit d'une
+            dépendance d'environnement d'exécution. Il n'est pas nécessaire
+            d'avoir le chargeur pixbuf lors de la compilation de Gwyddion.
+          </entry>
+        </row>
+        <row id='dependency-openexr'>
+          <entry><ulink url='https://www.openexr.com/'>OpenEXR</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Import et export des images HDR OpenEXR.
+          </entry>
+        </row>
+        <row id='dependency-cxx'>
+          <entry>Compilateur C++</entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Import et export d'images HDR OpenEXR HDR et import d'autres images
+            à grande dynamique.
+          </entry>
+        </row>
+        <row id='dependency-cfitsio'>
+          <entry><ulink url='https://heasarc.gsfc.nasa.gov/fitsio/fitsio.html'>cfitsio</ulink></entry>
+          <entry/>
+          <entry>Facultatif</entry>
+          <entry>
+            Import des images FITS (Flexible Image Transport System).
+          </entry>
+        </row>
+        <row id='dependency-desktop-file-utils'>
+          <entry><ulink url='http://www.freedesktop.org/software/desktop-file-utils'>desktop-file-utils</ulink></entry>
+          <entry/>
+          <entry>Facultatif, Unix</entry>
+          <entry>
+            Intégration basique au bureau pour les environnements conformes aux
+            recommendations Freedesktop, incluant l'association des types de 
+            fichiers et l'installation de Gwyddion dans le menu.
+          </entry>
+        </row>
+        <row id='dependency-gtk-mac-integration'>
+          <entry><ulink url='https://github.com/jralls/gtk-mac-integration'>gtk-mac-integration</ulink></entry>
+          <entry/>
+          <entry>Facultatif, OS X</entry>
+          <entry>
+            Intégration dans l'environnement OS X, en particulier dans le menu
+            global.
+          </entry>
+        </row>
+        <row id='dependency-gconf2'>
+          <entry><ulink url='http://projects.gnome.org/gconf/'>GConf2</ulink></entry>
+          <entry/>
+          <entry>Obsolète, Unix</entry>
+          <entry>
+            Intégration améliorée dans GNOME 2 et Xfce (jusqu'à XFce 4.6), en
+            particulier la génération automatique de vignettes pour les fichiers
+            SPM dans Nautilus et Thunar. Les versions plus récentes de ces
+            environnements de bureau utilisent des mécanismes différents.
+          </entry>
+        </row>
+        <row id='dependency-libxmu'>
+          <entry><ulink url='https://www.x.org/wiki/'>libXmu</ulink></entry>
+          <entry/>
+          <entry>Obsolète, X11</entry>
+          <entry>
+            <link linkend='remote-control'>Contrôle à distance</link> pour X11. 
+            Il s'agit d'une librairie standard du système X Window et toute 
+            personne ayant X aura probablement ses propres fichiers d'exécution.
+            Toutefois, depuis la modularisation de X dans Xorg 7.0, il est 
+            distribué séparéement, et il se pourrait que vous n'ayez pas les
+            fichiers de développement installés.
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

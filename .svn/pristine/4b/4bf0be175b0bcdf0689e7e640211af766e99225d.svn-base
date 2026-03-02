@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='specific-data-import'>
+  <title>Import de Données Spécifiques</title>
+  <para>
+    L'import de plusieurs types de données ne se fait pas automatiquement et
+    nécessite une intervention de l'utilisateur.
+  </para>
+  <sect2 id='pixmap-file-import'>
+    <title>Formats Graphiques </title>
+    <para>
+      L'import de données sous un format d'image tel que PNG, TIFF, JPEG ou BMP
+      est similaire à l'import de données brutes/inconnues, la procédure est
+      juste plus simple.
+    </para>
+    <para>
+      Cette simplicité vient du fait que la structure du fichier est connue et
+      que le format est automatiquement reconnu. Le type de fichier n'a ainsi
+      pas besoin d'être sélectionné de manière explicite. Toutefois,
+      l'interprétation des données n'est <emphasis>a priori</emphasis> pas
+      connue et doit donc être spécifiée manuellement. La fenêtre de dialogue
+      d'import d'image est ainsi semblable à l'onglet
+      <guilabel>Information</guilabel> de l'import de données brutes, celle-ci
+      vous invitera à spécifier les dimensions physiques et l'échelle de
+      hauteur.
+    </para>
+    <para>
+      Notez que les dimensions physiques proposées ne sont pas obtenues à partir
+      du fichier, elles correspondent seulement aux dernières valeurs utilisées.
+      Certains formats de données SPM sont basés sur des format d'images (basés
+      en général sur le format TIFF) et contiennent les informations sur les
+      échelles physiques et les unités, ceux-ci sont toutefois stockés d'une
+      manière propre au constructeur. Dans ce cas, un module d'import spécifique
+      peut être développé pour ce format précis afin de charger les fichiers
+      automatiquement avec les bonnes échelles.
+    </para>
+    <para>
+      Reportez-vous à la section
+      <link linkend='pixmap-image-keys'>Formats d'image à grande dynamique</link>
+      pour plus de détails sur le support d'image à dynamique élevée
+      ainsi que sur la possibilité de les utiliser pour représenter des
+      données.
+    </para>
+  </sect2>
+  <sect2 id='graph-curve-import'>
+    <title>Courbes</title>
+    <para>
+      On peut importer des courbes sous la forme de simples fichiers textes
+      contenant les données en deux colonnes. Dans certains cas ces fichiers
+      sont reconnus automatiquement. Ils peuvent aussi être sélectionnés
+      explicitement en choisissant <guilabel>Graphes ASCII</guilabel> dans la
+      fenêtre d'ouverture de fichier, forçant le module d'import à tenter de
+      charger le fichier en tant que courbe.
+    </para>
+    <para>
+      La fenêtre de dialogue affiche une prévisualisation du graphe et permet
+      de régler les unités et les légendes.
+    </para>
+  </sect2>
+  <sect2 id='raw-xyz-import'>
+    <title>Données XYZ</title>
+    <indexterm>
+      <primary>Données XYZ</primary>
+      <secondary>import</secondary>
+    </indexterm>
+    <para>
+      L'import de données XYZ sous la forme de fichiers texte contenant trois
+      colonnes peut se faire en choisissant le type
+      <guilabel>Coordonnées XYZ</guilabel>. Là encore, ces fichiers peuvent être
+      reconnus automatiquement mais la sélection explicite de ce type de format
+      force le module à charger le fichier en tant que
+      <link linkend='xyz-data'>données XYZ</link>.
+    </para>
+    <para>
+      La fenêtre d'import affiche le nombre de points ainsi que les plages des 
+      données, et permet de définir les unités latérales et de valeur. Les 
+      plages affichées en unités physiques sont immédiatement mises à jour  
+      en fonction de ce que vous entrez, vous pouvez donc immédiatement vérifier
+      que ce que vous faites est correct.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

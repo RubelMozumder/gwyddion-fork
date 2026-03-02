@@ -1,0 +1,73 @@
+(define-function gwy_app_data_browser_get_current
+  (c-name "gwy_app_data_browser_get_current")
+  (return-type "any")
+  (parameters
+    '("GwyAppWhat" "obj_type")
+  )
+)
+
+(define-function gwy_app_data_browser_get_containers
+  (c-name "gwy_app_data_browser_get_containers")
+  (return-type "list")
+)
+
+(define-method get_data_pointer
+  (of-object "GwyDataLine")
+  (c-name "gwy_data_line_get_data_pointer")
+  (return-type "long")
+)
+
+(define-method get_data_pointer
+  (of-object "GwyDataField")
+  (c-name "gwy_data_field_get_data_pointer")
+  (return-type "long")
+)
+
+(define-method get_data_pointer
+  (of-object "GwyBrick")
+  (c-name "gwy_brick_get_data_pointer")
+  (return-type "long")
+)
+
+(define-method keys_by_name
+  (of-object "GwyContainer")
+  (c-name "gwy_container_keys_by_name")
+  (return-type "list")
+)
+
+(define-method get_value_by_name
+  (of-object "GwyContainer")
+  (c-name "gwy_container_get_value_by_name")
+  (return-type "any")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method get_value
+  (of-object "GwyContainer")
+  (c-name "gwy_container_get_value")
+  (return-type "any")
+  (parameters
+    '("int" "key")
+  )
+)
+
+(define-method set_value_by_name
+  (of-object "GwyContainer")
+  (c-name "gwy_container_set_value_by_name")
+  (parameters
+    '("const-gchar*" "name")
+    '("any" "value")
+  )
+)
+
+(define-method set_value
+  (of-object "GwyContainer")
+  (c-name "gwy_container_set_value")
+  (parameters
+    '("int" "key")
+    '("any" "value")
+  )
+)
+

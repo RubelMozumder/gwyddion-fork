@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: specific-data-import.xml 25931 2023-10-24 12:09:36Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='specific-data-import'>
+  <title>Specific Data Import</title>
+  <para>
+    Import of several other types of data is not automatic and it requires
+    human intervention.
+  </para>
+  <sect2 id='pixmap-file-import'>
+    <title>Graphics Formats</title>
+    <para>
+      Importing data from image formats such as PNG, TIFF, JPEG or BMP is
+      similar to import from raw/unknown file formats, only simpler.
+    </para>
+    <para>
+      It is simpler because the file structure is known and the file format is
+      automatically detected.  Hence the file type does need to be selected
+      explicitly.  However, the data interpretation is still unknown and must
+      be specified manually.  The pixmap import dialogue therefore resembles the
+      <guilabel>Information</guilabel> tab of raw data import, requiring you to
+      set the physical dimensions and value scale.
+    </para>
+    <para>
+      Note the physical dimensions suggested there are <emphasis>not</emphasis> obtained from
+      the file, they are simply the last values used.  Some SPM data formats
+      are based on an image format (typically, TIFF is used as the base)
+      and contain the information about physical scales and units, albeit
+      stored in a manufacturer-specific way.  In this case a separate import
+      module can be written for this particular format to load the files
+      automatically with correctly scaled values.
+    </para>
+    <para>
+      See the reference section <link linkend='pixmap-image-keys'>High-Depth
+      Image Formats</link> for the details of support for high-depth images
+      and the possibility of using them for data representations.
+    </para>
+    <para>
+      For plain (non-SPM) images there is also an option to <guilabel>Just use
+      pixels</guilabel> for the dimensions. This sets the physical dimensions
+      equal to the pixel dimensions. They can be still adjusted later, for
+      instance using <link linkend='dimensions-and-units'>Dimensions and
+      Units</link>.
+    </para>
+    <sect3 id='pixmap-file-import-volume'>
+      <title>Image stack as volume data</title>
+      <para>
+        A multipage image (image stack) can be also imported as volume data instead
+        of a heap of images. It is enabled by <guilabel>Import as volume data</guilabel>.
+        This option currently exists only for multipage TIFFs.
+      </para>
+      <para>
+        The <xi:include href="eqi-z.xml"/> coordinate in the imported data is simply the
+        image number in the stack (starting from 0). Use volume data
+        <link linkend='volume-calibrate'>Dimensions and Units</link> or
+        <link linkend='volume-zcalibration'>Z Calibration</link> function
+        to set the physical scale and/or units of <xi:include href="eqi-z.xml"/>.
+      </para>
+    </sect3>
+  </sect2>
+  <sect2 id='graph-curve-import'>
+    <title>Graph Curves</title>
+    <para>
+      Simple two-column text files containing curve data can be imported as
+      graph curves.  In some cases, these files are recognized automatically.
+      They can also be explicitly selected as <guilabel>ASCII graph curve
+        files</guilabel> in the file open dialogue, causing the import module to
+      try harder to load the file as a graph data.
+    </para>
+    <para>
+      The import dialogue shows a preview of the graph and permits to set the
+      units and labels.
+    </para>
+  </sect2>
+  <sect2 id='raw-xyz-import'>
+    <title>XYZ Data</title>
+    <indexterm>
+      <primary>XYZ data</primary>
+      <secondary>import</secondary>
+    </indexterm>
+    <para>
+      Three-column text files containing XYZ data are imported by selecting
+      the <guilabel>XYZ data files</guilabel> file type.  Again, they can be
+      recognized automatically but requesting this format explicitly makes the
+      module to try harder to load the file as
+      <link linkend='xyz-data'>XYZ data</link>.
+    </para>
+    <para>
+      The import dialogue displays the number of points and physical ranges of
+      the data and permits setting the lateral and value units.  The displayed
+      ranges in physical units are updated according to the units you enter so
+      you can immediately see if they they are correct.
+    </para>
+    <para>
+      Occasionally one can encounter image data are stored as XYZ data with
+      completely regular lateral coordinates.  Since they are still meant to be
+      treated as image data, just in an odd format, the import module attempts
+      to detect this situation.  It then offers direct rendering to an image
+      instead of importing the file as true XYZ data.
+    </para>
+  </sect2>
+  <sect2 id='nmm-xyz-import'>
+    <title>Nano Measuring Machine XYZ Data</title>
+    <para>
+      The Nano Measuring Machine data are sets of often huge XYZ files that
+      would be difficult, if even possible to handle normally in Gwyddion.
+      Therefore, they are directly rasterised to an image upon import.  Select
+      the main description file (<filename>.dsc</filename>) to open the data
+      file set and set the import parameters.
+    </para>
+    <para>
+      Usually, the vertical size should be chosen as the number of profiles
+      (i.e. number of data files).  However, a larger resolution can be also
+      useful.  If you enable the <guilabel>Identical measures</guilabel>
+      checkbox then the imported image will have square pixels.  Only one
+      resolution can be then entered – the other one is determined
+      automatically.
+    </para>
+    <para>
+      On 64bit systems, the import module can currently handle up to
+      2<superscript>32</superscript> points per channel while the total number
+      of data values is not limited.  Note that reading the data points can
+      take considerable time.  Select only channels you are actually interested
+      in to speed up the import process.
+    </para>
+  </sect2>
+  <sect2 id='nanonis-sxm-import'>
+    <title>Nanonis SXM Data</title>
+    <para>
+      Nanonis uses a right-handed coordinate system and Gwyddion a
+      left-handed system.  Hence it is not possible to preserve simultaneously
+      how images look visually and the absolute coordinates of images and their
+      features – the latter is required for correct import of spectra.
+    </para>
+    <para>
+      The default behaviour was varying between versions.  Since version 2.52
+      you can choose it by setting the value of
+      <literal>/module/nanonis/preserve_coordinates</literal> in the
+      <link linkend='settings'>settings</link>:
+      <itemizedlist>
+        <listitem>
+          <literal>False</literal> means images look the same, but vertical
+          coordinates are flipped.
+        </listitem>
+        <listitem>
+          <literal>True</literal> means coordinates are correct, but images
+          look flipped vertically.
+        </listitem>
+      </itemizedlist>
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

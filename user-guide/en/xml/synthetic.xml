@@ -1,0 +1,3944 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: synthetic.xml 26085 2024-01-02 16:20:48Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='synthetic' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Synthetic Surfaces</title>
+  <para>
+    Beside functions for analysis of measured data, Gwyddion provides
+    several generators of artificial surfaces and measurement artefacts that
+    can be used for testing or simulations also outside Gwyddion
+    [<link linkend='synthetic-ref-1'>1</link>].
+  </para>
+  <para>
+    All the surface generators share a certain set of parameters, determining
+    the dimensions and scales of the created surface and the random number
+    generator controls.  These parameters are described below, the parameters
+    specific to each generator are described in the corresponding subsections.
+  </para>
+  <para>
+    Image parameters:
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <guilabel>Horizontal, Vertical size</guilabel>
+      </term>
+      <listitem>
+        <para>
+          The horizontal and vertical resolution of the generated surface in
+          pixels.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Square image</guilabel>
+      </term>
+      <listitem>
+        <para>
+          This option, when enabled, forces the horizontal and vertical
+          resolution to be identical.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Width, Height</guilabel>
+      </term>
+      <listitem>
+        <para>
+          The horizontal and vertical physical dimensions of the generated
+          surface in selected units.  Note square pixels are assumed so,
+          changing one causes the other to be recalculated.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Dimension, Value units</guilabel>
+      </term>
+      <listitem>
+        <para>
+          Units of the lateral dimensions (<guilabel>Width</guilabel>,
+          <guilabel>Height</guilabel>) and of the values (heights).  The units
+          chosen here also determine the units of non-dimensionless parameters
+          of the individual generators.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guibutton><guilabel>Take Dimensions from Current Image</guilabel></guibutton>
+      </term>
+      <listitem>
+        <para>
+          Clicking this button fills all the above parameters according to
+          the current image.
+        </para>
+        <para>
+          Note that while the units of values are updated, the value scale is
+          defined by generator-specific parameters that might not be directly
+          derivable from the statistical properties of the current image.
+          Hence these parameters are not recalculated.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Replace the current image</guilabel>
+      </term>
+      <listitem>
+        <para>
+          This option has two effects.  First, it causes the dimensions and
+          scales to be automatically set to those of the current image.
+          Second, it makes the generated surface replace the current image
+          instead of creating a new image.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Start from the current image</guilabel>
+      </term>
+      <listitem>
+        <para>
+          This option has two effects.  First, it causes the dimensions and
+          scales to be automatically set to those of the current image.
+          Second, it makes the generator to start from the surface contained
+          in the current image and modify it instead of starting from a flat
+          surface.  Note this does not affect whether the result actually goes
+          to the current image or a new image is created.
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    Random generator controls:
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <guilabel>Random seed</guilabel>
+      </term>
+      <listitem>
+        <para>
+          The random number generator seed.  Choosing the same parameters and
+          resolutions and the same random seed leads to the same surface, even
+          on different computers.  Different seeds lead to different surfaces
+          with the same overall characteristics given by the generator
+          parameters.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guibutton><guilabel>New</guilabel></guibutton>
+      </term>
+      <listitem>
+        <para>
+          Replaces the seed with a random number.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Randomize</guilabel>
+      </term>
+      <listitem>
+        <para>
+          Enabling this option makes the seed to be chosen randomly every time
+          the generator is run.  This permits to conveniently re-run the
+          generator with a new seed simply by pressing <keycap>Ctrl-F</keycap>
+          (see <link linkend='keyboard-shortcuts'>keyboard shortcuts</link>).
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    Update/preview controls:
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <guilabel>Instant updates</guilabel>
+      </term>
+      <listitem>
+        <para>
+          If the checkbox is enabled the surface is recalculated whenever
+          an input parameter changes.  This option is available in generators
+          which are relatively fast.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
+        <guilabel>Progressive preview</guilabel>
+      </term>
+      <listitem>
+        <para>
+          If the checkbox is enabled the preview shows the evolution of the
+          surface during the simulation. This option is available in slow
+          generators involving iterative physical simulations.  Enabling the
+          progressive generally makes the simulation slightly slower as
+          snapshots need to be taken and displayed.
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <sect2 id='spectral-synthesis'>
+    <title>
+      Spectral <gwy:icon name='synthetic_spectral'/>
+    </title>
+    <para>
+      The spectral synthesis module creates randomly rough surfaces by
+      constructing the Fourier transform of the surface according to specified
+      parameters and then performing the inverse Fourier transform to obtain
+      the real surface.  The generated surfaces are periodic (i.e. perfectly
+      tilable).
+    </para>
+    <para>
+      The Fourier image parameters define the shape of the PSDF, i.e. the
+      Fourier coefficient modulus, the phases are chosen randomly.  At present,
+      all generated surfaces are isotropic, i.e. the PSDF is radially
+      symmetric.
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>RMS</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The root mean square value of the heights (or of the differences
+            from the mean plane which, however, always is the
+            <xi:include href="eqi-z-is-0.xml"/> plane).  Button
+            <guilabel>Like Current Image</guilabel> sets the RMS value to
+            that of the current image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Minimum, maximum frequency</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The minimum and maximum spatial frequency.  Increasing the minimum
+            frequency leads to <quote>flattening</quote> of the image, i.e. to
+            removal of large features.  Decreasing the maximum frequency
+            limits the sharpness of the features.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Enable Gaussian multiplier</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Enables the multiplication of the Fourier coefficients by a
+            Gaussian function that in the real space corresponds to the
+            convolution with a Gaussian.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Enable Lorentzian multiplier</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Enables the multiplication of the Fourier coefficients by a
+            function proportional to
+            <xi:include href="eqi-1-over-1-plus-K2T2-to-3t4.xml"/>, where
+            <xi:include href="eqi-T.xml"/> is the autocorrelation length.
+            So, the factor itself is not actually Lorentzian but it
+            corresponds to Lorentzian one-dimensional power spectrum density
+            which in turn corresponds to exponential autocorrelation function
+            (see section
+            <link linkend='autocorrelation-1d'>Statistical Analysis</link> for
+            the discussion of autocorrelation functions).  This factor
+            decreases relatively slowly so the finite resolution plays
+            usually a larger role than in the case of Gaussian.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Autocorrelation length</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The autocorrelation length of the Gaussian or Lorentzian factors
+            (see section
+            <link linkend='autocorrelation-1d'>Statistical Analysis</link> for
+            the discussion of autocorrelation functions).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Enable power multiplier</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Enables multiplication of Fourier coefficients by factor
+            proportional to
+            <xi:include href="eqi-1-over-k-to-p.xml"/>, where
+            <xi:include href="eqi-k.xml"/>
+            is the spatial frequency and <xi:include href="eqi-p.xml"/> is the
+            power.  This permits to generate various fractal surfaces.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Power</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The power <xi:include href="eqi-p.xml"/>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-spectral'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-spectral.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial surfaces generated by spectral synthesis: a narrow range
+          of spatial frequencies (left), Gaussian random surface (centre) and a
+          fractal surface generated with power multiplier and
+          <xi:include href="eqi-p.xml"/> equal to 1.5 (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='object-synthesis'>
+    <title>
+      Objects <gwy:icon name='synthetic_objects'/>
+    </title>
+    <para>
+      The object placement method permits to create random surfaces composed
+      of features of a specific shape.  The algorithm is simple: the given
+      number of objects is placed on random positions at the surface.  For each
+      object placed, the new heights are changed to
+      <xi:include href="eqi-max-z-z_0-plus-h.xml"/>, where
+      <xi:include href="eqi-z.xml"/> is the current height at a specific
+      pixel, <xi:include href="eqi-h.xml"/> is the height of the object at this
+      pixel (assuming a zero basis) and <xi:include href="eqi-z_0.xml"/>
+      is the current minimum height over the basis of the object being placed.
+      The algorithm considers the horizontal plane to be filled with identical
+      copies of the surface, hence, the generated surfaces are also periodic
+      (i.e. perfectly tilable).
+    </para>
+    <informaltable role='image-grid' align='center' id='table-synthetic-objects'>
+      <tgroup frame='none' cols='4'>
+        <?dblatex cccc?>
+        <tbody>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-pyramid.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-diamond.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-tetrahedron.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-hexpyramid.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Pyramid</entry>
+            <entry>Diamond</entry>
+            <entry>Tetrahedron</entry>
+            <entry>Hexagonal pyramid</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-cone.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-sphere.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-nugget.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-parbump.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Cone</entry>
+            <entry>Half-sphere</entry>
+            <entry>Half-nugget</entry>
+            <entry>Parabolic bump</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-gaussian.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-expspike.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-fullsphere.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-fullnugget.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Gaussian</entry>
+            <entry>Exponential spike</entry>
+            <entry>Full sphere</entry>
+            <entry>Full nugget</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-box.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-thatch.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-semipyramid.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-tent.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+          </row>
+          <row>
+            <entry>Box</entry>
+            <entry>Thatch</entry>
+            <entry>Semi-pyramid</entry>
+            <entry>Tent</entry>
+          </row>
+          <row>
+            <entry>
+              <inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref='synthetic-object-doughnut.png' format='PNG'/>
+                </imageobject>
+              </inlinemediaobject>
+            </entry>
+            <entry/>
+            <entry/>
+            <entry/>
+          </row>
+          <row>
+            <entry>Doughnut</entry>
+            <entry/>
+            <entry/>
+            <entry/>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+    <para>
+      Parameters and options in the <guilabel>Shape</guilabel> tab control
+      the shape of individual features:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Shape</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The shape (type) of placed objects.  At present the possibilities
+            include half-spheres, boxes, various pyramids, bumps, spikes and
+            a few more weird shapes. The difference between half-sphere and
+            full sphere is in the height. The full sphere includes also the height
+            of the lower half. The same applies to nuggets.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Size</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The lateral object size, usually the side of a containing square.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Aspect Ratio</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The ratio between the <xi:include href="eqi-x.xml"/> and
+            <xi:include href="eqi-y.xml"/> dimensions of an object – with
+            respect to some default proportions.
+          </para>
+          <para>
+            Changing the aspect ratio does not always imply mere geometrical
+            scaling, e.g. objects called nuggets change between half-spheres
+            and rods when the ratio is changed.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            A quantity proportional to the height of the object, normally
+            the height of the highest point.
+          </para>
+          <para>
+            Enabling <guilabel>Scales with size</guilabel> makes unperturbed
+            heights to scale proportionally to the sizes of individual objects.
+            Otherwise the height is independent on size.  Proportional scaling
+            is useful with non-zero size variance to keep the shape of all
+            objects identical (as opposed to elongating and flattening them
+            vertically).  If all objects have the same size the option has no
+            effect.
+          </para>
+          <para>
+            Button <guilabel>Like Current Image</guilabel> sets the height
+            value to a value based on the RMS of the current image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Truncate</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The shapes can be truncated at a certain height, enabling creation
+            of truncated cones, pyramids, etc.  The truncation height is given
+            as a proportion to the total object height.  Unity means the shape is
+            not truncated, zero would mean complete removal of the object.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Each parameter can be randomized for individual objects, this is
+      controlled by <guilabel>Variance</guilabel>.  For multiplicative
+      quantities (all except orientation and truncation), the distribution is log-normal
+      with the RMS value of the logarithmed quantity given by
+      <guilabel>Variance</guilabel>.
+    </para>
+    <para>
+      Parameters and options in the <guilabel>Placement</guilabel> tab control
+      where and how the surface is modified using the generated shapes:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number of times an object covers a pixel on the image.
+            Coverage value of 1 means the surface would be exactly once covered
+            by the objects assuming that they covered it uniformly and did not
+            overlap.  Values larger than 1 mean more layers of objects – and
+            slower image generation.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Feature sign</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The direction in which the surface is changed by adding objects.
+            Positive and negative modifications correspond forming hills and
+            pits adding objects, respectively.  Zero value of the parameter
+            means hills and pits are chosen randomly.  Positive values mean
+            hills are more likely, while the maximum value 1 means only hills.
+            The same holds for pits and negative values.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Columnarity</guilabel>
+        </term>
+        <listitem>
+          <para>
+            For columnarity of zero the local surface modification works as
+            described in the introduction.  For columnarity of one (the maximum),
+            the objects are considered to have also a lower part, which is
+            a perfect mirror of the (visible) upper part.  Once the lower
+            object part touches any point on the surface, it sticks to it.  This
+            determines the final height.  The range of heights grows quckly
+            in this case and the volume is rather porous (not representable with
+            a height field, of course).  Values between 0 and 1 mean the object
+            height is interpolated between the two extremes.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Avoid stacking</guilabel>
+        </term>
+        <listitem>
+          <para>
+            When this option is enabled, at most one object may be placed on
+            any pixel of the surface.  Hence, they never overlap.  The
+            <guilabel>Coverage</guilabel> option then does not determine how
+            many objects are actually placed, but only how many the generator
+            tries.  Once there is no free space remaning where an object of
+            given size could be added, increasing the coverage has no effect
+            (beside slowing down the generation).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Orientation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The rotation of objects with respect to some base orientation,
+            measured anticlockwise.  The orientation can be also randomised
+            using the corresponding <guilabel>Variance</guilabel>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-objects'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-objects.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial surfaces generated by object placement: spheres of varied
+          size (left), narrow thatches of varied direction (centre), negative
+          non-overlapping hexagonal pyramids of varying size (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='particle-synthesis'>
+    <title>
+      Particles <gwy:icon name='synthetic_particles'/>
+    </title>
+    <para>
+      Particle depositions performs a dynamical simulation of interacting
+      spherical particles falling onto a solid surface.  The particles do not
+      fall all at once.  Instead, they are dropped sequentially among the
+      particles already lying on the surface and left to relax.
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Particle radius</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Radius of the spherical particles in real units.  The height and
+            lateral dimensions must be the same physical quantity so there
+            is only one dimensional parameter.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Distribution width</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Standard deviation of radius distribution (Gaussian).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            How much of the surface would be covered if it was covered
+            uniformly by the deposited particles.  If the simulation is unable
+            to place as many particles as requested, usually due to too short
+            time, an error message is displayed.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Relaxation steps</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Simulation length, measured in the number of iterations.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para id='rod-synthesis'>
+      The rod deposition method is based on the same dynamic simulation, but
+      for elongated particles.  The particles are in fact formed by sphere
+      triplets, nevertheless this still allows a reasonable range of particle
+      aspect ratios. The simulation also has several more interaction
+      parameters.
+      <!--- and no one knows what they mean, maybe not even Peter any more -->
+    </para>
+  </sect2>
+  <sect2 id='pileup-synthesis'>
+    <title>
+      Pile Up <gwy:icon name='synthetic_pileup'/>
+    </title>
+    <para>
+      The <link linkend='object-synthesis'>Objects</link> artificial surface
+      generator is rather fast but at the expense of avoiding any kind of
+      3D geometry and just moulding the surface using a few simple rules.
+      <link linkend='particle-synthesis'>Particle and rod depositions</link>
+      lie near the other end of the
+      speed-realism spectrum and perform actual dynamical simulation of
+      interacting particles falling onto the surface.
+      This module represents a middle ground, as it forms the surface from
+      real 3D solids, but still using only simple rules for what happens to
+      them when they hit the surface, retaining a good surface generation
+      speed.
+    </para>
+    <para>
+      The solids start falling in the horizontal position.  When they hit the
+      surface, a local mean plane around in the contact area is found.  The
+      shape is then rotated to lie flat on this local plane.  Its final height
+      is determined as detailed in the description of
+      <guilabel>Columnarity</guilabel> below and then it just sticks in this
+      position.  There is no further sliding, toppling or other dynamic
+      settling process.
+    </para>
+    <para>
+      Several generator parameters have exactly the same meaning as in
+      <link linkend='object-synthesis'>Objects</link>.  This includes
+      <guilabel>Coverage</guilabel>, <guilabel>Avoid stacking</guilabel> and
+      <guilabel>Orientation</guilabel>.  The others are explained below:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Shape</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The shape (type) of placed objects.  At present the possibilities
+            include various elongated shapes.
+          </para>
+          <informaltable role='image-grid' align='center' id='table-synthetic-pileup'>
+            <tgroup frame='none' cols='3'>
+              <?dblatex ccc?>
+              <tbody>
+                <row>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref='synthetic-pileup-ellipsoid.png' format='PNG'/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref='synthetic-pileup-bar.png' format='PNG'/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref='synthetic-pileup-cylinder.png' format='PNG'/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                </row>
+                <row>
+                  <entry>Ellipsoid</entry>
+                  <entry>Bar</entry>
+                  <entry>Cylinder</entry>
+                </row>
+                <row>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref='synthetic-pileup-nugget.png' format='PNG'/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                    <inlinemediaobject>
+                      <imageobject>
+                        <imagedata fileref='synthetic-pileup-hexbar.png' format='PNG'/>
+                      </imageobject>
+                    </inlinemediaobject>
+                  </entry>
+                  <entry>
+                  </entry>
+                </row>
+                <row>
+                  <entry>Nugget</entry>
+                  <entry>Hexagonal rod</entry>
+                  <entry></entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Width</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The shapes can be elongated along the
+            <xi:include href="eqi-x.xml"/> axis (as controlled by
+            <guilabel>Aspect ratio</guilabel>).  Their dimension in the
+            orthogonal direction is given by width.  The cross section is
+            symmetrical.  Therefore, the width determines both the horizontal
+            width and height.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Aspect ratio</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The ratio between the <xi:include href="eqi-x.xml"/> and
+            <xi:include href="eqi-y.xml"/> dimensions, in other words, the
+            elongation.  It is always at least unity; the shapes are never
+            squashed along the <xi:include href="eqi-x.xml"/> axis.  The
+            aspect ratio distribution can be thus noticeably asymmetrical when
+            the nominal aspect ratio is around unity and the variation is
+            large.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Columnarity</guilabel>
+        </term>
+        <listitem>
+          <para>
+            In general, this parameter influences how much the shapes tend to
+            form columnar structures (porous, if topographical images could
+            represent it).
+            The default value of zero can be imagined as the lower part of the
+            shape melting upon impact and filling the depression it has fallen
+            into.  Note that the volume balance is somewhat approximate and the
+            height at which the object settles may be such that sharp spikes on
+            the surface pierce through it.
+          </para>
+          <para>
+            The maximum columnarity (1) means that once any part of the shape
+            touches the surface, it sticks to it.  For smaller positive values
+            the final height is interpolated between the two heights gien by
+            the two approaches.
+          </para>
+          <para>
+            If columnarity is negative, the shape is rammed into the surface.
+            For the minimum value (−1) it settles at the lowest height for
+            which at least one point of its entire lower boundary would not be
+            below the original surface.  Again, for other negative values the
+            final height is interpolated.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-pileup'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-pileup.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial surfaces generated by piling up geometrical shapes:
+          oriented hexagonal rods on a central ridge (left), jumble of
+          ellipsoid needles (centre), heap of cubes piled up on a central
+          pillar (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='noise-synthesis'>
+    <title>
+      Noise <gwy:icon name='synthetic_noise'/>
+    </title>
+    <para>
+      Random uncorrelated point noise is generated independently in each pixel.
+      Several distributions are available.
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Distribution</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The distribution of the noise value.  The possibilities include
+            Gaussian, exponential, uniform, triangular and salt and pepper
+            distributions.
+          </para>
+          <para>
+            The salt and pepper distribution works somewhat differently than is
+            usual in computer graphics since the range of values is unbounded.
+            It is a bimodal distribution consiting of two
+            <xi:include href='eqi-delta.xml'/>-functions.  In other words, a constant
+            (given by RMS) is added and/or subtracted from the pixel values.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Direction</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The noise can be generated as symmetrical or one-sided.  The
+            mean value of the distribution of a symmetrical noise is zero,
+            i.e. the mean value of data does not change when a symmetrical
+            noise is added.  One-sided noise only increases (if positive)
+            or decreases (if negative) the data values.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>RMS</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Root mean square value of the noise distribution.  More precisely,
+            it is the RMS of the corresponding symmetrical distribution in the
+            case the distribution is one-sided.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Density</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Density is the fraction of values modified.  If it is 1 all pixels are
+            modified.  When it is smaller some are left intact.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-noise'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-noise.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Different artificial noise applied to the same surface:
+          symmetrical Gaussian noise (left);
+          positive exponential noise (centre);
+          negative exponential noise (right).
+          All images have the same false colour scale and all noises have the
+          same RMS.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='line-noise-synthesis'>
+    <title>
+      Line Noise <gwy:icon name='synthetic_line_noise'/>
+    </title>
+    <para>
+      Line noise represents noise with non-negligible duration that leads to typical
+      steps or scars (also called strokes) in the direction of the fast
+      scanning axis – or misaligned scan lines.  Parameters
+      <guilabel>Distribution</guilabel>, <guilabel>Direction</guilabel> and
+      <guilabel>RMS</guilabel> have the same meaning as in
+      <link linkend='noise-synthesis'>Point noise</link>.
+      Other parameters control the lateral characteristics of the noise.
+    </para>
+    <para>
+      The following line defect types are available:
+      <itemizedlist>
+        <listitem>
+          <guilabel>Steps</guilabel> represent abrupt changes in the value that
+          continue to the end of the scan (or until another step occurs).
+        </listitem>
+        <listitem>
+          <guilabel>Scars</guilabel> are local changes of the value with
+          a finite duration, i.e. the values return to the original level
+          within the same scan line.
+        </listitem>
+        <listitem>
+           <guilabel>Ridges</guilabel> are similar to scars but on a larger
+           scale: they can span several scan lines.
+        </listitem>
+        <listitem>
+           <guilabel>Tilt</guilabel> perturbs the slope of individual scan lines,
+           as opposed to directly shifting heights.
+        </listitem>
+        <listitem>
+           <guilabel>Hum</guilabel> adds a quasi-periodic disturbance, simulating
+           a type of noise originating from electronic interference.
+        </listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      Steps have the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Density</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Average number of defects per scan line, including any dead time
+            (as determined by parameter <guilabel>Within line</guilabel>).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Within line</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Fraction of the time to scan one line that corresponds to actual data
+            acquisition.  The rest of time is a dead time.  Value 1 means there is no dead
+            time, i.e. all steps occur within the image.  Value 0 means the data acquisition
+            time is negligible to the total line scan time, consequently, steps only occur
+            between lines.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Scanning direction</guilabel>
+        </term>
+        <listitem>
+          <para>
+            If steps can occur inside a scan line it determines the horizontal scanning
+            direction (assuming the slow axis scan is from top to bottom). For left to
+            right scanning the left part of the scan line is contiguous with the data above
+            and the right part with data below. For right to left scanning it is the opposite.
+            The two directions are illustrated in the descriptions of
+            <link linkend='fig-scan-step-artefacts'>Block line correction</link> which corrects
+            similar artefacts.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Cumulative</guilabel>
+        </term>
+        <listitem>
+          <para>
+            For cumulative steps the random step value is always added to the
+            current value offset; for non-cumulative steps the new value offset is directly
+            equal to the random step value.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Scars have the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The fraction of the the image covered by defect if they did not
+            overlap.  Since the defect may overlap, coverage value of 1 does
+            not mean the image is covered completely.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Length</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Scar length in pixels.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Variance</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Variance of the scar length, see <link linkend='object-synthesis'>Objects</link>
+            for description of variances.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Ridges have the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Density</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Average number of defects per scan line, including any dead time
+            (as determined by parameter <guilabel>Within line</guilabel>).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Within line</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Fraction of the time to scan one line that corresponds to actual data
+            acquisition.  The rest of time is a dead time.  Value 1 means there is no dead
+            time, i.e. all value changes occur within the image.  Value 0 means the data
+            acquisition time is negligible to the total line scan time, consequently, value
+            changes only occur between lines.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Scanning direction</guilabel>
+        </term>
+        <listitem>
+          <para>
+            If steps can occur inside a scan line it determines the horizontal scanning
+            direction (assuming the slow axis scan is from top to bottom). For left to
+            right scanning the left part of the scan line is contiguous with the data above
+            and the right part with data below. For right to left scanning it is the opposite.
+            The two directions are illustrated in the descriptions of
+            <link linkend='fig-scan-step-artefacts'>Block line correction</link> which corrects
+            similar artefacts.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Width</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Mean duration of the defect, measured in image size.  Value 1 means the mean
+            duration will be the entire image scanning time.  Small values mean the defects
+            will mostly occupy just one scan line.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Tilt has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Offset dispersion</guilabel>
+        </term>
+        <listitem>
+          <para>
+            With zero offsets all scan lines are tilted around the middle.  In other words, the
+            central image column remains unperturbed.  Increasing the dispersion of the offsets
+            moves the pivot points randomly more and more to left or right.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Hum has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Wavelength</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Characteristic wavelength of the hum, measured in the image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Spread</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Small spread means the noise is very narrow-band and looks more or less like
+            as a pure sine wave.  Large values produce a wider spectrum with beats and more
+            distorted profile.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Components</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The number of random sine wave components that are used to construct the hum
+            in each scan line.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-line-noise'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-line-noise.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Different types of line noise added to an artificial pyramidal surface.
+          Top row:
+          unmodified surface (left);
+          relatively sparse cumulative steps (centre);
+          relatively sparse ridges (right).
+          Bottom row:
+          scars of mean length of 16 px and high coverage (left);
+          tilt with small offset dispersion (centre);
+          hum with default settings (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='pattern-synthesis'>
+    <title>
+      Pattern <gwy:icon name='synthetic_pattern'/>
+    </title>
+    <para>
+      Regular geometrical patterns represent surfaces often encountered in
+      microscopy as standards or testing samples.  Currently it can generate
+      the following types of pattern:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Staircase</guilabel>
+        </term>
+        <listitem>
+          <para>
+            One-dimensional staircase pattern, formed by steps of constant
+            width and height.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Grating</guilabel>
+        </term>
+        <listitem>
+          <para>
+            One-dimensional pattern, formed by double-sided steps (ridges)
+            constant width and height.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Amphitheatre</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Superellipse-shaped pattern formed by concentric steps of constant
+            width and height.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Concentric rings</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Superellipse-shaped pattern formed by concentric double-sided steps
+            (ridges) of constant width and height.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Siemens star</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Radial pattern formed by alternating high and low wedges.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Holes (rectangular)</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Two-dimensional regular arrangement of rectangular holes, possibly
+            round.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Pillars</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Two-dimensional regular arrangement of symmetrical pillars of
+            several possible shapes (circular, square or hexagonal).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Double staircase</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Two-dimensional regular arrangement of steps of fixed width and
+            height.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Each type of pattern has its own set of geometrical parameters
+      determining the shape and dimensions of various part of the pattern.
+      They are described in the following sections.
+      Most geometrical parametrs have an associated variance control, similar
+      to <link linkend='object-synthesis'>Object synthesis</link>, which
+      permits making some aspects of the pattern irregular.
+    </para>
+    <para>
+      The placement of the pattern in the horizontal plane is controlled by
+      parameters in tab <guilabel>Placement</guilabel>, common to all pattern
+      types:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Orientation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The rotation of the pattern with respect to some base orientation,
+            measured anticlockwise.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      This tab also contains the deformation parameters.  While enabling the
+      variation of geometrical parameters makes the generated surface somewhat
+      irregular the shape of its features is maintained.
+      <guilabel>Deformation</guilabel> is a complementary method to introduce irregularity,
+      specifically by distorting the pattern in the <xi:include href="eqi-xy.xml"/> plane.
+      It has two parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Amplitude</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The magnitude of the lateral deformation.  It is a relative
+            numerical quantity essentially determining how far the deformation
+            can reach.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Lateral scale</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The characteristic size of the deformations.  It describes not
+            how far the features are moved but how sharply or slowly the
+            deformation itself changes within the horizontal plane.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The deformation is analogous to the two-dimensional Gaussian deformation
+      applied by <link linkend='displacement-field'>Displacement field</link>.
+      However, it is applied to coordinates before rendering the pattern, whereas
+      <link linkend='displacement-field'>Displacement field</link> distorts
+      already sampled images.
+    </para>
+    <para>
+      All patterns also have a <guilabel>Height</guilabel> parameter, giving
+      the height of features in physical units.  For staircase-like patterns
+      that grow continuously it is the height of a single step.  For patterns
+      consisting of bumps of holes in a flat base plane it is the height of
+      each individual feature (unless modified by variance).
+    </para>
+    <informalfigure id='fig-synthetic-pattern'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-pattern.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial pattern surfaces.  Top row:
+          sharp steps with long-wavelength deformation,
+          scaled grating with large width variance and wide asymmetrical
+          slopes,
+          a slightly deformed amphitheatre with negative parabolicity,
+          and concentric rings with positive parabolicity and varying height.
+          Bottom row:
+          Siemens star with enlarged upper surface,
+          long rectangular holes with varying vertical dimension and position,
+          rows of slightly deformed circular pillars,
+          and double staircase with irregular step width.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <sect3 id='pattern-synthesis-staircase'>
+      <title>Staircase</title>
+      <para>
+        Staircase has the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Terrace width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The width of one step, given in pixels but also displayed in
+              physical units.  All other lateral dimensions are given as
+              fractions of this base width.
+            </para>
+            <para>
+              The width includes the slope width and can be seen as a
+              <quote>period</quote> of the pattern.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Position variance</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Randomisation of the position of step edge.  The edges never
+              cross.  Even for the maximum randomness, they can at most move
+              to touch the next edge.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Slope width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of width taken by the sloping edge.  Zero means sharp
+              edges, one means the pattern will be a flat ramp (without
+              randomness or other modifying parameters).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Scales with width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              If enabled for the step height, the heights will be adjusted to
+              be proportional to the widths of surrounding terraces, while
+              keeping the average step height as given.  This more closely
+              preserves the mean plane of the surface even for randomised
+              terrace width.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id='pattern-synthesis-grating'>
+      <title>Grating</title>
+      <para>
+        Grating has the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Period</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The period of the pattern, given in pixels but also displayed in
+              physical units.  All other lateral dimensions are given as
+              fractions of this base width.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Position variance</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Randomisation of the widths of individual ridge-trough pairs.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Scale features with width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              If enabled then all lateral dimensions scale with the width of
+              each individual ridge-trough pair for randomised patterns.
+              Otherwise <guilabel>Top fraction</guilabel> or <guilabel>Slope
+              width</guilabel> refer to the unperturbed base period.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Top fraction</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of width taken by the upper surface.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Slope width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of width taken by the sloping edges.  Slopes are
+              added to the top surface; they do not replace it.  Therefore,
+              zero <guilabel>Top fraction</guilabel> and non-zero slope
+              results in a triangular profile.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Asymmetry</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Distribution of slope width to left and right edges.
+              Minus one means left edges are sloped and right edges
+              are sharp.  Plus one means left edges are sharp and right
+              edges are sloped.  Zero means symmetrical slopes.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id='pattern-synthesis-amphitheatre'>
+      <title>Amphitheatre</title>
+      <para>
+        Amphitheatre has the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Superellipse parameter</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Step contours are superellipses described by
+              <xi:include href="eq-superellipse-pattern-amphitheatre.xml"/>
+              where <xi:include href='eqi-p.xml'/> is the parameter.
+              Zero corresponds to squares, the maximum value two corresponds
+              to diamonds, and the default value one corresponds to circles.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Terrace width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The width of one step, given in pixels but also displayed in
+              physical units.  All other lateral dimensions are given as
+              fractions of this base width.
+            </para>
+            <para>
+              The width includes the slope width and can be seen as a
+              <quote>period</quote> of the pattern.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Position variance</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Randomisation of the position of step edge.  The edges never
+              cross.  Even for the maximum randomness, they can at most move
+              to touch the next edge.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Parabolicity</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Positive values means that the terrace become narrower with
+              increasing distance from centre and the overall profile
+              becomes close to parabolical.  Negative values have the
+              opposite effect, with the overall shape becoming a parabola
+              lying on its side.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Slope width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of width taken by the sloping edge.  Zero means sharp
+              edges, one means the pattern will be become a cone (without
+              randomness or other modifying parameters).
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id='pattern-synthesis-rings'>
+      <title>Concentric rings</title>
+      <para>
+        Concentric rings have the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Superellipse parameter</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Ring contours are superellipses described by
+              <xi:include href="eq-superellipse-pattern-rings.xml"/>
+              where <xi:include href='eqi-p.xml'/> is the parameter.
+              Zero corresponds to squares, the maximum value two corresponds
+              to diamonds, and the default value one corresponds to circles.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Period</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The period of the pattern, given in pixels but also displayed in
+              physical units.  All other lateral dimensions are given as
+              fractions of this base width.
+            </para>
+            <para>
+              Since the patern is radial, the period must be understood as
+              observed when travelling from the centre outwards.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Position variance</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Randomisation of the widths of individual ridge-trough pairs.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Parabolicity</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Positive values means that the terrace become narrower with
+              increasing distance from centre and the overall profile
+              becomes close to parabolical.  Negative values have the
+              opposite effect, with the overall shape becoming a parabola
+              lying on its side.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Scale features with width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              If enabled then all lateral dimensions scale with the width of
+              each individual ridge-trough pair for randomised patterns.
+              Otherwise <guilabel>Top fraction</guilabel> or <guilabel>Slope
+              width</guilabel> refer to the unperturbed base period.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Top fraction</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of width taken by the upper surface.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Slope width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of width taken by the sloping edges.  Slopes are
+              added to the top surface; they do not replace it.  Therefore,
+              zero <guilabel>Top fraction</guilabel> and non-zero slope
+              results in a triangular profile.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Asymmetry</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Distribution of slope width to left and right edges.
+              Minus one means inner edges are sloped and outer edges
+              are sharp.  Plus one means inner edges are sharp and outer
+              edges are sloped.  Zero means symmetrical slopes.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id='pattern-synthesis-siemens-star'>
+      <title>Siemens star</title>
+      <para>
+        Siemens star has the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Number of sectors</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The number of circular sectors the plane is divided to.  Each
+              sector contain an upper and a lower surface, so the number of
+              edges is twice the number of sectors.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Top fraction</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of angles taken by the upper surface.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Edge shift</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Shift of edges with respect to spokes meeting in the middle.
+              Positive values mean the upper surface is enlarged by the shift,
+              negative values mean the lower surface is enlarged.  The shift
+              does not change the asymptotic top fraction (for radius going to
+              infinity), but it modifies the centre of the pattern.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id='pattern-synthesis-rectangular-holes'>
+      <title>Holes (rectangular)</title>
+      <para>
+        Rectangular holes have the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>X period</guilabel>
+            and
+            <guilabel>Y period</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The horizontal and vertical period of the pattern, given in
+              pixels but also displayed in physical units.  All other lateral
+              dimensions are given as fractions of the smaller of these two
+              sizes.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Position variance</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Randomisation of the positions of the hole with respect to the
+              rectangle centre.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>X top fraction</guilabel>
+            and
+            <guilabel>Y top fraction</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of width taken by the upper surface in horizontal and
+              vertical profiles going through the hole centre.  Since the
+              dimensions are given as two fractions, the aspect ratio of
+              the hole scales with the corresponding two periods.
+            </para>
+            <para>
+              The top surface has generally larger area because some profiles
+              do not cross any holes – and it can be further increased by round
+              corners.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Slope width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of size (smaller side of the base rectangle) taken by
+              the sloping edges.  The slope is the same in both directions.
+            </para>
+            <para>
+              Slopes are added to the top surface; they do not replace it.
+              Therefore, zero top fraction and non-zero slope can result in
+              triangular profiles.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Roundness</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Radius of rounded corners, given as a fraction of size (smaller
+              side of the base rectangle).
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id='pattern-synthesis-pillars'>
+      <title>Pillars</title>
+      <para>
+        Pillars have the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Shape</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The shape of the pillar base, which can be circular, square or
+              hexagonal.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>X period</guilabel>
+            and
+            <guilabel>Y period</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The horizontal and vertical period of the pattern, given in
+              pixels but also displayed in physical units.  All other lateral
+              dimensions are given as fractions of the smaller of these two
+              sizes.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Position variance</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Randomisation of the positions of the pillar with respect to the
+              rectangle centre.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Size</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Pillar width, given as fraction the size (smaller side of the
+              base rectangle).  Pillars are symmetrical and their aspect ratio
+              does not scale with the rectangle.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Slope width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Fraction of size (smaller side of the base rectangle) taken by
+              the sloping edges.  The slope is the same in both directions.
+            </para>
+            <para>
+              Slopes are added to the top surface; they do not replace it.
+              Therefore, zero top fraction and non-zero slope can result in
+              triangular profiles.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Orientation</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Rotation of individual pillars with respect to the rectangular
+              base lattice.  For instance square pillars in the base
+              orientation will look similar to the holes pattern (just
+              inverted), whereas rotated by 45 degrees they can form a
+              checkerboard pattern.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+    <sect3 id='pattern-synthesis-double-staircase'>
+      <title>Double staircase</title>
+      <para>
+        Double staircase has the following specific parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Terrace X width</guilabel>
+            and
+            <guilabel>Terrace Y width</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The width and height of one step in the horizontal and vertical
+              directions, given in pixels but also displayed in physical units.
+              It can be seen as a <quote>periods</quote> of the pattern.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+  </sect2>
+  <sect2 id='columnar-synthesis'>
+    <title>
+      Columnar films <gwy:icon name='synthetic_columnar'/>
+    </title>
+    <para>
+      The columnar film growth simulation utilises a simple Monte Carlo
+      deposition algorithm in which small particles are incident on the
+      surface from directions generated according to given paramerters,
+      and they stick to the surface around the point where they hit it,
+      increasing the height there locally.  The shadowing effect then causes
+      more particles to stick to higher parts of the surface and less
+      particles to the lower parts.  This positive local height feedback
+      leads to the formation of columns.
+      The algorithm considers the horizontal plane to be filled with identical
+      copies of the surface, hence, the generated surfaces are also periodic
+      (i.e. perfectly tilable).  The surface generator has the following
+      parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number of times a particle is generated above each
+            surface pixel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Local height increase occurring when the particle sticks to
+            a pixel.  Since the horizontal size of the particle is always one
+            pixel the height is measured in pixels.  A height of one pixel
+            essentially means cubical particles, as far as growth is
+            concerned.  From the point of view of collision detection the
+            particles are considered infinitely small.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Inclination</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Central inclination angle with which the particles are generated
+            (angle of incidence).  The value of zero means very small angles
+            of incidence have the highest probability.  Large values mean
+            that the particles are more likely to impinge at large angles
+            than at small angles.  But for large direction variance, the
+            distribution is still isotropic in the horizontal plane.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Direction</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Central direction in the horizontal plane with which the
+            particles are generated.  Large variance means the distribution
+            is isotropic in the horizontal plane; for small variances the
+            growth is anisotopic.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Relaxation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Method for determination of the pixel the particle will finally
+            stick to.  Two options exist at this moment.  Weak relaxation, in
+            which only the two pixels just immediately before collision and
+            after collision are considered and the particle sticks to the
+            lower of them.  In the case of strong relaxation, a 3×3
+            neighbourhood is considered in addition.  The particle can move
+            to a lower neighbour pixel with a certain probability before
+            sticking permanently.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-columnar'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-columnar.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial columnar surfaces: loosely packed columns (left);
+          tightly packed columns (centre); directional growth with strong
+          relaxation (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='ballistic-synthesis'>
+    <title>
+      Ballistic deposition <gwy:icon name='synthetic_ballistic_deposition'/>
+    </title>
+    <para>
+      Vertical ballistic deposition is one of the simplest fundamental film
+      growth models.  Particles fall vertically onto randomly chosen sites
+      (pixels).  The height in the site is incremented by the particle height.
+      However, if the new height would be smaller than the height in any of the
+      four neigbour sites, the particle is assumed to stick to the neigbour
+      columns.  Thus height at the impact site then becomes the maximum of the
+      neigbour heights instead.  This is the only mechanism introducing lateral
+      correlations in the resulting roughness.
+    </para>
+    <para>
+      The simulation has only a few parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number of times a particle is generated above each
+            surface pixel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Local height increase occurring when the particle falls onto a
+            pixel.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-ballistic'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-ballistic.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial surfaces created by ballistic deposition:
+          initial stage with relatively small correlation length (left);
+          after correlations reached image size (centre);
+          deposition starting from a microchip surface (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='wave-synthesis'>
+    <title>
+      Waves <gwy:icon name='synthetic_waves'/>
+    </title>
+    <para>
+      The wave synthesis method composes the image using interference of waves
+      from a number of point sources.  Beside the normal cosine wave, a few
+      other wave types are available, each having a cosine and sine form that
+      differ by phase shift <xi:include href="eqi-pi-over-2.xml"/> in all
+      frequency components.  When the wave is treated as complex, the cosine
+      form is its real part and its sine form is its imaginary part.
+    </para>
+    <informalfigure id='fig-synthetic-wave-waveform'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='waveform.pdf' format='PDF'/>
+        </imageobject>
+        <imageobject>
+          <imagedata fileref='waveform.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Sine and cosine wave forms for the available wave types.  Only the
+          cosine form is used for displacement images; the entire complex wave
+          is used for intensity and phase images.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+    <para>
+      The generator has the following options:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Quantity</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Quantity to display in the image.  Displacement is the sum of the
+            real parts.  Amplitude is the absolute value of the complex wave.
+            Phase is the phase angle of the complex wave.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Number of waves</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The number of point sources the waves propagate from.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Wave form</guilabel>
+        </term>
+        <listitem>
+          <para>
+            One of the wave forms described above.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Amplitude</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Approximate amplitude (rms) of heights in the generated image.
+            Note it differs from the amplitude of individual waves: the
+            amplitude of heights in the generated image would grow with the
+            square root of the number of waves in such case, whereas it in
+            fact stays approxiately constant unless the amplitude changes.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Frequency</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Spatial frequency of the waves.  It is relative to the image size,
+            i.e. the value of 1.0 means wavelength equal to the lenght of the
+            image side.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>X center</guilabel>,
+          <guilabel>Y center</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Locations of the point sources.  Zero corresponds to the image
+            centre. The positions are also measured in image sizes.
+            Generally, at least one of the corresponding variances should be
+            non-zero; otherwise all the point sources coincide (some
+            interesting patterns can be still generated with varying frequency
+            though).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Decay</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Decay determines how quickly the waves are attenuated.
+            The value is measured in inverse wavelengths and given as a decimal
+            logarithm, indicated by the units <guilabel>log₁₀</guilabel>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-waves'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-waves.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial wave surfaces: displacement image generated with fairly
+          large frequency variation (left); amplitude image for inverse cosh
+          wave form (centre); phase image for a small cluster of far-away
+          sources (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='domain-synthesis'>
+    <title>
+      Domains <gwy:icon name='synthetic_domains'/>
+    </title>
+    <para>
+      The simulation implements a hybrid non-equilibrium Ising model
+      [<link linkend='synthetic-ref-2'>2</link>],
+      combining a discrete short-scale discrete Ising model with continuous
+      slow inhibitor.
+    </para>
+    <para>
+      The discrete variable
+      <xi:include href="eqi-u.xml"/> has two possible values, between
+      which it can flip probabilistically with probability
+      <xi:include href="eq-ising-flipping.xml"/>
+      where <xi:include href='eqi-Delta-E.xml'/> is the change of energy
+      resulting from flipping and <xi:include href='eqi-T.xml'/> is the
+      temperature.  The energy is given by the number of neighbours in the
+      opposite state in the directions along the coordinate axes
+      <xi:include href="eqi-n_o.xml"/>,
+      the number of neighbours in the opposite state in the directions along
+      diagonals
+      <xi:include href="eqi-n_d.xml"/>
+      and also by bias caused by the inhibitor field
+      <xi:include href="eqi-v.xml"/>:
+      <xi:include href="eq-ising-energy.xml"/>
+    </para>
+    <para>
+      The continuous inhibitor field
+      <xi:include href="eqi-v.xml"/> is governed by a local differential
+      equation coupled to the variable <xi:include href="eqi-u.xml"/>:
+      <xi:include href="eq-ising-diffeq.xml"/>
+      where <xi:include href='eqi-mu.xml'/> is the inhibitor coupling and
+      <xi:include href='eqi-nu.xml'/> is the bias parameter.
+      The boundary conditions of the simulation are periodic, hence, the
+      generated images are also periodic (i.e. perfectly tilable).
+    </para>
+    <para>
+      The calculation has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Number of iterations</guilabel>
+        </term>
+        <listitem>
+          <para>
+            One iteration consists of four steps: A Monte Carlo update of
+            <xi:include href="eqi-u.xml"/>, a time step of solution of the
+            differential equation for <xi:include href="eqi-v.xml"/>, another
+            Monte Carlo step and another differential euqation time step.
+            The values of <xi:include href="eqi-v.xml"/> shown correspond
+            to the second update. The quantity shown as
+            <xi:include href="eqi-u.xml"/> is the average from the two values
+            surrounding in time the corresponding value of
+            <xi:include href="eqi-v.xml"/>.  Hence the images of
+            <xi:include href="eqi-u.xml"/> are three-valued, not two-valued.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Temperature</guilabel>
+          <xi:include href='eqi-T.xml'/>
+        </term>
+        <listitem>
+          <para>
+            Temperature determines the probability with which the two-state
+            variable <xi:include href="eqi-u.xml"/> can flip to the other value
+            if it results in a configurations with higher energy or similar
+            (flips that lower the energy a lot occur unconditonally).  A larger
+            temperature means less separation between the two
+            <xi:include href="eqi-u.xml"/> domains.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Inhibitor strength</guilabel>
+          <xi:include href='eqi-B.xml'/>
+        </term>
+        <listitem>
+          <para>
+            Strength with which the continuous variable biases the energy
+            of each pixel.  For large values the inhibitor has larger influence
+            compared to the surface tension.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Inhibitor coupling</guilabel>
+          <xi:include href='eqi-mu.xml'/>
+        </term>
+        <listitem>
+          <para>
+            Coupling factor between <xi:include href="eqi-u.xml"/> and
+            <xi:include href="eqi-v.xml"/> in the differential equation for
+            <xi:include href="eqi-v.xml"/>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Bias</guilabel>
+          <xi:include href='eqi-nu.xml'/>
+        </term>
+        <listitem>
+          <para>
+            Bias in the differential equation for
+            <xi:include href="eqi-v.xml"/> towards larger or smaller values.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Monte Carlo time step</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Time step in the differential equation corresponding to one
+            Monte Carlo step.  So this parameter determines the relative speed
+            of the two processes.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Range of values of the created images.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Tab <guilabel>Presets</guilabel> contains a few loadable sets of parameters
+      producing interesting patterns.  Select a preset and press
+      <guibutton>Load Selected Preset</guibutton> to load the parameters to the
+      generator.  The random seed is not a part of the preset.  So the output images
+      vary with the seed, but they keep the same general character (luck is also
+      involved; some random seeds result in less interesting images than others).
+    </para>
+    <informalfigure id='fig-synthetic-domains'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-domains.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial domain surfaces: spiral waves with long-range order
+          (left);
+          short-range ordered spiral waves at a higher temperature (centre);
+          the continous variable for a low-temperature situation with
+          small strength and coupling (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='annealing-synthesis'>
+    <title>
+      Annealing <gwy:icon name='synthetic_anneal'/>
+    </title>
+    <para>
+      The simulation implements a simple cellular-automaton model of phase
+      separation by annealing an imiscible lattice gas consisting of two
+      components A and C.  Only nearest neighbour interaction is considered.
+      The difference of formation energies
+      <xi:include href='eq-anneal-formation-energy-difference.xml'/>
+      determines the preference for phase separation.
+      The annealing proceeds by two neighbour cells (pixels) swaping positions.
+      The always relax to an energentically preferred configuration but they
+      can also switch to energentically less preferred configuration with
+      a probability depending on the temperature <xi:include href='eqi-T.xml'/>
+      <xi:include href='eq-anneal-swapping-probability.xml'/>
+      Since the probability depends only the ratio, we can put the Boltzmann
+      equal to unity and then model depends only on a unitless temperature
+      and relative fractions of the two components.
+    </para>
+    <para>
+      The calculation has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Number of iterations</guilabel>
+        </term>
+        <listitem>
+          <para>
+            One iteration correspond to each pair of neighbour cell positions
+            being checked for possible swapping once.  However, this only holds
+            in probabilistic sense.  Some positions can be checked multiple
+            times in one iterations, others not at all.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Initial temperature</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The unitless temperature determines the probability with which
+            cells can swap into less energetically preferred configuration, as
+            described above.  The initial temperature is the temperature at
+            which the annealing begins.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Final temperature</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The unitless temperature at which the simulation finishes.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Component fraction</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Fraction of component C in the A–C mixture.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Range of values of the created images.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Average iterations</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The output image can capture just the final state, or it can be
+            calculated by averaging a certain number of states before the end
+            given by this parameter.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Optionally, a three-component model can be enabled.  The third component
+      B behaves identically to A and C.  However, the model now has more
+      parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Fraction of B</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The fraction of component B in the mixture.  The remainder is
+            divided among A and C according to <guilabel>Component
+            fraction</guilabel>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Mixing energy AB</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Difference of formation energies for components A and B, relative
+            to the maximum value.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Mixing energy AC</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Difference of formation energies for components A and C, relative
+            to the maximum value.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Mixing energy BC</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Difference of formation energies for components B and C, relative
+            to the maximum value.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      In order to keep the unitless temperature scaled consistently with the
+      two-component model, the largest mixing energy is always normalised to 1.
+      If you try to decrease it, the other two mixing energies increase
+      instead, preserving the ratio, until one of them reaches the value 1.
+      Then this energy difference becomes the largest and the previously
+      largest one can be decreased further.
+    </para>
+    <informalfigure id='fig-synthetic-annealing'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-annealing.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial annealing images generates for the two-component model
+          and two different settings of the three-component model.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='cpde-synthesis'>
+    <title>
+      Coupled PDEs <gwy:icon name='synthetic_turing_pattern'/>
+    </title>
+    <para>
+      A number of interesting patterns can be generated by solving numerically
+      coupled non-linear partial differential equations in the image plane.
+      At present the module implements two generators with a common basic
+      parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Number of iterations</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The number of time steps when solving the coupled PDEs.  Usually
+            the state more or less ceases to evolve after a certain number of
+            iterations – which, however, varies wildly with the pattern type
+            and its parameters.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <sect3 id='cpde-synthesis-turing'>
+      <title>Turing pattern</title>
+      <para>
+        The Turing pattern generator can generate the single classic pattern in
+        a relatively controllable manner. It has the following parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Size</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Characteristic width of stripes in the pattern.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Degree of chaos</guilabel>
+          </term>
+          <listitem>
+            <para>
+              An ad hoc parameter controlling the convergence of the solution.
+              Small values produce orderly patterns.  However, the equations can
+              take extremely long time to converge for larger sizes.  Large
+              values produce more disturbed patterns, but much more quickly.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      <para>
+        The pattern is generated by a two-component diffusion-reaction model simulation,
+        with equations for both components of the form
+        <xi:include href="eq-turing-diffeq.xml"/>
+        In the equation for the second component the roles are just swapped (and
+        the constants differ). Function <xi:include href='eqi-f.xml'/> is defined
+        <xi:include href="eq-turing-function-f.xml"/>
+        Constants <xi:include href='eqi-p.xml'/>, <xi:include href='eqi-q.xml'/>
+        and <xi:include href='eqi-r.xml'/> are not controlled directly. They (and the
+        time step) are calculated from size and degree of chaos according to
+        a calibration formula.
+      </para>
+      <informalfigure id='fig-synthetic-turing'>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref='synthetic-turing.png' format='PNG'/>
+          </imageobject>
+          <caption>
+            Three Turing patterns of the same characteristic stripe size and
+            degree of chaos increasing from left to right.
+          </caption>
+        </mediaobject>
+      </informalfigure>
+    </sect3>
+    <sect3 id='cpde-synthesis-diffreact'>
+      <title>Diffusion reaction</title>
+      <para>
+        The diffusion reaction model can generate a variety of patterns.
+        However, one adjusts directly the reaction constants and parameters
+        such as feature size are not possible to control. It has the following
+        parameters:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <guilabel>Output type</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Which of the two components should be rendered to the image.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Removal rate</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Removal rate constant for the reaction.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Feed rate</guilabel>
+          </term>
+          <listitem>
+            <para>
+              Feed rate constant for the reaction.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>Source density</guilabel>
+          </term>
+          <listitem>
+            <para>
+              The pixel density of fixed sources with low/high values. The
+              density is per pixel, but not the factor 10<superscript>-3</superscript>.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <guilabel>No-source iterations</guilabel>
+          </term>
+          <listitem>
+            <para>
+              How many iterations at the end should be carried out with sources
+              removed. It is possible to choose a number larger than the total
+              number of iterations, although it is not very useful (the sources
+              are removed immediately then).
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      <para>
+        In most parameter ranges the reaction needs a source of reactants to
+        produce interesting patterns. Without such supply the system state
+        evolves to a constant flat image or checkerboard instability. One possibility
+        of forcing an intersting pattern (often used in demonstrations) is
+        a large spatial variation of the reaction constants through the domain.
+        However, this does not allow computation of specific patterns for
+        particular parameter values.
+      </para>
+      <para>
+        So, instead, the module adds explicit sources. They are realised in
+        a crude manner as random pixels which keep their low/high values (and
+        can be sometimes observed in the animated evolution). They are not
+        subject to the reaction, but they influence their neigbours.
+      </para>
+      <para>
+        Some patterns are stable once they develop and nothing happens when
+        sources are removed. Some are not and degenerate into one of the
+        non-interesting states. Slightly different sets of patterns can be
+        obtained with sources removed for a long time and with sources removed
+        just briefly at the end. In addition, there are some interesting
+        transitional patterns.
+      </para>
+      <informalfigure id='fig-synthetic-diffreact'>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref='synthetic-diffreact.png' format='PNG'/>
+          </imageobject>
+          <caption>
+            Examples of patterns which can be produced by the diffusion
+            reaction model.
+          </caption>
+        </mediaobject>
+      </informalfigure>
+    </sect3>
+  </sect2>
+  <sect2 id='diffusion-synthesis'>
+    <title>
+      Diffusion <gwy:icon name='synthetic_diffusion'/>
+    </title>
+    <para>
+      The simulation implements a Monte Carlo discrete diffusion limited
+      aggregation model.  Pixel-shaped particles fall onto the surface and move
+      around it until they stick to a cluster, slowly forming a monolayer.  The
+      flux of incoming particles is low so that only a few particles are free
+      to move at any given time and the particles can travel a considerable
+      distance on the surface before sticking.  For typical parameter values,
+      this leads to the formation of <quote>fractal flake</quote> clusters.
+    </para>
+    <para>
+      The calculation has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number of times a particle falls onto any given pixel.
+            Coverage value of 1 means the surface would be covered by a
+            monolayer, assuming the particles cover it uniformly.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Flux</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number particles falling onto any given pixel per
+            simulation step.  Smaller values of flux lead to larger structures
+            as the particles diffuse for longer time before they meet another
+            particle.  The value is given as a decimal logarithm, indicated by
+            the units <guilabel>log₁₀</guilabel>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The height of one particle which gives the height of the steps
+            in the resulting image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Sticking probability</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The probability that a free particle will finally stick and stop
+            moving when it touches another single particle.  Probabilities that
+            the particle will stick if it touches two or three particles
+            increase progressively depending on this value.  The sticking
+            probability is always zero for a particle with no neighbours and
+            always one for a particle with all four neighbours.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Activation probability</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The probability a particle that has not stuck will move if it
+            touches another particle.  The probability for more touching
+            particles decreases as a power of the single-particle probability.
+            Particles without any neighbours can always move freely.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Passing Schwoebel probability</guilabel>
+        </term>
+        <listitem>
+          <para>
+            A particle that has fallen on the top of an already formed cluster
+            can have reduced probability to descend to the lower layer due to
+            so called Schwoebel barrier.  If this parameter is 1 there is no
+            such barrier, i.e. particles can descend freely.  Conversely,
+            probability 0 means particles can never descend to the lower layer.
+            The value is given as a decimal logarithm, indicated by the units
+            <guilabel>log₁₀</guilabel>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Note that some parameter combinations, namely very small flux combined
+      with very small Schwoebel barrier passing probability, can lead to
+      excessively long simulation times.
+    </para>
+    <informalfigure id='fig-synthetic-diffusion'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-diffusion.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial diffusion surfaces: sparse clusters with high sticking
+          probability (left); dense clusters with low sticking probability
+          (centre); mutltilayer fractal structures with high Schwoebel barrier
+          (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='fibre-synthesis'>
+    <title>
+      Fibres <gwy:icon name='synthetic_fibres'/>
+    </title>
+    <para>
+      The random fibre placement synthesis method is very similar to
+      <link linkend='object-synthesis'>Objects</link>, except instead of
+      finite-sized objects it adds infinitely long (in principle) fibres to
+      the surface.
+    </para>
+    <para>
+      The generator has quite a few parameters, divided into
+      <guilabel>Generator</guilabel> and
+      <guilabel>Placement</guilabel>.  The first group contains the basic
+      settings and parameters determining the profiles of individual fibres:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Shape</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The shape of profile across a fibre.  Options
+            <guilabel>Semi-circle</guilabel>,
+            <guilabel>Triangle</guilabel>,
+            <guilabel>Rectangle</guilabel>
+            and
+            <guilabel>Parabola</guilabel>
+            are self-explanatory.
+            <guilabel>Quadratic spline</guilabel>
+            shape corresponds to the three-part piecewise quadratic
+            function that is the basis function of quadratic B-spline.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number of times a fibre would be placed onto any given
+            pixel.  Coverage value of 1 means the surface would be exactly once
+            covered by the fibres assuming that they covered it uniformly and
+            did not overlap.  Values larger than 1 mean more layers of
+            fibres – and slower image generation.  The value is approximate and
+            the actual coverage depends somewhat on other parameters.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Width</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Fibre width in pixels.  It has the usual
+            <guilabel>Variance</guilabel> associated, which determines the
+            difference between entire fibres.  However, the width can also vary
+            along a single fibre.  This is controlled by the
+            <guilabel>Along fibre</guilabel> option.  High values of variation
+            along the fibre can in combination with some other options (in
+            particular high lengthwise deformation and height variation)
+            result in very odd looking images and possibly artefacts.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            A quantity proportional to the height of the fibre, normally
+            the height of the highest point.  Similarly to
+            <guilabel>Width</guilabel>, it has two variances, between entire
+            fibres and along each individual fibre.
+          </para>
+          <para>
+            Enabling <guilabel>Scales with width</guilabel> makes unperturbed
+            heights to scale proportionally with fibre width.  Otherwise the
+            height is independent on size.
+          </para>
+          <para>
+            Button <guilabel>Like Current Image</guilabel> sets the height
+            value to a value based on the RMS of the current image.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Truncate</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The fibres can be truncated at a certain height, enabling creation
+            of profiles in the form of truncated semi-circles, parabolas, etc.
+            The truncation height is given as a proportion to the total fibre
+            height.  Unity means the fibre is not truncated, zero would mean
+            complete removal of the fibre.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The second group contains options controlling how fibres are deformed
+      and added to the image:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Orientation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The rotation of fibres, measured anticlockwise.
+            Zero corresponds to the left-to-right orientation.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Density</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Density controls how frequently the fibre is deformed along its
+            length.  Low density means gradual deformation on a large scale,
+            whereas high density means the fibre is deformed often, leading to
+            wavy or curly shapes.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Lateral</guilabel>
+        </term>
+        <listitem>
+          <para>
+            How much the fibre is deformed in the direction perpendicular to
+            its main direction.  Increasing this value makes the fibre wavy,
+            but in a relatively regular manner.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Lengthwise</guilabel>
+        </term>
+        <listitem>
+          <para>
+            How much points of the fibre are moved along its length.
+            Increasing this value causes irregular kinks and loops (or even
+            knots) to appear.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-fibres'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-fibres.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial fibre surfaces: moderately deformed fibres, all oriented
+          more or less in the same direction (left); many layers of thin
+          straight randomly oriented fibres (centre); parallel fibres with
+          high lateral deformation density (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='lattice-synthesis'>
+    <title>
+      Lattice <gwy:icon name='synthetic_lattice'/>
+    </title>
+    <para>
+      The lattice synthesis module creates surfaces based on randomised
+      two-dimensional lattices.  It has two major parts.  The first part,
+      controlled by parameters in tab <guilabel>Lattice</guilabel>, is the
+      creation of a set of points in plane that are organised to a more or less
+      randomised lattice.  The second part, controlled by parameters in tab
+      <guilabel>Surface</guilabel>, is the actual construction of a surface
+      based on quantities calculated from Voronoi tessellation and/or Delaunay
+      triangulation of the set of points.
+    </para>
+    <para>
+      The creation of the lattice has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Lattice</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The base lattice type.  The random lattice corresponds to
+            completely randomly placed points.  Other types correspond to
+            regular organisations of points (square, hexagonal, triangular),
+            well-known tilings (Cairo, snub square, Penrose) or surface
+            reconstructions (silicon 7×7).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Size</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average cell size.  More precisely, this parameter describes
+            the mean point density.  It is equal to the side of the square if
+            the same number of points was organised to a square lattice.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Lattice relaxation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Amount to which the lattice is allowed to relax.  The relaxation
+            process pushes points away from very close neighbours and towards
+            large empty space.  The net result is that cell sizes become more
+            uniform.  Of course, relaxation has no effect on regular lattices.
+            It should be noted that relaxation requires progressive
+            retessellation and large relaxation parameter values can slow down
+            the surface generation considerably.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height relaxation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Amount to which the random values assigned to each point (see
+            below) are allowed to relax.  The relaxation process is similar
+            to diffusion and leads to overal smoothing of the random values.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Orientation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The rotation of the lattice with respect to some base orientation,
+            measured anticlockwise.  It is only available for regular
+            lattices as the random lattice is isotropic.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Amplitude</guilabel>,
+          <guilabel>Lateral scale</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Parameters that control the lattice deformation.  They have the
+            same meaning as in
+            <link linkend='pattern-synthesis'>Pattern synthesis</link>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The final surface is constructed as a weighted sum of a subset of basic
+      quantities derived from the Voronoi tessellation or Delaunay
+      triangulation.  Each quantity can be enabled and disabled.  When it
+      is selected in the list, its weight in the sum and its thresholding
+      parameters can be modified using the sliders.  The lower and upper
+      threshold cut the value range (which is always normalised to
+      <xi:include href='eqi-interval-0-1.xml'/>) by changing all values larger
+      than the upper threshold equal to the thresold value and similarly for
+      the lower thresold.
+    </para>
+    <para>
+      Some of the basic quantities are calculated from lateral coordinates
+      only.  Some, however, are calculated from random values
+      (<quote>heights</quote>) assigned to each point in the set.  The
+      available quantities include:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Random constant</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Rounding interpolation between the random values assigned to each
+            point of the set.  This means each Voronoi cell is filled with
+            a constant random value.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Random linear</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Linear interpolation between the random values assigned to each
+            point of the set.  Thus the surface is continuous, with each
+            Delaunay triangle corresponding to a facet.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Random bumpy</guilabel>
+        </term>
+        <listitem>
+          <para>
+            An interpolation similar to the previous one, but non-linear,
+            creating relatively level areas around each point of the set.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Radial distance</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Distance to the closest point of the set.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Segmented distance</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Distance to the closest Voronoi cell border, scaled in each cell
+            segment so that the set point is in the same distance from all
+            borders.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Segmented random</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The same quantity as segmented distance, but multiplied by the
+            radndom value assigned to the point of the set.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Border distance</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Distance to the closest Voronoi cell border.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Border random</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The same quantity as border distance, but multiplied by the
+            radndom value assigned to the point of the set.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Second nearest distance</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Distance to the second nearest point of the set.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-lattice'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-lattice.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial lattice surfaces: faceted surface created by
+          random linear interpolation (left);
+          bumps in a distorted triangular pattern (centre);
+          distorted rectangular pattern with segments separated by trenches
+          (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='brownian-synthesis'>
+    <title>
+      Brownian <gwy:icon name='synthetic_brownian_motion'/>
+    </title>
+    <para>
+      The module generates, among other things, surfaces with profiles similar
+      to samples of fractional Brownian motion.  The construction method is,
+      however, not very sophisticated.  Starting from corners of the image,
+      interior points are recursively linearly interpolated along the
+      horizontal and vertical axes, adding noise that scales with distance
+      according to the given Hurst exponent.  Some of the surfaces are
+      essentially the same as those generated using
+      <link linkend='spectral-synthesis'>spectral synthesis</link>, however,
+      constructing them in the direct space instead of frequency space allows
+      different modifications of their properties.
+    </para>
+    <para>
+      The generator has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Hurst exponent</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The design Hurst exponent <xi:include href='eqi-H.xml'/>.
+            For the normal values between 0 and 1, the square root of
+            <link linkend='height-height-correlation-1d'>height-height
+              correlation function</link>
+            grows as <xi:include href='eqi-H.xml'/>-th power of the distance.
+            The construction algorithm permits formally even negative values
+            beause it stops at the finite resolution of one pixel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Stationarity scale</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Scale at which stationarity is enforced (note Fractional Brownian
+            motion is not a stationary).  When this scale is comparable to the
+            image size or larger, it has little effect.  However, when it is
+            small the image becomes <quote>homogeneised</quote> instead of
+            self-similar above this scale.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Distribution</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Distribution of the noise added during the generation.  Uniform
+            and Gaussian result in essentially the same surfaces
+            (statistically); the former is faster though.  More heavy-tailed
+            distributions, i.e. exponential and especially power, lead to
+            prominent peaks and valleys.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Power</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Power <xi:include href='eqi-alpha.xml'/> for the power
+            distribution.  The probability density function is proportional to
+            <xi:include href="eq-fBm-power-pdf.xml"/>
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>RMS</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The root mean square value of the heights (or of the differences
+            from the mean plane which, however, always is the
+            <xi:include href="eqi-z-is-0.xml"/> plane).  Note this value
+            applies to the specific generated image, not the process as such,
+            which does not have finite RMS.  Button <guilabel>Like Current
+              Image</guilabel> sets the RMS value to that of the current
+            image.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-brownian'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-brownian.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial Brownian surfaces:
+          classic surface generated with H about 0.7 (left);
+          nebula-like image generated with a heavy-tailed power distribution
+          (centre);
+          the effect of small stationarity scale (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='phases-synthesis'>
+    <title>
+      Phases <gwy:icon name='synthetic_phases'/>
+    </title>
+    <para>
+      The module creates data somewhat resembling magnetic domain structures
+      that have been studied by magnetic force microscopy (MFM).  Unlike
+      more physically correct but very computationally expensive approaches,
+      it works by spectral synthesis of a surface with a limited range of
+      spatial frequencies, and then application of morphological operations
+      to obtain a two-phase image.  The output image thus mostly contains of
+      two values representing the two phases, although occasionally a middle
+      <quote>in transition</quote> value can appear.
+    </para>
+    <para>
+      The generator has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Size</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Typical width of the stripe.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Size spread</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Spread of sizes (or, more precisely, spatial frequencies).
+            Small spread means smooth regular features.  However, for very
+            small spread values preferred directions may appear in the image
+            (it becomes anisotropic) due to the exhaustion of allowed spatial
+            frequencies.  Large spread means less regular phase boundaries
+            and also more in-transition regions.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The difference between the values corresponding to the two phases,
+            determining overall <xi:include href="eqi-z.xml"/>-scale of
+            the image.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-phases'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-phases.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial two-phase images:
+          small size spread (left);
+          larger size spread (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='discs-synthesis'>
+    <title>
+      Discs <gwy:icon name='synthetic_discs'/>
+    </title>
+    <para>
+      The module creates data consisting of non-overlapping discs, possibly
+      post-processed to form a surface covered by tiles.  A similar result can
+      be also achieved with <link linkend='object-synthesis'>Objects</link>
+      when <guilabel>Avoid stacking</guilabel> is enabled.  However, in this
+      case the only a few seed discs are placed randomly, the remaining ones
+      are always placed to the middle of the largest remaining empty space.
+      This results in a more uniform distribution of sizes.  Furthermore, the
+      transformation to tiles creates structures where typically three tiles
+      meet at angles close to 120 degrees, similarly to foam structures.
+    </para>
+    <para>
+      The generator has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Starting radius</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Radius of the seed discs placed randomly at the beginnig.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Minimum radius</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The minimum allowed radius of all other discs.  When there is no
+            space for a disc of at least this size, the generation stop.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Separation</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Additional separation from neighbour discs.  While
+            <guilabel>Minimum radius</guilabel> detemines the minimum size of
+            the actually placed dics, this parameter increases the minimum
+            size of free space allowing placement.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Transform to tiles</guilabel>
+        </term>
+        <listitem>
+          <para>
+            When enabled, all discs are expanded until they would touch their
+            neighbours.  The surface becomes tiles, with thin gaps between
+            tiles.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Gap thickness</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Width of gaps between tiles after the tile transformation.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Apply opening filter</guilabel>
+        </term>
+        <listitem>
+          <para>
+            When enabled, the tiling is further post-processed using
+            <link linkend='maskops-opening'>opening filter</link> of
+            given size.  This removes too small tiles and makes the remaning
+            ones rounder.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Size</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Size of the opening filter.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Height</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The height of discs or tiles with respect to the base,
+            determining overall <xi:include href="eqi-z.xml"/>-scale of
+            the image.  Heights of individual features will be spread around
+            this value when <guilabel>Variance</guilabel> is non-zero.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-discs'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-discs.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Artificial disc images:
+          round discs with some height distribution (left);
+          transformation to tiles (centre);
+          erosion by opening filter (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='dunes-synthesis'>
+    <title>
+      Dunes <gwy:icon name='synthetic_dunes'/>
+    </title>
+    <para>
+      The module is based on a simple simulation of formation of eolian dunes
+      [<link linkend='synthetic-ref-3'>3</link>]. Particles can be picked up by wind
+      with a certain probability, transferred along the wind direction and deposited
+      in another location. The function has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number of particles per one pixel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Number of iterations</guilabel>
+        </term>
+        <listitem>
+          <para>
+            One iteration correspond to wind picking up randomly one particle
+            in each pixel and deposting it elsewhere. However, the pixels are chosen
+            randomly. Some locations may be chosen multiple times in one iteraton,
+            others not at all. Some selected locations may also be bare bedrock
+            with no sand particle to pick up.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Direction</guilabel> and <guilabel>Spread</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The mean wind direction and wind direction spread.
+            Small spread means the wind direction is consistent. Large values mean more
+            random wind direction.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Minimum step</guilabel> and <guilabel>Step range</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The sand particle can be imagined as only touching the surface occasionally
+            and being carried by the wind high above it between. It can only be deposited
+            when it touches the surface. The minimum step is the minimum
+            distance (in pixels) of one such jump; the range gives the interval
+            (again in pixels) from minimum to maximum jump length.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Stickng probability on rock</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The probability the particle is deposited when it touches the bare bedrock.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Stickng probability on sand</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The probability the particle is deposited when it touches the surface and there
+            is already some sand. This probability should be generally higher than for bare
+            rock.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Maximum slope</guilabel>
+        </term>
+        <listitem>
+          <para>
+            When deposition of a particle (or picking up by wind) creates a too
+            large height difference between neighbour pixels the sand becomes unstable.
+            It then trickles down to either reduce the slopes of a hill for fill holes
+            until the maximum slope is nowhere exceeded.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-dunes'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-dunes.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Dune images:
+          the default settings (left);
+          long flat dunes with small maximum slope (centre);
+          more isotropic dunes for highly random wind direction (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='plateaus-synthesis'>
+    <title>
+      Plateaus <gwy:icon name='synthetic_plateaus'/>
+    </title>
+    <para>
+      The surface is created by stacking flakes or plateaus on top of each other,
+      starting from the largest and progressing to the smallest according to a scaling
+      law. By default they do not overlap, but it can be enabled to allow overlapping
+      flakes (a bit like those that might occur with 1D materials such as graphene).
+      The generator has the following parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Maximum size</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The approximate maximum radius of a plateau.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Minimum size</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The approximate minimum radius of a plateau.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Size power law</guilabel>
+        </term>
+        <listitem>
+          <para>
+            How fast the plateau size radius decreases with the increasing number of
+            plateaus already there. High values mean the size decreases quickly and
+            plateaus tend to be sparse and isolated. Low values mean the size decreases
+            slowly and plateaus ten to be dense and stacked high.
+          </para>
+          <warning>
+            It may be difficult, or even impossible, to find positions for all
+            the plateaus with given the maximum and minimum size and scaling
+            power. Low powers are only useful with narrow size ranges.
+            Otherwise the surface generation can be extremely slow – or even
+            never finish at all.
+          </warning>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Shape irregularity</guilabel>
+        </term>
+        <listitem>
+          <para>
+            How much the shapes can differ from symmetrical discs.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Overlap fraction</guilabel>
+        </term>
+        <listitem>
+          <para>
+            Approximate fraction of plateaus that overlap with another plateau.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Scale with power of size</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The power with which plateau height scales with its radius. For the
+            default power of 0 all pleateaus have the same height (apart from
+            possible random spread). Positive powers mean the height decreases as the size
+            decreased. Negative powers mean smaller plateaus are taller, creating a spiky
+            surface.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-plateaus'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-plateaus.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Plateau images:
+          the default settings (left);
+          approximately self-affine surface with small scaling power and minimum size (centre);
+          somewhat overlapping irregular flakes (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='wetting-synthesis'>
+    <title>
+      Wetting
+    </title>
+    <para>
+      Wetting is a simple simulation of wetting front progressing through a
+      random medium. The medium is represented as a voxel grid, where each voxel
+      has a different resistance. The liquid always propagates to the least
+      resistant voxel. The generator produces isotropic patterns with discrete
+      heights corresponding to the levels to which the wetting front have
+      progressed. It has a couple of parameters:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Coverage</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The average number of times the liquid is propagated per pixel. The
+            resulting image shows only the farthest points, so its average value
+            is not in a simple relation to coverage.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <guilabel>Diffusion</guilabel>
+        </term>
+        <listitem>
+          <para>
+            The probability of random propagation from neighbour voxels, not
+            according to the resistance based priority. Note that the value is
+            logarithmic.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <informalfigure id='fig-synthetic-wetting'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='synthetic-wetting.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Wetting front images:
+          a typical result with moderate coverage (left);
+          initial stage of propagation (right).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='synthetic-ref'>
+    <title>References</title>
+    <para id='synthetic-ref-1'>
+      [1] D. Nečas, P. Klapetek: Synthetic Data in Quantitative Scanning Probe Microscopy.
+      Nanomaterials 11 (2021) 1746
+     <ulink url='http://dx.doi.org/10.3390/nano11071746'>10.3390/nano11071746</ulink>
+    </para>
+    <para id='synthetic-ref-2'>
+      [2] L. M. Pismen, M. I. Monine, G. V. Tchernikov: Patterns
+      and localized structures in a hybrid non-equilibrium Ising model.
+      Physica D 199 (2004) 82,
+     <ulink url='http://dx.doi.org/10.1016/j.physd.2004.08.006'>doi:10.1016/j.physd.2004.08.006</ulink>
+    </para>
+    <para id='synthetic-ref-3'>
+      [3] B. T. Werner: Eolian dunes: Computer simulations and attractor interpretation.
+      Geology 23 (1995) 1107,
+     <ulink url='http://dx.doi.org/10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3.CO;2'>doi:10.1130/0091-7613(1995)023&lt;1107:EDCSAA&gt;2.3.CO;2</ulink>
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

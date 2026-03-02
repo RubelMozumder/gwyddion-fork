@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: filters.xml 9429 2009-07-14 21:11:45Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='force_indentation' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Force et indentation</title>
+  <sect2 id='indentanalyze'>
+    <title>
+      Analyse d'empreinte
+      <gwy:icon name='tip_indent_analyze'/>
+    </title>
+    <para>
+      <menuchoice>
+        <guimenu>Traitement des données</guimenu>
+        <guisubmenu>Modes SPM</guisubmenu>
+        <guisubmenu>Force et indentation</guisubmenu>
+        <guisubmenu>Analyser l'empreinte</guisubmenu>
+      </menuchoice>
+    </para>
+
+    <para>
+      Ce module calcule identifie caractéristiques d'une empreinte 
+      d'indentation et calcule les surfaces projetée et développée 
+      (<xi:include href="eqi-A_p.xml"/> et <xi:include href="eqi-A_d.xml"/>), 
+      ainsi que les volumes correspondants.
+      <variablelist>
+        <varlistentry>
+          <term> Impression </term>
+          <listitem>
+          <para> 
+			Région autour du minimum local ayant le même vecteur normal
+			(à la symétrie près). Elle correspond à la définition 
+			usuelle de la surface de contact.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Enfoncement </term>
+        <listitem>
+          <para>
+            Partie de l'impression située au-dessus du plan de référence.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Débordement </term>
+        <listitem>
+          <para>
+            Partie de l'image située au-dessus du plan de référence mais
+            ayant une vecteur normal différent de celui de l'impression.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Points spéciaux </term>
+        <listitem>
+          <para>
+            Inclut le maximum, le minimum ainsi que les points le long
+            des pentes les plus fortes.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Aires projetée et développée attendues </term>
+        <listitem>
+          <para>
+            Fait référence aux valeurs obtenues en évaluant la fonction
+            d'aire théorique de l'indenteur choisi en considérant la 
+            profondeur de l'empreinte.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term> Volume au-desus/en-dessous </term>
+        <listitem>
+          <para>
+            Il s'agit de la différence entre le volume au-dessud du plan 
+            référence et celui sous ce plan.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+  <para>
+    Notez que ce module met à niveau les données en ajustant les plans 
+    le long des bords de l'image. Cela peut aboutir à des écarts entre
+    les valeurs obtenues avec ce modèle et les valeurs analogues
+    obtenues avec l'outil 
+    <link linkend='tool-stats'>Statistiques</link>. Les données doivent
+    être mises à niveau manuellement pour réduire cet effet.
+  </para>
+  <informalfigure id='fig-indent-analyze'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='indentation-pileup.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Schéma des différentes régions d'une indentation: au-dessus, en-dessous, plan, impression, enfoncement et débordement.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+</sect2>
+  </sect1>
+
+  <!-- vim: set ts=2 sw=2 et : -->

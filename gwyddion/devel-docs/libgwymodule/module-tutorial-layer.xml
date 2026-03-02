@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<refentry id="gwymodule-tutorial-layer" revision="$Id: module-tutorial-layer.xml 20682 2017-12-18 18:39:00Z yeti-dn $">
+  <refmeta>
+    <refentrytitle>Layer Modules</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo>Gwyddion</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>Layer Modules</refname>
+    <refpurpose>
+      More about layer modules
+    </refpurpose>
+  </refnamediv>
+
+  <refsect1>
+    <title>Tool Module Registration</title>
+    <para>
+      To be written.
+    </para>
+  </refsect1>
+</refentry>
+

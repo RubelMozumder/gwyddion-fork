@@ -1,0 +1,22 @@
+[gwyddion-mingw]
+name=Gwyddion MinGW for $releasever - $basearch
+baseurl=http://gwyddion.net/download/fedora-mingw/$releasever/$basearch/os/
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-gwyddion
+
+[gwyddion-mingw-debuginfo]
+name=Gwyddion MinGW for $releasever - $basearch - Debug
+baseurl=http://gwyddion.net/download/fedora-mingw/$releasever/$basearch/debug/
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-gwyddion
+gpgcheck=1
+
+[gwyddion-mingw-source]
+name=Gwyddion MinGW for $releasever - $basearch - Source
+baseurl=http://gwyddion.net/download/fedora-mingw/$releasever/SRPMS/
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-gwyddion
+gpgcheck=1
+
+# vim: set ft=desktop:

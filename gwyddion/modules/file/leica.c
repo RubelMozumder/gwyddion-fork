@@ -1,0 +1,976 @@
+/*
+ *  $Id: leica.c 26237 2024-03-01 14:46:58Z yeti-dn $
+ *  Copyright (C) 2014 Daniil Bratashov (dn2010), David Necas (Yeti)..
+ *
+ *  E-mail: dn2010@gmail.com.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-leica-spm">
+ *   <comment>Leica LIF File</comment>
+ *   <magic priority="80">
+ *     <match type="string" offset="0" value="\x70\x00\x00\x00"/>
+ *   </magic>
+ *   <glob pattern="*.lif"/>
+ *   <glob pattern="*.LIF"/>
+ * </mime-type>
+ **/
+
+/**
+ * [FILE-MAGIC-FILEMAGIC]
+ * # Leica LIF
+ * 0 string \x70\x00\x00\x00 Leica LIF File
+ **/
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Leica LIF Data File
+ * .lif
+ * Read Volume
+ **/
+
+/*
+ * TODO: laser and filter settings in metadata
+ */
+
+#include "config.h"
+#include <string.h>
+#include <stdlib.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwyutils.h>
+#include <libgwyddion/gwymath.h>
+#include <libprocess/datafield.h>
+#include <libprocess/spectra.h>
+#include <libprocess/brick.h>
+#include <libgwydgets/gwygraphmodel.h>
+#include <libgwydgets/gwygraphbasics.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils-file.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
+
+#include "err.h"
+#include "get.h"
+
+#define MAGIC "\x70\x00\x00\x00"
+#define MAGIC_SIZE (4)
+#define TESTCODE 0x2a
+
+#define EXTENSION ".lif"
+
+typedef enum {
+    DimNotValid = 0,
+    DimX        = 1,
+    DimY        = 2,
+    DimZ        = 3,
+    DimT        = 4,
+    DimLambda   = 5,
+    DimRotation = 6,
+    DimXT       = 7,
+    DimTSlice   = 8
+} LIFDimID;
+
+typedef struct {
+    gint32 magic;
+    guint32 size;
+    gchar testcode;
+    guint32 xmllen;
+    gchar *xmlheader;
+} LIFHeader;
+
+typedef struct {
+    gint32 magic;
+    guint32 size;
+    gchar testcode;
+    guint64 memsize;
+    guint32 desclen;
+    gchar *memid;
+    gpointer data;
+} LIFMemBlock;
+
+typedef struct {
+    gint res;
+    gdouble min;
+    gdouble max;
+    gchar *unit;
+    gchar *lut;
+    gsize bytesinc;
+} LIFChannel;
+
+typedef struct {
+    gint dimid;
+    gint res;
+    gdouble origin;
+    gdouble length;
+    gchar *unit;
+    gsize bytesinc;
+} LIFDimension;
+
+typedef struct {
+    gchar  *name;
+    gsize   memsize;
+    gchar  *memid;
+    GArray *channels;
+    GArray *dimensions;
+    GwyContainer *metadata;
+} LIFElement;
+
+typedef struct {
+    gint        version;
+    LIFHeader  *header;
+    GArray     *elements;
+    GHashTable *memblocks;
+} LIFFile;
+
+typedef struct {
+    LIFFile *file;
+    GArray *elements;
+} XMLParserData;
+
+static gboolean      module_register     (void);
+static gint          lif_detect          (const GwyFileDetectInfo *fileinfo,
+                                          gboolean only_name);
+static GwyContainer* lif_load            (const gchar *filename,
+                                          GwyRunType mode,
+                                          GError **error);
+static LIFFile*      parse_xml_header    (LIFHeader *header,
+                                          GError **error);
+static const gchar*  lut_name_to_palette (const gchar *lut);
+static gboolean      create_images       (LIFElement *element,
+                                          LIFMemBlock *memblock,
+                                          gint *channelno,
+                                          GwyContainer *container,
+                                          const gchar *filename,
+                                          GError **error);
+static gboolean      create_volumes      (LIFElement *element,
+                                          LIFMemBlock *memblock,
+                                          gint *channelno,
+                                          GwyContainer *container,
+                                          const gchar *filename,
+                                          GError **error);
+static void          lif_file_free       (LIFFile *file);
+static LIFMemBlock*  lif_read_memblock   (const guchar *buffer,
+                                          gsize *size,
+                                          gint version);
+static gboolean      lif_remove_memblock (gpointer key,
+                                          gpointer value,
+                                          gpointer user_data);
+static void          header_start_element(GMarkupParseContext *context,
+                                          const gchar *element_name,
+                                          const gchar **attribute_names,
+                                          const gchar **attribute_values,
+                                          gpointer user_data,
+                                          GError **error);
+static void          header_end_element  (GMarkupParseContext *context,
+                                          const gchar *element_name,
+                                          gpointer user_data,
+                                          GError **error);
+static void          header_parse_text   (GMarkupParseContext *context,
+                                          const gchar *text,
+                                          gsize text_len,
+                                          gpointer user_data,
+                                          GError **error);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Imports Leica CLSM image files (LIF)."),
+    "Daniil Bratashov <dn2010@gmail.com>",
+    "0.6",
+    "Daniil Bratashov (dn2010), David Necas (Yeti)",
+    "2016",
+};
+
+GWY_MODULE_QUERY2(module_info, leica)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("leica",
+                           N_("Leica LIF image files (.lif)"),
+                           (GwyFileDetectFunc)&lif_detect,
+                           (GwyFileLoadFunc)&lif_load,
+                           NULL,
+                           NULL);
+
+    return TRUE;
+}
+
+static gint
+lif_detect(const GwyFileDetectInfo *fileinfo,
+           gboolean only_name)
+{
+    gint score = 0;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, EXTENSION) ? 10 : 0;
+
+    if (fileinfo->buffer_len > MAGIC_SIZE
+        && memcmp(fileinfo->head, MAGIC, MAGIC_SIZE) == 0)
+        score = 100;
+
+    return score;
+}
+
+static GwyContainer*
+lif_load(const gchar *filename,
+         G_GNUC_UNUSED GwyRunType mode,
+         GError **error)
+{
+    GwyContainer *container = NULL;
+    LIFHeader *header = NULL;
+    LIFMemBlock *memblock = NULL;
+    LIFFile *file = NULL;
+    LIFElement *element = NULL;
+    LIFDimension *dimension = NULL;
+    gsize size = 0, memblock_size = 0;
+    gint64 remaining = 0;
+    gchar *buffer;
+    const guchar *p;
+    GError *err = NULL;
+    gint i, j, imageno = 0, volumeno = 0;
+    gint res, xres;
+    gboolean ok = FALSE;
+
+    if (!g_file_get_contents(filename, &buffer, &size, &err)) {
+        err_GET_FILE_CONTENTS(error, &err);
+        goto fail;
+    }
+
+    if (size < 13) { /* header too short */
+        err_TOO_SHORT(error);
+        goto fail;
+    }
+
+    p = buffer;
+    remaining = size;
+    header = g_new0(LIFHeader, 1);
+    header->magic = gwy_get_gint32_le(&p);
+    gwy_debug("Magic = %d", header->magic);
+    header->size = gwy_get_guint32_le(&p);
+    gwy_debug("Size = %d", header->size);
+    header->testcode = *(p++);
+    gwy_debug("Testcode = 0x%x", header->testcode);
+    if (header->testcode != TESTCODE) {
+        err_FILE_TYPE(error, "Leica LIF");
+        goto fail;
+    }
+    header->xmllen = gwy_get_guint32_le(&p);
+    gwy_debug("XML length = %d", header->xmllen);
+    if (size < 13 + header->xmllen * 2) {
+        err_TOO_SHORT(error);
+        goto fail;
+    }
+
+    remaining -= 13;
+
+    header->xmlheader = gwy_utf16_to_utf8((const gunichar2*)p, header->xmllen, GWY_BYTE_ORDER_LITTLE_ENDIAN);
+    p += header->xmllen * 2;
+    remaining -= header->xmllen * 2;
+
+    // Uncomment to see large XML header
+    // gwy_debug("%s", header->xmlheader);
+
+    /* Parse XML header */
+    if (!(file = parse_xml_header(header, error)))
+        goto fail;
+
+    /* Reading memblocks */
+    file->memblocks = g_hash_table_new(g_str_hash, g_str_equal);
+    while (remaining > 0) {
+        memblock = lif_read_memblock(p, &memblock_size, file->version);
+        if (!memblock) {
+            break;
+        }
+        remaining -= memblock_size;
+        if (remaining >= 0) {
+            gwy_debug("remaining = %" G_GUINT64_FORMAT "", remaining);
+            p += memblock_size;
+            g_hash_table_insert(file->memblocks, memblock->memid, memblock);
+        }
+    }
+
+    /* Create data objects. */
+    container = gwy_container_new();
+    for (i = 0; i < file->elements->len; i++) {
+        element = &g_array_index(file->elements, LIFElement, i);
+
+        if ((element->dimensions == NULL) || (element->channels == NULL)) {
+            gwy_debug("Empty element");
+            continue;
+        }
+
+        gwy_debug("Dimensions = %d channels=%d",
+                  element->dimensions->len,
+                  element->channels->len);
+        gwy_debug("memid=%s", element->memid);
+
+        /* check if we can load this type of data into Gwyddion structures */
+        res = 0;
+        if ((element->dimensions->len != 2) && (element->dimensions->len != 3)) {
+            /* check for case ndim == 4 && res == 1 */
+            for (j = 0; j < element->dimensions->len; j++) {
+                dimension = &g_array_index(element->dimensions, LIFDimension, j);
+                xres = dimension->res;
+                gwy_debug("dim[%d].res=%d", j, xres);
+                if (j == 2) {
+                    res = xres;
+                }
+            }
+            if ((element->dimensions->len == 4) && (res == 1)) {
+                gwy_debug("4D volume");
+            }
+            else {
+                gwy_debug("not loading");
+                continue;
+            }
+        }
+
+        memblock = (LIFMemBlock *)g_hash_table_lookup(file->memblocks, element->memid);
+        if (!memblock) {
+            gwy_debug("Failed to locate memblock with key %s", element->memid);
+            continue;
+        }
+
+        if (element->dimensions->len == 2) {
+            /* Image */
+            if (!create_images(element, memblock, &imageno, container, filename, error))
+                goto fail;
+        }
+        else if (element->dimensions->len == 3 || (element->dimensions->len == 4 && res == 1)) {
+            /* Volume */
+            if (!create_volumes(element, memblock, &volumeno, container, filename, error))
+                goto fail;
+        }
+    }
+    ok = TRUE;
+
+fail:
+    /* freeing all stuff */
+    g_free(buffer);
+    lif_file_free(file);
+    if (header)
+        g_free(header->xmlheader);
+    g_free(header);
+
+    if (!ok)
+        GWY_OBJECT_UNREF(container);
+    else if (!gwy_container_get_n_items(container)) {
+        err_NO_DATA(error);
+        GWY_OBJECT_UNREF(container);
+    }
+
+    return container;
+}
+
+static gboolean
+create_images(LIFElement *element, LIFMemBlock *memblock, gint *channelno,
+              GwyContainer *container, const gchar *filename,
+              GError **error)
+{
+    gdouble zscale = 1.0;
+    GwySIUnit *siunitxy = NULL, *siunitz = NULL;
+    gint power10xy = 0, power10z = 0;
+    LIFDimension *dimension = NULL;
+    LIFChannel *channel = NULL;
+    const guchar *tp, *p = memblock->data;
+    GwyDataField *dfield = NULL;
+    gdouble *data = NULL;
+    const gchar *lutname;
+    gint x, xres, xstep, y, yres, ystep, offset;
+    gdouble xreal, yreal, xoffset, yoffset;
+    guint j;
+
+    for (j = 0; j < element->channels->len; j++) {
+        dimension = &g_array_index(element->dimensions, LIFDimension, 0);
+        xres = dimension->res;
+        xreal = dimension->length;
+        xoffset = dimension->origin;
+        xstep = dimension->bytesinc;
+        siunitxy = gwy_si_unit_new_parse(dimension->unit, &power10xy);
+
+        dimension = &g_array_index(element->dimensions, LIFDimension, 1);
+        yres = dimension->res;
+        yreal = dimension->length;
+        yoffset = dimension->origin;
+        ystep = dimension->bytesinc;
+
+        if (xreal <= 0.0)
+            xreal = 1.0;
+        if (yreal <= 0.0)
+            yreal = 1.0;
+
+        channel = &g_array_index(element->channels, LIFChannel, j);
+        offset = channel->bytesinc;
+        siunitz = gwy_si_unit_new_parse(channel->unit, &power10z);
+
+        zscale = pow10(power10z);
+        if (offset + (xres - 1)*xstep + (yres - 1)*ystep > memblock->memsize) {
+            gwy_debug("Memblock too small");
+            gwy_debug("%d %" G_GUINT64_FORMAT "",
+                      offset + (xres-1)*xstep + (yres-1)*ystep,
+                      memblock->memsize);
+            err_SIZE_MISMATCH(error, offset + (xres-1)*xstep + (yres-1)*ystep, memblock->memsize, FALSE);
+            return FALSE;
+        }
+
+        dfield = gwy_data_field_new(xres, yres,
+                                    xreal*pow10(power10xy), yreal*pow10(power10xy),
+                                    TRUE);
+        gwy_data_field_set_xoffset(dfield, xoffset*pow10(power10xy));
+        gwy_data_field_set_yoffset(dfield, yoffset*pow10(power10xy));
+
+        data = gwy_data_field_get_data(dfield);
+        if (xstep == 1) {
+            for (y = 0; y < yres; y++) {
+                for (x = 0; x < xres; x++) {
+                    *(data++) = zscale * (gdouble)*(p + offset + x*xstep + y*ystep);
+                }
+            }
+        }
+        else if (xstep == 2) {
+            for (y = 0; y < yres; y++) {
+                for (x = 0; x < xres; x++) {
+                    tp = p + offset + x*xstep + y*ystep;
+                    *(data++) = zscale * gwy_get_guint16_le(&tp);
+                }
+            }
+        }
+
+        if (siunitxy) {
+            gwy_si_unit_assign(gwy_data_field_get_si_unit_xy(dfield), siunitxy);
+            g_object_unref(siunitxy);
+        }
+        if (siunitz) {
+            gwy_si_unit_assign(gwy_data_field_get_si_unit_z(dfield), siunitz);
+            g_object_unref(siunitz);
+        }
+
+        gwy_container_pass_object(container, gwy_app_get_data_key_for_id(*channelno), dfield);
+        if (element->name)
+            gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(*channelno), element->name);
+        if (element->metadata) {
+            gwy_container_pass_object(container, gwy_app_get_data_meta_key_for_id(*channelno),
+                                      gwy_container_duplicate(element->metadata));
+        }
+        if ((lutname = lut_name_to_palette(channel->lut)))
+            gwy_container_set_const_string(container, gwy_app_get_data_palette_key_for_id(*channelno), lutname);
+
+        gwy_file_channel_import_log_add(container, *channelno, NULL, filename);
+
+        (*channelno)++;
+    }
+
+    return TRUE;
+}
+
+static gboolean
+create_volumes(LIFElement *element, LIFMemBlock *memblock, gint *channelno,
+               GwyContainer *container, const gchar *filename,
+               GError **error)
+{
+    gdouble wscale = 1.0;
+    GwySIUnit *siunitx = NULL, *siunity = NULL, *siunitz = NULL, *siunitw = NULL;
+    gint power10x = 0, power10y = 0, power10z = 0, power10w = 0;
+    LIFDimension *dimension = NULL;
+    LIFChannel *channel = NULL;
+    const guchar *tp, *p = memblock->data;
+    GwyBrick *brick = NULL;
+    gdouble *data = NULL;
+    const gchar *lutname;
+    gint x, xres, xstep, y, yres, ystep, z, zres, zstep, offset;
+    gdouble xreal, yreal, zreal, xoffset, yoffset, zoffset;
+    gboolean flipz = FALSE;
+    guint j;
+
+    for (j = 0; j < element->channels->len; j++) {
+        dimension = &g_array_index(element->dimensions, LIFDimension, 0);
+        xres = dimension->res;
+        xreal = dimension->length;
+        gwy_debug("xreal = %g", xreal);
+        xoffset = dimension->origin;
+        xstep = dimension->bytesinc;
+        siunitx = gwy_si_unit_new_parse(dimension->unit, &power10x);
+
+        dimension = &g_array_index(element->dimensions, LIFDimension, 1);
+        yres = dimension->res;
+        yreal = dimension->length;
+        gwy_debug("yreal = %g", yreal);
+        yoffset = dimension->origin;
+        ystep = dimension->bytesinc;
+        siunity = gwy_si_unit_new_parse(dimension->unit, &power10y);
+
+        if (element->dimensions->len == 3)
+            dimension = &g_array_index(element->dimensions, LIFDimension, 2);
+        else
+            dimension = &g_array_index(element->dimensions, LIFDimension, 3);
+
+        zres = dimension->res;
+        zreal = dimension->length;
+        gwy_debug("zreal = %g", zreal);
+        zoffset = dimension->origin;
+        if (zreal < 0.0) {
+            zreal = -zreal;
+            zoffset -= zreal;
+            flipz = TRUE;
+        }
+        zstep = dimension->bytesinc;
+        siunitz = gwy_si_unit_new_parse(dimension->unit, &power10z);
+
+        channel = &g_array_index(element->channels, LIFChannel, j);
+        offset = channel->bytesinc;
+        siunitw = gwy_si_unit_new_parse(channel->unit, &power10w);
+        wscale = pow10(power10w);
+
+        if (offset + (xres-1)*xstep + (yres-1)*ystep + (zres-1)*zstep > memblock->memsize) {
+            gwy_debug("Memblock too small");
+            gwy_debug("%d %" G_GUINT64_FORMAT "",
+                      offset + (xres-1)*xstep + (yres-1)*ystep + (zres-1)*zstep, memblock->memsize);
+            err_SIZE_MISMATCH(error,
+                              memblock->memsize,
+                              offset + (xres-1)*xstep + (yres-1)*ystep + (zres-1)*zstep,
+                              FALSE);
+            return FALSE;
+        }
+        brick = gwy_brick_new(xres, yres, zres,
+                              xreal*pow10(power10x), yreal*pow10(power10y), zreal*pow10(power10z),
+                              TRUE);
+        gwy_brick_set_xoffset(brick, xoffset*pow10(power10x));
+        gwy_brick_set_yoffset(brick, yoffset*pow10(power10y));
+        gwy_brick_set_zoffset(brick, zoffset*pow10(power10z));
+
+        data = gwy_brick_get_data(brick);
+
+        /* FIXME: I would like to use gwy_convert_raw_data(), and perhaps gwy_brick_invert() if necessary.
+         * But it might not be less messy than this at the end… */
+        if (!flipz) {
+            if (xstep == 1) {
+                for (z = 0; z < zres; z++) {
+                    for (y = 0; y < yres; y++) {
+                        for (x = 0; x < xres; x++) {
+                            *(data++) = wscale * (gdouble)*(p + offset + x*xstep + y*ystep + z*zstep);
+                        }
+                    }
+                }
+            }
+            else if (xstep == 2) {
+                for (z = 0; z < zres; z++) {
+                    for (y = 0; y < yres; y++) {
+                        for (x = 0; x < xres; x++) {
+                            tp = p + offset + x*xstep + y*ystep + z*zstep;
+                            *(data++) = wscale * gwy_get_guint16_le(&tp);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            if (xstep == 1) {
+                for (z = zres-1; z >= 0; z--) {
+                    for (y = 0; y < yres; y++) {
+                        for (x = 0; x < xres; x++) {
+                            *(data++) = wscale * (gdouble)*(p + offset + x*xstep + y*ystep + z*zstep);
+                        }
+                    }
+                }
+            }
+            else if (xstep == 2) {
+                for (z = zres-1; z >= 0; z--) {
+                    for (y = 0; y < yres; y++) {
+                        for (x = 0; x < xres; x++) {
+                            tp = p + offset + x*xstep + y*ystep + z*zstep;
+                            *(data++) = wscale * gwy_get_guint16_le(&tp);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (siunitx) {
+            gwy_si_unit_assign(gwy_brick_get_si_unit_x(brick), siunitx);
+            g_object_unref(siunitx);
+        }
+        if (siunity) {
+            gwy_si_unit_assign(gwy_brick_get_si_unit_y(brick), siunity);
+            g_object_unref(siunity);
+        }
+        if (siunitz) {
+            gwy_si_unit_assign(gwy_brick_get_si_unit_z(brick), siunitz);
+            g_object_unref(siunitz);
+        }
+        if (siunitw) {
+            gwy_si_unit_assign(gwy_brick_get_si_unit_w(brick), siunitw);
+            g_object_unref(siunitw);
+        }
+
+        gwy_container_pass_object(container, gwy_app_get_brick_key_for_id(*channelno), brick);
+
+        if (element->name)
+            gwy_container_set_const_string(container, gwy_app_get_brick_title_key_for_id(*channelno), element->name);
+        if (element->metadata) {
+            gwy_container_pass_object(container, gwy_app_get_brick_meta_key_for_id(*channelno),
+                                      gwy_container_duplicate(element->metadata));
+        }
+        if ((lutname = lut_name_to_palette(channel->lut)))
+            gwy_container_set_const_string(container, gwy_app_get_brick_palette_key_for_id(*channelno), lutname);
+
+        gwy_file_volume_import_log_add(container, *channelno, NULL, filename);
+
+        (*channelno)++;
+    }
+
+    return TRUE;
+}
+
+static const gchar*
+lut_name_to_palette(const gchar *lut)
+{
+    if (!lut)
+        return NULL;
+    if (gwy_strequal(lut, "Red"))
+        return "RGB-Red";
+    if (gwy_strequal(lut, "Green"))
+        return "RGB-Green";
+    if (gwy_strequal(lut, "Blue"))
+        return "RGB-Blue";
+    if (gwy_strequal(lut, "Gray"))
+        return "Gray";
+    return NULL;
+}
+
+static void
+lif_file_free(LIFFile *file)
+{
+    guint i, j;
+
+    if (!file)
+        return;
+
+    if (file->memblocks) {
+        g_hash_table_foreach_remove(file->memblocks, lif_remove_memblock, NULL);
+        g_hash_table_unref(file->memblocks);
+    }
+    if (file->elements) {
+        for (i = 0; i < file->elements->len; i++) {
+            LIFElement *element = &g_array_index(file->elements, LIFElement, i);
+
+            if (element->dimensions) {
+                for (j = 0; j < element->dimensions->len; j++) {
+                    LIFDimension *dimension = &g_array_index(element->dimensions, LIFDimension, j);
+                    g_free(dimension->unit);
+                }
+                g_array_free(element->dimensions, TRUE);
+            }
+            if (element->channels) {
+                for (j = 0; j < element->channels->len; j++) {
+                    LIFChannel *channel = &g_array_index(element->channels, LIFChannel, j);
+                    g_free(channel->unit);
+                    g_free(channel->lut);
+                }
+                g_array_free(element->channels, TRUE);
+            }
+
+            g_free(element->name);
+            g_free(element->memid);
+            GWY_OBJECT_UNREF(element->metadata);
+        }
+        g_array_free(file->elements, TRUE);
+    }
+    g_free(file);
+}
+
+static LIFMemBlock*
+lif_read_memblock(const guchar *buffer, gsize *size, gint version)
+{
+    LIFMemBlock *memblock;
+    const guchar *p;
+    int i;
+
+    p = buffer;
+    memblock = g_new0(LIFMemBlock, 1);
+    memblock->magic = gwy_get_gint32_le(&p);
+    gwy_debug("Magic = %d", memblock->magic);
+
+    if (memcmp(&memblock->magic, MAGIC, MAGIC_SIZE) != 0) {
+        gwy_debug("Wrong magic for memblock");
+        size = 0;
+        g_free(memblock);
+        return NULL;
+    }
+    memblock->size = gwy_get_guint32_le(&p);
+    gwy_debug("Size = %d", memblock->size);
+    memblock->testcode = *(p++);
+    gwy_debug("Testcode = 0x%x", memblock->testcode);
+    if (memblock->testcode != TESTCODE) {
+        gwy_debug("Wrong testcode for memblock");
+        g_free(memblock);
+        size = 0;
+        return NULL;
+    }
+    if (version == 1) {
+        memblock->memsize = gwy_get_guint32_le(&p);
+    }
+    else if (version >= 2) {
+        memblock->memsize = gwy_get_guint64_le(&p);
+    }
+    gwy_debug("data length = %" G_GUINT64_FORMAT "", memblock->memsize);
+
+    i = 0;
+    while (*(p++) != TESTCODE) {
+        i++;
+    }
+    gwy_debug("skipped %d bytes", i);
+    memblock->desclen = gwy_get_guint32_le(&p);
+    gwy_debug("description length = %d", memblock->desclen);
+    memblock->memid = gwy_utf16_to_utf8((const gunichar2*)p, memblock->desclen, GWY_BYTE_ORDER_LITTLE_ENDIAN);
+    gwy_debug("description = %s", memblock->memid);
+    p += memblock->desclen * 2;
+    memblock->data = (gpointer)p;
+
+    *size = (gsize)(p - buffer) + memblock->memsize;
+    return memblock;
+}
+
+static gboolean
+lif_remove_memblock(G_GNUC_UNUSED gpointer key,
+                    gpointer value,
+                    G_GNUC_UNUSED gpointer user_data)
+{
+    LIFMemBlock *memblock;
+
+    memblock = (LIFMemBlock *)value;
+    g_free(memblock->memid);
+    g_free(memblock);
+
+    return TRUE;
+}
+
+static LIFFile*
+parse_xml_header(LIFHeader *header, GError **error)
+{
+    GMarkupParser parser = {
+        header_start_element, header_end_element, header_parse_text, NULL, NULL
+    };
+    GMarkupParseContext *context;
+    GError *err = NULL;
+    XMLParserData *xmldata;
+    LIFFile *file;
+    gboolean ok = TRUE;
+
+    /* Parse XML header */
+    xmldata = g_new0(XMLParserData, 1);
+    xmldata->elements = g_array_new(FALSE, TRUE, sizeof(LIFElement));
+    file = xmldata->file = g_new0(LIFFile, 1);
+    file->elements = g_array_new(FALSE, TRUE, sizeof(LIFElement));
+    file->header = header;
+    context = g_markup_parse_context_new(&parser, G_MARKUP_TREAT_CDATA_AS_TEXT, (gpointer)xmldata, NULL);
+
+    if (!g_markup_parse_context_parse(context, header->xmlheader, -1, &err)
+        || !g_markup_parse_context_end_parse(context, &err)) {
+        err_XML(error, &err);
+        ok = FALSE;
+    }
+    g_markup_parse_context_free(context);
+    /* It should be empty at this point. */
+    g_array_free(xmldata->elements, TRUE);
+    g_free(xmldata);
+
+    if (ok)
+        return file;
+
+    lif_file_free(file);
+    return NULL;
+}
+
+static inline LIFElement*
+get_last_element(GArray *elements, const gchar *name, GError **error)
+{
+    if (elements->len)
+        return &g_array_index(elements, LIFElement, elements->len - 1);
+
+    g_set_error(error, GWY_MODULE_FILE_ERROR, GWY_MODULE_FILE_ERROR_DATA,
+                _("Wrong XML element %s."), name);
+    return NULL;
+}
+
+static void
+header_start_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                     const gchar *element_name,
+                     const gchar **attribute_names,
+                     const gchar **attribute_values,
+                     gpointer user_data,
+                     GError **error)
+{
+    const gchar **name_cursor = attribute_names;
+    const gchar **value_cursor = attribute_values;
+    XMLParserData *data;
+    LIFElement *element;
+
+    data = (XMLParserData *)user_data;
+
+    // gwy_debug("Name = %s", element_name);
+    if (gwy_strequal(element_name, "LMSDataContainerHeader")) {
+        while (*name_cursor) {
+            if (gwy_strequal(*name_cursor, "Version"))
+                data->file->version = atoi(*value_cursor);
+
+            name_cursor++;
+            value_cursor++;
+        }
+    }
+    else if (gwy_strequal(element_name, "Element")) {
+        LIFElement elem;
+
+        gwy_clear(&elem, 1);
+        while (*name_cursor) {
+            if (gwy_strequal(*name_cursor, "Name"))
+                elem.name = g_strdup(*value_cursor);
+
+            name_cursor++;
+            value_cursor++;
+        }
+
+        g_array_append_val(data->elements, elem);
+    }
+    else if (gwy_strequal(element_name, "Memory")) {
+        if (!(element = get_last_element(data->elements, "Memory", error)))
+            goto fail_xml;
+
+        while (*name_cursor) {
+            if (gwy_strequal(*name_cursor, "Size"))
+                element->memsize = g_ascii_strtoull(*value_cursor, NULL, 10);
+            else if (gwy_strequal(*name_cursor, "MemoryBlockID"))
+                element->memid = g_strdup(*value_cursor);
+
+            name_cursor++;
+            value_cursor++;
+        }
+
+        if (!element->memid) {
+            gwy_debug("Wrong XML: Element has no MemID");
+            err_FILE_TYPE(error, "Leica LIF");
+        }
+    }
+    else if (gwy_strequal(element_name, "ChannelDescription")) {
+        LIFChannel channel;
+
+        if (!(element = get_last_element(data->elements, "ChannelDescription", error)))
+            goto fail_xml;
+
+        gwy_clear(&channel, 1);
+        while (*name_cursor) {
+            if (gwy_strequal(*name_cursor, "Resolution"))
+                channel.res = atoi(*value_cursor);
+            else if (gwy_strequal(*name_cursor, "Min"))
+                channel.min = g_ascii_strtod(*value_cursor, NULL);
+            else if (gwy_strequal(*name_cursor, "Max"))
+                channel.max = g_ascii_strtod(*value_cursor, NULL);
+            else if (gwy_strequal(*name_cursor, "Unit"))
+                channel.unit = g_strdup(*value_cursor);
+            else if (gwy_strequal(*name_cursor, "LUTName"))
+                channel.lut = g_strdup(*value_cursor);
+            else if (gwy_strequal(*name_cursor, "BytesInc"))
+                channel.bytesinc = g_ascii_strtoull(*value_cursor, NULL, 10);
+
+            name_cursor++;
+            value_cursor++;
+        }
+
+        if (!element->channels)
+            element->channels = g_array_new(FALSE, TRUE, sizeof(LIFChannel));
+
+        g_array_append_val(element->channels, channel);
+    }
+    else if (gwy_strequal(element_name, "DimensionDescription")) {
+        LIFDimension dimension;
+
+        if (!(element = get_last_element(data->elements, "DimensionDescription", error)))
+            goto fail_xml;
+
+        gwy_clear(&dimension, 1);
+        while (*name_cursor) {
+            if (gwy_strequal(*name_cursor, "DimID"))
+                dimension.dimid = atoi(*value_cursor);
+            else if (gwy_strequal(*name_cursor, "NumberOfElements"))
+                dimension.res = atoi(*value_cursor);
+            else if (gwy_strequal(*name_cursor, "Origin"))
+                dimension.origin = g_ascii_strtod(*value_cursor, NULL);
+            else if (gwy_strequal(*name_cursor, "Length"))
+                dimension.length = g_ascii_strtod(*value_cursor, NULL);
+            else if (gwy_strequal(*name_cursor, "Unit"))
+                dimension.unit = g_strdup(*value_cursor);
+            else if (gwy_strequal(*name_cursor, "BytesInc"))
+                dimension.bytesinc = g_ascii_strtoull(*value_cursor, NULL, 10);
+
+            name_cursor++;
+            value_cursor++;
+        }
+        if (!element->dimensions)
+            element->dimensions = g_array_new(FALSE, TRUE, sizeof(LIFDimension));
+
+        g_array_append_val(element->dimensions, dimension);
+    }
+    else if (gwy_strequal(element_name, "ATLConfocalSettingDefinition")) {
+        if (!(element = get_last_element(data->elements, "ATLConfocalSettingDefinition", error)))
+            goto fail_xml;
+
+        if (!element->metadata)
+            element->metadata = gwy_container_new();
+
+        while (*name_cursor) {
+            gwy_container_set_const_string_by_name(element->metadata, *name_cursor, *value_cursor);
+            name_cursor++;
+            value_cursor++;
+        }
+    }
+
+fail_xml:
+    return;
+}
+
+static void
+header_end_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                   const gchar *element_name,
+                   gpointer user_data,
+                   G_GNUC_UNUSED GError **error)
+{
+    XMLParserData *data = (XMLParserData *)user_data;
+
+    // gwy_debug("End name = %s", element_name);
+    if (gwy_strequal(element_name, "Element")) {
+        LIFElement element = g_array_index(data->elements, LIFElement, data->elements->len - 1);
+
+        if (!element.memid) {
+            gwy_debug("Wrong XML: Element has no MemID");
+            err_FILE_TYPE(error, "Leica LIF");
+        }
+        else {
+            g_array_append_val(data->file->elements, element);
+            g_array_remove_index(data->elements, data->elements->len - 1);
+        }
+    }
+}
+
+static void
+header_parse_text(G_GNUC_UNUSED GMarkupParseContext *context,
+                  G_GNUC_UNUSED const gchar *value,
+                  G_GNUC_UNUSED gsize value_len,
+                  G_GNUC_UNUSED gpointer user_data,
+                  G_GNUC_UNUSED GError **error)
+{
+    // gwy_debug("Text = %s", value);
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

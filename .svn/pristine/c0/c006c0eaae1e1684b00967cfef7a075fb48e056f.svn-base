@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: filters.xml 9429 2009-07-14 21:11:45Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="force_indentation" xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Силы и индентирование</title>
+  <sect2 id="indentanalyze">
+    <title>Анализ отпечатка <gwy:icon name="tip_indent_analyze"/></title>
+    <para>
+      <menuchoice>
+        <guimenu>Обработка данных</guimenu>
+        <guisubmenu>Режимы СЗМ</guisubmenu>
+        <guisubmenu>Силы и индентирование</guisubmenu>
+        <guisubmenu>Анализ отпечатка...</guisubmenu>
+      </menuchoice>
+    </para>
+
+    <para>Одуль определяет различные характеристические области отечатка и рассчитывает соответствующие площади поверхности и проекции (<xi:include href="eqi-A_p.xml"/> и <xi:include href="eqi-A_d.xml"/>), а также объёмы. <variablelist>
+        <varlistentry>
+          <term>Отпечаток</term>
+          <listitem>
+            <para>Определяется как область вокруг локального минимума с одинаковым вектором нормали (с точностью до симметричного отображения). Это соответствует обычному определению области контакта.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Внутреннее выдавливание</term>
+        <listitem>
+          <para>Часть отпечатка лежащая выше базовой плоскости.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Внешнее выдавливание</term>
+        <listitem>
+          <para>Часть отпечатка, лежащего выше базовой плоскости, но вектор нормали к которой отличается от отпечатка.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Особые точки</term>
+        <listitem>
+          <para>Включают максимум, минимум и точки вдоль направления наискорейшего спуска.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Ожидаемые площади поверхности и проекции</term>
+        <listitem>
+          <para>Приводятся значения, полученные расчётом теоретической функции площади для выбранного типа индентора на глубине отпечатка.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Объём выше-ниже</term>
+        <listitem>
+          <para>Объем выше-ниже это разность между объёмом над базовой плоскостью и объёмом под ней.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist></para>
+  <para>Следует отметить, что в этом модуле данные выравниваются аппроксимацией плоскостей вдоль границ изабражения. Это может приводить к несоответствиям между значениям, возвращаемым этой моделью и аналогичными, получаемыми с помощью <link linkend="tool-stats">инструмента Статистических величин</link>. Данные необходимо выравнивать вручную чтобы уменьшить этот эффект.</para>
+  <informalfigure id="fig-indent-analyze">
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="indentation-pileup.png" format="PNG"/>
+      </imageobject>
+      <caption>Схема различных областей на отпечатке: над плоскостью, под ней, плоскость, отпечаток, внутреннее выдавливание и внешнее выдавливание.</caption>
+    </mediaobject>
+  </informalfigure>
+</sect2>
+  </sect1>
+<!-- vim: set ts=2 sw=2 et : -->

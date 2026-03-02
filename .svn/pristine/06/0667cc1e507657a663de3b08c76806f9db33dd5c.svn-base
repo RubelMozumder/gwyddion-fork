@@ -1,0 +1,552 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<refentry id='gwyddion'>
+  <refentryinfo>
+    <productname>gwyddion</productname>
+    <author><othername>Yeti</othername></author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>gwyddion</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">Gwyddion</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>gwyddion</refname>
+    <refpurpose>SPM data visualization and analysis</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv id='gwyddion-synopsis'>
+    <title>Synopsis</title>
+    <cmdsynopsis>
+      <command>gwyddion</command>
+      <arg rep='repeat'><replaceable>OPTION</replaceable></arg>
+      <arg rep='repeat'><replaceable>FILE</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id='gwyddion-description'>
+    <title>Description</title>
+    <para>
+      Gwyddion is a graphical SPM (Scanning Probe Microscope) data
+      visualization and analysis program, using Gtk+.
+    </para>
+  </refsect1>
+
+  <refsect1 id='gwyddion-options'>
+    <title>Options</title>
+    <para>
+      The program accepts all standard Gtk+, Gdk, and GtkGLExt options like
+      <option>--display</option> or <option>--sync</option>.  Please see
+      documentation of these packages for description of toolkit options.
+    </para>
+    <para>
+      The behaviour of the remote control options
+      <option>--remote-<replaceable>*</replaceable></option> is undefined when
+      more than one instance of Gwyddion is running on the display.  They can
+      choose an arbitrary instance to communicate to.  The last remote control
+      option given (including <option>--new-instance</option>) overrides all
+      preceding ones.
+    </para>
+    <para>
+      If a directory is given as <replaceable>FILE</replaceable> argument
+      the program opens a file chooser in this directory.
+    </para>
+    <para>
+      Gwyddion options:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>--help</option>
+        </term>
+        <listitem>
+          <para>
+            Prints a brief help and terminates.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--version</option>
+        </term>
+        <listitem>
+          <para>
+            Prints version information and terminates.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--no-splash</option>
+        </term>
+        <listitem>
+          <para>
+            Disables splash screen on program startup.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='remote-control'>
+        <term>
+          <option>--remote-new</option>
+        </term>
+        <listitem>
+          <para>
+            Opens files given on the command line in an already running
+            instance of Gwyddion on the display.  Runs a new instance if none
+            is running.
+          </para>
+          <para>
+            This is probably the most useful remote control option.  File type
+            associations are usually installed to run Gwyddion with this
+            option.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--remote-existing</option>
+        </term>
+        <listitem>
+          <para>
+            Opens files given on the command line in an already running
+            instance of Gwyddion on the display.  Fails if none is running.
+          </para>
+          <para>
+            This is useful if you want to handle the case of Gwyddion not
+            running differently than by starting it.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--remote-query</option>
+        </term>
+        <listitem>
+          <para>
+            Succeeds if an instance of Gwyddion is already running on the
+            display and prints its instance identifier.  Fails if none is
+            running.
+          </para>
+          <para>
+            The instance identifier depends on the remote control backend in
+            use.  In some cases it is useful as a global window identifier,
+            in some it is not.  With libXmu this option prints the X11
+            <type>Window</type>, on Win32 <type>HWND</type> is printed, while
+            with LibUnique the startup id is printed.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--new-instance</option>
+        </term>
+        <listitem>
+          <para>
+            Runs a new instance of Gwyddion. It can also used to override
+            preceding remote control options and to ensure a new instance is
+            run when the default remote control behaviour is modified.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--identify</option>
+        </term>
+        <listitem>
+          <para>
+            Instead of running the user interface and opening
+            <replaceable>FILE</replaceable>s, it detects the file type for each
+            and terminates.
+          </para>
+          <para>
+            The SPM file type printed corresponds to the description shown in
+            the list of supported file formats in the user guide.  The
+            file type is followed (in square brackets) by the name of Gwyddion
+            file import module that would be used to load the file and
+            detection score.  Scores considerably lower than 100 mean that
+            although the detection produced a possible file type, it is unsure
+            about it.
+          </para>
+          <para>
+            If the file type is not recognised at all, <literal>Unknown</literal>
+            is printed as the file type.  The program exit code is 1 if any
+            <replaceable>FILE</replaceable> was not recognised.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--check</option>
+        </term>
+        <listitem>
+          <para>
+            Instead of running the user interface and opening
+            <replaceable>FILE</replaceable>s, it loads the files, performs
+            a sanity check on them (printing errors to standard error output)
+            and terminates.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--convert-to-gwy=<replaceable>OUTFILE.gwy</replaceable></option>
+        </term>
+        <listitem>
+          <para>
+            Instead of running the user interface and opening
+            <replaceable>FILE</replaceable>s, it reads them, merges all the data
+            and writes a GWY file <replaceable>OUTFILE.gwy</replaceable>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--disable-gl</option>
+        </term>
+        <listitem>
+          <para>
+            Disables OpenGL entirely, including any checks whether it is
+            available.  This option, of course, has any effect only if
+            Gwyddion was built with OpenGL support and one of the most visible
+            effects is that 3D view becomes unavailable.  However, you may
+            find it useful if you encounter a system so broken that even
+            checking for OpenGL capabilities leads to X server errors.  It can
+            also help when you run Gwyddion remotely using X11 forwarding and
+            the start-up time seems excessively long.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--log-to-file</option>
+        </term>
+        <listitem>
+          <para>
+            Write messages from GLib, Gtk+, Gwyddion, etc. to
+            <filename>~/.gwyddion/gwyddion.log</filename> or file given in
+            <link linkend='GWYDDION_LOGFILE'><envar>GWYDDION_LOGFILE</envar></link>
+            environment variable.  This option is most useful on Unix as on
+            Win32 messages are redirected to a file by default.
+            Logging to a file and console are not exclusive; messages can go to
+            both.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--no-log-to-file</option>
+        </term>
+        <listitem>
+          <para>
+            Prevents writing messages from GLib, Gtk+, Gwyddion, etc.
+            to a file.  This is most useful on Win32 where messages are
+            written to a file by default.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--log-to-console</option>
+        </term>
+        <listitem>
+          <para>
+            Print messages from GLib, Gtk+, Gwyddion, etc. to the console.
+            More precisely, debugging messages are printed to the standard
+            output, errors and warnings to the standard error.
+            On Unix messages are printed to the console by default.
+            Logging to a file and console are not exclusive; messages can go to
+            both.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--no-log-to-console</option>
+        </term>
+        <listitem>
+          <para>
+            Disables printing messages to the console.
+            This is most useful on Unix where messages are printed to the
+            console by default.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--disable-modules=<replaceable>MODULE,...</replaceable></option>
+        </term>
+        <listitem>
+          <para>
+            Prevents the registration modules of given names.  This is mostly
+            useful for development and debugging.  For instance, you might
+            want to use <option>--disable-modules=pygwy</option> when running
+            under Valgrind for faster startup (and possibly to avoid extra
+            errors).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--startup-time</option>
+        </term>
+        <listitem>
+          <para>
+            Prints wall-clock time taken by various startup (and shutdown)
+            tasks. Useful only for developers and people going to complain
+            about too slow startup.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 id='gwyddion-environment'>
+    <title>Environment</title>
+    <para>
+      On Linux/Unix, following environment variables can be used to override
+      compiled-in installation paths (MS Windows version always looks to
+      directories relative to path where it was installed). Note they are
+      intended to override system installation paths therefore they are not
+      path lists, they can contain only a single path.
+    </para>
+    <variablelist>
+      <varlistentry id='GWYDDION_DATADIR'>
+        <term>
+          <envar>GWYDDION_DATADIR</envar>
+        </term>
+        <listitem>
+          <para>
+            Base data directory where resources (color gradients, OpenGL
+            materials, …) were installed.  Gwyddion looks into its
+            <filename>gwyddion</filename> subdirectory for resources.
+          </para>
+          <para>
+            When it is unset, it defaults to compiled-in value of
+            <varname>${datadir}</varname> which is usually
+            <filename>/usr/local/share</filename>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='GWYDDION_LIBDIR'>
+        <term>
+          <envar>GWYDDION_LIBDIR</envar>
+        </term>
+        <listitem>
+          <para>
+            Base library directory where modules were installed.  Gwyddion
+            looks into its <filename>gwyddion/modules</filename> subdirectory
+            for modules.
+          </para>
+          <para>
+            When it is unset, it defaults to compiled-in value of
+            <varname>${libdir}</varname> which is usually
+            <filename>/usr/local/lib</filename> or
+            <filename>/usr/local/lib64</filename>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='GWYDDION_LIBEXECDIR'>
+        <term>
+          <envar>GWYDDION_LIBEXECDIR</envar>
+        </term>
+        <listitem>
+          <para>
+            Base lib-exec directory where plug-ins were installed.  Gwyddion
+            looks into its <filename>gwyddion/plugins</filename> subdirectory
+            for plug-ins.
+          </para>
+          <para>
+            When it is unset, it defaults to compiled-in value of
+            <varname>${libexecdir}</varname> which is usually
+            <filename>/usr/local/libexec</filename>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='GWYDDION_LOCALEDIR'>
+        <term>
+          <envar>GWYDDION_LOCALEDIR</envar>
+        </term>
+        <listitem>
+          <para>
+            Locale data directory where message catalogs (translations) were
+            installed.
+          </para>
+          <para>
+            When it is unset, it defaults to compiled-in value of
+            <varname>${datadir}/locale</varname> which is usually
+            <filename>/usr/local/share/locale</filename>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      Other variables that influence <application>Gwyddion</application>
+      run-time behaviour include
+      <ulink url='http://library.gnome.org/devel/glib/stable/glib-running.html'>GLib+ variables</ulink>
+      and
+      <ulink url='http://library.gnome.org/devel/gtk/stable/gtk-running.html'>Gtk+ variables</ulink>
+      and some Gwyddion-specific variables:
+    </para>
+    <variablelist>
+      <varlistentry id='GWYDDION_LOGFILE'>
+        <term>
+          <envar>GWYDDION_LOGFILE</envar>
+        </term>
+        <listitem>
+          <para>
+            Name of file to redirect log messages to.  On MS Windows, messages
+            are always sent to a file as working with the terminal is
+            cumbersome there.  The default log file location,
+            <filename>gwyddion.log</filename> in user's Documents and Settings,
+            can be overridden with <envar>GWYDDION_LOGFILE</envar>. On Unix,
+            messages go to the terminal by default and this environment
+            variable has effect only if <option>--log-to-file</option> is
+            given.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      If <application>Gwyddion</application> is built with OpenMP support, it
+      utilizes parallelization (not all data processing methods implement
+      parallelization, but a sizable part does).  OpenMP environment variables
+      such as <envar>OMP_NUM_THREADS</envar> can be used to tune it.
+    </para>
+  </refsect1>
+
+  <refsect1 id='gwyddion-files'>
+    <title>Files</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <filename>~/.gwyddion/settings</filename>
+        </term>
+        <listitem>
+          <para>
+            Saved user settings and tool states.  Do not edit while Gwyddion is
+            running, it will overwrite it at exit.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename>~/.gwyddion/glmaterials</filename>,
+          <filename>~/.gwyddion/gradients</filename>,
+          ...
+        </term>
+        <listitem>
+          <para>
+            User directories with various resources (OpenGL materials, color
+            gradients, ...).
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/glmaterials</filename>,
+          <filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/gradients</filename>
+          ...
+        </term>
+        <listitem>
+          <para>
+            The same for system-wide resources.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename>~/.gwyddion/pixmaps</filename>
+        </term>
+        <listitem>
+          <para>
+            Directory to place user icons to.  This is mainly useful for
+            installation of modules to home.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename><envar>$GWYDDION_DATADIR</envar>/gwyddion/pixmaps</filename>,
+        </term>
+        <listitem>
+          <para>
+            The same for system-wide icons.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename>~/.gwyddion/modules</filename>
+        </term>
+        <listitem>
+          <para>
+            Directory to place user modules to.  They should be placed into
+            <filename>file</filename>, <filename>graph</filename>,
+            <filename>process</filename>, <filename>layer</filename>, and
+            <filename>tools</filename> subdirectories according to their kind,
+            though this is more a convention than anything else.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename><envar>$GWYDDION_LIBDIR</envar>/gwyddion/modules</filename>,
+        </term>
+        <listitem>
+          <para>
+            The same for system-wide modules.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename>~/.gwyddion/plugins</filename>
+        </term>
+        <listitem>
+          <para>
+            Directory to place user plug-ins to.  They should be placed into
+            <filename>file</filename> and <filename>process</filename>
+            subdirectories according to their kind.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename><envar>$GWYDDION_LIBEXECDIR</envar>/gwyddion/plugins</filename>,
+        </term>
+        <listitem>
+          <para>
+            The same for system-wide plug-ins.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <filename>~/.gwyddion/pygwy</filename>
+        </term>
+        <listitem>
+          <para>
+            Directory to place user python modules or scripts to.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1 id="gwyddion-see-also">
+    <title>See also</title>
+    <para>
+      <citerefentry>
+        <refentrytitle>gwyddion-thumbnailer</refentrytitle>
+        <manvolnum>1</manvolnum>
+      </citerefentry>,
+      <citerefentry>
+        <refentrytitle>gxsm</refentrytitle>
+        <manvolnum>1</manvolnum>
+      </citerefentry>
+    </para>
+  </refsect1>
+</refentry>
+<!-- vim: set ts=2 sw=2 et : -->

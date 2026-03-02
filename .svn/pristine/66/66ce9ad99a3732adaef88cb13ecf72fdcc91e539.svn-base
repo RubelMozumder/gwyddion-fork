@@ -1,0 +1,569 @@
+/*
+ *  $Id$
+ *  Copyright (C) 2020-2024 David Necas (Yeti), Petr Klapetek.
+ *  E-mail: yeti@gwyddion.net, klapetek@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Zygo DATX HDF5
+ * .datx
+ * Read
+ **/
+
+/**
+ * [FILE-MAGIC-MISSING]
+ * Avoding clash with a standard file format.
+ **/
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-zygo-datx-hdf5-spm">
+ *   <comment>Zygo HDF5 SPM data</comment>
+ *   <glob pattern="*.datx"/>
+ *   <glob pattern="*.DATX"/>
+ * </mime-type>
+ **/
+
+#include "config.h"
+#include <libgwyddion/gwyutils.h>
+#include <libprocess/datafield.h>
+#include <app/gwyapp.h>
+#include <app/gwymoduleutils-file.h>
+
+#include "gwyhdf5.h"
+#include "hdf5file.h"
+
+/* Zygo DATX. */
+typedef struct {
+    gchar *source;
+    gchar *link;
+    gchar *destination;
+} DatxMetadata;
+
+typedef struct {
+    gchar *category;
+    gchar *base_unit;
+    guint nparams;
+    gdouble *params;
+} DatxConverter;
+
+typedef struct {
+    /* Parsed "MetaData" data set. */
+    gint nmetadata;
+    DatxMetadata *metadata;
+} DatxFile;
+
+static gint           datx_detect              (const GwyFileDetectInfo *fileinfo,
+                                                gboolean only_name);
+static GwyContainer*  datx_load                (const gchar *filename,
+                                                GwyRunType mode,
+                                                GError **error);
+static gboolean       datx_read_images         (const DatxFile *dfile,
+                                                hid_t file_id,
+                                                GwyContainer *container,
+                                                gboolean surfaces,
+                                                gint *id,
+                                                GError **error);
+static gboolean       datx_read_metadata       (DatxFile *dfile,
+                                                hid_t file_id,
+                                                GError **error);
+static DatxConverter* datx_get_converter_params(hid_t file_id,
+                                                const gchar *path,
+                                                const gchar *name);
+static void           datx_converter_free      (DatxConverter *converter);
+static void           datx_free                (DatxFile *dfile);
+
+void
+gwyhdf5_register_datxfile(void)
+{
+    gwy_file_func_register("datxfile",
+                           N_("Zygo DATX HDF5 files (.datx)"),
+                           (GwyFileDetectFunc)&datx_detect,
+                           (GwyFileLoadFunc)&datx_load,
+                           NULL,
+                           NULL);
+}
+
+static gint
+datx_detect(const GwyFileDetectInfo *fileinfo, gboolean only_name)
+{
+    hid_t file_id;
+    gint version, dims = 1, score = 0;
+
+    if ((file_id = gwyhdf5_quick_check(fileinfo, only_name)) < 0)
+        return 0;
+
+    if (gwyhdf5_get_ints_attr(file_id, "Attributes", "File Layout Version", 1, &dims, &version, NULL)) {
+        score = 80;
+        if (version == 1)
+            score = 100;
+    }
+
+    H5Fclose(file_id);
+
+    return score;
+}
+
+static GwyContainer*
+datx_load(const gchar *filename,
+          G_GNUC_UNUSED GwyRunType mode,
+          GError **error)
+{
+    GwyContainer *container = NULL;
+    GwyHDF5File ghfile;
+    DatxFile dfile;
+    hid_t file_id;
+    H5O_info_t infobuf;
+    herr_t status;
+    gint id = 0;
+
+    file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+    gwy_debug("file_id %d", (gint)file_id);
+    status = H5Oget_info(file_id, &infobuf);
+    if (!gwyhdf5_check_status(status, file_id, NULL, "H5Oget_info", error))
+        return NULL;
+
+    gwy_clear(&dfile, 1);
+    gwyhdf5_init(&ghfile);
+    ghfile.impl = &dfile;
+    g_array_append_val(ghfile.addr, infobuf.addr);
+
+    if (!datx_read_metadata(&dfile, file_id, error))
+        goto fail;
+
+    status = H5Literate(file_id, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, gwyhdf5_scan_file, &ghfile);
+    if (!gwyhdf5_check_status(status, file_id, &ghfile, "H5Literate", error)) {
+        datx_free(&dfile);
+        return NULL;
+    }
+    /* Other file formats also do H5Aiterate2() but here we do not seem to get anything useful. */
+
+    container = gwy_container_new();
+    if (!datx_read_images(&dfile, file_id, container, TRUE, &id, error)
+        || !datx_read_images(&dfile, file_id, container, FALSE, &id, error))
+        GWY_OBJECT_UNREF(container);
+    else if (!gwy_container_get_n_items(container)) {
+        GWY_OBJECT_UNREF(container);
+        err_NO_DATA(error);
+    }
+
+fail:
+    status = H5Fclose(file_id);
+    gwy_debug("status %d", status);
+    datx_free(&dfile);
+    gwyhdf5_free(&ghfile);
+
+    return container;
+}
+
+static gboolean
+datx_read_images(const DatxFile *dfile, hid_t file_id, GwyContainer *container,
+                 gboolean surfaces,
+                 gint *id, GError **error)
+{
+    gint dims[2] = { -1, -1 };
+    GwyDataField *field;
+    const DatxMetadata *m;
+    DatxConverter *converter;
+    GString *title;
+    hid_t dataset;
+    herr_t status;
+    gboolean ok = FALSE;
+    gdouble xscale, yscale, zscale;
+    gint i, power10;
+
+    title = g_string_new(NULL);
+    for (i = 0; i < dfile->nmetadata; i++) {
+        m = dfile->metadata + i;
+
+        /* Weed out obviously uninteresting stuff. */
+        if (!gwy_strequal(m->source, "Root") || m->destination[0] == '{')
+            continue;
+
+        /* Does it look like path to data? */
+        if (!g_str_has_prefix(m->link, "Measurement::"))
+            continue;
+        g_string_assign(title, m->link + strlen("Measurement::"));
+        if (!g_str_has_suffix(title->str, "::Path"))
+            continue;
+        g_string_truncate(title, title->len - strlen("::Path"));
+
+        /* Separate anything called "Surface" and put it first. */
+        if (surfaces && !gwy_strequal(title->str, "Surface"))
+            continue;
+        else if (!surfaces && gwy_strequal(title->str, "Surface"))
+            continue;
+
+        dims[0] = dims[1] = -1;
+        if ((dataset = gwyhdf5_open_and_check_dataset(file_id, m->destination, 2, dims, error)) < 0)
+            continue;
+        if (err_DIMENSION(error, dims[0]) || err_DIMENSION(error, dims[1]))
+            goto fail;
+
+        xscale = yscale = zscale = 1.0;
+        if ((converter = datx_get_converter_params(file_id, m->destination, "X Converter"))
+            && converter->nparams > 1
+            && gwy_strequal(converter->category, "LateralCat")
+            && gwy_strequal(converter->base_unit, "Pixels"))
+            xscale = converter->params[1];
+        else
+            g_warning("Cannot obtain X Converter");
+        datx_converter_free(converter);
+        sanitise_real_size(&xscale, "x scale");
+
+        if ((converter = datx_get_converter_params(file_id, m->destination, "Y Converter"))
+            && converter->nparams > 1
+            && gwy_strequal(converter->category, "LateralCat")
+            && gwy_strequal(converter->base_unit, "Pixels"))
+            yscale = converter->params[1];
+        else
+            g_warning("Cannot obtain Y Converter");
+        datx_converter_free(converter);
+        sanitise_real_size(&yscale, "y scale");
+
+        converter = datx_get_converter_params(file_id, m->destination, "Z Converter");
+        if (surfaces) {
+            if (converter && converter->nparams > 1
+            && gwy_strequal(converter->category, "HeightCat"))
+                zscale = converter->params[1];
+            else
+                g_warning("Cannot obtain Z Converter");
+            /* FIXME: I do not know how to use the numbers in Z Converter and none of them seem to give reasonable
+             * heights when used as a multiplier. Also, base_unit is something like NanoMetres and multiplying just by
+             * 10⁻⁹ and ignoring the converter produces values of a sane order of magnitude. So that's what we do
+             * for now…
+             *
+             * For intensity there is basically no conversion so we just keep the values as they are. */
+        }
+
+        field = gwy_data_field_new(dims[1], dims[0], xscale*dims[1], yscale*dims[0], FALSE);
+        status = H5Dread(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, gwy_data_field_get_data(field));
+        if (status < 0) {
+            id = 0;
+            g_object_unref(field);
+            err_HDF5(error, "H5Dread", status);
+            goto fail;
+        }
+
+        /* FIXME: The lateral unit should be probably the same as for Resolutions, e.g.
+         * /Attributes/{UUID}/{ChannelName} Data Context/Lateral Resolution/Unit
+         * But it probably cannot be anything else than metre anyway. */
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(field), "m");
+        if (surfaces && converter) {
+            gwy_si_unit_set_from_string_parse(gwy_data_field_get_si_unit_z(field), converter->base_unit, &power10);
+            zscale = pow10(power10);
+        }
+        gwy_data_field_multiply(field, zscale);
+        datx_converter_free(converter);
+
+        /* If we see image called "Surface", put it to id 0. */
+        gwy_container_pass_object(container, gwy_app_get_data_key_for_id(*id), field);
+        gwy_container_set_const_string(container, gwy_app_get_data_title_key_for_id(*id), title->str);
+        (*id)++;
+    }
+
+    ok = TRUE;
+
+fail:
+    g_string_free(title, TRUE);
+
+    return ok;
+}
+
+/* We need to read the dataset "MetaData". It is an array of compund types (string, string, string) specifying various
+ * things in the most obtuse way.
+ *
+ * It is basically a serialisation of a tree as a list of edges (well, hopefully a tree as there is no guarantee it
+ * is cycle-free). After resolving it gives us UUIDs (parts of paths in the HDF5 file) for the various data. But we
+ * still need to know the data names like Surface and Intensity, there is no way to generically enumerate these.
+ *
+ * The result of resolution has Source always equal to Root, Link to the full name (using :: separators) and
+ * Destination a path in the HDF5 file. That is if it is well-formed. There will be also some entries where
+ * destination is still an UUID reference – therse correspond to non-leaves of the tree.
+ *
+ * Alternatively, we can ignore all this nonsense and just:
+ * - look into group "Data"
+ * - find all groups inside; these are "Surface" or "Intensity"
+ * - in each there is some dataset
+ * - read that
+ *
+ * There is also group "Processed Data: " with hardlinks to all these.
+ */
+static gboolean
+datx_read_metadata(DatxFile *dfile, hid_t file_id, GError **error)
+{
+    static const gchar *member_names[3] = { "Source", "Link", "Destination" };
+    hid_t metadata_id, member_type = -1, file_member_type = -1, str_type = -1, metadata_type = -1;
+    H5T_class_t type_class, member_class;
+    gint i, j, len, reclevel, nmembers, unresolved, nmetadata = -1;
+    gchar *member_name, *t, **s = NULL;
+    DatxMetadata *m, *mm;
+    gboolean ok = FALSE;
+    herr_t status;
+
+    dfile->nmetadata = 0;
+    if ((metadata_id = gwyhdf5_open_and_check_dataset(file_id, "MetaData", 1, &nmetadata, error)) < 0)
+        return FALSE;
+    gwy_debug("nmetadata %d", nmetadata);
+    if (!nmetadata) {
+        err_INVALID(error, "MetaData");
+        goto end;
+    }
+
+    metadata_type = H5Dget_type(metadata_id);
+    if (metadata_type < 0) {
+        err_HDF5(error, "H5Dget_type", metadata_type);
+        goto end;
+    }
+    type_class = H5Tget_class(metadata_type);
+    gwy_debug("metadata metadata_type is %ld, class %d (expecting %d)", (glong)metadata_type, type_class, H5T_COMPOUND);
+    if (type_class != H5T_COMPOUND) {
+        err_INVALID(error, "MetaData");
+        goto end;
+    }
+
+    nmembers = H5Tget_nmembers(metadata_type);
+    gwy_debug("nmembers %d", nmembers);
+    if (nmembers != 3) {
+        err_INVALID(error, "MetaData");
+        goto end;
+    }
+
+    dfile->nmetadata = nmetadata;
+    dfile->metadata = g_new0(DatxMetadata, nmetadata);
+    s = g_new(gchar*, nmetadata);
+    for (i = 0; i < nmembers; i++) {
+        gwy_clear(s, nmetadata);
+        member_name = H5Tget_member_name(metadata_type, i);
+        member_class = H5Tget_member_class(metadata_type, i);
+        gwy_debug("metadata[%d] = %s, class %d", i, member_name, member_class);
+        if (member_class != H5T_STRING || !gwy_strequal(member_name, member_names[i])) {
+            err_INVALID(error, "MetaData");
+            goto end;
+        }
+
+        file_member_type = H5Tget_member_type(metadata_type, i);
+        member_type = H5Tcreate(H5T_COMPOUND, sizeof(gpointer));
+        str_type = gwyhdf5_make_string_type_for_attr(file_member_type);
+        H5Tinsert(member_type, member_name, 0, str_type);
+
+        status = H5Dread(metadata_id, member_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, s);
+        gwy_debug("status %d", status);
+        H5Tclose(member_type);
+        H5Tclose(file_member_type);
+        H5free_memory(member_name);
+
+        if (status < 0) {
+            err_HDF5(error, "H5Dread", status);
+            goto end;
+        }
+
+        /* Move strings to the struct, ensuring they are GLib-allocated on the way. */
+        if (i == 0) {
+            for (j = 0; j < nmetadata; j++)
+                dfile->metadata[j].source = g_strdup(s[j]);
+        }
+        else if (i == 1) {
+            for (j = 0; j < nmetadata; j++)
+                dfile->metadata[j].link = g_strdup(s[j]);
+        }
+        else {
+            for (j = 0; j < nmetadata; j++)
+                dfile->metadata[j].destination = g_strdup(s[j]);
+        }
+        for (j = 0; j < nmetadata; j++) {
+            gwy_debug("metdata[%d][%d] = %s", j, i, s[j]);
+            H5free_memory(s[j]);
+        }
+    }
+
+    /* Resolve recursive references. */
+    reclevel = 0;
+    do {
+        unresolved = 0;
+        for (i = 0; i < nmetadata; i++) {
+            m = dfile->metadata + i;
+            if (m->source[0] != '{')
+                continue;
+
+            len = strlen(m->source);
+            if (m->source[len-1] != '}')
+                continue;
+
+            for (j = 0; j < nmetadata; j++) {
+                mm = dfile->metadata + j;
+                if (j != i && gwy_strequal(m->source, mm->destination)) {
+                    t = g_strconcat(mm->link, "::", m->link, NULL);
+                    g_free(m->source);
+                    g_free(m->link);
+                    m->link = t;
+                    m->source = g_strdup(mm->source);
+                    break;
+                }
+            }
+
+            if (m->source[0] == '{')
+                unresolved++;
+        }
+    } while (unresolved && reclevel < 5);
+
+    for (i = 0; i < nmetadata; i++) {
+        m = dfile->metadata + i;
+        gwy_debug("resolved metdata[%d] = %s, %s, %s", i, m->source, m->link, m->destination);
+    }
+
+    ok = TRUE;
+
+end:
+    g_free(s);
+    if (metadata_type >= 0)
+        H5Tclose(metadata_type);
+    H5Dclose(metadata_id);
+
+    return ok;
+}
+
+static gchar*
+datx_get_compound_string(hid_t attr, gint i, const gchar *name)
+{
+    hid_t attr_type, member_type, str_type, file_member_type;
+    gchar *v, *s;
+    herr_t status;
+
+    attr_type = H5Aget_type(attr);
+    file_member_type = H5Tget_member_type(attr_type, i);
+    H5Tclose(attr_type);
+    if (!H5Tis_variable_str(file_member_type)) {
+        H5Tclose(file_member_type);
+        return NULL;
+    }
+
+    member_type = H5Tcreate(H5T_COMPOUND, sizeof(gpointer));
+    str_type = gwyhdf5_make_string_type_for_attr(file_member_type);
+    H5Tinsert(member_type, name, 0, str_type);
+    status = H5Aread(attr, member_type, &v);
+    gwy_debug("read string value \"%s\" of \"%s\" (status %d)", v, name, status);
+    H5Tclose(str_type);
+    H5Tclose(member_type);
+    H5Tclose(file_member_type);
+
+    if (status >= 0) {
+        s = g_strdup(v);
+        H5free_memory(v);
+        return s;
+    }
+
+    return NULL;
+}
+
+static DatxConverter*
+datx_get_converter_params(hid_t file_id, const gchar *path, const gchar *name)
+{
+    DatxConverter converter;
+    hid_t attr, attr_type, space, member_type, item_type;
+    H5T_class_t attr_class;
+    gint nitems, iparameters, icateogry, ibaseunit;
+    herr_t status;
+    hvl_t v;
+
+    if ((attr = H5Aopen_by_name(file_id, path, name, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
+        gwy_debug("cannot open attr \"%s\" at \"%s\"", name, path);
+        return NULL;
+    }
+
+    space = H5Aget_space(attr);
+    attr_type = H5Aget_type(attr);
+    attr_class = H5Tget_class(attr_type);
+    nitems = H5Sget_simple_extent_npoints(space);
+    gwy_debug("class %d, nitems %d", attr_class, nitems);
+    icateogry = H5Tget_member_index(attr_type, "Category");
+    ibaseunit = H5Tget_member_index(attr_type, "BaseUnit");
+    iparameters = H5Tget_member_index(attr_type, "Parameters");
+    gwy_debug("indices are Category %d, BaseUnit %d, Parameter %d", icateogry, ibaseunit, iparameters);
+    if (attr_class != H5T_COMPOUND || nitems != 1
+        || iparameters < 0 || H5Tget_member_class(attr_type, iparameters) != H5T_VLEN
+        || icateogry < 0 || H5Tget_member_class(attr_type, icateogry) != H5T_STRING
+        || ibaseunit < 0 || H5Tget_member_class(attr_type, ibaseunit) != H5T_STRING) {
+        gwy_debug("converter \"%s\" failed sanity check", name);
+        H5Tclose(attr_type);
+        H5Aclose(attr);
+        H5Sclose(space);
+        return NULL;
+    }
+    H5Tclose(attr_type);
+
+    member_type = H5Tcreate(H5T_COMPOUND, sizeof(hvl_t));
+    item_type = H5Tvlen_create(H5T_NATIVE_DOUBLE);
+    H5Tinsert(member_type, "Parameters", 0, item_type);
+    status = H5Aread(attr, member_type, &v);
+    gwy_debug("read \"Parameters\" with %lu values (status %d)", (gulong)v.len, status);
+    H5Tclose(item_type);
+    H5Tclose(member_type);
+    if (status < 0) {
+        H5Aclose(attr);
+        H5Sclose(space);
+        return NULL;
+    }
+
+    converter.nparams = v.len;
+    converter.params = (gdouble*)g_memdup(v.p, v.len*sizeof(gdouble));
+    /* XXX: It looks strange that we should do this in addition to H5Dvlen_reclaim(). But if we do not valgrind
+     * reports a memory leak. And it does not report any double-free when we do. So there's that. */
+    H5free_memory(v.p);
+    H5Dvlen_reclaim(member_type, space, H5P_DEFAULT, &v);
+    H5Sclose(space);
+
+    converter.category = datx_get_compound_string(attr, icateogry, "Category");
+    converter.base_unit = datx_get_compound_string(attr, ibaseunit, "BaseUnit");
+    H5Aclose(attr);
+
+    if (!converter.category || !converter.base_unit) {
+        g_free(converter.category);
+        g_free(converter.base_unit);
+        g_free(converter.params);
+        return NULL;
+    }
+
+    return g_memdup(&converter, sizeof(converter));
+}
+
+static void
+datx_converter_free(DatxConverter *converter)
+{
+    if (!converter)
+        return;
+    g_free(converter->params);
+    g_free(converter->base_unit);
+    g_free(converter->category);
+    g_free(converter);
+}
+
+static void
+datx_free(DatxFile *dfile)
+{
+    DatxMetadata *m;
+    gint i;
+
+    for (i = 0; i < dfile->nmetadata; i++) {
+        m = dfile->metadata + i;
+        g_free(m->source);
+        g_free(m->link);
+        g_free(m->destination);
+    }
+    g_free(dfile->metadata);
+    dfile->nmetadata = 0;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

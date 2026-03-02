@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='curve-maps'>
+  <title>Curve Maps</title>
+  <indexterm><primary>curve maps</primary></indexterm>
+  <para>
+    Curve maps are bundles of curves measured in points of a regular grid.
+    While the grid is regular, like in <link linkend='data-windows'>image</link>
+    and <link linkend='volume-data'>volume</link> data, curves in each bundle
+    can have different numbers of points. Some bundles can even be empty (no
+    data were measured in the corresponding point). Curve maps also usually
+    comprise several data series, for instance height and force, whereas in
+    other types of data each physical quantity is a separate data item.
+  </para>
+  <para>
+    Containing a bundle of curves in every point means that also the independent
+    variable is one of the curves. For example, the force-distance curve bundle
+    contains the force values and distance values. In most of the modules using
+    curve maps one needs to choose which variable is dependent and which independent
+    (sometimes the module can guess it).
+  </para>
+  <para>
+    An important concept is also the segmentation of the curve bundles. In some cases
+    it is useful to have some marks on the bundle, e.g. to separate the approach and
+    retract part of a force-distance curve. Such marks form segments which are then
+    used by data processing modules. Segments are individual to curve bundles,
+    so each bundle can use only one set of marks. 
+    Segments can be loaded from manufacturer's file format, or created in Gwyddion.
+  </para>
+  <!-- TODO show some nice data
+  <informalfigure id='fig-curve-maps-window'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='curve-maps-window.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        A volume data window displaying the associated two-dimensional preview
+        data.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  -->
+  <para>
+    Button <guibutton>Change Preview</guibutton> near the top of the window
+    can be used to change the preview image.  The preview can either be
+    calculated as a summary quantity for one of the curves characterising data
+    along the invisible <xi:include href="eqi-z.xml"/> direction (minimum,
+    maximum, mean, …), or alternatively just any two-dimensional data of the
+    same dimensions can be shown as the preview.
+  </para>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

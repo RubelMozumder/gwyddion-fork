@@ -1,0 +1,1141 @@
+/*
+ *  $Id: graph_measure_period.c 25382 2023-05-30 14:06:42Z yeti-dn $
+ *  Copyright (C) 2023 David Necas (Yeti).
+ *  E-mail: yeti@gwyddion.net.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include "config.h"
+#include <stdlib.h>
+#include <string.h>
+#include <fftw3.h>
+#include <libgwyddion/gwymacros.h>
+#include <libprocess/gwyprocess.h>
+#include <libgwydgets/gwygraphmodel.h>
+#include <libgwydgets/gwystock.h>
+#include <libgwymodule/gwymodule-graph.h>
+#include <app/gwymoduleutils.h>
+#include <app/gwyapp.h>
+
+#define CNORM(x) (x[0]*x[0] + x[1]*x[1])
+
+enum {
+    PARAM_CURVE,
+    PARAM_RANGE_FROM,
+    PARAM_RANGE_TO,
+    PARAM_REPORT_STYLE,
+    PARAM_LEVEL,
+    PARAM_SHOW_LEVELED,
+    LABEL_NPOINTS,
+    WIDGET_RESULTS_FFT,
+    WIDGET_RESULTS_ACF,
+    WIDGET_RESULTS_DIRECT,
+};
+
+typedef struct {
+    gdouble x;
+    gdouble l;
+} GravityCentre;
+
+typedef struct {
+    GwyParams *params;
+    GwyGraphModel *gmodel;
+    GwyGraphCurveModel *levelled;
+} ModuleArgs;
+
+typedef struct {
+    ModuleArgs *args;
+    GtkWidget *dialog;
+    GwyResults *results;
+    GwyParamTable *table;
+    GwyGraphModel *gmodel;
+    GtkWidget *graph;
+} ModuleGUI;
+
+static gboolean     module_register     (void);
+static GwyParamDef* define_module_params(void);
+static void         graph_measure_period(GwyGraph *graph);
+static void         run_gui             (ModuleArgs *args,
+                                         GwyContainer *data);
+static gint         execute             (ModuleArgs *args,
+                                         GwyResults *results);
+static void         param_changed       (ModuleGUI *gui,
+                                         gint id);
+static void         dialog_response     (ModuleGUI *gui,
+                                         gint response);
+static void         preview             (gpointer user_data);
+static GwyResults*  create_results      (GwyContainer *data,
+                                         GwyGraphModel *gmodel,
+                                         GwySIUnit *xunit,
+                                         GwySIUnit *yunit);
+
+static const gchar* results_period[] = {
+    "simple-fft", "zoom-fft",
+    "simple-acf", "multi-acf",
+    "zero-cross", "grav-centre",
+};
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Evaluates the period of a one-dimensional periodic structure."),
+    "Yeti <yeti@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti)",
+    "2023",
+};
+
+GWY_MODULE_QUERY2(module_info, graph_measure_period)
+
+static gboolean
+module_register(void)
+{
+    gwy_graph_func_register("graph_measure_period",
+                            (GwyGraphFunc)&graph_measure_period,
+                            N_("/Measure _Features/_Period..."),
+                            GWY_STOCK_GRAPH_PERIOD_MEASURE,
+                            GWY_MENU_FLAG_GRAPH_CURVE,
+                            N_("Measure grating period"));
+
+    return TRUE;
+}
+
+static GwyParamDef*
+define_module_params(void)
+{
+    static GwyParamDef *paramdef = NULL;
+
+    if (paramdef)
+        return paramdef;
+
+    paramdef = gwy_param_def_new();
+    gwy_param_def_set_function_name(paramdef, gwy_graph_func_current());
+    gwy_param_def_add_graph_curve(paramdef, PARAM_CURVE, "curve", NULL);
+    gwy_param_def_add_report_type(paramdef, PARAM_REPORT_STYLE, "report_style", _("Save Parameters"),
+                                  GWY_RESULTS_EXPORT_PARAMETERS, GWY_RESULTS_REPORT_COLON);
+    gwy_param_def_add_boolean(paramdef, PARAM_LEVEL, "level", _("_Subtract background"), TRUE);
+    gwy_param_def_add_boolean(paramdef, PARAM_SHOW_LEVELED, "show-leveled", _("Show _leveled curve"), TRUE);
+    /* Not saved to settings. */
+    gwy_param_def_add_double(paramdef, PARAM_RANGE_FROM, NULL, _("Range"), -G_MAXDOUBLE, G_MAXDOUBLE, 0.0);
+    gwy_param_def_add_double(paramdef, PARAM_RANGE_TO, NULL, NULL, -G_MAXDOUBLE, G_MAXDOUBLE, 0.0);
+    return paramdef;
+}
+
+static void
+graph_measure_period(GwyGraph *graph)
+{
+    GwyContainer *data;
+    ModuleArgs args;
+
+    gwy_app_data_browser_get_current(GWY_APP_CONTAINER, &data, 0);
+    gwy_clear(&args, 1);
+    args.params = gwy_params_new_from_settings(define_module_params());
+    args.gmodel = gwy_graph_get_model(graph);
+
+    run_gui(&args, data);
+    gwy_params_save_to_settings(args.params);
+    g_object_unref(args.params);
+    GWY_OBJECT_UNREF(args.levelled);
+}
+
+static void
+run_gui(ModuleArgs *args, GwyContainer *data)
+{
+    GtkWidget *hbox, *graph;
+    GwyDialog *dialog;
+    GwyParamTable *table;
+    GwySIUnit *xunit, *yunit;
+    ModuleGUI gui;
+
+    gwy_clear(&gui, 1);
+    gui.args = args;
+    gui.gmodel = gwy_graph_model_new_alike(args->gmodel);
+    g_object_get(args->gmodel, "si-unit-x", &xunit, "si-unit-y", &yunit, NULL);
+    gui.results = create_results(data, args->gmodel, xunit, yunit);
+
+    gui.dialog = gwy_dialog_new(_("Measure Period"));
+    dialog = GWY_DIALOG(gui.dialog);
+    gwy_dialog_add_buttons(dialog, GWY_RESPONSE_CLEAR, GTK_RESPONSE_OK, 0);
+
+    hbox = gwy_hbox_new(0);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
+    gwy_dialog_add_content(GWY_DIALOG(gui.dialog), hbox, FALSE, FALSE, 0);
+
+    graph = gui.graph = gwy_graph_new(gui.gmodel);
+    gtk_widget_set_size_request(graph, 480, 360);
+    gtk_box_pack_end(GTK_BOX(hbox), graph, TRUE, TRUE, 0);
+    gwy_graph_enable_user_input(GWY_GRAPH(graph), FALSE);
+
+    table = gui.table = gwy_param_table_new(args->params);
+
+    gwy_param_table_append_graph_curve(table, PARAM_CURVE, args->gmodel);
+    gwy_param_table_append_checkbox(table, PARAM_LEVEL);
+    gwy_param_table_append_checkbox(table, PARAM_SHOW_LEVELED);
+    gwy_create_graph_xrange_with_params(table, PARAM_RANGE_FROM, PARAM_RANGE_TO, GWY_GRAPH(graph), args->gmodel);
+    gwy_param_table_append_info(table, LABEL_NPOINTS, _("Number of points"));
+
+    gwy_param_table_append_header(table, -1, _("Fourier Transform"));
+    gwy_param_table_append_results(table, WIDGET_RESULTS_FFT, gui.results, "simple-fft", "zoom-fft", NULL);
+    gwy_param_table_append_header(table, -1, _("Autocorrelation"));
+    gwy_param_table_append_results(table, WIDGET_RESULTS_ACF, gui.results, "simple-acf", "multi-acf", NULL);
+    gwy_param_table_append_header(table, -1, _("Direct Methods"));
+    gwy_param_table_append_results(table, WIDGET_RESULTS_DIRECT, gui.results, "zero-cross", "grav-centre", NULL);
+    gwy_param_table_append_report(table, PARAM_REPORT_STYLE);
+    gwy_param_table_report_set_results(table, PARAM_REPORT_STYLE, gui.results);
+
+    gtk_box_pack_start(GTK_BOX(hbox), gwy_param_table_widget(table), FALSE, TRUE, 0);
+    gwy_dialog_add_param_table(dialog, table);
+
+    g_signal_connect_swapped(table, "param-changed", G_CALLBACK(param_changed), &gui);
+    g_signal_connect_swapped(dialog, "response", G_CALLBACK(dialog_response), &gui);
+    gwy_dialog_set_preview_func(dialog, GWY_PREVIEW_IMMEDIATE, preview, &gui, NULL);
+    gwy_dialog_run(dialog);
+
+    g_object_unref(gui.gmodel);
+    g_object_unref(gui.results);
+    g_object_unref(xunit);
+    g_object_unref(yunit);
+}
+
+static void
+param_changed(ModuleGUI *gui, gint id)
+{
+    GwyParams *params = gui->args->params;
+
+    if (id < 0 || id == PARAM_LEVEL)
+        gwy_param_table_set_sensitive(gui->table, PARAM_SHOW_LEVELED, gwy_params_get_boolean(params, PARAM_LEVEL));
+    if (id != PARAM_REPORT_STYLE)
+        gwy_dialog_invalidate(GWY_DIALOG(gui->dialog));
+}
+
+static void
+dialog_response(ModuleGUI *gui, gint response)
+{
+    if (response == GWY_RESPONSE_CLEAR) {
+        gwy_selection_clear(gwy_graph_area_get_selection(GWY_GRAPH_AREA(gwy_graph_get_area(GWY_GRAPH(gui->graph))),
+                                                         GWY_GRAPH_STATUS_XSEL));
+    }
+}
+
+static GwyResults*
+create_results(GwyContainer *data, GwyGraphModel *gmodel,
+               GwySIUnit *xunit, GwySIUnit *yunit)
+{
+    GwyResults *results;
+
+    results = gwy_results_new();
+    gwy_results_add_header(results, N_("Grating Period"));
+    gwy_results_add_value_str(results, "file", N_("File"));
+    gwy_results_add_value_str(results, "graph", N_("Graph"));
+    gwy_results_add_value_str(results, "curve", N_("Curve"));
+    gwy_results_add_format(results, "range", N_("Range"), TRUE,
+    /* TRANSLATORS: %{from}v and %{to}v are ids, do NOT translate them. */
+                           N_("%{from}v to %{to}v"),
+                           "power-x", 1,
+                           NULL);
+    gwy_results_add_value_int(results, "npts", N_("Number of points"));
+
+    gwy_results_add_separator(results);
+    gwy_results_add_header(results, _("Results"));
+    gwy_results_add_value(results, "simple-fft", N_("Simple FFT"), "power-x", 1, "precision", 5, NULL);
+    gwy_results_add_value(results, "zoom-fft", N_("Refined FFT"), "power-x", 1, "precision", 5, NULL);
+    gwy_results_add_value(results, "simple-acf", N_("Simple ACF"), "power-x", 1, "precision", 5, NULL);
+    gwy_results_add_value(results, "multi-acf", N_("Multi-peak ACF"), "power-x", 1, "precision", 5, NULL);
+    gwy_results_add_value(results, "grav-centre", N_("Gravity centers"), "power-x", 1, "precision", 5, NULL);
+    gwy_results_add_value(results, "zero-cross", N_("Zero crossings"), "power-x", 1, "precision", 5, NULL);
+
+    gwy_results_set_unit(results, "x", xunit);
+    gwy_results_set_unit(results, "z", yunit);
+
+    gwy_results_fill_filename(results, "file", data);
+    gwy_results_fill_graph(results, "graph", gmodel);
+
+    return results;
+}
+
+static void
+preview(gpointer user_data)
+{
+    ModuleGUI *gui = (ModuleGUI*)user_data;
+    ModuleArgs *args = gui->args;
+    gint curve = gwy_params_get_int(args->params, PARAM_CURVE);
+    gchar buffer[16];
+    gint npts;
+
+    npts = execute(gui->args, gui->results);
+    gwy_graph_model_remove_all_curves(gui->gmodel);
+    gwy_graph_model_add_curve(gui->gmodel, gwy_graph_model_get_curve(args->gmodel, curve));
+    if (args->levelled)
+        gwy_graph_model_add_curve(gui->gmodel, args->levelled);
+
+    /* TODO: Show some `not enough points' message if npts = 0. */
+    gwy_param_table_results_fill(gui->table, WIDGET_RESULTS_FFT);
+    gwy_param_table_results_fill(gui->table, WIDGET_RESULTS_ACF);
+    gwy_param_table_results_fill(gui->table, WIDGET_RESULTS_DIRECT);
+    gwy_param_table_set_sensitive(gui->table, PARAM_REPORT_STYLE, npts > 0);
+    g_snprintf(buffer, sizeof(buffer), "%u", npts);
+    gwy_param_table_info_set_valuestr(gui->table, LABEL_NPOINTS, buffer);
+}
+
+/* An ad-hoc curve regularisation method. If the points are exactly regular, the net result is basically some
+ * pointless interpolation (which includes points exactly correspoding to the curve points). Otherwise it just
+ * does some kind of linear averaging/interpolation thing. */
+static GwyDataLine*
+regularise_curve(GwyGraphCurveModel *gcmodel, gint pos, gint npts)
+{
+    GwyDataLine *line, *mask;
+    gint ndata, i, res = 4*(npts - 1) + 3;
+    const gdouble *xdata, *ydata;
+    gdouble *data, *mdata;
+    gdouble dx, xoff, xbegin, xend;
+
+    xdata = gwy_graph_curve_model_get_xdata(gcmodel);
+    ydata = gwy_graph_curve_model_get_ydata(gcmodel);
+    ndata = gwy_graph_curve_model_get_ndata(gcmodel);
+    xbegin = xdata[pos];
+    xend = xdata[pos + npts-1];
+    dx = (xend - xbegin)/(res - 3);
+    xoff = xbegin - dx;
+    line = gwy_data_line_new(res, dx*res, TRUE);
+    mask = gwy_data_line_new_alike(line, TRUE);
+    data = gwy_data_line_get_data(line);
+    mdata = gwy_data_line_get_data(mask);
+
+    for (i = MAX(pos-3, 0); i < MIN(pos + npts+3, ndata); i++) {
+        gdouble x = xdata[i], y = ydata[i];
+        gdouble ix = (x - xoff)/dx;
+        gint j = (gint)floor(ix + 0.5);
+
+        if (j > 0 && j < res) {
+            mdata[j] += 1;
+            data[j] += y;
+        }
+    }
+
+    for (i = 0; i < res; i++) {
+        if (mdata[i] > 1e-9) {
+            data[i] /= mdata[i];
+            mdata[i] = 0.0;
+        }
+        else
+            mdata[i] = 1.0;
+    }
+
+    gwy_data_line_correct_laplace(line, mask);
+    g_object_unref(mask);
+
+    return line;
+}
+
+static gdouble
+mean_value_of_positive(gdouble a, gdouble b)
+{
+    if (a > 0.0)
+        return b > 0.0 ? 0.5*(a + b) : a;
+    else
+        return b > 0.0 ? b : -1.0;
+}
+
+static gint
+locate_maximum_complex(const fftw_complex *f, gint n, gint ifrom)
+{
+    gint i, imax = -1;
+    gdouble wmax = 0.0;
+
+    for (i = ifrom; i < n; i++) {
+        gdouble w = CNORM(f[i]);
+        if (w > wmax) {
+            imax = i;
+            wmax = w;
+        }
+    }
+
+    return imax;
+}
+
+static gdouble
+linear_fit_slope_with_error_estimate(gint n, const gdouble *xdata, const gdouble *ydata, gdouble *err_estim)
+{
+    gdouble xmean = 0.0, ymean = 0.0;
+    gdouble Varx = 0.0, Vary = 0.0, Cxy = 0.0;
+    gdouble a, Vara;
+    gint i;
+
+    for (i = 0; i < n; i++) {
+        xmean += xdata[i];
+        ymean += ydata[i];
+    }
+    xmean /= n;
+    ymean /= n;
+
+    for (i = 0; i < n; i++) {
+        gdouble dx = xdata[i] - xmean, dy = ydata[i] - ymean;
+        Varx += dx*dx;
+        Vary += dy*dy;
+        Cxy += dx*dy;
+    }
+    Varx /= n;
+    Vary /= n;
+    Cxy /= n;
+
+    a = Cxy/Varx;
+    if (n > 1) {
+        Vara = (Vary/Varx - a*a)/(n - 1);
+        *err_estim = sqrt(fmax(Vara, 0.0));
+    }
+    else
+        *err_estim = 0.0;
+
+    return a;
+}
+
+/* Estimate period in pixels. */
+static gdouble
+coarse_period_estimate(GwyDataLine *line, gdouble oversample)
+{
+    gint i, imax = 0, res = gwy_data_line_get_res(line);
+    gint extres = gwy_fft_find_nice_size((gint)ceil(oversample*res));
+    GwyDataLine *wline = gwy_data_line_new(res, res, TRUE);
+    fftw_complex *data = fftw_alloc_complex(extres);
+    fftw_complex *f = fftw_alloc_complex(extres);
+    gdouble *wdata;
+    gdouble x = 0.0;
+    fftw_plan plan;
+
+    plan = fftw_plan_dft_1d(extres, data, f, FFTW_FORWARD, FFTW_DESTROY_INPUT | FFTW_ESTIMATE);
+
+    gwy_data_line_copy(line, wline);
+    gwy_data_line_fft_window(wline, GWY_WINDOWING_HANN);
+    gwy_clear(data, extres);
+    wdata = gwy_data_line_get_data(wline);
+    for (i = 0; i < res; i++)
+        data[i][0] = wdata[i];
+    g_object_unref(wline);
+
+    fftw_execute(plan);
+    fftw_destroy_plan(plan);
+    fftw_free(data);
+    imax = locate_maximum_complex(f, extres/3, 5);
+    if (imax < 0)
+        return -1.0;
+
+    if (imax > 0 && imax < extres-1) {
+        gdouble a[3];
+
+        for (i = 0; i < 3; i++)
+            a[i] = CNORM(f[imax-1+i]);
+        gwy_math_refine_maximum_1d(a, &x);
+    }
+    fftw_free(f);
+
+    return extres/(imax + x);
+}
+
+/* Estimate period in pixels. */
+static gdouble
+zoom_period_estimate(GwyDataLine *line, gdouble Tcoarse)
+{
+    gint i, imax, res = gwy_data_line_get_res(line);
+    GwyDataLine *wline = gwy_data_line_duplicate(line);
+    GwyDataLine *rzfft = gwy_data_line_new_alike(line, FALSE), *izfft = gwy_data_line_new_alike(line, FALSE);
+    gdouble *rdata, *idata;
+    gdouble f0, f1, fm, x = 0.0;
+
+    g_return_val_if_fail(Tcoarse > 0.0, -1.0);
+
+    f0 = fmax(res/Tcoarse - 1.05, 0.0);
+    f1 = res/Tcoarse + 1.05;
+    gwy_data_line_fft_window(wline, GWY_WINDOWING_HANN);
+    gwy_data_line_zoom_fft(wline, NULL, rzfft, izfft, res, f0, f1);
+    g_object_unref(wline);
+
+    rdata = gwy_data_line_get_data(rzfft);
+    idata = gwy_data_line_get_data(izfft);
+    imax = res/2;
+    for (i = 0; i < res; i++)
+        rdata[i] = rdata[i]*rdata[i] + idata[i]*idata[i];
+    g_object_unref(izfft);
+
+    imax = GWY_ROUND(gwy_data_line_max_pos_i(rzfft));
+    if (imax > 0 && imax < res-1)
+        gwy_math_refine_maximum_1d(rdata + imax-1, &x);
+
+    fm = f0 + (f1 - f0)*(imax + x)/(res - 1.0);
+    g_object_unref(rzfft);
+
+    return res/fm;
+}
+
+static GravityCentre
+find_gravity_centre(const gdouble *data, gint n, gdouble threshold)
+{
+    /* Intersections. */
+    gdouble xinter_start, xinter_end, w, x, sxw = 0.0, sw = 0.0;
+    GravityCentre gc = { -1.0, -1.0 };
+    gint i;
+
+    if (!(n > 2))
+        return gc;
+    if ((data[0] - threshold)*(data[1] - threshold) > 0.0)
+        return gc;
+    if ((data[n-1] - threshold)*(data[n-2] - threshold) > 0.0)
+        return gc;
+
+    xinter_start = fabs((data[0] - threshold)/(data[1] - data[0]));
+    xinter_end = fabs((data[n-2] - threshold)/(data[n-2] - data[n-1]));
+
+    /* Initial triangular segment. */
+    w = 0.5*(1.0 - xinter_start)*(data[1] - threshold);
+    x = (2.0 + xinter_start)/3.0;
+    sw += w;
+    sxw += w*x;
+
+    /* Final triangular segment. */
+    w = 0.5*xinter_end*(data[n-2] - threshold);
+    x = n-2 + xinter_end/3.0;
+    sw += w;
+    sxw += w*x;
+
+    /* The middle part, formed by trapezoids. */
+    for (i = 1; i < n-2; i++) {
+        x = i + (2*data[i+1] + data[i] - 3.0*threshold)/(data[i+1] + data[i] - 2.0*threshold)/3.0;
+        w = (data[i+1] + data[i])/2.0 - threshold;
+        sw += w;
+        sxw += w*x;
+    }
+
+    gc.x = sxw/sw;
+    gc.l = xinter_end + n-1 - xinter_start;
+    return gc;
+}
+
+/* Destroys the array contents! */
+static gdouble
+fit_slope_of_centres(GArray *centres, gdouble tolerance, gdouble *err_estim)
+{
+    gint i, ngood, firstgood, lastgood, n = centres->len;
+    GravityCentre *cd = &g_array_index(centres, GravityCentre, 0);
+    gdouble *xdata = g_new(gdouble, 2*n), *idata = xdata + n;
+    gdouble T, m, p;
+
+    if (n < 2)
+        return -1.0;
+
+    /* First figure out what ‘too long’ means here.  If there are just a few segments we are basically finding the
+     * longest one, but that is OK because the prefilter removes only segments much shorter than that.  If there are
+     * many valid segments so that they can be a couple of pixels long, the prefilter is not going to remove any
+     * segments for being too short, but that is OK too – we just want a negligible probablity of picking a too long
+     * semgment as the rule and removing valid segments as being too short here. */
+    for (i = 0; i < n; i++)
+        xdata[i] = cd[i].l;
+
+    p = 92.0;
+    gwy_math_percentiles(n, xdata, GWY_PERCENTILE_INTERPOLATION_HIGHER, 1, &p, &m);
+    for (i = ngood = 0; i < n; i++) {
+        if (cd[i].l >= 0.1*m && cd[i].l <= 1.4*m) {
+            cd[ngood] = cd[i];
+            xdata[ngood] = cd[i].l;
+            ngood++;
+        }
+    }
+    if (ngood < 2)
+        return -1.0;
+    n = ngood;
+
+    /* Now we got rid of noise-created too short segments (possibly many) and maybe some too long ones (a few).  So
+     * take percentile closer to median and filter again. */
+    p = 50.0;
+    gwy_math_percentiles(n, xdata, GWY_PERCENTILE_INTERPOLATION_LINEAR, 1, &p, &m);
+    for (i = ngood = 0; i < n; i++) {
+        if (cd[i].l >= 0.7*m && cd[i].l <= 1.4*m) {
+            cd[ngood] = cd[i];
+            xdata[ngood] = cd[i].l;
+            ngood++;
+        }
+    }
+    if (ngood < 2)
+        return -1.0;
+    n = ngood;
+
+    /* Calculate distances. */
+    for (i = 0; i < n-1; i++)
+        xdata[i] = cd[i+1].x - cd[i].x;
+    n = n-1;
+
+    /* Now look at the typical distance (not length).
+     *
+     * XXX: Do not use plain mean because it is obviously unstable.  However, do not use median either because in
+     * some odd cases the distances basically form two groups, differing by 1 pixel. So the median will be either
+     * 1/2 pixel too large or too small, but in either case it will be bad. */
+    m = gwy_math_trimmed_mean(n, xdata, n/4, n/4);
+
+    /* Find three consecutive points which are approximately m apart.  We cannot trust the first centre to be good. */
+    for (firstgood = 0; firstgood < n-3; firstgood++) {
+        if (fabs(cd[firstgood+1].x - cd[firstgood].x - m)/m <= tolerance
+            && fabs(cd[firstgood+2].x - cd[firstgood+1].x - m)/m <= tolerance)
+            break;
+    }
+    /* OK, try to find at least two (may be necessary if there are just a handful of bars). */
+    if (firstgood >= n-3) {
+        for (firstgood = 0; firstgood < n-2; firstgood++) {
+            if (fabs(cd[firstgood+1].x - cd[firstgood].x - m)/m <= tolerance)
+                break;
+        }
+    }
+    if (firstgood >= n-2)
+        return -1.0;
+
+    /* There is no good cluster before firstgood so always use firstgood for reference. */
+    for (i = ngood = 0; i < firstgood; i++) {
+        gdouble l = (cd[i].x - cd[firstgood].x)/m;
+        gint lint = GWY_ROUND(l);
+        /* Accept only points which are close to an integer multiple from the last good point. */
+        if (lint < 0 && fabs(l - lint)/sqrt(lint) <= tolerance) {
+            xdata[ngood] = cd[i].x;
+            idata[ngood] = lint;
+            ngood++;
+        }
+    }
+    /* Then add firstgood with index 0. */
+    xdata[ngood] = cd[firstgood].x;
+    idata[ngood] = 0;
+    ngood++;
+    /* Then add everything after firstgood.  Here we use lastgood as the reference. */
+    lastgood = firstgood;
+    for (i = firstgood+1; i < n; i++) {
+        gdouble l = (cd[i].x - cd[lastgood].x)/m;
+        gint lint = GWY_ROUND(l);
+        /* Accept only points which are close to an integer multiple from the last good point. */
+        if (lint > 0 && fabs(l - lint)/sqrt(lint) <= tolerance) {
+            //printf("[%d] %d (%g) %g\n", i, lint, l, cd[i].x - cd[lastgood].x);
+            xdata[ngood] = cd[i].x;
+            idata[ngood] = idata[ngood-1] + lint;
+            lastgood = i;
+            ngood++;
+        }
+    }
+
+    //gwy_math_fit_polynom(ngood, idata, xdata, 1, coeffs);
+    T = linear_fit_slope_with_error_estimate(ngood, idata, xdata, err_estim);
+    g_free(xdata);
+
+    return T;
+}
+
+static gdouble
+gravcentre_period_estimate(GwyDataLine *line, gdouble *err_estim)
+{
+    const gdouble threshold = 0.0;
+    gint i, istart, iend, res = gwy_data_line_get_res(line);
+    const gdouble *d = gwy_data_line_get_data(line);
+    GArray *xcabove, *xcbelow;
+    gdouble Tabove, Tbelow, err_above, err_below;
+    GravityCentre gc;
+    gboolean above;
+
+    i = 0;
+    if (d[0] > threshold) {
+        while (i < res && d[i] > threshold)
+            i++;
+        above = FALSE;
+    }
+    else {
+        while (i < res && d[i] < threshold)
+            i++;
+        above = TRUE;
+    }
+
+    xcabove = g_array_new(FALSE, FALSE, sizeof(GravityCentre));
+    xcbelow = g_array_new(FALSE, FALSE, sizeof(GravityCentre));
+    do {
+        /* The last sample before the condition is satisfied. */
+        istart = i-1;
+        if (above) {
+            while (i < res && d[i] > threshold)
+                i++;
+        }
+        else {
+            while (i < res && d[i] < threshold)
+                i++;
+        }
+        if (i == res)
+            break;
+        /* The first sample where the condition fails again. */
+        iend = i;
+
+        /* Ignore single pixel noise around the threshold crossing. */
+        gc = find_gravity_centre(d + istart, iend+1 - istart, threshold);
+        if (gc.l > 0.0) {
+            gc.x += istart;
+            if (above)
+                g_array_append_val(xcabove, gc);
+            else
+                g_array_append_val(xcbelow, gc);
+        }
+
+        above = !above;
+        if (iend == istart+1)
+            i++;
+    } while (i < res);
+
+    Tabove = fit_slope_of_centres(xcabove, 0.1, &err_above);
+    Tbelow = fit_slope_of_centres(xcbelow, 0.1, &err_below);
+
+    g_array_free(xcabove, TRUE);
+    g_array_free(xcbelow, TRUE);
+
+    *err_estim = 0.0;
+    if (Tabove > 0.0)
+        *err_estim = (Tbelow > 0.0) ? 0.5*sqrt(err_above*err_above + err_below*err_below) : err_above;
+    else if (Tbelow > 0.0)
+        *err_estim = err_below;
+
+    return mean_value_of_positive(Tabove, Tbelow);
+}
+
+/* Destroys the centres array content! */
+static gdouble
+fit_slope_of_crossings(GArray *crossings, gdouble tolerance, gdouble *err_estim)
+{
+    gint i, ngood, firstgood, lastgood, n = crossings->len;
+    gdouble *zc = &g_array_index(crossings, gdouble, 0);
+    gdouble *xdata = g_new(gdouble, 2*n), *idata = xdata + n;
+    gdouble T, m;
+
+    if (n < 2)
+        return -1.0;
+
+    /* XXX: This part seems to be common with the second part of GC fit.  Factor to a function? */
+
+    /* Calculate distances. */
+    for (i = 0; i < n-1; i++)
+        xdata[i] = zc[i+1] - zc[i];
+    n = n-1;
+
+    /* Now look at the typical distance (not length).
+     *
+     * XXX: Do not use plain mean because it is obviously unstable.  However, do not use median either because in
+     * some odd cases the distances basically form two groups, differing by 1 pixel. So the median will be either
+     * 1/2 pixel too large or too small, but in either case it will be bad. */
+    m = gwy_math_trimmed_mean(n, xdata, n/4, n/4);
+
+    /* Find three consecutive points which are approximately m apart.  We cannot trust the first centre to be good. */
+    for (firstgood = 0; firstgood < n-3; firstgood++) {
+        if (fabs(zc[firstgood+1] - zc[firstgood] - m)/m <= tolerance
+            && fabs(zc[firstgood+2] - zc[firstgood+1] - m)/m <= tolerance)
+            break;
+    }
+    /* OK, try to find at least two (may be necessary if there are just a handful of bars). */
+    if (firstgood >= n-3) {
+        for (firstgood = 0; firstgood < n-2; firstgood++) {
+            if (fabs(zc[firstgood+1] - zc[firstgood] - m)/m <= tolerance)
+                break;
+        }
+    }
+    if (firstgood >= n-2)
+        return -1.0;
+
+    /* There is no good cluster before firstgood so always use firstgood for reference. */
+    for (i = ngood = 0; i < firstgood; i++) {
+        gdouble l = (zc[i] - zc[firstgood])/m;
+        gint lint = GWY_ROUND(l);
+        /* Accept only points which are close to an integer multiple from the last good point. */
+        if (lint < 0 && fabs(l - lint)/sqrt(lint) <= tolerance) {
+            xdata[ngood] = zc[i];
+            idata[ngood] = lint;
+            ngood++;
+        }
+    }
+    /* Then add firstgood with index 0. */
+    xdata[ngood] = zc[firstgood];
+    idata[ngood] = 0;
+    ngood++;
+    /* Then add everything after firstgood.  Here we use lastgood as the reference. */
+    lastgood = firstgood;
+    for (i = firstgood+1; i < n; i++) {
+        gdouble l = (zc[i] - zc[lastgood])/m;
+        gint lint = GWY_ROUND(l);
+
+        /* Accept only points which are close to an integer multiple from the last good point. */
+        if (lint > 0 && fabs(l - lint)/sqrt(lint) <= tolerance) {
+            xdata[ngood] = zc[i];
+            idata[ngood] = idata[ngood-1] + lint;
+            lastgood = i;
+            ngood++;
+        }
+    }
+
+    T = linear_fit_slope_with_error_estimate(ngood, idata, xdata, err_estim);
+    g_free(xdata);
+
+    return T;
+}
+
+static gdouble
+zerocross_period_estimate(GwyDataLine *line, gdouble *err_estim)
+{
+    GArray *zcdown, *zcup, *zxdata;
+    gint i, istart, iend, res = line->res;
+    const gdouble *d = line->data;
+    gdouble threshold = 0.0;
+    gdouble Tup, Tdown, err_up, err_down;
+
+    zcdown = g_array_new(FALSE, FALSE, sizeof(gdouble));
+    zcup = g_array_new(FALSE, FALSE, sizeof(gdouble));
+    zxdata = g_array_new(FALSE, FALSE, sizeof(gdouble));
+    i = 1;
+    while (i < res) {
+        gdouble x, coeffs[2];
+        gint ii, seglen;
+
+        /* Find a zero crossing. */
+        if (d[i]*d[i-1] > 0.0 || (d[i] == 0.0 && d[i-1] == 0.0)) {
+            i++;
+            continue;
+        }
+
+        /* Expand around it. Try to go one point beyond the theshold if nothing bad seems to happening there. */
+        istart = i-1;
+        while (istart && fabs(d[istart-1]) < threshold)
+            istart--;
+
+        iend = i;
+        while (iend < res-1 && fabs(d[iend+1]) < threshold)
+            iend++;
+
+        /* If the height returns back to the same sign just skip it. */
+        if (d[istart]*d[i-1] < 0 || d[iend]*d[i] < 0) {
+            i = iend+1;
+            continue;
+        }
+
+        /* Fit the segment around crossing with a line.
+         * NB: We fit x=az+b, not z=ax+b.  For some weird reason it is more stable. */
+        seglen = iend+1 - istart;
+        g_array_set_size(zxdata, 2*seglen);
+        for (ii = istart; ii <= iend; ii++) {
+            g_array_index(zxdata, gdouble, ii-istart) = d[ii];
+            g_array_index(zxdata, gdouble, seglen + ii-istart) = ii - i;
+        }
+        gwy_math_fit_polynom(seglen, &g_array_index(zxdata, gdouble, 0), &g_array_index(zxdata, gdouble, seglen),
+                             1, coeffs);
+        x = i + coeffs[0];
+        if (d[i] > 0.0)
+            g_array_append_val(zcdown, x);
+        else
+            g_array_append_val(zcup, x);
+
+        i = iend+1;
+    }
+    g_array_free(zxdata, TRUE);
+
+    Tup = fit_slope_of_crossings(zcup, 0.1, &err_up);
+    Tdown = fit_slope_of_crossings(zcdown, 0.1, &err_down);
+
+    g_array_free(zcup, TRUE);
+    g_array_free(zcdown, TRUE);
+
+    *err_estim = 0.0;
+    if (Tup > 0.0)
+        *err_estim = (Tdown > 0.0) ? 0.5*sqrt(err_up*err_up + err_down*err_down) : err_up;
+    else if (Tdown > 0.0)
+        *err_estim = err_down;
+
+    return mean_value_of_positive(Tup, Tdown);
+}
+
+static gint
+find_first_acf_peak(const gdouble *d, gint res)
+{
+    gint i;
+
+    /* Locate the first trough and get out. */
+    for (i = 1; i < res/2; i++) {
+        if (d[i] < 0.0)
+            break;
+    }
+    while (i < res/2) {
+        if (d[i] > 0.0)
+            break;
+        i++;
+    }
+    if (i == res/2)
+        return -1;
+
+    /* Then locate the first peak. */
+    while (i < res-2) {
+        if (d[i] < d[i-1])
+            break;
+        i++;
+    }
+    if (i == res-2)
+        return -1;
+    return i-1;
+}
+
+static gdouble
+acf_period_estimate(GwyDataLine *line)
+{
+    GwyDataLine *acf = gwy_data_line_new_alike(line, FALSE);
+    gdouble x = 0.0;
+    gint peakpos;
+
+    gwy_data_line_acf(line, acf);
+    peakpos = find_first_acf_peak(acf->data, acf->res);
+    if (!(peakpos > 0))
+        return -1.0;
+    gwy_math_refine_maximum_1d(acf->data + peakpos-1, &x);
+    g_object_unref(acf);
+
+    return peakpos + x;
+}
+
+static gdouble
+multiacf_period_estimate(GwyDataLine *line, gdouble *err_estim)
+{
+    GwyDataLine *acf = gwy_data_line_new_alike(line, FALSE);
+    GArray *xdata, *ydata;
+    gdouble x = 0.0, sxx, sxy, f, m0, t;
+    gdouble *d;
+    gint i, j, res, peakpos;
+
+    gwy_data_line_acf(line, acf);
+    d = acf->data;
+    res = acf->res;
+    peakpos = find_first_acf_peak(d, res);
+    if (!(peakpos > 0))
+        return -1.0;
+    gwy_math_refine_maximum_1d(d + peakpos-1, &x);
+
+    xdata = g_array_new(FALSE, FALSE, sizeof(gdouble));
+    ydata = g_array_new(FALSE, FALSE, sizeof(gdouble));
+
+    /* This is the 1×T peak; there is also 0×T, but this one contributes zero to the sums.  Weight positions by peak
+     * height d[peakpos]. */
+    i = 1;
+    m0 = d[peakpos];
+    sxx = i*i*d[peakpos];
+    sxy = i*(peakpos + x)*d[peakpos];
+    i++;
+    while (TRUE) {
+        f = sxy/sxx;
+        peakpos = GWY_ROUND(f*i);
+        if (!peakpos || peakpos+2 >= res)
+            break;
+
+        /* If we miss the peak by more than 2 samples, abort. */
+        for (j = 0; j < 2; j++) {
+            if (peakpos > 1 && d[peakpos-1] > d[peakpos])
+                peakpos--;
+        }
+        if (!peakpos || d[peakpos-1] > d[peakpos])
+            break;
+
+        for (j = 0; j < 2; j++) {
+            if (peakpos+2 < res && d[peakpos+1] > d[peakpos])
+                peakpos++;
+        }
+        if (peakpos+2 >= res || d[peakpos+1] > d[peakpos])
+            break;
+
+        if (d[peakpos] < 0.15*m0)
+            break;
+
+        gwy_math_refine_maximum_1d(d + peakpos-1, &x);
+        sxx += i*i*d[peakpos];
+        sxy += i*(peakpos + x)*d[peakpos];
+
+        t = i;
+        g_array_append_val(xdata, t);
+        t = peakpos + x;
+        g_array_append_val(ydata, t);
+
+        i++;
+    }
+
+    g_object_unref(acf);
+
+    /* This overestimates the error because we do not fit the intercept. However, we also underestimate it because
+     * the inputs do not have uncorrelated errors. In summary, the estimate is not very reliable. */
+    linear_fit_slope_with_error_estimate(xdata->len,
+                                         &g_array_index(xdata, gdouble, 0), &g_array_index(ydata, gdouble, 0),
+                                         err_estim);
+    g_array_free(xdata, TRUE);
+    g_array_free(ydata, TRUE);
+
+    return sxy/sxx;
+}
+
+static void
+remove_envelope(GwyDataLine *line)
+{
+    GwyDataField *background;
+    GwyDataLine *tmp;
+    gdouble *bg, *d;
+    gdouble a, b, T;
+    gint m, i, res;
+
+    /* If the profile is way off zero line, weird things may happen. Get it approximately right first. */
+    gwy_data_line_get_line_coeffs(line, &a, &b);
+    gwy_data_line_line_level(line, a, b);
+    res = gwy_data_line_get_res(line);
+
+    /* Then use the envelope method. */
+    T = coarse_period_estimate(line, 2.0);
+    if (T < 0.0)
+        return;
+
+    m = GWY_ROUND(1.4*T) | 1;
+    if (m >= res-1)
+        return;
+
+    background = gwy_data_field_new(res, 2, res, 2, FALSE);
+    tmp = gwy_data_line_new_alike(line, FALSE);
+
+    gwy_data_line_copy(line, tmp);
+    gwy_data_line_part_filter_kth_rank(tmp, m, 0, res, GWY_ROUND(0.05*m));
+    gwy_data_field_set_row(background, tmp, 0);
+
+    gwy_data_line_copy(line, tmp);
+    gwy_data_line_part_filter_kth_rank(tmp, m, 0, res, GWY_ROUND(0.95*m));
+    gwy_data_field_set_row(background, tmp, 1);
+
+    gwy_data_field_row_gaussian(background, 0.5*T);
+    bg = gwy_data_field_get_data(background);
+    d = gwy_data_line_get_data(line);
+
+    /* Remove the envelope. */
+    for (i = 0; i < res; i++)
+        d[i] -= 0.5*(bg[i] + bg[i + res]);
+
+    g_object_unref(tmp);
+    g_object_unref(background);
+}
+
+static void
+fix_zero_line(GwyDataLine *line)
+{
+    /* For some gratings this is not very good, but it is a one-liner and the method based on peaks in height
+     * distribution has its own problems. Do not use plain median. If the fill ratio is relatively far from 1/2,
+     * mean becomes just somewhat off, whereas median can easily move to the top or bottom level. */
+    gwy_data_line_add(line, -gwy_data_line_get_avg(line));
+}
+
+/* The way we do levelling makes a bit difficult to show it for the original curve. Try to reconstruct it at least
+ * in spirit by roughly sampling it back. */
+static GwyGraphCurveModel*
+rough_levelled_graph_curve(GwyGraphCurveModel *origmodel, GwyDataLine *dline, gdouble from)
+{
+    GwyGraphCurveModel *levelledcmodel;
+    GwyDataLine *resampled;
+    gint res, ndata;
+
+    res = gwy_data_line_get_res(dline);
+    ndata = res/4;
+    resampled = gwy_data_line_new_resampled(dline, ndata, GWY_INTERPOLATION_KEY);
+    gwy_data_line_set_offset(resampled, from);
+    levelledcmodel = gwy_graph_curve_model_new_alike(origmodel);
+    g_object_set(levelledcmodel,
+                 "line-style", GDK_LINE_ON_OFF_DASH,
+                 "description", _("Leveled profile"),
+                 NULL);
+    gwy_graph_curve_model_set_data_from_dataline(levelledcmodel, resampled, 0, 0);
+    g_object_unref(resampled);
+
+    return levelledcmodel;
+}
+
+static void
+fill_value_if_positive(GwyResults *results, const gchar *name, gdouble value)
+{
+    if (value > 0.0)
+        gwy_results_fill_values(results, name, value, NULL);
+    else
+        gwy_results_set_na(results, name, NULL);
+}
+
+static void
+fill_value_with_error_if_positive(GwyResults *results, const gchar *name, gdouble value, gdouble error)
+{
+    gwy_results_set_na(results, name, NULL);
+    if (value > 0.0) {
+        if (error > 0.0)
+            gwy_results_fill_values_with_errors(results, name, value, error, NULL);
+        else
+            gwy_results_fill_values(results, name, value, NULL);
+    }
+}
+
+static gint
+execute(ModuleArgs *args, GwyResults *results)
+{
+    GwyParams *params = args->params;
+    gdouble from = gwy_params_get_double(params, PARAM_RANGE_FROM);
+    gdouble to = gwy_params_get_double(params, PARAM_RANGE_TO);
+    gint curve = gwy_params_get_int(params, PARAM_CURVE);
+    gboolean level = gwy_params_get_boolean(params, PARAM_LEVEL);
+    gboolean show_levelled = gwy_params_get_boolean(params, PARAM_SHOW_LEVELED);
+    GwyGraphCurveModel *gcmodel = gwy_graph_model_get_curve(args->gmodel, curve);
+    GwyDataLine *line;
+    const gdouble *xdata;
+    guint ndata, pos, npts;
+    gdouble xoff, dx, Tfft, Tzoomfft, Tacf, Tmultiacf, Tgc, Tzc, err_gc, err_zc, err_multiacf;
+
+    xdata = gwy_graph_curve_model_get_xdata(gcmodel);
+    ndata = gwy_graph_curve_model_get_ndata(gcmodel);
+    gwy_results_fill_graph_curve(results, "curve", gcmodel);
+    gwy_results_set_nav(results, G_N_ELEMENTS(results_period), results_period);
+
+    for (pos = 0; pos < ndata && xdata[pos] < from; pos++)
+        pos++;
+    for (npts = ndata; npts && xdata[npts-1] > to; npts--)
+        npts--;
+
+    if (npts <= pos + 5)
+        return 0;
+
+    xoff = fmax(xdata[0], from);
+    npts -= pos;
+    gwy_results_fill_values(results, "npts", npts, NULL);
+    gwy_results_fill_format(results, "range", "from", from, "to", to, NULL);
+
+    line = regularise_curve(gcmodel, pos, npts);
+    if (level) {
+        remove_envelope(line);
+        fix_zero_line(line);
+    }
+
+    dx = gwy_data_line_get_dx(line);
+    Tfft = coarse_period_estimate(line, 2.0);
+    Tzoomfft = Tfft > 0.0 ? zoom_period_estimate(line, Tfft) : -1.0;
+    Tacf = acf_period_estimate(line);
+    Tmultiacf = Tacf > 0.0 ? multiacf_period_estimate(line, &err_multiacf) : -1.0;
+    Tgc = gravcentre_period_estimate(line, &err_gc);
+    Tzc = zerocross_period_estimate(line, &err_zc);
+
+    GWY_OBJECT_UNREF(args->levelled);
+    if (level && show_levelled)
+        args->levelled = rough_levelled_graph_curve(gcmodel, line, xoff);
+    g_object_unref(line);
+
+    fill_value_if_positive(results, "simple-fft", Tfft*dx);
+    fill_value_if_positive(results, "zoom-fft", Tzoomfft*dx);
+    fill_value_if_positive(results, "simple-acf", Tacf*dx);
+    fill_value_with_error_if_positive(results, "multi-acf", Tmultiacf*dx, err_multiacf*dx);
+    fill_value_with_error_if_positive(results, "zero-cross", Tzc*dx, err_zc*dx);
+    fill_value_with_error_if_positive(results, "grav-centre", Tgc*dx, err_gc*dx);
+
+    return npts;
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

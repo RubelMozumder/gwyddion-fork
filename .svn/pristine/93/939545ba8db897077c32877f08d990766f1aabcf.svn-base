@@ -1,0 +1,1005 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gwyddion-documentation\n"
+"POT-Creation-Date: 2023-05-21 22:47+0400\n"
+"PO-Revision-Date: 2023-05-21 22:49+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.3.1\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: feature-measurement.xml:6(title)
+msgid "Feature Measurement"
+msgstr "Измерение особенностей"
+
+#: feature-measurement.xml:7(para)
+msgid ""
+"Menu <menuchoice><guisubmenu>Measure Features</guisubmenu></menuchoice> "
+"offers several functions for the measurement of specific shapes or features "
+"in topographical images."
+msgstr ""
+"Меню <menuchoice><guisubmenu>Измерение</guisubmenu></menuchoice> содержит "
+"несколько функций для измерения характерных форм или особенностей на "
+"изображениях топографии."
+
+#: feature-measurement.xml:16(title)
+msgid "Curvature <gwy:icon name=\"curvature\"/>"
+msgstr "Кривизна <gwy:icon name=\"curvature\"/>"
+
+#: feature-measurement.xml:19(primary)
+msgid "curvature"
+msgstr "кривизна"
+
+#: feature-measurement.xml:22(guimenu) feature-measurement.xml:66(guimenu)
+#: feature-measurement.xml:95(guimenu) feature-measurement.xml:241(guimenu)
+#: feature-measurement.xml:348(guimenu) feature-measurement.xml:436(guimenu)
+msgid "Data Process"
+msgstr "Обработка данных"
+
+#: feature-measurement.xml:23(guisubmenu)
+#: feature-measurement.xml:67(guisubmenu)
+#: feature-measurement.xml:96(guisubmenu)
+#: feature-measurement.xml:242(guisubmenu)
+#: feature-measurement.xml:349(guisubmenu)
+#: feature-measurement.xml:437(guisubmenu)
+msgid "Measure Features"
+msgstr "Измерение"
+
+#: feature-measurement.xml:24(guimenuitem)
+msgid "Curvature"
+msgstr "Кривизна"
+
+#: feature-measurement.xml:27(para)
+msgid ""
+"The global surface curvature parameters are calculated by fitting a "
+"quadratic polynomial and finding its main axes. Positive signs of the "
+"curvature radii correspond to a concave (cup-like) surface, whereas negative "
+"signs to convex (cap-like) surface, mixed signs mean a saddle-like surface."
+msgstr ""
+"Глобальные параметры кривизны поверхности рассчитываются аппроксимацией "
+"квадратичным полиномом и определением его главных осей. Положительные знаки "
+"радиусов кривизны соответствуют вогнутой (чашеподобной) поверхности, "
+"отрицательные выпуклой (куполоподобной), смешанные знаки обозначают "
+"седловидную поверхность."
+
+#: feature-measurement.xml:34(para)
+msgid ""
+"Beside the parameter table, it is possible to set the line selection on the "
+"data to the fitted quadratic surface axes and/or directly read profiles "
+"along them. The zero of the abscissa is placed to the intersection of the "
+"axes."
+msgstr ""
+"Помимо таблицы параметров, можно задать выбранные линии на данных вдоль осей "
+"аппроксимирующей квадратичной поверхности и/или напрямую считать профили "
+"вдоль них. Нулевое значение абсциссы помещается в пересечение осей."
+
+#: feature-measurement.xml:40(para)
+msgid ""
+"Similarly to the background subtraction functions, if a mask is present on "
+"the data the module offers to include or exclude the data under mask."
+msgstr ""
+"Подобно функциям вычета фона, если на данных присутствует маска, модуль "
+"предлагает включить или исключить данные под маской."
+
+#: feature-measurement.xml:49(caption)
+msgid ""
+"Curvature dialogue screenshot showing the strong deflection of a glass plate "
+"with a thin film with compressive internal stress."
+msgstr ""
+"Снимок экрана диалогового окна кривизны. показывающего сильное отклонение "
+"стеклянной пластинки с тонкой плёнкой при наличии сжимающего внутреннего "
+"напряжения."
+
+#: feature-measurement.xml:57(title)
+msgid "Fit Shape <gwy:icon name=\"fit_shape\"/>"
+msgstr "Аппроксимировать форму <gwy:icon name=\"fit_shape\"/>"
+
+#: feature-measurement.xml:61(primary)
+msgid "fitting"
+msgstr "аппроксимация"
+
+#: feature-measurement.xml:62(secondary)
+msgid "3D shapes to topographical images"
+msgstr "3D формы относительно изображения топографии"
+
+#: feature-measurement.xml:68(guimenuitem)
+msgid "Fit Shape"
+msgstr "Аппроксимировать форму"
+
+#: feature-measurement.xml:71(para)
+msgid ""
+"Form removal as well as measurement of geometrical parameters can be "
+"performed by fitting geometrical shapes on the data using the least-squares "
+"method. The <guilabel>Fit Shape</guilabel> module is essentially the same "
+"for images and XYZ data and it is <link linkend=\"fit-shape\">described in "
+"detail</link> in the XYZ data processing part. Only the differences are "
+"mentioned here."
+msgstr ""
+"Удаление формы, а также измерение геометрических параметров можно "
+"производить путём аппроксимации данных геометрическими формами используя "
+"метод наименьших квадратов. Модуль <guilabel>Аппроксимировать форму</"
+"guilabel> практически одинаков для изображений и данных XYZ и он <link "
+"linkend=\"fit-shape\">детально описан</link> в разделе о работе с данными "
+"XYZ, поэтому здесь упомянуты только отличающиеся особенности."
+
+#: feature-measurement.xml:79(para)
+msgid ""
+"Standard masking is supported for images. That is if a mask is present the "
+"dialogue offers to use the data under the mask, exclude the data under mask "
+"or ignore the mask and use the entire data. Since the excluded pixels can be "
+"outliers or image parts not conforming to the chosen shape it it possible to "
+"avoid them also in the difference image by disabling <guilabel>Calculate "
+"differences for excluded pixels</guilabel>."
+msgstr ""
+"Для изображений поддерживается стандартная работа с маской. То есть, если "
+"маска присутствует, то диалоговое окно предлагает использовать данные под "
+"маской, исключить данные под маской или игнорировать маску и использовать "
+"все данные. Поскольку исключённые пиксели могут быть выпадающими или частью "
+"изображения, не вписывающейся в заданную фигуру, можно также исключить их на "
+"изображении разности выключив переключатель <guilabel>Рассчитать различия "
+"для исключенных пикселей</guilabel>."
+
+#: feature-measurement.xml:89(title)
+msgid "Facet Analysis <gwy:icon name=\"facet_analysis\"/>"
+msgstr "Анализ граней <gwy:icon name=\"facet_analysis\"/>"
+
+#: feature-measurement.xml:92(primary) feature-measurement.xml:238(primary)
+msgid "facet analysis"
+msgstr "анализ граней"
+
+#: feature-measurement.xml:97(guimenuitem)
+msgid "Facet Analysis"
+msgstr "Анализ граней"
+
+#: feature-measurement.xml:100(para)
+msgid ""
+"Facet analysis enables to interactively study orientations of facets "
+"occurring in the data and mark facets of specific orientations on the image. "
+"The top left view displays data with preview of marked facets. The smaller "
+"bottom left view, called facet view below, displays the two-dimensional "
+"slope distribution."
+msgstr ""
+"Анализ граней позволяет в интерактивном режиме изучать ориентацию граней, "
+"которые встречаются в данных и выделять грани определённой ориентации на "
+"изображении. Левое верхнее окно просмотра показывает данные с предпросмотром "
+"помеченных граней. Правое нижнее меньшее окно, ниже именуемое просмотром "
+"граней, показывает двумерное распределение наклонов."
+
+#: feature-measurement.xml:112(caption)
+msgid ""
+"Facet analysis screenshot, showing two selected points on the angular "
+"distribution and marked facets for one of them."
+msgstr ""
+"Снимок экрана анализа граней, показывающий две выбранные точки на "
+"распределении углов и отмеченные грани для одной из них."
+
+#: feature-measurement.xml:118(para) feature-measurement.xml:253(para)
+msgid ""
+"The centre of facet view always correspond to zero inclination (horizontal "
+"facets), slope in <include href=\"eqi-x.xml\"/>-direction increases towards "
+"left and right border and slope in <include href=\"eqi-y.xml\"/>-direction "
+"increases towards top and bottom borders. The exact coordinate system is a "
+"bit complex (an area preserving transformation between spherical angles and "
+"the planar facet view is used) and it adapts to the range of slopes in the "
+"particular data displayed. The range of inclinations is displayed below the "
+"facet view."
+msgstr ""
+"Центр грани всегда будет соответствовать нулевому наклону (горизонтальные "
+"грани), наклон в направлении <include href=\"eqi-x.xml\"/> увеличивается в "
+"направлении левой и правой границы и наклон в направлении <include href="
+"\"eqi-y.xml\"/> увеличивается в направлении верхней и нижней границы. Точное "
+"представление координатной системы достаточно сложно (используется "
+"сохраняющее площадь преобразование между сферическими углами и плоским "
+"просмотром граней) и оно адаптируется к диапазону наклонов в конкретных "
+"отображаемых данных. Диапазон наклонов показан под изображением граней."
+
+#: feature-measurement.xml:128(para)
+msgid ""
+"Points selected on the facet view, i.e. directions in space, are listed in "
+"the top right corner as both angles and unit vector components. You can also "
+"choose the direction of the selected point by clicking on the image view. "
+"The direction is then set to the local facet at that position in the image."
+msgstr ""
+"Точки, выбранные в окне просмотра граней, т.е. направления в пространстве, "
+"перечислены в верхнем правом углу и как углы, и как компоненты единичного "
+"вектора. Также можно выбрать направление выбранной точки нажатием в окне "
+"просмотра изображений. Направление будет установлено в соответствии с "
+"локальной гранью в этом месте изображения."
+
+#: feature-measurement.xml:135(para)
+msgid ""
+"Standard controls allowing manipulation with the entire list or the selected "
+"point are below the list. Button <guibutton>Refine</guibutton> tries to "
+"improve the position of selected point to a local maximum in the facet view. "
+"Button <guibutton>Mark</guibutton> creates a mask on the image corresponding "
+"to the selected direction and a range of close directions. The directions "
+"are simultaneously shown on the facet view. The mean normal of the selected "
+"region is displayed as <guilabel>Mean normal</guilabel> below."
+msgstr ""
+"Стандартные элементы управления, которые позволяют работать со всем списком "
+"или с выбранной точкой, находятся под списком. Кнопка <guibutton>Уточнить</"
+"guibutton> пытается улучшить положение выбранной точки смещая её в локальный "
+"максимум в окне граней. Кнопка <guibutton>Пометить</guibutton> создаёт маску "
+"на изображении, соответствующую выбранному направлению и диапазону близких к "
+"нему. Направления одновременно показаны в окне просмотра граней. Средняя "
+"нормаль к выбранной области показана как <guilabel>Средняя нормаль</"
+"guilabel> внизу."
+
+#: feature-measurement.xml:145(para)
+msgid ""
+"The bottom right part contains tabs with settings and some advanced "
+"operations."
+msgstr ""
+"Нижняя правая часть содержит вкладки с настройками и некоторыми продвинутыми "
+"операциями."
+
+#: feature-measurement.xml:152(guilabel)
+msgid "Facet"
+msgstr "Грань"
+
+#: feature-measurement.xml:155(para) feature-measurement.xml:263(para)
+msgid ""
+"<guilabel>Facet plane size</guilabel> controls the size (radius) of plane "
+"locally fitted in each point to determine the local inclination. The special "
+"value 0 stands for no plane fitting, the local inclination is determined "
+"from symmetric <include href=\"eqi-x.xml\"/> and <include href=\"eqi-y.xml\"/"
+"> derivatives in each point. The choice of neighbourhood size is crucial for "
+"meaningful results: it must be smaller than the features one is interested "
+"in to avoid their smoothing, on the other hand it has to be large enough to "
+"suppress noise present in the image."
+msgstr ""
+"<guilabel>Площадь поверхности грани</guilabel> управляет размером (радиусом) "
+"плоскости, локально аппроксимированной в каждой точке для определения "
+"локального уклона. Специальное значение 0 соответствует случаю, когда "
+"аппроксимация плоскостью не проводится, локальный уклон определяется исходя "
+"из симметричных производных по осям <include href=\"eqi-x.xml\"/> и <include "
+"href=\"eqi-y.xml\"/> в каждой точке. Выбор размера окружения критически "
+"важен для получения значимого результата: он должен быть меньше, чем те "
+"особенности, которые интересуют, чтобы избежать сглаживания, в то же время "
+"он должен быть достаточно большим чтобы подавить шум, который присутствует в "
+"изображении."
+
+#: feature-measurement.xml:166(para) feature-measurement.xml:274(para)
+msgid ""
+"<guilabel>Tolerance</guilabel> determines the range of directions for "
+"marking. It also determines the search range for refining the the selected "
+"direction."
+msgstr ""
+"<guilabel>Допуск</guilabel> определяет диапазон направлений для выделения. "
+"Также определяет диапазон поиска для уточнения выбранного направления."
+
+#: feature-measurement.xml:175(guilabel)
+msgid "Rotation"
+msgstr "Поворот"
+
+#: feature-measurement.xml:178(para)
+msgid ""
+"The set of selected directions can be rotated in space using either the "
+"shader control or by changing individual angles. The rotation angle around "
+"the vertical axis is denoted <include href=\"eqi-alpha.xml\"/> and it is "
+"applied first. The directions are then rotated by angle <include href=\"eqi-"
+"theta.xml\"/> in the direction given by azimuth <include href=\"eqi-phi.xml"
+"\"/>."
+msgstr ""
+"Набор выбранных направлений может быть повёрнут в пространстве используя "
+"либо управление шейдером, или путём изменения индивидуальных углов. Угол "
+"поворота вокруг вертикальной оси обозначается <include href=\"eqi-alpha.xml"
+"\"/> и применяется первым. Направления затем поворачиваются на угол <include "
+"href=\"eqi-theta.xml\"/> в направлении, задаваемым азимутом <include href="
+"\"eqi-phi.xml\"/>."
+
+#: feature-measurement.xml:188(para)
+msgid ""
+"The global rotation cannot be mixed with movement of individual points on "
+"the facet view. Once you start changing points there, the global rotation is "
+"reset and the current positions, whatever they are, become the initial "
+"positions. During rotation you can reset it to the starting state using the "
+"<guibutton>Reset</guibutton> button."
+msgstr ""
+"Глобальное вращение нельзя смешивать с движением отдельных точек в окне "
+"просмотра граней. Как только вы начали менять точки здесь, глобальное "
+"вращение сбрасывается, и текущие положения, какими бы они не были, "
+"становятся начальными положениями. В процессе вращения можно сбросить их к "
+"стартовому состоянию используя кнопку <guibutton>Сброс</guibutton>."
+
+#: feature-measurement.xml:200(guilabel)
+#: feature-measurement.xml:350(guimenuitem)
+msgid "Lattice"
+msgstr "Решетка"
+
+#: feature-measurement.xml:203(para)
+msgid ""
+"A set of directions corresponding to low-number Miller indices can be "
+"created by choosing the lattice type, its parameters and pressing button "
+"<guibutton>Create points</guibutton>. The absolute lengths of the cell edges "
+"are not important for the directions, only their ratios are. Therefore, they "
+"can be given in arbitrary units."
+msgstr ""
+"Набор направлений соответствующих индексам Миллера с малыми значениями может "
+"быть выбран путём выбора типа решетки, её параметров и нажатием кнопки "
+"<guibutton>Создать точки</guibutton>. Абсолютные длины граней ячейки в "
+"данном случае не важны для задания направления, влияют только их "
+"соотношения. Следовательно, они могут быть заданы в произвольных единицах."
+
+#: feature-measurement.xml:211(para)
+msgid ""
+"Together with rotation, this function can be useful for matching the image "
+"facets to crystallographic planes."
+msgstr ""
+"Вместе с поворотом, эта функция может быть полезна для сопоставления граней "
+"изображения и кристаллографических плоскостей."
+
+#: feature-measurement.xml:223(caption)
+msgid ""
+"Illustration of the influence of fitted plane size on the distribution of a "
+"scan of a delaminated DLC surface with considerable fine noise. One can see "
+"the distribution is completely obscured by the noise at small plane sizes. "
+"The neighbourhood sizes are: (a) 0, (b) 2, (c) 4, (d) 7. The angle and false "
+"colour mappings are full-scale for each particular image, i.e. they vary "
+"among them."
+msgstr ""
+"Иллюстрация влияния размера аппроксимирующей плоскости на распределение в "
+"скане расслоённого алмазоподобного покрытия со значительным тонким шумом. "
+"Можно заметить, что распределение полностью скрыто шумом при малых размерах "
+"плоскости. Размеры окружения: (a) 0, (b) 2, (c) 4, (d) 7. Шкалы углов и "
+"псевдоцвета растянуты на весь диапазон для каждого изображения, т.е. они "
+"различны для разных изображений."
+
+#: feature-measurement.xml:235(title)
+msgid "Facet Measurement <gwy:icon name=\"facet_measure\"/>"
+msgstr "Измерение граней <gwy:icon name=\"facet_measure\"/>"
+
+#: feature-measurement.xml:243(guimenuitem)
+msgid "Facet Measurement"
+msgstr "Измерение граней"
+
+#: feature-measurement.xml:246(para)
+msgid ""
+"Facet measurement allows to interactively select and mark several facets of "
+"specific orientations on the image, measure their positions and store the "
+"results in a table. The top left view displays data with preview of marked "
+"facets. The smaller bottom left view, called facet view below, displays the "
+"two-dimensional slope distribution."
+msgstr ""
+"Измерение граней позволяет интерактивно выбирать и отметить несколько граней "
+"заданной ориентации на изображении, измерить их положения и сохранить "
+"результат в таблице. Верхнее левое окно показывает данные предпросмотра "
+"выбранных граней. Меньшее нижнее левое окно, именуемое окном просмотра "
+"граней ниже, показывает двумерное распределение наклонов."
+
+#: feature-measurement.xml:279(para)
+msgid ""
+"The currently selected point in facet view (facet orientation) is displayed "
+"as <guilabel>Selected</guilabel><include href=\"eqi-theta.xml\"/> and "
+"<include href=\"eqi-phi.xml\"/>. Button <guilabel>Refine</guilabel> tries to "
+"improve the position of selected point to a local maximum in the facet view. "
+"Button <guibutton>Mark</guibutton> creates a mask on the image corresponding "
+"to the selected direction and a range of close directions. If "
+"<guilabel>Instant facet marking</guilabel> is enabled facets are marked "
+"immediately as the selected point changes (the <guibutton>Mark</guibutton> "
+"button is then disabled). <placeholder-1/> Once you are satisfied with the "
+"facet selection press <guibutton>Measure</guibutton> to add a measurement to "
+"the table below. Each row of the table contains"
+msgstr ""
+"Текущая выбранная точка в окне просмотра граней (ориентации граней) "
+"показывается как <guilabel>Выбранные</guilabel><include href=\"eqi-theta.xml"
+"\"/> и <include href=\"eqi-phi.xml\"/>. Кнопка <guilabel>Уточнить</guilabel> "
+"пытается улучшить положение выбранной точки до локального максимума в окне "
+"просмотра граней. Кнопка <guibutton>Пометить</guibutton> создаёт на "
+"изображении маску, соответствующую выбранному направлению и диапазону "
+"близких к нему. Если включена опция <guilabel>Мгновенное выделение граней</"
+"guilabel> грани выделяются сразу как только меняется выранная точка (и "
+"кнопка <guibutton>Пометить</guibutton> становится отключенной). "
+"<placeholder-1/> После того как выбор граней вас устраивает нужно нажать "
+"<guibutton>Измерить</guibutton> для того, чтобы добавить измерение к таблице "
+"ниже. Каждая строка в таблице содержит"
+
+#: feature-measurement.xml:297(listitem)
+msgid "Point index <include href=\"eqi-n.xml\"/>."
+msgstr "Индекс точки <include href=\"eqi-n.xml\"/>."
+
+#: feature-measurement.xml:298(listitem)
+msgid "Number of pixels marked and used for the measurement."
+msgstr "Число пикселей, помеченных и использованных в процессе измерения."
+
+#: feature-measurement.xml:301(listitem)
+msgid "Tolerance <include href=\"eqi-t.xml\"/> used in the measurement."
+msgstr ""
+"Допуск <include href=\"eqi-t.xml\"/> использованный в процессе измерения."
+
+#: feature-measurement.xml:304(listitem)
+msgid "Mean polar angle <include href=\"eqi-theta.xml\"/> of the facet normal."
+msgstr ""
+"Средний полярный угол <include href=\"eqi-theta.xml\"/> нормали к грани."
+
+#: feature-measurement.xml:308(listitem)
+msgid ""
+"Mean azimuthal angle <include href=\"eqi-phi.xml\"/> of the facet normal."
+msgstr ""
+"Средний азимутальный угол <include href=\"eqi-phi.xml\"/> нормали к грани."
+
+#: feature-measurement.xml:312(listitem)
+msgid "Facet normal as a unit vector <include href=\"eqi-vector-x-y-z.xml\"/>"
+msgstr ""
+"Нормаль к грани как единичный вектор <include href=\"eqi-vector-x-y-z.xml\"/>"
+
+#: feature-measurement.xml:315(listitem)
+msgid ""
+"Standard deviation of facet normals within the marked set <include href="
+"\"eqi-delta.xml\"/>."
+msgstr ""
+"Стандартное отклонение нормали к грани внутри заданного множества <include "
+"href=\"eqi-delta.xml\"/>."
+
+#: feature-measurement.xml:320(para)
+msgid ""
+"The mean normals are calculated by simple averaging of the unit normal "
+"vectors <include href=\"eqi-vec-n.xml\"/>, which is appropriate when their "
+"spread is relatively small. The standard deviation is calculated in radians "
+"as follows <include href=\"eq-standard-deviation-of-normals.xml\"/> where "
+"bar denotes the mean normal."
+msgstr ""
+"Средние нормали рассчитываются простым усреднением единичных векторов "
+"нормали <include href=\"eqi-vec-n.xml\"/>, что является правильным если их "
+"разброс относительно мал. Стандартное отклонение рассчитывается в радианах "
+"следующим методом <include href=\"eq-standard-deviation-of-normals.xml\"/> "
+"где чертой обозначается средняя нормаль."
+
+#: feature-measurement.xml:330(title)
+msgid "Lattice <gwy:icon name=\"measure_lattice\"/>"
+msgstr "Решетка <gwy:icon name=\"measure_lattice\"/>"
+
+#: feature-measurement.xml:333(primary) feature-measurement.xml:340(secondary)
+#: feature-measurement.xml:344(secondary)
+msgid "lattice measurement"
+msgstr "измерение решетки"
+
+#: feature-measurement.xml:335(primary)
+msgid "pitch measurement"
+msgstr "измерение шага"
+
+#: feature-measurement.xml:336(secondary)
+msgid "two-dimensional"
+msgstr "двумерная"
+
+#: feature-measurement.xml:339(primary)
+msgid "power spectral density function"
+msgstr "функция спектральной плотности мощности"
+
+#: feature-measurement.xml:343(primary)
+msgid "autocorrelation function"
+msgstr "функция автокорреляции"
+
+#: feature-measurement.xml:353(para)
+msgid ""
+"Parameters of regular two-dimensional structures can be obtained by "
+"analysing data transformed into a form that captures their regularity. The "
+"ACF and PSDF are particularly well-suited for this because they exhibit "
+"peaks corresponding to the Bravais lattice vectors for the periodic pattern."
+msgstr ""
+"Параметры правильных двумерных структур могут быть получены анализом данных, "
+"преобразованных в форму, которая учитывает их периодичность. Функции "
+"автокорреляции и плотности спектра мощности особенно хорошо подходят для "
+"этого, поскольку при анализе периодических структур на них присутствуют "
+"пики, соответствующие базисным векторам решеток Браве."
+
+#: feature-measurement.xml:360(para)
+msgid ""
+"Peaks in the two-dimensional ACF correspond to lattice vectors in the direct "
+"space (and their integer multiples and linear combinations). Peaks in the "
+"two-dimensional PSDF correspond to lattice vectors of the "
+"<emphasis>reciprocal</emphasis> lattice. The matrices formed by the lattice "
+"vectors in direct and frequency space are transposed inverses of each other. "
+"With a suitable transformation either can be used to measure the lattice."
+msgstr ""
+"Пики на двумерной функции автокорреляции соответствуют векторам решетки в "
+"нормальном линейном пространстве (а также им же, умноженным в целое число "
+"раз и их линейным комбинациям). Пики на двумерной функции плотности спектра "
+"мощности соответствуют векторам <emphasis>обратной</emphasis> решетки. "
+"Матрицы, образованные векторами решетки в линейном пространстве и "
+"пространстве частот (Фурье-пространстве) являются транспонированными "
+"версиями обратных матриц друг друга. С соответствующим преобразованием любая "
+"из них может применяться для измерения периодической решетки."
+
+#: feature-measurement.xml:369(para)
+msgid ""
+"The Gwyddion function <guimenuitem>Measure Lattice</guimenuitem> can utilise "
+"either ACF or PSDF for the measurement. Since regular lattices with large "
+"periods correspond to peaks in the ACF image that are far apart but peaks in "
+"the PSDF that are close, it is preferable to use the ACF in this case to "
+"improve the resolution. Conversely, the PSDF image is more suitable if the "
+"lattice periods are small. In the dialogue you can switch freely between "
+"direct and frequency space representations and the selected lattice is "
+"transformed as necessary."
+msgstr ""
+"Функция программы Gwyddion <guimenuitem>Измерить решетку</guimenuitem> может "
+"использовать либо функцию автокорреляции, либо ФСПМ для измерения. Поскольку "
+"правильные решетки с большими значениями периодов соответствуют далеко "
+"расположенным пикам на изображении функции автокорреляции, но "
+"близкорасположенным на ФСПМ, в этом случае лучше использовать "
+"автокорреляционную функцию для получения лучшего разрешения. Наоборот, "
+"изображение ФСПМ лучше подходит для измерения малых периодов решетки. В "
+"диалоговом окне можно свободно переключаться между линейным и Фурье-"
+"пространством и выбранная решетка по необходимости преобразуется вместе с "
+"пространством."
+
+#: feature-measurement.xml:380(para)
+msgid ""
+"If scan lines contain lots of high-frequency noise the horizontal ACF "
+"(middle row in the ACF image) can be also quite noisy. In such case it is "
+"better to interpolate it from the surrounding rows by enabling the option "
+"<guilabel>Interpolate horizontal ACF</guilabel>."
+msgstr ""
+"Если линии сканирования содержат много высокочастотного шума, горизонтальная "
+"автокорреляционная функция (средняя строка на изображении АКФ) также может "
+"оказаться достаточно шумной. В этом случае лучше интерполировать её по "
+"окружающим строкам используя опцию <guilabel>Интерполировать горизонтальную "
+"АКФ</guilabel>."
+
+#: feature-measurement.xml:386(para)
+msgid ""
+"The button <guibutton>Estimate</guibutton> attempts to find automatically "
+"the lattice for the image. When it does not select the vectors as you would "
+"like you can adjust the vectors in the image manually. The selection can be "
+"done either in a manner similar to <link linkend=\"correct-affine\">Affine "
+"Distortion</link> (this corresponds to choosing <guilabel>Show lattice as</"
+"guilabel><guilabel>Lattice</guilabel>), or only the two vectors can be shown "
+"and adjusted (<guilabel>Vectors</guilabel>). Either way, when you choose "
+"approximately the peak positions, pressing the <guibutton>Refine</guibutton> "
+"button adjusts the positions of the vectors to improve the match with the "
+"peaks. Button <guibutton>Reset</guibutton> can be used to restore the "
+"vectors to a sane initial state."
+msgstr ""
+"При нажатии на кнопку <guibutton>Оценить</guibutton> будет сделана попытка "
+"подобрать параметры решетки автоматически. Если полученные в результате "
+"вектора вас не устраивают, их можно выбрать на изображении вручную. Выбор "
+"можно делать либо способом, похожим на <link linkend=\"correct-affine"
+"\">Афинное искажение</link> (соответствует выбору <guilabel>Показать решетку "
+"как</guilabel> <guilabel>Решетку</guilabel>), либо будут показываться и "
+"настраиваться только два вектора (<guilabel>Вектора</guilabel>). Независимо "
+"от представления, когда вы приблизительно выберете положения пиков, нажатие "
+"на кнопку <guibutton>Уточнить</guibutton> подстроит вектора таким образом, "
+"чтобы они максимально точно соответствовали пикам. Кнопка <guibutton>Сброс</"
+"guibutton> может использоваться чтобы восстановить вектора во вменяемое "
+"исходное состояние."
+
+#: feature-measurement.xml:401(para)
+msgid ""
+"The lattice vectors are always displayed as direct-space vectors, with "
+"components, total lengths and directions. The angle shown as <include href="
+"\"eqi-phi.xml\"/> is the angle between the two vectors."
+msgstr ""
+"Вектора решетки всегда показываются как вектора в линейном пространстве в "
+"виде компонент, длин и направлений. Угол, показанный как <include href=\"eqi-"
+"phi.xml\"/> является углом между двумя векторами."
+
+#: feature-measurement.xml:406(para)
+msgid ""
+"The direct lattice vectors <include href=\"eqi-vec-a_1.xml\"/> and <include "
+"href=\"eqi-vec-a_2.xml\"/> are related to the reciprocal lattice vectors "
+"<include href=\"eqi-vec-b_1.xml\"/> and <include href=\"eqi-vec-b_2.xml\"/> "
+"by the following relation: <include href=\"eq-reciprocal-lattice-vectors.xml"
+"\"/> where <include href=\"eqi-R.xml\"/> denotes a 90 degree rotation "
+"matrix. The inverse transform is similar. Therefore, the lattice vectors "
+"must always be considered as a pair. Changing for instance <include href="
+"\"eqi-vec-b_1.xml\"/> in the PSDF image changes both <include href=\"eqi-vec-"
+"a_1.xml\"/> and <include href=\"eqi-vec-a_2.xml\"/>."
+msgstr ""
+"Векторы прямой решетки <include href=\"eqi-vec-a_1.xml\"/> и <include href="
+"\"eqi-vec-a_2.xml\"/> соотносятся с векторами обратной решетки <include href="
+"\"eqi-vec-b_1.xml\"/> и <include href=\"eqi-vec-b_2.xml\"/> следующим "
+"соотношением: <include href=\"eq-reciprocal-lattice-vectors.xml\"/> где "
+"<include href=\"eqi-R.xml\"/> обозначает матрицу поворота на 90 градусов. "
+"Обратное преобразование будет похожим. Следовательно, вектора решетки всегда "
+"рассматриваются в паре. Изменение, например, <include href=\"eqi-vec-b_1.xml"
+"\"/> в изображении ФСПМ меняет оба вектора <include href=\"eqi-vec-a_1.xml\"/"
+"> и <include href=\"eqi-vec-a_2.xml\"/>."
+
+#: feature-measurement.xml:418(para)
+msgid ""
+"Sometimes it is useful to measure a single lattice vector, e.g. in images of "
+"one-dimensional periodic structures. The second vector then gets in the way. "
+"For this there exists a single-vector mode, enabled by <guilabel>Measure "
+"single vector</guilabel>. It hides the second vectors and ensures <include "
+"href=\"eqi-vec-a_1.xml\"/> are <include href=\"eqi-vec-b_1.xml\"/> are "
+"parallel and with mutually reciprocal lengths, as expected."
+msgstr ""
+"Иногда бывает полезно измерить один вектор решетки, например, для "
+"изображений периодических в одном направлении структур. При этом второй "
+"вектор только мешает. Для этого существует режим одного вектора, включаемый "
+"опцией <guilabel>Измерить один вектор</guilabel>. Он прячет вторые вектора и "
+"обеспечивает параллельность векторов <include href=\"eqi-vec-a_1.xml\"/> и "
+"<include href=\"eqi-vec-b_1.xml\"/>, и то, что их длины будут взаимно "
+"обратными, как и должно быть в данном случае."
+
+#: feature-measurement.xml:429(title)
+msgid "Terraces <gwy:icon name=\"terrace_measure\"/>"
+msgstr "Террасы <gwy:icon name=\"terrace_measure\"/>"
+
+#: feature-measurement.xml:432(primary)
+msgid "terrace measurement"
+msgstr "измерение террасы"
+
+#: feature-measurement.xml:433(primary)
+msgid "amphitheatre measurement"
+msgstr "измерения амфитеатра"
+
+#: feature-measurement.xml:438(guimenuitem)
+msgid "Terraces"
+msgstr "Террасы"
+
+#: feature-measurement.xml:441(para)
+msgid ""
+"Terrace measurement can be used either to measure steps between plateaus in "
+"terrace or amphitheatre-like structures, or calibration by measuring such "
+"structures with precisely known step heights – in particular atomic steps on "
+"silicon [<link linkend=\"feature-measurement-ref-1\">1</link>]."
+msgstr ""
+"Измерения террасы могут быть использованы либо для измерения шага между "
+"плоскими областями в структурах типа террас или амфитеатров, или для "
+"калибровки путем измерения таких структур с точно известной высотой ступеней "
+"– в частности атомарных ступеней в кремнии [<link linkend=\"feature-"
+"measurement-ref-1\">1</link>]."
+
+#: feature-measurement.xml:447(para)
+msgid "The image processing has several parts:"
+msgstr "Обработка изображений состоит из нескольких частей:"
+
+#: feature-measurement.xml:452(link)
+msgid "Gaussian step"
+msgstr "Гауссова ступень"
+
+#: feature-measurement.xml:451(listitem)
+msgid "edge detection using the <placeholder-1/> filter,"
+msgstr "поиска края с использованием <placeholder-1/> фильтра,"
+
+#: feature-measurement.xml:455(listitem)
+msgid "segmentation into terraces,"
+msgstr "сегментации на террасы,"
+
+#: feature-measurement.xml:458(listitem)
+msgid ""
+"fitting the image with polynomial background, allowing each terrace to be "
+"offset vertically differently,"
+msgstr ""
+"аппроксимации изображения полиномиальным фоном, что позволяет каждой из "
+"террас быть смещенной по вертикали по разному,"
+
+#: feature-measurement.xml:462(listitem)
+msgid ""
+"estimation of step height and integer levels of individual terraces, and"
+msgstr "оценки высоты ступени и целочисленных уровней отдельных террас и"
+
+#: feature-measurement.xml:466(listitem)
+msgid "fitting the image again, assuming given integer levels."
+msgstr ""
+"аппроксимации изображения снова, считая заданные целочисленные уровни "
+"правильными."
+
+#: feature-measurement.xml:470(para)
+msgid ""
+"Some of them are optional. Furthermore, filtering and segmentation is "
+"interactive, whereas fitting is only run when button <guibutton>Fit</"
+"guibutton> is pressed. Intermediate results can be visualised by choosing "
+"the image to display using the <guilabel>Display</guilabel> menu. At the "
+"beginning, the most useful image is usually <guilabel>Marked terraces</"
+"guilabel> which shows individual recognised terraces in different colours."
+msgstr ""
+"Некоторые из них являются опциональными. Более того, фильтрация и "
+"сегментация являются интерактивными, в то время как аппроксимация "
+"запускается только в случае если кнопка <guibutton>Аппроксимировать</"
+"guibutton> нажата. Промежуточные результаты могут визуализироваться выбором "
+"соответствующего изображения в меню <guilabel>Отображать</guilabel>. Вначале "
+"наиболее полезным изображением обычно будет <guilabel>Выделенные террасы</"
+"guilabel>, которое показывает отдельные обнаруженные террасы разными цветами."
+
+#: feature-measurement.xml:479(para)
+msgid ""
+"Parameter <guilabel>Step detection kernel</guilabel> of edge detection is "
+"the same as for the Gaussian step filter. The following parameters control "
+"segmentation:"
+msgstr ""
+"Параметр <guilabel>Ядро детекции ступеней</guilabel> в соответствующей "
+"стадии такой же, как для фильтра гауссовых ступеней. Следующие параметры "
+"управляют сегментацией:"
+
+#: feature-measurement.xml:487(guilabel)
+msgid "Step detection threshold"
+msgstr "Порог для детекции ступени"
+
+#: feature-measurement.xml:490(para)
+msgid ""
+"Threshold for the edge-detection (as a percentage of maximum value of the "
+"filtered image). Too small threshold leads to fragmented terraces as too "
+"much of the image is considered edges. Too high threshold leads to merging "
+"of terraces which are actually at different heights – this is often best "
+"checked using the <guilabel>Marked terraces</guilabel> image."
+msgstr ""
+"Порог для детекции краёв (как процент от максимального значения изображения "
+"после фильтра). Слишком малые значения порога приводят к фрагментированным "
+"террасам поскольку слишком большая часть изображения рассматривается как "
+"края. Слишком большой порог приводит к слиянию террас, которые в "
+"действительности расположены на разных высотах – это проще всего проверить "
+"используя изображение <guilabel>Помеченные террасы</guilabel>."
+
+#: feature-measurement.xml:502(guilabel)
+msgid "Step broadening"
+msgstr "Уширение ступени"
+
+#: feature-measurement.xml:505(para)
+msgid ""
+"Regions recognised as edges are widened by given number of pixels. This "
+"helps with separation of terraces which should stay separate. In addition, "
+"it excludes regions too close to edges from polynomial fitting."
+msgstr ""
+"Области, распознанные как края уширяются на заданное число пикселей. Это "
+"помогает разделению террас которые должны быть раздельными. В дополнение, "
+"это исключает области слишком близкие к раям из полиномиальной аппроксимации."
+
+#: feature-measurement.xml:515(guilabel)
+msgid "Minimum terrace area"
+msgstr "Минимальная площадь террасы"
+
+#: feature-measurement.xml:518(para)
+msgid ""
+"After segmentation, only sufficiently large terraces are kept. This option "
+"specifies the minimum terrace area, given as a fraction of the entire image "
+"area."
+msgstr ""
+"После разделения только достаточно большие террасы оставляются для "
+"дальнейшего анализа. Эта опция задаёт минимальную площадь террасы, как долю "
+"от всей площади изображения."
+
+#: feature-measurement.xml:526(para)
+msgid ""
+"Segmentation can be augmented – or replaced – by a user-supplied mask. If "
+"the image has a mask, the standard masking options are offered. Here "
+"<guilabel>Exclude masked region</guilabel> means excluding it from the "
+"detected terraces. This allowing prevention of unwanted terrace merging – "
+"for instance by drawing manually small pieces of the boundaries using <link "
+"linkend=\"mask-editor\">Mask Editor tool</link>."
+msgstr ""
+"Сегментация может быть дополнена – или заменена – маской, предоставленной "
+"пользователем. Если изображение уже содержит маску, то предлагаются "
+"стандартные опции по работе с масками. Здесь <guilabel>Исключить область под "
+"маской</guilabel> означает исключение её из обнаруженных террас. Это "
+"позволяет избежать нежелательных слияний террас – например рисуя вручную "
+"небольших фрагментов границ используя <link linkend=\"mask-editor"
+"\">инструмент редактирования маски</link>."
+
+#: feature-measurement.xml:534(para)
+msgid ""
+"If option <guilabel>Do not segment, use only mask</guilabel> is enabled, no "
+"filtering is done and the mask is directly used as marked terraces (or their "
+"edges, depending on the masking mode). Filtering of terraces by area is "
+"still applied."
+msgstr ""
+"Если опция <guilabel>Не сегментировать, использовать только маску</guilabel> "
+"включена, фильтрация не производится и маска напрямую используется как "
+"изображение выделенных террас (или их краёв), в зависимости от режима "
+"использования маски. Фильтрация террас по размеру будет всё равно "
+"применяться."
+
+#: feature-measurement.xml:540(para)
+msgid ""
+"The total degree of the two-dimensional polynomial to fit is determined by "
+"parameter <guilabel>Polynomial degree</guilabel>. The polynomial is "
+"constructed in the same manner as in <link linkend=\"polynomial-level"
+"\">Polynomial levelling</link> with limited total degree, except for the "
+"different base heights of each terrace."
+msgstr ""
+"Общая степень двумерного полинома для аппроксимации задаётся параметром "
+"<guilabel>Степень полинома</guilabel>. Полиномиальная поверхность "
+"конструируется таким же способом, что и при <link linkend=\"polynomial-level"
+"\">выравнивании полиномом</link> с ограниченной общей степенью, за "
+"исключение различной базовой высоты для каждой террасы."
+
+#: feature-measurement.xml:548(para)
+msgid ""
+"The subsequent processing depends on whether <guilabel>Independents heights</"
+"guilabel> is enabled. If terrace heights are independent, each detected "
+"terrace is allowed to have arbitrary height offset. The module does not "
+"attempt to fit the data with one common step height. This is generally not "
+"useful with mono atomic steps which should be all of the same height, but "
+"can be useful for other types of terrace-like structures. The terrace list "
+"still shows estimated integer levels – which may or may not be meaningful in "
+"this case."
+msgstr ""
+"Последующая обработка зависит от того, включена ли опция "
+"<guilabel>Независимые высоты</guilabel>. Если высоты отдельных террас "
+"независимы, каждая из обнаруженных террас может иметь произвольное смещение "
+"по высоте. Модуль не пытается аппроксимировать данные с помощью одной общей "
+"высоты ступени. Это в общем случае не очень полезно для одноатомных "
+"ступеней, которые должны иметь одну и ту же высоту, но может оказаться "
+"полезным для других разновидностей террасоподобных структур. Список террас "
+"по прежнему будет показывать оценку целочисленных уровней, которые могут "
+"быть, а могут и не быть значащими в этом случае."
+
+#: feature-measurement.xml:559(para)
+msgid ""
+"When heights are not independent, the module estimates the common step "
+"height and assigns an integer level to each terrace – this means the height "
+"of any terrace differs from any other by an integer multiple of the step "
+"height. Using this initial estimate, the polynomial fitting is performed "
+"again, leading to the final value of the step height."
+msgstr ""
+"Когда высоты не являются независимыми, модуль оценивает общую высоту ступени "
+"и присваивает целочисленный уровень каждой из террас – это означает, что "
+"высота любой террасы отличается от любой другой на величину, кратную общей "
+"высоте ступени. Используя начальную оценку, полиномиальная аппроксимация "
+"производится вновь, приводя к итоговому значению высоты ступени."
+
+#: feature-measurement.xml:571(caption)
+msgid ""
+"Terrace measurement dialogue screenshot showing marked terraces for an "
+"amphitheatre structure formed by atomic steps on silicon."
+msgstr ""
+"Снимок экрана диалогового окна измерения террас показывающего выделенные "
+"террасы для структуры амфитеатра, сформированного атомными ступенями в "
+"кремнии."
+
+#: feature-measurement.xml:577(para)
+msgid ""
+"The lower part of tab <guilabel>Parameters</guilabel> shows an overview of "
+"the fitting results:"
+msgstr ""
+"Нижняя часть вкладки <guilabel>Параметры</guilabel> показывает информацию о "
+"результатах аппроксимации:"
+
+#: feature-measurement.xml:583(guilabel)
+msgid "Fitted step height"
+msgstr "Аппроксимированная высота ступеньки"
+
+#: feature-measurement.xml:582(listitem)
+msgid ""
+"<placeholder-1/>, usually the main result, shown with error obtained from "
+"the least-squares method,"
+msgstr ""
+"<placeholder-1/>, обычно основной результат, показанный с ошибкой измерения "
+"полученной в результате использования метода наименьших квадратов,"
+
+#: feature-measurement.xml:587(guilabel)
+msgid "Mean square difference"
+msgstr "Среднеквадратичная разница"
+
+#: feature-measurement.xml:586(listitem)
+msgid ""
+"<placeholder-1/> between the data and fit (including only terraces, not "
+"edges),"
+msgstr ""
+"<placeholder-1/> между данными и аппроксимацией (включая только террасы, не "
+"ступени),"
+
+#: feature-measurement.xml:591(guilabel)
+msgid "Terrace discrepancy"
+msgstr "Расхождение террас"
+
+#: feature-measurement.xml:590(listitem)
+msgid ""
+"<placeholder-1/>, the mean square difference between actual average terrace "
+"height and its height as a multiple of step height, and"
+msgstr ""
+"<placeholder-1/>, среднеквадратичная разница между действительной средней "
+"высотой террасы и её высотой как кратной высоте ступени и"
+
+#: feature-measurement.xml:596(guilabel)
+msgid "Number of terraces"
+msgstr "Количество террас"
+
+#: feature-measurement.xml:595(listitem)
+msgid "<placeholder-1/> found, marked and used for the fitting."
+msgstr ""
+"<placeholder-1/> найденных, помеченных и использованных для аппроксимации."
+
+#: feature-measurement.xml:600(para)
+msgid ""
+"Tab <guilabel>Terraces</guilabel> contains a table detailing properties of "
+"individual terraces. Each row corresponds to one terrace. The columns are:"
+msgstr ""
+"Вкладка <guilabel>Террасы</guilabel> содержит таблицу, уточняющую свойства "
+"отдельных террас. Каждая строка соответствует одной террасе. Столбцы "
+"представляют собой:"
+
+#: feature-measurement.xml:608(guilabel)
+msgid "Marked terraces"
+msgstr "Выделенные террасы"
+
+#: feature-measurement.xml:606(listitem)
+msgid ""
+"<include href=\"eqi-n.xml\"/>, terrace index (and colour in <placeholder-1/> "
+"image),"
+msgstr ""
+"<include href=\"eqi-n.xml\"/>, номер террасы (и цвет на <placeholder-1/> "
+"изображении),"
+
+#: feature-measurement.xml:610(listitem)
+msgid ""
+"<include href=\"eqi-h.xml\"/>, average height – actual, not multiple of step "
+"height,"
+msgstr ""
+"<include href=\"eqi-h.xml\"/>, средняя высота – действительная, а не кратная "
+"высоте ступени,"
+
+#: feature-measurement.xml:614(listitem)
+msgid "<include href=\"eqi-k.xml\"/>, integer level (multiple of step height),"
+msgstr ""
+"<include href=\"eqi-k.xml\"/>, целочисленный уровень (который домножается на "
+"высоту ступени),"
+
+#: feature-measurement.xml:618(listitem)
+msgid "<include href=\"eqi-A_px.xml\"/>, area in pixels,"
+msgstr "<include href=\"eqi-A_px.xml\"/>, площадь в пикселях,"
+
+#: feature-measurement.xml:621(listitem)
+msgid ""
+"<include href=\"eqi-Delta.xml\"/>, discrepancy, i.e. difference between "
+"average height and the assigned multiple of step height, and"
+msgstr ""
+"<include href=\"eqi-Delta.xml\"/>, расхождение, т.е. разница между средней "
+"высотой и присвоенной кратной высоте ступени, и"
+
+#: feature-measurement.xml:625(listitem)
+msgid ""
+"<include href=\"eqi-r.xml\"/>, residuum, mean square difference between fit "
+"and data."
+msgstr ""
+"<include href=\"eqi-r.xml\"/>, остаточная среднеквадратичная разница между "
+"аппроксимацией и данными."
+
+#: feature-measurement.xml:630(para)
+msgid ""
+"For relatively noisy data, discrepancies can be clearer indicators of "
+"correct fit than fit residua."
+msgstr ""
+"Для относительно шумных данных расхождения могут быть лучшим индикатором "
+"корректной аппроксимации чем ошибки аппроксимации."
+
+#: feature-measurement.xml:634(para)
+msgid ""
+"The resulting step height varies slightly with algorithm parameters. This "
+"dependence can be investigated using <guilabel>Survey</guilabel> by "
+"performing an automated scan over a range of polynomial degrees and/or step "
+"broadenings. All parameters not scanned in the survey are kept at values "
+"selected in the <guilabel>Parameters</guilabel> tab."
+msgstr ""
+"Получаемая высота ступеней слегка различается в зависимости от параметров "
+"алгоритма. Эта зависимость может быть изучена используя функцию "
+"<guilabel>Обзор</guilabel> и проводя автоматическое сканирование по "
+"диапазону степеней полинома и/или уширений ступени. Все параметры, которые "
+"не варьируются при обзоре, сохраняют значения, установленные на вкладке "
+"<guilabel>Параметры</guilabel>."
+
+#: feature-measurement.xml:641(para)
+msgid ""
+"The survey is executed by pressing <guilabel>Execute</guilabel> and can take "
+"a while to finish. When it finishes a file dialogue will appear, allowing to "
+"choose the file where the resulting table should be saved."
+msgstr ""
+"Обзор выполняется при нажатии кнопки <guilabel>Выполнить</guilabel> и может "
+"занять какое-то время. Когда он заканчивает работу, появляется окно выбора "
+"файла, которое позволяет выбрать файл, куда будет сохраняться итоговая "
+"таблица."
+
+#: feature-measurement.xml:648(title)
+msgid "References"
+msgstr "Ссылки"
+
+#: feature-measurement.xml:649(para)
+msgid ""
+"[1] J. Garnæs, D. Nečas, L. Nielsen, M. Madsen, A. Torras-Rosell, G. Zeng, "
+"P. Klapetek, A. Yacoot, Algorithms for using silicon steps for scanning "
+"probe microscope evaluation. Metrologia 57 (2020) 064002, <ulink url="
+"\"http://dx.doi.org/10.1088/1681-7575/ab9ad3\">doi:10.1088/1681-7575/ab9ad3</"
+"ulink>"
+msgstr ""
+"[1] J. Garnæs, D. Nečas, L. Nielsen, M. Madsen, A. Torras-Rosell, G. Zeng, "
+"P. Klapetek, A. Yacoot, Algorithms for using silicon steps for scanning "
+"probe microscope evaluation. Metrologia 57 (2020) 064002, <ulink url="
+"\"http://dx.doi.org/10.1088/1681-7575/ab9ad3\">doi:10.1088/1681-7575/ab9ad3</"
+"ulink>"

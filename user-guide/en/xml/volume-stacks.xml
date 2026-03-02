@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: volume-data-processing.xml 25933 2023-10-24 12:13:10Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='image-stacks-processing'>
+  <title>Volume Data Processing: Image stacks</title>
+  <para>
+    Volume data can be also used to represent stacks of images, i.e. coming
+    from high-speed Scanning Probe Microscopy, representing multiple measurements
+    of the sample, either on the same place or when moving laterally.
+    In this case the data should be loaded as stack of images along
+    the <xi:include href='eqi-z.xml'/> axis.
+    Such data can be processed by specialized functions available
+    in the <guimenu>Volume Data</guimenu> menu of the toolbox, mostly described
+    in this part of the User Guide. On top of it, the general functions for
+    handling Volume data can be used as well.
+  </para>
+  <sect2 id='image-stack-correction'>
+    <title>XY Plane Correction</title>
+    <para>
+      A few simple corrections or adjustments can be applied automatically
+      to each <xi:include href='eqi-xy.xml'/> plane in the volume data.
+    </para>
+    <para id='volume-plane-level'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>XY Plane Level</guimenuitem>
+      </menuchoice>
+      applies plane levelling to each plane.  In other words, it subtracts the
+      mean plane from all images formed by <xi:include href='eqi-xy.xml'/>
+      planes. Each plane is treated separately.
+    </para>
+    <para id='volume-mean-plane-level'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>XY Mean Plane Level</guimenuitem>
+      </menuchoice>
+      applies plane levelling using the same plane, the mean one, to each plane
+      in the image stack. It calculates a single mean plane from all the images
+      formed by <xi:include href='eqi-xy.xml'/> planes, and subtracts the
+      mean plane from all the images.
+    </para>
+    <para id='volume-facet-level'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>XY Facet Level</guimenuitem>
+      </menuchoice>
+      applies facet leveling to all the images
+      formed by <xi:include href='eqi-xy.xml'/> planes,
+      see description of the <link linkend='facet-level'>Facet Level</link> algorithm
+      for more details. Each plane is treated separately.
+    </para>
+    <para id='volume-flatten-base'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>XY Flatten Base</guimenuitem>
+      </menuchoice>
+      applies flatten base algorithm to all the images
+      formed by <xi:include href='eqi-xy.xml'/> planes,
+      see description of the <link linkend='facet-level'>Flatten Base</link> algorithm
+      fro more details. Each plane is treated separately.
+    </para>
+    <para id='volume-step-line'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Step Line Correction</guimenuitem>
+      </menuchoice>
+      applies step line correction algorithm to all the images
+      formed by <xi:include href='eqi-xy.xml'/> planes,
+      see description of the
+      <link linkend='line-correction-step'>Step Line Correction module for images</link>.
+      Each plane is treated separately.
+    </para>
+     <para id='volume-outliers'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>XY Plane Outliers</guimenuitem>
+      </menuchoice>
+      replaces the outliers in each <xi:include href='eqi-xy.xml'/> plane by
+      the mean value of this plane.  Outliers are defined here as values lying
+      farther than three standard deviations from the mean.
+    </para>
+    <para id='volume-1dfft-filtering'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>1D FFT Filtering</guimenuitem>
+      </menuchoice>
+      performs 1D FFT filtering in each <xi:include href='eqi-xy.xml'/> plane.
+      The power spectrum shown in the graph can be calculated for every plane
+      individually, or it can be averaged from all the planes. By changing the preview
+      level, one can go through all the planes and cross-check the filtering
+      impact. Mouse selection in the graph and the suppression methods have same logic
+      as in the <link linkend='fft-filter-1d'>1D FFT Filtering module for images</link>.
+    </para>
+    <para id='volume-scars'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Scars</guimenuitem>
+      </menuchoice>
+      performs detection and removal of scars (fast scanning axis feedback loop errors)
+      in each <xi:include href='eqi-xy.xml'/> plane. Each plane is treated separately
+      and preview z level can be used to go through them.
+      Scars detection method is same as in the
+      <link linkend='mark-scars'>Mark Scars module for images</link>.
+    </para>
+    <para id='volume-drift'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>Correct Data</guisubmenu>
+        <guimenuitem>Estimate Drift</guimenuitem>
+      </menuchoice>
+      performs detection and removal of drift
+      in each <xi:include href='eqi-xy.xml'/> plane. Drift is detected by cross-correlation
+      which can be applied either to adjacent planes, one by one, which is optimal for
+      larger drifts observed during the image stack acquisition, or an average plane
+      can be used as a reference, which is optimal for small drifts or noisy data.
+      Preview z level can be used to go through the planes, including visualisation
+      of the cropped data after application of drift correction. On top of XYZ drift
+      estimation, the images can be also rotated in given range, searching for the rotation
+      angle which gives the best correlation score.
+    </para>
+    <informalfigure id='fig-volume-drift'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='volume-drift.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Estimate drift dialogue showing detected drift and cropped data.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='image-superresolution'>
+    <title>Super-resolution methods</title>
+    <para>
+      When multiple images of the same surface area are measured and the image stack is
+      stored as Volume data, they can be used for a super-resolution image calculation,
+      e.g. using some hypothesis about sample statistical parameters.
+    </para>
+    <para id='volume-localisation-merge'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>SPM Modes</guisubmenu>
+        <guimenuitem>Localization Merge</guimenuitem>
+      </menuchoice>
+      performs the localisation algorithm [<link linkend='image-stacks-ref-1'>1</link>].
+      At every <xi:include href='eqi-xy.xml'/> plane the local peaks are detected,
+      a probability for peak location is expressed and summed across the planes.
+      The method works best on biomolecules or similar objects consisting of
+      resolvable peaks, lying on a flat surface, and can remove the tip convolution
+      impact and provide a high resolution image from series of low resolution ones.
+      An important assumption is that the tip touches slightly different parts of the
+      object at each scan, making the method well suited to soft samples in liquid
+      environment. Note that the individual frames have to be aligned to display the
+      same area of the surface, for this, e.g. the <link linkend='volume-drift'>Estimate Drift</link>
+      module can be used.
+    </para>
+    <informalfigure id='fig-volume-lafm'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='volume-lafm.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          A single high-speed AFM frame and a localisation microscopy algorithm result,
+          data courtesy of George R. Heath and Simon Scheuring.
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='image-stitch'>
+    <title>Stitching</title>
+    <para>
+      When the image stack represents different areas on the surface, a merged data
+      representing larger area of the surface can be created. For this an information
+      coming from sample coarse motion stage or from detected image overlaps can be used.
+    </para>
+    <para id='volume-stitch'>
+      <menuchoice>
+        <guimenu>Volume Data</guimenu>
+        <guisubmenu>SPM Modes</guisubmenu>
+        <guimenuitem>XY Stitch</guimenuitem>
+      </menuchoice>
+      performs stitching of a set of images represented as volume data, using
+      the overlaps to minimize mutual offsets and using graphs of X and Y translations
+      between the images. The X and Y translations are in base units (i.e. usually meters)
+      and its X axis is treated as the frame number.
+    </para>
+    <informalfigure id='fig-xy-stitch'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='volume-xy-stitch.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Volume data stitching example, showing one of 32 images taken on MetExSPM project
+          test sample (manufactured by PTB), coarse movement stage data in X axis 
+          and the stitched data preview in the module GUI. 
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='image-stacks-ref'>
+    <title>References</title>
+    <para id='image-stacks-ref-1'>
+      [1] G.R Heath, E. Kots, J.L. Robertson, et al.:
+      Localization atomic force microscopy.
+      Nature 594 (2021) 385–390,
+     <ulink url='http://dx.doi.org/10.1038/s41586-021-03551-x'>10.1038/s41586-021-03551-x</ulink>
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

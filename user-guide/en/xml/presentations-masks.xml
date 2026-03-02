@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: presentations-masks.xml 22939 2020-09-04 14:21:54Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='presentations-masks'>
+  <title>Presentations and Masks</title>
+  <para>
+    Presentations and masks are secondary images with specific functions
+    attached to the data.  Presentation is a different image displayed over the
+    actual data.   Mask represents an irregular set of selected pixels.
+    Their presence is indicated by the flags
+    <guilabel>P</guilabel> (presentation) and <guilabel>M</guilabel> (mask) in
+    the <link linkend='data-browser-images'>data browser</link>.
+  </para>
+  <informalfigure id='fig-mask-presentation-scheme'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='data-show-mask.png' format='PNG'/>
+      </imageobject>
+      <textobject>
+        <phrase>
+          Mask (top), presentation (middle), original data (bottom)
+        </phrase>
+      </textobject>
+      <caption>
+        Visualization of masks and presentations.  If you look from above they
+        can be imagined to be stacked as in the picture.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <para>
+    Both masks and presentations can be removed from the data by functions
+    in the right-click menu of the
+    <link linkend='data-windows'>data window</link>, or with
+    <link linkend='keyboard-shortcuts'>keyboard shortcuts</link>.
+  </para>
+  <informalfigure id='fig-mask-presentation'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='mask.png' format='PNG'/>
+      </imageobject>
+      <textobject>
+        <phrase>A data field shown with a mask and a presentation</phrase>
+      </textobject>
+      <caption>
+        Data in default false colour representation (left), with superimposed
+        mask visualized with a red colour (centre) and with shading presentation
+        (right).
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <sect2 id='presentations-introduction'>
+    <indexterm><primary>presentation</primary></indexterm>
+    <title>Presentations</title>
+    <para>
+      Presentations can be used to show the height field in another way than as
+      a false colour map of the heights, for instance with shading or with
+      highlighted edges.  It is also possible to superimpose an arbitrary data
+      field over another one as the presentation.
+    </para>
+    <para>
+      Note the superimposed presentation is really only a presentation, it is
+      never used for calculations.  In all data processing functions or tools
+      the results are always computed from the original underlying data.  Since
+      presentations can be computationally intensive to calculate, they are not
+      automatically updated when the underlying data change.  The various
+      presentations available are described in section
+      <link linkend='presentations'>Presentations</link>.
+    </para>
+    <para>
+      Since the values of the presentation image have arbitrary absolute
+      scale and may not even correspond to any meaningful physical quantity,
+      the false colour map ruler on the right side of the
+      <link linkend='data-windows'>data window</link> does not
+      display any ticks nor the minimum and maximum value when a presentation
+      is shown.
+    </para>
+  </sect2>
+  <sect2 id='masks-introduction'>
+    <indexterm><primary>mask</primary></indexterm>
+    <title>Masks</title>
+    <para>
+      Masks are used for special areal selections, e.g.
+      <link linkend='grain-analysis'>grains</link>,
+      <link linkend='mask-of-outliers'>defects</link>
+      or <link linkend='facet-analysis'>facets with certain orientation</link>.
+      Masks can have any shape and within the data window and they are
+      visualized by a colour overlaid over the data.  The mask colour and
+      opacity can be changed in the right-click context menu of the data
+      window.
+    </para>
+    <para>
+      Many functions, especially statistical, levelling and row correction
+      functions, can use masks to include or exclude areas from the
+      calculation.  This choice is presented as <guilabel>Masking
+      Mode</guilabel> with the options to exclude the masked region, include
+      only the masked region or ignore the mask and use the entire data.
+      Note that this choice is usually displayed only if a mask is present.
+    </para>
+    <para>
+      Since grain marking is the most common use of masks, several functions
+      that operate on marked areas are called <quote>grain</quote> functions,
+      e.g. Grain Statistics.  Also, a contiguous part of mask is sometimes
+      called grain in this guide.  However, since a mask does not bear any
+      information how it was created all mask functions can be used with masks
+      of any origin.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

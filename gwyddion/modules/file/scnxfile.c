@@ -1,0 +1,485 @@
+/*
+ *  $Id: scnxfile.c 26341 2024-05-15 09:06:23Z yeti-dn $
+ *  Copyright (C) 2024 David Necas (Yeti).
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any
+ *  later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+/**
+ * [FILE-MAGIC-USERGUIDE]
+ * Cyber technologies SCNX data
+ * .scnx
+ * Read
+ **/
+
+/**
+ * [FILE-MAGIC-FREEDESKTOP]
+ * <mime-type type="application/x-cyber-scnx-profilometry">
+ *   <comment>Cyber technologies SCNX profilometry data</comment>
+ *   <glob pattern="*.scnx"/>
+ *   <glob pattern="*.SCNX"/>
+ * </mime-type>
+ **/
+
+#include "config.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <glib/gstdio.h>
+#include <libgwyddion/gwymacros.h>
+#include <libgwyddion/gwymath.h>
+#include <libgwyddion/gwyutils.h>
+#include <libprocess/stats.h>
+#include <libgwymodule/gwymodule-file.h>
+#include <app/gwymoduleutils-file.h>
+#include <app/data-browser.h>
+
+#include "err.h"
+#include "gwyzip.h"
+
+#define SCNX_MAGIC "PK\x03\x04"
+#define SCNX_MAGIC_SIZE (sizeof(SCNX_MAGIC)-1)
+#define SCNX_MAGIC1 "scan/document.xml"
+#define SCNX_MAGIC1_SIZE (sizeof(SCNX_MAGIC1)-1)
+#define SCNX_MAGIC2 "media/scandata0.bin"
+#define SCNX_MAGIC2_SIZE (sizeof(SCNX_MAGIC2)-1)
+#define SCNX_EXTENSION ".scnx"
+
+#define BLOODY_UTF8_BOM "\xef\xbb\xbf"
+#define BLOODY_UTF8_BOM_LEN 3
+
+enum {
+    SCNX_BIN_HEADER_SIZE = 80
+};
+
+typedef struct {
+    GHashTable *hash;
+    gsize size;
+    guchar *data;
+
+    guint magic;
+    guint unknown1;
+    guint xres;
+    guint yres;
+    guint zres;
+} SCNXData;
+
+typedef struct {
+    GArray *datafiles;
+
+    // Auxiliary when scanning files.
+    GString *path;
+    GString *str;
+    GHashTable *hash;
+    gint stop_here;
+} SCNXFile;
+
+static gboolean      module_register      (void);
+static gint          scnx_detect          (const GwyFileDetectInfo *fileinfo,
+                                           gboolean only_name);
+static GwyContainer* scnx_load            (const gchar *filename,
+                                           GwyRunType mode,
+                                           GError **error);
+static GHashTable*   scnx_parse_one_file  (GwyZipFile zipfile,
+                                           SCNXFile *scnxfile,
+                                           GError **error);
+static gboolean      scnx_read_binary_data(GwyZipFile zipfile,
+                                           const gchar *name,
+                                           SCNXData *datafile,
+                                           GError **error);
+static void          scnx_file_free       (SCNXFile *scnxfile);
+
+static GwyModuleInfo module_info = {
+    GWY_MODULE_ABI_VERSION,
+    &module_register,
+    N_("Reads Cyber technologies SCNX files."),
+    "Yeti <yeti@gwyddion.net>",
+    "1.0",
+    "David Nečas (Yeti)",
+    "2024",
+};
+
+GWY_MODULE_QUERY(module_info)
+
+static gboolean
+module_register(void)
+{
+    gwy_file_func_register("scnxfile",
+                           N_("Cyber technologies SCNX data (.scnx)"),
+                           (GwyFileDetectFunc)&scnx_detect,
+                           (GwyFileLoadFunc)&scnx_load,
+                           NULL,
+                           NULL);
+
+    return TRUE;
+}
+
+static gint
+scnx_detect(const GwyFileDetectInfo *fileinfo,
+            gboolean only_name)
+{
+    GwyZipFile zipfile;
+    gchar *content;
+    gint score = 0;
+
+    if (only_name)
+        return g_str_has_suffix(fileinfo->name_lowercase, SCNX_EXTENSION) ? 20 : 0;
+
+    if (fileinfo->buffer_len <= SCNX_MAGIC_SIZE
+        || memcmp(fileinfo->head, SCNX_MAGIC, SCNX_MAGIC_SIZE) != 0)
+        return 0;
+
+    /* It contains scan/document.xml and binary scan files in media.  One of them should be somewehre near the
+     * begining of the file. */
+    if (!gwy_memmem(fileinfo->head, fileinfo->buffer_len, SCNX_MAGIC1, SCNX_MAGIC1_SIZE)
+        && !gwy_memmem(fileinfo->tail, fileinfo->buffer_len, SCNX_MAGIC1, SCNX_MAGIC1_SIZE)
+        && !gwy_memmem(fileinfo->head, fileinfo->buffer_len, SCNX_MAGIC2, SCNX_MAGIC2_SIZE)
+        && !gwy_memmem(fileinfo->tail, fileinfo->buffer_len, SCNX_MAGIC2, SCNX_MAGIC2_SIZE))
+        return 0;
+
+    /* It is fairly likely to be the right type now, so look inside to be sure. */
+    if ((zipfile = gwyzip_open(fileinfo->name, NULL))) {
+        if (gwyzip_locate_file(zipfile, "scan/document.xml", 1, NULL)
+            && (content = gwyzip_get_file_content(zipfile, NULL, NULL))) {
+            if (g_strstr_len(content, 4096, "/www.cybertechnologies.com/"))
+                score = 100;
+            g_free(content);
+        }
+        gwyzip_close(zipfile);
+    }
+
+    return score;
+}
+
+static GwyContainer*
+scnx_load(const gchar *filename,
+          G_GNUC_UNUSED GwyRunType mode,
+          GError **error)
+{
+    GwyContainer *container = NULL;
+    SCNXFile scnxfile;
+    GwyZipFile zipfile = NULL;
+    GwyDataField *field, *mask;
+    GString *str;
+    guint i;
+
+    /* NB: The file format looks very much like an MS Office XML document format. It does not have any subdirectory
+     * like "word"; it has "scan" instead. All the other crap like "[Content_Types].xml" and "_rels/.rels" is there.
+     * It says somewhere inside to be creased by Msftedit and it might even contain something like a worksheet. But it
+     * cannot opened as an Office document. */
+    if (!(zipfile = gwyzip_open(filename, NULL)))
+        return NULL;
+
+    gwy_clear(&scnxfile, 1);
+
+    //scnxfile.hash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    scnxfile.datafiles = g_array_new(FALSE, FALSE, sizeof(SCNXData));
+    scnxfile.path = g_string_new(NULL);
+    scnxfile.str = str = g_string_new(NULL);
+
+    i = 0;
+    while (TRUE) {
+        SCNXData datafile;
+
+        gwy_clear(&datafile, 1);
+        g_string_printf(str, "scan/data/scaninfo%d.xml", i);
+        if (!gwyzip_locate_file(zipfile, str->str, FALSE, NULL))
+            break;
+
+        gwy_debug("found XML file: <%s>", str->str);
+        if (!(datafile.hash = scnx_parse_one_file(zipfile, &scnxfile, error))) {
+            g_hash_table_destroy(datafile.hash);
+            goto fail;
+        }
+        if (!require_keys(datafile.hash, error, "/scaninfo/stepsize/X", "/scaninfo/stepsize/Y", NULL)) {
+            g_hash_table_destroy(datafile.hash);
+            goto fail;
+        }
+
+        g_string_printf(str, "media/scandata%d.bin", i);
+        if (!gwyzip_locate_file(zipfile, str->str, FALSE, NULL)) {
+            g_hash_table_destroy(datafile.hash);
+            break;
+        }
+        gwy_debug("found binary file: <%s>", str->str);
+
+        if (!scnx_read_binary_data(zipfile, str->str, &datafile, error)) {
+            g_hash_table_destroy(datafile.hash);
+            goto fail;
+        }
+        g_array_append_val(scnxfile.datafiles, datafile);
+        i++;
+    }
+
+    if (!i) {
+        err_NO_DATA(error);
+        goto fail;
+    }
+
+    container = gwy_container_new();
+    for (i = 0; i < scnxfile.datafiles->len; i++) {
+        SCNXData *datafile = &g_array_index(scnxfile.datafiles, SCNXData, i);
+        gint xres = datafile->xres, yres = datafile->yres;
+        gdouble dx, dy;
+
+        dx = g_ascii_strtod(g_hash_table_lookup(datafile->hash, "/scaninfo/stepsize/X"), NULL);
+        sanitise_real_size(&dx, "x step");
+        dy = g_ascii_strtod(g_hash_table_lookup(datafile->hash, "/scaninfo/stepsize/Y"), NULL);
+        sanitise_real_size(&dy, "y step");
+
+        field = gwy_data_field_new(xres, yres, dx*xres*1e-3, dy*yres*1e-3, FALSE);
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_xy(field), "m");
+        gwy_si_unit_set_from_string(gwy_data_field_get_si_unit_z(field), "m");
+        gwy_convert_raw_data(datafile->data + SCNX_BIN_HEADER_SIZE, xres*yres, 1,
+                             GWY_RAW_DATA_DOUBLE, GWY_BYTE_ORDER_LITTLE_ENDIAN,
+                             gwy_data_field_get_data(field), 1.0, 0.0);
+        if ((mask = gwy_app_channel_mask_of_nans(field, TRUE)))
+            gwy_container_pass_object(container, gwy_app_get_mask_key_for_id(i), mask);
+        gwy_container_pass_object(container, gwy_app_get_data_key_for_id(i), field);
+        gwy_app_channel_title_fall_back(container, i);
+    }
+
+fail:
+    if (zipfile)
+        gwyzip_close(zipfile);
+    scnx_file_free(&scnxfile);
+
+    return container;
+}
+
+static void
+scnx_start_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                   const gchar *element_name,
+                   G_GNUC_UNUSED const gchar **attribute_names,
+                   G_GNUC_UNUSED const gchar **attribute_values,
+                   gpointer user_data,
+                   G_GNUC_UNUSED GError **error)
+{
+    SCNXFile *scnxfile = (SCNXFile*)user_data;
+    const gchar *component_name = element_name;
+    GString *path = scnxfile->path, *str = scnxfile->str;
+    gboolean is_item;
+    gchar *key;
+    gint i, len;
+
+    /* Replace <item name="something"> with <something> and ignore any structure below. */
+    is_item = gwy_strequal(element_name, "item");
+    if (is_item) {
+        for (i = 0; attribute_names[i]; i++) {
+            if (gwy_strequal(attribute_names[i], "name")) {
+                component_name = attribute_values[i];
+                break;
+            }
+        }
+    }
+    g_string_append_c(path, '/');
+    g_string_append(path, component_name);
+    //gwy_debug("%s", scnxfile->path->str);
+
+    if (is_item) {
+        if (scnxfile->stop_here < 0)
+            scnxfile->stop_here = path->len;
+        return;
+    }
+
+    len = path->len;
+    g_string_append_c(path, '/');
+    for (i = 0; attribute_names[i]; i++) {
+        g_string_append(path, attribute_names[i]);
+        g_string_assign(str, attribute_values[i]);
+        g_strstrip(str->str);
+        if (*(str->str)) {
+            key = (scnxfile->stop_here >= 0 ? g_strndup(path->str, scnxfile->stop_here) : g_strdup(path->str));
+            gwy_debug("%s = <%s>", key, str->str);
+            g_hash_table_replace(scnxfile->hash, key, g_strdup(str->str));
+        }
+        g_string_truncate(path, len+1);
+    }
+    g_string_truncate(path, len);
+}
+
+static void
+scnx_end_element(G_GNUC_UNUSED GMarkupParseContext *context,
+                 const gchar *element_name,
+                 gpointer user_data,
+                 G_GNUC_UNUSED GError **error)
+{
+    SCNXFile *scnxfile = (SCNXFile*)user_data;
+    GString *path = scnxfile->path;
+    guint n;
+    gchar *slash;
+    gboolean is_item;
+
+    /* Can't check consistenty with <item> because we replace it with whatever it stands for.
+     * Also had to get out of the mess created by ignoring anything below <item>. */
+    is_item = gwy_strequal(element_name, "item");
+    if (is_item) {
+        slash = strrchr(path->str, '/');
+        g_return_if_fail(slash);
+        n = path->len - (slash - path->str) - 1;
+    }
+    else {
+        n = strlen(element_name);
+        g_return_if_fail(g_str_has_suffix(path->str, element_name));
+        g_return_if_fail(path->len > n);
+        g_return_if_fail(path->str[path->len-1 - n] == '/');
+    }
+    //gwy_debug("%s", pathstr);
+
+    g_string_set_size(path, path->len-1 - n);
+    if (path->len <= scnxfile->stop_here)
+        scnxfile->stop_here = -1;
+}
+
+static void
+scnx_text(G_GNUC_UNUSED GMarkupParseContext *context,
+          const gchar *text,
+          G_GNUC_UNUSED gsize text_len,
+          gpointer user_data,
+          G_GNUC_UNUSED GError **error)
+{
+    SCNXFile *scnxfile = (SCNXFile*)user_data;
+    GString *path = scnxfile->path, *str = scnxfile->str;
+    gchar *key;
+
+    if (!*text)
+        return;
+
+    g_string_assign(str, text);
+    g_strstrip(str->str);
+    if (*(str->str))
+        return;
+
+    key = (scnxfile->stop_here >= 0 ? g_strndup(path->str, scnxfile->stop_here) : g_strdup(path->str));
+    gwy_debug("%s = <%s>", key, str->str);
+    g_hash_table_replace(scnxfile->hash, key, g_strdup(str->str));
+}
+
+static GHashTable*
+scnx_parse_one_file(GwyZipFile zipfile, SCNXFile *scnxfile, GError **error)
+{
+    GMarkupParser parser = {
+        &scnx_start_element, &scnx_end_element, &scnx_text, NULL, NULL,
+    };
+    GMarkupParseContext *context = NULL;
+    GHashTable *hash = NULL;
+    guchar *content = NULL, *s;
+    GError *err = NULL;
+    gsize size;
+
+    if (!(content = gwyzip_get_file_content(zipfile, &size, error)))
+        return FALSE;
+
+    if (g_str_has_prefix(content, "<"))
+        s = gwy_strkill(content, "\r");
+    else if (g_str_has_prefix(content, BLOODY_UTF8_BOM "<"))
+        s = gwy_strkill(content + BLOODY_UTF8_BOM_LEN, "\r");
+    else {
+        err_FILE_TYPE(error, "Cyber SCNX");
+        goto fail;
+    }
+
+    g_string_truncate(scnxfile->path, 0);
+    hash = scnxfile->hash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    scnxfile->stop_here = -1;
+    context = g_markup_parse_context_new(&parser, 0, scnxfile, NULL);
+    if (!g_markup_parse_context_parse(context, s, -1, &err) || !g_markup_parse_context_end_parse(context, &err)) {
+        err_XML(error, &err);
+        g_hash_table_destroy(hash);
+        hash = NULL;
+    }
+
+fail:
+    if (context)
+        g_markup_parse_context_free(context);
+    g_free(content);
+    scnxfile->hash = NULL;
+
+    return hash;
+}
+
+static gboolean
+scnx_read_binary_data(GwyZipFile zipfile, const gchar *name,
+                      SCNXData *datafile, GError **error)
+{
+    guchar *content = NULL;
+    const guchar *p;
+    gsize size, expected_size;
+
+    if (!(content = gwyzip_get_file_content(zipfile, &size, error)))
+        return FALSE;
+
+    if (size <= SCNX_BIN_HEADER_SIZE) {
+        err_TRUNCATED_PART(error, name);
+        g_free(content);
+        return FALSE;
+    }
+
+    p = content;
+    datafile->magic = gwy_get_guint16_le(&p);
+    datafile->unknown1 = gwy_get_guint32_le(&p);
+    gwy_debug("magic 0x%0x, unknown1 0x%0x", datafile->magic, datafile->unknown1);
+    datafile->xres = gwy_get_guint32_le(&p);
+    datafile->yres = gwy_get_guint32_le(&p);
+    /* Not sure what the last number means, but it seems to be 1. */
+    datafile->zres = gwy_get_guint32_le(&p);
+    gwy_debug("xres %u, yres %u, zres %u", datafile->xres, datafile->yres, datafile->zres);
+    if (err_DIMENSION(error, datafile->xres) || err_DIMENSION(error, datafile->yres)) {
+        g_free(content);
+        return FALSE;
+    }
+
+    /* XXX: Now this is a proper mess. We read three values which seem to be dimensions of the image. An in fact
+     * they should be according to another representaton of the same data. And the values inside seem to be doubles.
+     *
+     * But there are not enough of them. Only if scandata0.bin and scandata1.bin are taken together we might have
+     * enough doubles.
+     *
+     * Even worse, it seems occasionally a byte is missing. Some CRLF evil?
+     *
+     * But they may in fact be single precision floats and I am reading them wrong? The .scan file seem single
+     * precision.
+     *
+     * Anyway, just check the data size as if nothing strange was going on. This will almost surely fail. Perhaps
+     * someone will provide some more files or information. */
+    expected_size = SCNX_BIN_HEADER_SIZE + datafile->xres*datafile->yres*sizeof(gdouble);
+    if (err_SIZE_MISMATCH(error, expected_size, size, TRUE)) {
+        g_free(content);
+        return FALSE;
+    }
+
+    datafile->size = size;
+    datafile->data = content;
+    return TRUE;
+}
+
+static void
+scnx_file_free(SCNXFile *scnxfile)
+{
+    guint i;
+
+    if (scnxfile->path)
+        g_string_free(scnxfile->path, TRUE);
+    if (scnxfile->str)
+        g_string_free(scnxfile->str, TRUE);
+    if (scnxfile->datafiles) {
+        for (i = 0; i < scnxfile->datafiles->len; i++) {
+            SCNXData *datafile = &g_array_index(scnxfile->datafiles, SCNXData, i);
+            g_free(datafile->data);
+            if (datafile->hash)
+                g_hash_table_destroy(datafile->hash);
+        }
+        g_array_free(scnxfile->datafiles, TRUE);
+    }
+}
+
+/* vim: set cin columns=120 tw=118 et ts=4 sw=4 cino=>1s,e0,n0,f0,{0,}0,^0,\:1s,=0,g1s,h0,t0,+1s,c3,(0,u0 : */

@@ -1,0 +1,84 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2019-09-23 00:34+0400\n"
+"PO-Revision-Date: 2013-06-06 12:02+0300\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: develop.xml:6(title)
+msgid "Developing Gwyddion"
+msgstr "Разработка Gwyddion"
+
+#: develop.xml:7(para)
+msgid "You are encouraged to become a developer of Gwyddion."
+msgstr "Мы приглашаем вас стать одним из разработчиков Gwyddion."
+
+#: develop.xml:10(para)
+msgid ""
+"If you want to become developer, we recommend you to start with some simple "
+"modules (see module tutorial), to see how the application works. If you "
+"write a module or plug-in, you are encouraged to share it here with other "
+"Gwyddion users. Let us know, so that we can link your modules or plug-ins to "
+"these pages or even include in it Gwyddion. You don't have to limit yourself "
+"to modules or plug-ins of course, but they should be easier to start with."
+msgstr ""
+"Если вы хотите стать разработчиком, мы рекомендуем начать с некоторых "
+"простых модулей (см. руководство по написанию модуля), чтобы посмотреть, как "
+"работает приложение. Если вы написали модуль, мы будем рады, если вы "
+"поделитесь им с другими пользователями Gwyddion. Дайте нам знать, чтобы мы "
+"могли дать ссылку на ваш модуль или включить его в состав Gwyddion. Вам не "
+"обязательно ограничиваться модулями, но начать написание проще с них."
+
+#: develop.xml:20(title)
+msgid "API References"
+msgstr "Руководства по API"
+
+#: develop.xml:21(para)
+msgid ""
+"There are many functions that can help you while developing your module. See "
+"API reference at <ulink url=\"http://gwyddion.net/documentation/"
+"\">Documentation section</ulink> of the project web."
+msgstr ""
+"Есть множество функций, которые могут помочь вам написать ваш модуль. См. "
+"руководство по API в <ulink url=\"http://gwyddion.net/documentation/"
+"\">разделе документации</ulink> на сайте проекта."
+
+#: develop.xml:29(title)
+msgid "Bug reports"
+msgstr "Сообщения об ошибках"
+
+#: develop.xml:30(para)
+msgid ""
+"We will be very happy if you send us bug reports if you find errors in "
+"Gwyddion. For doing this, please, specify as much as possible the situation "
+"that led to error, operating system and Gwyddion version used. You can also "
+"send us the SPM data that were being processed when the problem was found, "
+"this is necessary namely for reporting bugs related to file loading and "
+"saving."
+msgstr ""
+"Мы будем рады, если вы будете посылать нам сообщения об ошибках, которые вы "
+"нашли в Gwyddion. Желательно при этом указывать как можно больше сведений о "
+"ситуации, которая привела к ошибке, а также используемой операционной "
+"системе и версии Gwyddion. Также можно переслать нам данные СЗМ, которые "
+"обрабатывались в то время, когда была обнаружена ошибка, это особенно "
+"необходимо для сообщений об ошибках, связанных с загрузкой и сохранением "
+"файлов."
+
+#: develop.xml:38(para)
+msgid ""
+"The preferred bug reporting method is to send an e-mail to "
+"<email>klapetek@gwyddion.net</email>."
+msgstr ""
+"Предпочитаемый способ отправки сообщений об ошибках — электронной почтой на "
+"адрес <email>klapetek@gwyddion.net</email>."
+
+#~ msgid "translator-credits"
+#~ msgstr "Даниил Браташов"

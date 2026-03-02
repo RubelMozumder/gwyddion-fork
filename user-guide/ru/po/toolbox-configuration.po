@@ -1,0 +1,336 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2019-01-05 21:47+0400\n"
+"PO-Revision-Date: 2017-09-04 21:12+0400\n"
+"Last-Translator: Daniil Bratashov <dn2010@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: toolbox-configuration.xml:6(title)
+msgid "Toolbox Configuration"
+msgstr "Настройка панели инструментов"
+
+#: toolbox-configuration.xml:7(primary)
+msgid "Toolbox"
+msgstr "Панель инструментов"
+
+#: toolbox-configuration.xml:8(para)
+msgid ""
+"The lower part of the <link linkend=\"main-window\">toolbox</link> "
+"containing the buttons for functions and tools can be modified from within "
+"the program using the toolbox editor <menuchoice><guimenu>Edit</"
+"guimenu><guimenuitem>Toolbox</guimenuitem></menuchoice>."
+msgstr ""
+"Нижняя часть <link linkend=\"main-window\">окна инструментов</link>, "
+"содержащая кнопки для вызова функций и инструментов может быть "
+"модифицирована не выходя из программы с использованием редактора "
+"инструментов, вызываемого из меню <menuchoice><guimenu>Правка</"
+"guimenu><guimenuitem>Панель инструментов</guimenuitem></menuchoice>."
+
+#: toolbox-configuration.xml:17(para)
+msgid ""
+"It can be also customised by editing file <filename>ui/toolbox.xml</"
+"filename>. This is also the file you should copy to another account or "
+"machine to replicate the toolbox configuration there. Similarly to custom "
+"<link linkend=\"keyboard-shortcuts\">keyboard shortcuts</link>, the file "
+"located in the user's directory, which usually means <filename>~/.gwyddion</"
+"filename> (Unix) or <filename>Documents and Settings\\gwyddion</filename> "
+"(MS Windows). A good starting point for customisation is the default "
+"<filename>ui/toolbox.xml</filename> file installed with Gwyddion under "
+"<filename>share/gwyddion</filename>."
+msgstr ""
+"Также можно настроить эту панель с помощью редактирования файла <filename>ui/"
+"toolbox.xml</filename>. Этот же файл можно перенести на другую учётную "
+"запись пользователя или другую машину, если вы хотите скопировать туда "
+"конфигурацию панели инструментов. По аналогии с настройкой <link linkend="
+"\"keyboard-shortcuts\">комбинаций клавиш</link>, файл должен находиться в "
+"домашнем каталоге пользователя, что обычно подразумевает <filename>~/."
+"gwyddion</filename> (в Unix) или <filename>Documents and Settings\\gwyddion</"
+"filename> (в MS Windows). Хорошим примером для начальной настройки может "
+"служить файл с настройками по умолчанию <filename>ui/toolbox.xml</filename>, "
+"который устанавливается в <filename>share/gwyddion</filename>."
+
+#: toolbox-configuration.xml:30(para)
+msgid ""
+"The number buttons in a row is controlled by the <literal>width</literal> "
+"attribute of the top level element <literal>toolbox</literal>. To change it "
+"to five just change the begining of the file to "
+"<informalexample><programlisting><![CDATA[<toolbox width='5'>]]></"
+"programlisting></informalexample>"
+msgstr ""
+"Число кнопок в ряду регулируется атрибутом <literal>width</literal> элемента "
+"верхнего уровня <literal>toolbox</literal>. Чтобы изменить его на пять "
+"просто замените начало файла на <informalexample><programlisting><!"
+"[CDATA[<toolbox width='5'>]]></programlisting></informalexample>"
+
+#: toolbox-configuration.xml:38(para)
+msgid ""
+"Expandable and collapsable groups of buttons such as <guilabel>Data Process</"
+"guilabel> or <guilabel>Tools</guilabel> are created with tag <literal>group</"
+"literal>. You can create as many or as few groups as you want. Functions of "
+"different kinds can placed in one group if you wish. Each group must be "
+"identified with a unique <literal>id</literal> attribute which is, among "
+"other things, used to remember which groups were collapsed and which were "
+"expanded. The attribute <literal>title</literal> determines the title: "
+"<informalexample><programlisting><![CDATA[<group id='proc' title='Data "
+"Process' translatable='yes'>]]></programlisting></informalexample> Groups "
+"can optionally have a <literal>translatable</literal> attribute that "
+"specifies if the title should be translated. This is most useful for groups "
+"present in the default toolbox configuration. When you add custom groups you "
+"will probably already give them names in your preferred language."
+msgstr ""
+"Расширяемые и сжимаемые группы кнопок, такие как <guilabel>Обработка данных</"
+"guilabel> или <guilabel>Инструменты</guilabel> создаются тегом "
+"<literal>group</literal>. Можно создать столько групп, сколько нужно. "
+"Функции различных типов можно собирать в одну группу по желанию. Каждая "
+"группа должна быть снабжена уникальным атрибутом <literal>id</literal>, "
+"который, кроме всего прочего, используется для запоминания какая из групп "
+"была свёрнута, а какая развёрнута. Атрибут<literal>title</literal> задаёт "
+"название группы: <informalexample><programlisting><![CDATA[<group id='proc' "
+"title='Data Process' translatable='yes'>]]></programlisting></"
+"informalexample> Группы могут иметь опциональный атрибут "
+"<literal>translatable</literal>, который задаёт, что заголовок группы должен "
+"быть переведён. Наиболее полезен этот атрибут для групп, присутствующих в "
+"панели инструментов по умолчанию. Когда вы добавляете свои новые группы, вы "
+"вероятно уже задаёте им имена на предпочитаемом языке."
+
+#: toolbox-configuration.xml:56(para)
+msgid ""
+"Individual buttons are created with elements <literal>item</literal>: "
+"<informalexample><programlisting><![CDATA[<item type='proc' "
+"function='align_rows' icon='gwy_line_level' run='non-interactive'/>]]></"
+"programlisting></informalexample> Each item must have the <literal>type</"
+"literal> attribute, defining the function type. Unless the type is "
+"<literal>'empty'</literal> it must also have a <literal>function</literal> "
+"attribute defining the specific function. Function names can be located in "
+"the module browser (<menuchoice><guimenu>Info</guimenu><guimenuitem>Module "
+"Browser</guimenuitem></menuchoice>), where they are listed in "
+"<guilabel>Registered functions</guilabel> for each module; or in the <ulink "
+"url=\"http://gwyddion.net/module-list.php\">on-line module browser</ulink>. "
+"The available function types are listed in the following table:"
+msgstr ""
+"Отдельные кнопки создаются с помощью элементов <literal>item</literal>: "
+"<informalexample><programlisting><![CDATA[<item type='proc' "
+"function='align_rows' icon='gwy_line_level' run='non-interactive'/>]]></"
+"programlisting></informalexample> Каждый такое элемент должен содержать "
+"атрибут <literal>type</literal>, определяющий тип функции. Если тип функции "
+"не является пустым — <literal>'empty'</literal>, элемент также должен "
+"содержать атрибут <literal>function</literal>, задающий определённую "
+"функцию. Имена функций можно найти в окне просмотра модулей "
+"(<menuchoice><guimenu>Информация</guimenu><guimenuitem>Просмотр модулей</"
+"guimenuitem></menuchoice>), где они перечислены в списке "
+"<guilabel>Зарегистрированные функции</guilabel> для каждого модуля; или в "
+"<ulink url=\"http://gwyddion.net/module-list.php\">онлайновом браузере "
+"модулей</ulink>. Доступные типы функций перечислены в следующей таблице:"
+
+#: toolbox-configuration.xml:80(entry)
+msgid "Type name"
+msgstr "Имя типа"
+
+#: toolbox-configuration.xml:81(entry)
+msgid "Function kind"
+msgstr "Тип функции"
+
+#: toolbox-configuration.xml:86(literal)
+msgid "empty"
+msgstr "empty"
+
+#: toolbox-configuration.xml:87(entry)
+msgid "Empty placeholder that can be used for separation or row alignment."
+msgstr ""
+"Пустой заполнитель, который можно использовать для разделения или "
+"выравнивания строк."
+
+#: toolbox-configuration.xml:93(literal)
+msgid "builtin"
+msgstr "builtin"
+
+#: toolbox-configuration.xml:97(literal)
+msgid "'display_3d'"
+msgstr "'display_3d'"
+
+#: toolbox-configuration.xml:98(literal)
+msgid "'zoom_in'"
+msgstr "'zoom_in'"
+
+#: toolbox-configuration.xml:99(literal)
+msgid "'zoom_out'"
+msgstr "'zoom_out'"
+
+#: toolbox-configuration.xml:101(literal)
+msgid "'zoom_1_1'"
+msgstr "'zoom_1_1'"
+
+#: toolbox-configuration.xml:94(entry)
+msgid ""
+"A built-in function, which includes zooming in and out and 3D view "
+"activation. There are exacly four: <placeholder-1/>, <placeholder-2/>, "
+"<placeholder-3/> and <placeholder-4/>."
+msgstr ""
+"Встроенные функции, которые включают приближение, удаление, активацию режима "
+"3D-просмотра. Всего их ровно четыре: <placeholder-1/>, <placeholder-2/>, "
+"<placeholder-3/> и <placeholder-4/>."
+
+#: toolbox-configuration.xml:105(literal)
+msgid "proc"
+msgstr "proc"
+
+#: toolbox-configuration.xml:108(literal)
+msgid "proc::"
+msgstr "proc::"
+
+#: toolbox-configuration.xml:106(entry)
+msgid ""
+"A two-dimensional data (image) processing function. It has prefix "
+"<placeholder-1/> in the module browser."
+msgstr ""
+"Функции обработки двумерных данных (изображений). Они имеют префикс "
+"<placeholder-1/> в окне просмотра модулей."
+
+#: toolbox-configuration.xml:112(literal)
+msgid "graph"
+msgstr "graph"
+
+#: toolbox-configuration.xml:115(literal)
+msgid "graph::"
+msgstr "graph::"
+
+#: toolbox-configuration.xml:113(entry)
+msgid "A graph function. It has prefix <placeholder-1/> in the module browser."
+msgstr ""
+"Функции обработки графиков. Они имеют префикс <placeholder-1/> в окне "
+"просмотра модулей."
+
+#: toolbox-configuration.xml:119(literal)
+msgid "volume"
+msgstr "volume"
+
+#: toolbox-configuration.xml:122(literal)
+msgid "volume::"
+msgstr "volume::"
+
+#: toolbox-configuration.xml:120(entry)
+msgid ""
+"A volume data function. It has prefix <placeholder-1/> in the module browser."
+msgstr ""
+"Функции обработки объёмных данных. Они имеют префикс <placeholder-1/> в окне "
+"просмотра модулей."
+
+#: toolbox-configuration.xml:126(literal)
+msgid "xyz"
+msgstr "xyz"
+
+#: toolbox-configuration.xml:129(literal)
+msgid "xyz::"
+msgstr "xyz::"
+
+#: toolbox-configuration.xml:127(entry)
+msgid ""
+"An XYZ data function. It has prefix <placeholder-1/> in the module browser."
+msgstr ""
+"Функции обработки данных XYZ. Они имеют префикс <placeholder-1/> в окне "
+"просмотра модулей."
+
+#: toolbox-configuration.xml:133(literal)
+msgid "tool"
+msgstr "tool"
+
+#: toolbox-configuration.xml:136(literal)
+msgid "tool::"
+msgstr "tool::"
+
+#: toolbox-configuration.xml:134(entry)
+msgid "A tool. It has prefix <placeholder-1/> in the module browser."
+msgstr ""
+"Инструменты. Они имеют префикс <placeholder-1/> в окне просмотра модулей."
+
+#: toolbox-configuration.xml:142(para)
+msgid ""
+"Data processing functions (inclduing volume and XYZ) can optionally have a "
+"<literal>run</literal> attribute that specifies how the function should be "
+"invoked. When it is set to <literal>non-interactive</literal> the function "
+"is executed immediately, without any dialogue asking for parameters (similar "
+"to how pressing <keycap>Ctrl-F</keycap> runs the last used image processing "
+"function). The opposite is <literal>interactive</literal> which generally "
+"does not need to be specified because it is also the default mode. Note that "
+"not all functions can be run in both modes: some simple functions never take "
+"any user input, other functions always require user input."
+msgstr ""
+"Функции обработки данных (включая обработку объёмных данных и данных XYZ) "
+"опционально могут иметь атрибут <literal>run</literal> который задаёт режим "
+"вызова функции. Если он установлен в <literal>non-interactive</literal>, "
+"функция будет вызвана немедленно, не показывая никаких диалоговых окон с "
+"параметрами (подобно тому, как нажатие <keycap>Ctrl-F</keycap> запускает "
+"последнюю использовавшуюся функцию обработки данных). Другой режим это "
+"<literal>interactive</literal>, который в общем случае не задаётся, "
+"поскольку является режимом по умолчанию. Следует отметить, что не для всех "
+"функций доступны оба режима: некоторые простые функции не требуют "
+"взаимодействия с пользователем, некоторые другие не работают без участия "
+"пользователя."
+
+#: toolbox-configuration.xml:154(para)
+msgid ""
+"The button icon is specified using the <literal>icon</literal> attribute. "
+"Some module functions have icons predefined (so you do not have to specify "
+"it) but not all have because the number of available functions is huge. A "
+"<ulink url=\"http://gwyddion.net/documentation/libgwydgets/libgwydgets-"
+"gwystock.php\">Gwyddion stock icon</ulink> can be used or possibly a <ulink "
+"url=\"https://developer.gnome.org/gtk2/stable/gtk2-Stock-Items.html\">Gtk+ "
+"stock icon</ulink>. Note Gwyddion icon names have words separated with "
+"underscores while Gtk+ icon names use dashes."
+msgstr ""
+"Изображение на кнопке задаётся атрибутом <literal>icon</literal>. Некоторые "
+"функции модулей уже содержат заданные изображения (которые не нужно "
+"указывать вручную), но этот список довольно ограничен в силу огромного "
+"количества доступных функций. Можно использовать изображения из коллекций "
+"<ulink url=\"http://gwyddion.net/documentation/libgwydgets/libgwydgets-"
+"gwystock.php\">Gwyddion stock icon</ulink> и <ulink url=\"https://developer."
+"gnome.org/gtk2/stable/gtk2-Stock-Items.html\">Gtk+ stock icon</ulink>. "
+"Следует отметить, что названия изображений в коллекции Gwyddion используют "
+"символ подчёркивания для связывания отдельных слов, иконки Gtk+ используют "
+"тире."
+
+#: toolbox-configuration.xml:164(para)
+msgid ""
+"If you cannot choose from the provided set of icons it is also possible to "
+"draw your own icon and put it to <filename>~/.gwyddion/pixmaps</filename> "
+"(or its equivalent on other systems), using the same naming convention as "
+"Gwyddion icons. It may be useful to start from the <ulink url=\"http://www."
+"gimp.org/\">GIMP</ulink> XCF <ulink url=\"https://sourceforge.net/p/gwyddion/"
+"code/HEAD/tree/trunk/gwyddion/pixmaps/\">source images</ulink> for the icons "
+"since they contain individual pieces that can be mixed and matched. If you "
+"draw a nice icon you are of course encouraged to submit it for inclusion in "
+"Gwyddion."
+msgstr ""
+"Если предложенного набора изображений недостаточно, чтобы выбрать нужное, "
+"можно нарисовать свою иконку и поместить её в <filename>~/.gwyddion/pixmaps</"
+"filename> (или эквивалентное место в других операционных системах), "
+"используя то же соглашение о наименовании элементов, что и иконки в "
+"Gwyddion. Может быть полезно начать с <ulink url=\"https://sourceforge.net/p/"
+"gwyddion/code/HEAD/tree/trunk/gwyddion/pixmaps/\">исходных файлов</ulink> "
+"<ulink url=\"http://www.gimp.org/\">GIMP</ulink> XCF для иконок, поскольку "
+"они уже содержат отдельные элементы, которые можно смешивать и использовать "
+"друг с другом. Если у вас получилась красивая иконка, её разумеется можно "
+"прислать для включения в состав Gwyddion."
+
+#: toolbox-configuration.xml:176(para)
+msgid ""
+"Since tools are accessible only from the toolbox, not listing a tool in "
+"<filename>ui/toolbox.xml</filename> renders it unavailable. Therefore, a "
+"special empty item <informalexample><programlisting><![CDATA[<item "
+"type='tool'/>]]></programlisting></informalexample> can be used to place all "
+"tools that have not been explicitly placed yet to the corresponding position "
+"(in a pretty much arbitrary order)."
+msgstr ""
+"Поскольку инструменты доступны только из окна инструментов, не указание их в "
+"<filename>ui/toolbox.xml</filename> делает их полностью недоступными. "
+"Следовательно, специальный пустой элемент <informalexample><programlisting><!"
+"[CDATA[<item type='tool'/>]]></programlisting></informalexample> можно "
+"использовать для размещения всех инструментов, которые ещё не перемещены в "
+"заданную позицию (в достаточно произвольном порядке)."

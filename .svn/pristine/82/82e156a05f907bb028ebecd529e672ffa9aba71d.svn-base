@@ -1,0 +1,144 @@
+LANGUAGES = @LANGUAGES@
+XHTML_ENABLE = @XHTML_ENABLE@
+PDF_ENABLE = @PDF_ENABLE@
+MAN_ENABLE = @MAN_ENABLE@
+PNG_ENABLE = @PNG_ENABLE@
+SVG_ENABLE = @SVG_ENABLE@
+
+VERSION = @PACKAGE_VERSION@
+BASENAME = @PACKAGE_TARNAME@
+PACKAGE = @PACKAGE_SHORTNAME@
+DISTNAME = $(BASENAME)-$(VERSION)
+
+GMAKE = @GMAKE@
+GSED = @GSED@
+
+DISTFILES = \
+	aclocal.m4 \
+	configure \
+	configure.ac \
+	docbook-xsl-version.xsl \
+	Makefile.in \
+	README \
+	version-greater-or-equal.xsl
+
+COMMONDISTFILES =  \
+	dblatex.xsl \
+	dblatex-postfix.py \
+	epilogue.tex \
+	fixpngres.c \
+	gwydefs.tex \
+	inkscape-export.sh.in \
+	ltablex.sty \
+	Makefile.in \
+	man.xsl \
+	pngsize.c \
+	prologue.tex \
+	render.sh.in \
+	svgscale.py \
+	user-guide.css \
+	user-guide.iss.in \
+	user-guide.sty \
+	xhtml.xsl \
+	xml-extract.py \
+	xmlpo.sh.in \
+	xmlunfold.py
+
+ALL_TARGETS = $(XHTML_ENABLE) $(PDF_ENABLE) $(MAN_ENABLE)
+
+all: $(ALL_TARGETS)
+
+Makefile: Makefile.in ./config.status
+	./config.status Makefile
+
+xhtml: common/pngsize
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x xhtml; done
+
+dist-xhtml:
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x dist-xhtml; done
+
+pdf:
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x pdf; done
+
+dist-pdf:
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x dist-pdf; done
+
+po-update:
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x po-update; done
+
+ifeq ($(PNG_ENABLE),png)
+FIXPNGRES = common/fixpngres
+common/fixpngres: common/fixpngres.c
+	$(CC) @PNG_CFLAGS@ -o common/fixpngres common/fixpngres.c @PNG_LIBS@
+endif
+
+common/pngsize: common/pngsize.c
+	cd common && $(CC) -o pngsize pngsize.c
+
+common/%: common/%.in config.status
+	./config.status $@
+
+common: common/pngsize common/render.sh common/inkscape-export.sh $(FIXPNGRES)
+
+clean:
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x clean; done
+	rm -rf common/cache
+	rm -f common/pngsize common/fixpngres
+
+distclean: clean
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x distclean; done
+	rm -f common/render.sh common/inkscape-export.sh common/$(PACKAGE).iss common/Makefile
+	rm -fr autom4te.cache
+	rm -f Makefile config.status config.log
+
+dist:
+	rm -rf $(DISTNAME)
+	mkdir $(DISTNAME) $(DISTNAME)/common $(DISTNAME)/common/formulas $(DISTNAME)/common/srcimages
+	cp $(DISTFILES) $(DISTNAME)/
+	cp $(patsubst %,common/%,$(COMMONDISTFILES)) $(DISTNAME)/common
+	cp -r common/formulas/*.xml $(DISTNAME)/common/formulas
+	cp -r common/srcimages/*.svg common/srcimages/*.png $(DISTNAME)/common/srcimages
+	@for x in $(LANGUAGES); do $(MAKE) -C $$x dist; done
+	tar -zcf $(DISTNAME).tar.gz $(DISTNAME)
+	rm -rf $(DISTNAME)
+
+# Removes all stuff that looks like dists...
+undist:
+	find . -iname 'gwyddion-user-guide-*20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*' -delete -print
+
+version:
+	d=`date --iso`; \
+	$(GSED) -i '/AC_INIT/s/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/'"$$d/" configure.ac
+	autoconf && ./configure
+
+help:
+	@echo "all          Compile User guide to all available formats ($(ALL_TARGETS))"
+ifeq ($(XHTML_ENABLE),xhtml)
+	@echo "xhtml        Compile User guide to XHTML"
+else
+	@echo "xhtml        Compile User guide to XHTML (not available)"
+endif
+ifeq ($(PDF_ENABLE),pdf)
+	@echo "pdf          Compile User guide to PDF"
+else
+	@echo "pdf          Compile User guide to PDF (not available)"
+endif
+ifeq ($(MAN_ENABLE),man)
+	@echo "man          Compile Unix manual pages for commands"
+else
+	@echo "man          Compile Unix manual pages for commands (not available)"
+endif
+	@echo "dist         Create tarball with DocBook sources"
+	@echo "dist-xhtml   Create tarballs with ready to read XHTML User guide"
+	@echo "dist-pdf     Create nicely named User guide PDFs"
+	@echo "common       Build common language-independent tools"
+	@echo "version      Update version number to current date"
+
+.PHONY: \
+	all help version common clean distclean \
+	dist dist-xhtml dist-pdf undist \
+	xhtml pdf man
+
+.PRECIOUS: Makefile
+
+# vim: set ts=4 sw=4 noet :

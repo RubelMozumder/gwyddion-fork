@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @(#) $Id: keyboard-shortcuts.xml 22630 2019-10-30 13:54:06Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<sect1 id="keyboard-shortcuts">
+  <title>Комбинации клавиш</title>
+  <indexterm>
+    <primary>Комбинации клавиш</primary>
+    <secondary>стандартные</secondary>
+  </indexterm>
+  <informaltable id="table-keyboard-shortcuts">
+    <tgroup cols="4" align="left">
+    <?dblatex llXX?>
+      <thead>
+        <row>
+          <entry>Комбинация</entry>
+          <entry>Эквивалент меню</entry>
+          <entry>Контекст</entry>
+          <entry>Действие</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry><keycap>F1</keycap></entry>
+          <entry/>
+          <entry>все окна</entry>
+          <entry>Открывает соответствующий раздел руководства пользователя в браузере.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Q</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Файл</guimenu>
+              <guimenuitem>Выйти</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Выйти из <application>Gwyddion</application>.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-O</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Файл</guimenu>
+              <guimenuitem>Открыть</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Открыть файл данных.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-S</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Файл</guimenu>
+              <guimenuitem>Сохранить</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Сохранить текущие данные (будет предложено имя файла, если оно ещё не связано с данными).</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Shift-S</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Файл</guimenu>
+              <guimenuitem>Сохранить как</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Сохранить текущие данные под другим именем. Имя файла, связанного с данными будет изменено на другое.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-W</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Файл</guimenu>
+              <guimenuitem>Закрыть</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график), окно инструментов, браузер данных</entry>
+          <entry>Закрыть файл, содержащий текущие данные.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Shift-M</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Файл</guimenu>
+              <guimenuitem>Объединить</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Добавить данные из файла к текущему файлу.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-H</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Файл</guimenu>
+              <guisubmenu>Последние файлы</guisubmenu>
+              <guimenuitem>Предыдущие документы</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Открыть окно просмотра предыдущих документов (или показать его окно поверх остальных, если оно уже открыто).</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-D</keycap></entry>
+          <entry>Сделать копию в браузере данных</entry>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график), окно инструментов, браузер данных</entry>
+          <entry>Сделать дубликат данных в текущем окне как нового блока данных в том же файле.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Insert</keycap></entry>
+          <entry>Извлечь в новый файл в браузере данных</entry>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график), окно инструментов, браузер данных</entry>
+          <entry>Создать новый файл, содержащий только текущий блок данных.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Delete</keycap></entry>
+          <entry>Удалить в браузере данных</entry>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график), окно инструментов, браузер данных</entry>
+          <entry>Удалить текущий блок данных из файла</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Z</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Правка</guimenu>
+              <guimenuitem>Отменить</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Отменить последний шаг обработки, применённый к текущим данным.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Y</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Правка</guimenu>
+              <guimenuitem>Повторить</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Повторить последний шаг обработки, применённый к текущим данным.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-K</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Правка</guimenu>
+              <guimenuitem>Удалить маску</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Удалить маску с текущего окна данных.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Shift-K</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Правка</guimenu>
+              <guimenuitem>Удалить презентацию</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Удалить презентацию с текущего окна данных (изображения).</entry>
+        </row>
+        <row>
+          <entry><keycap>F3</keycap></entry>
+          <entry/>
+          <entry>окно данных, окно инструмента, окно инструментов</entry>
+          <entry>Показать окно инструментов, если оно скрыто. Скрыть окно инструментов если оно показывается.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Shift-B</keycap></entry>
+          <entry><menuchoice><guimenuitem>Просмотр метаданных</guimenuitem></menuchoice> (в контекстном меню)</entry>
+          <entry>окно изображения, данных XYZ или объёмных данных</entry>
+          <entry>Показать окно просмотра метаданных для отображаемых данных.</entry>
+        </row>
+        <row>
+          <entry><keycap>+</keycap></entry>
+          <entry/>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график)</entry>
+          <entry>Приблизить изображение в текущем окне данных.</entry>
+        </row>
+        <row>
+          <entry><keycap>=</keycap></entry>
+          <entry/>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график)</entry>
+          <entry>Приблизить изображение в текущем окне данных.</entry>
+        </row>
+        <row>
+          <entry><keycap>-</keycap></entry>
+          <entry/>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график)</entry>
+          <entry>Отодвинуть изображение в текущем окне данных.</entry>
+        </row>
+        <row>
+          <entry><keycap>Z</keycap></entry>
+          <entry/>
+          <entry>любая разновидность окна данных (изображение, 3D, XYZ, объём, график)</entry>
+          <entry>Масштабировать текущее окно данных до масштаба 1:1.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-F</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Обработка данных</guimenu>
+              <guimenuitem>Повторить последний</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Применить к текущим данным последнюю функцию обработки данных с использованными в последний раз параметрами. Обычно операция будет тихо и незаметно повторно применена к данным, но если данный шаг обработки невозможен без участия человека, будет показано диалоговое окно.</entry>
+        </row>
+        <row>
+          <entry><keycap>Ctrl-Shift-F</keycap></entry>
+          <entry>
+            <menuchoice>
+              <guimenu>Обработка данных</guimenu>
+              <guimenuitem>Повторить с настройкой последний</guimenuitem>
+            </menuchoice>
+          </entry>
+          <entry>окно инструментов, окно данных, окно трёхмерного просмотра, окно графика, окно инструмента</entry>
+          <entry>Показать ещё раз диалог параметров последней функции обработки данных. Если операция не требует установки параметров, она будет проведена незамедлительно.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+  <indexterm>
+    <primary>Комбинации клавиш</primary>
+    <secondary>модифицированные</secondary>
+  </indexterm>
+  <para>Можно присвоить свои комбинации клавиш всем функциям в меню, также возможно вызывать инструменты комбинацией клавиш.</para>
+  <para>Чтобы изменить комбинацию клавиш для пункта меню просто нужно выбрать его с помощью мыши или клавиш-стрелок, нажать требуемую комбинацию клавиш, и она незамедлительно будет установлена. Комбинация клавиш должна быть или специальной клавишей, т.е. <keycap>F3</keycap>, или сочетанием, включающим модификаторы, т.е. <keycap>Ctrl-Shift-D</keycap>. Нельзя присваивать просто буквенно-цифровые клавиши, такие как <keycap>Q</keycap>.</para>
+  <para>Чтобы предотвратить случайное изменение комбинаций клавиш, они могут меняться только при включенной опции <menuchoice><guimenu>Правка</guimenu><guimenuitem>Комбинации клавиш</guimenuitem></menuchoice>. Изменения по умолчанию выключены, что рекомендуется делать при обычном использовании.</para>
+  <para>Все комбинации клавиш хранятся в файле <filename>ui/accel_map</filename> в каталоге пользователя, который обычно называется <filename>~/.gwyddion</filename> (Unix) или <filename>Documents and Settings\gwyddion</filename> (MS Windows). Присвоить комбинации клавиш инструментам можно только путём редактирования этого файла. Каждая строка соответствует действию, вызываемому этой комбинацией клавиш. Например, строка для инструмента "Редактор маски" по умолчанию выглядит так: <informalexample><programlisting>; (gtk_accel_path "&lt;tool&gt;/GwyToolMaskEditor" "")</programlisting></informalexample>Точки с запятой обозначают комментарии, т.е. строки. начинающиеся с них будут неактивными. Следовательно, чтобы присвоить сочетание клавиш <keycap>Ctrl-Shift-E</keycap> инструменту "Редактор маски", удалите точку с запятой чтобы сделать эту строку активной и запишите своё сочетание клавиш в пустое место между кавычками: <informalexample><programlisting>(gtk_accel_path "&lt;tool&gt;/GwyToolMaskEditor" "&lt;Control&gt;&lt;Shift&gt;e")</programlisting></informalexample></para>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

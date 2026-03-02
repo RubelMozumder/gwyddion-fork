@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='installation-cross-mingw32'>
+  <title>Cross-Compiling for MS Windows</title>
+  <para>
+    Cross-compiling Gwyddion for MS Windows under Linux is quite similar to
+    normal Unix compilation with certain additional setup and extra steps.
+    Although the process is quite smooth the initial setup may seem a bit
+    complicated.  If, in addition, you are not familiar with the normal Unix
+    compilation you might wish to start with that and attempt cross-compilation
+    once you familiarise yourself with the basic procedure.
+  </para>
+  <para>
+    These instructions describe compilation under
+    <ulink url='http://fedoraproject.org/'>Fedora</ulink> using its
+    <ulink url='http://fedoraproject.org/wiki/SIGs/MinGW'>MinGW cross-compilation
+      support</ulink> as this is what Gwyddion developers use.  In general,
+    the instructions work on the current version of Fedora.  Compilation
+    on other versions and other RedHat-based distributions
+    (<ulink url='http://centos.org/'>CentOS</ulink>,
+    <ulink url='https://scientificlinux.org/'>Scientific Linux</ulink>, …)
+    should be similar and relatively straightforward, possibly with some
+    tweaks.  Building on, for instance,
+    <ulink url='http://opensuse.org/'>openSUSE</ulink> will require
+    modifications.  Reports of success (or failure) of cross-compilation of
+    Gwyddion in other distributions and environments and namely improvements to
+    these instructions are welcome.
+  </para>
+  <para>
+    Full cross-compilation has the following steps:
+  </para>
+  <itemizedlist>
+    <listitem>configuration for mingw64/mingw32,</listitem>
+    <listitem>compilation,</listitem>
+    <listitem>installation into a staging area,</listitem>
+    <listitem>creation of an installer using NSIS.</listitem>
+  </itemizedlist>
+  <para>
+    A script is available that automatically performs all the steps, as
+    <link linkend='installation-cross-mingw32-scripts'>described below</link>.
+  </para>
+  <sect2 id='installation-cross-mingw32-setup'>
+    <title>Setup</title>
+    <para>
+      Before the first compilation you must set up the cross-compilation
+      environment.  This has to be done only once.
+    </para>
+    <sect3 id='installation-cross-mingw32-setup-base'>
+      <title>Base MinGW Packages</title>
+      <para>
+        Run as root:
+        <informalexample>
+          <literallayout><userinput>dnf install mingw{32,64}-{gcc-c++,gtk2,libxml2,minizip,fftw,gtkglext,libwebp,OpenEXR}</userinput></literallayout>
+        </informalexample>
+        to install the necessary mingw32 and mingw64 packages.  Several more
+        packages will be installed as dependencies of those explicitly given
+        here.  Note that, technically, some of the packages are
+        <link linkend='installation-dependencies'>optional dependencies</link>
+        and you can build a MS Windows installer without them (after some
+        adjustments).  Neverhteless the standard installers include these
+        packages and the cross-compilation scripts expect them to be present by
+        default.
+      </para>
+    </sect3>
+    <sect3 id='installation-cross-mingw32-setup-repo'>
+      <title>Gwyddion.net repository</title>
+      <para>
+        MinGW versions of a few packages used by Gwyddion are not available in
+        Fedora yet (or any more), or there may be some patches we would like to
+        include but they are not in Fedora packages.  This includes HDF5 and
+        gtksourceview2 (only used by pygwy).
+      </para>
+      <para>
+        You can build these additional packages using the patches and spec
+        files at
+        <ulink url='http://sourceforge.net/projects/gwyddion/files/mingw32-cross-compile/'>http://sourceforge.net/projects/gwyddion/files/mingw32-cross-compile/</ulink>,
+        however, it should be much easier to just install them using
+        <command>dnf</command>.  For this, download and install the
+        gwyddion.net <ulink url='http://gwyddion.net/download.php#stable-fedora'>repository configuration package</ulink>.
+        The installation brings two repository configurations, for the program and for
+        the extra MinGW packages.  By default only the <filename>gwyddion</filename>
+        repository is enabled.  Enable <filename>gwyddion-manually</filename> by editing
+        <filename>/etc/yum.repos.d/gwyddion-mingw.repo</filename> for the MinGW
+        packages.  Run the following command to install them:
+        <informalexample>
+          <literallayout><userinput>dnf install mingw32-{hdf5,gtksourceview2}</userinput></literallayout>
+        </informalexample>
+        Be warned the repo overrides a few Fedora MinGW packages to keep them
+        at specific versions.
+      </para>
+    </sect3>
+    <sect3 id='installation-cross-mingw32-setup-wine'>
+      <title>Wine</title>
+      <para>
+        Wine is the MS Windows compatibility layer/emulator for Unix.  It is
+        used to run NSIS that creates the executable Gwyddion Windows
+        installer.  Wine can also be used to run and test the cross-compiled
+        Gwyddion, as <link linkend='installation-cross-mingw32-running'>described
+          below</link>.
+      </para>
+      <para>
+        Run
+        <informalexample>
+          <literallayout><userinput>dnf install wine</userinput></literallayout>
+        </informalexample>
+        to install Wine.
+      </para>
+    </sect3>
+    <sect3 id='installation-cross-mingw32-setup-nsis'>
+      <title>NSIS</title>
+      <para>
+        <ulink url='http://nsis.sourceforge.net/'>Nullsoft scriptable install system</ulink>
+        (NSIS) is used to create the Gwyddion installer.  This is a MS Windows
+        program, therefore, it is installed <emphasis>under Wine</emphasis>.
+        A cross-compiled version of NSIS might be available in the distribution
+        but we have found the original more reliable.
+      </para>
+      <para>
+        Download NSIS from its web page and run
+        <informalexample>
+          <literallayout><userinput>wine nsis-3.06-setup.exe</userinput></literallayout>
+        </informalexample>
+        replacing 3.06 with the actual version.  Version 3.06 is the oldest
+        NSIS 3 that has been tested, but any version probably works.
+      </para>
+    </sect3>
+    <sect3 id='installation-cross-mingw32-setup-python'>
+      <title>Python</title>
+      <para>
+        To compile pygwy you need to install Python into Wine.  The steps are
+        the same as if you just want to use pygwy, except that all packages
+        listed in <link linkend='installation-ms-windows-pygwy'>Enabling
+          pygwy</link> need to be installed using <command>msiexec</command>:
+        <informalexample>
+          <literallayout><userinput>wine msiexec /i python-2.7.16.msi
+wine msiexec /i pygobject-2.28.3.win32-py2.7.msi
+wine msiexec /i pycairo-1.8.10.win32-py2.7.msi
+wine msiexec /i pygtk-2.24.0.win32-py2.7.msi</userinput></literallayout>
+        </informalexample>
+        or similarly.
+      </para>
+    </sect3>
+    <sect3 id='installation-cross-mingw32-scripts'>
+      <title>Support scripts</title>
+      <para>
+        Support scripts and data are available in
+        <filename>mingw32-cross-compile</filename> module in the Gwyddion
+        subversion repository.  Run
+        <informalexample>
+          <literallayout><userinput>svn checkout http://svn.code.sf.net/p/gwyddion/code/trunk/mingw32-cross-compile</userinput></literallayout>
+        </informalexample>
+        to check it out from the repository.
+      </para>
+      <para>
+        The most important tool you obtain is the <command>cross-build-32</command> (or <command>cross-build-64</command>)
+        script that automates all the cross-compilation steps.  Before you use
+        it for the first time, review file <filename>setup32</filename> that
+        defines where various things are located (or
+        <filename>setup64</filename> for the 64-bit target).  The default
+        contents looks as follows:
+        <informalexample>
+          <programlisting>source_dir=$HOME/Projects/Gwyddion/gwyddion-mingw
+mingw_prefix=/usr/i686-pc-mingw32/sys-root/mingw
+target_prefix=$HOME/opt/gwyddion-mingw32
+python_dir=$HOME/.wine/drive_c/Python27
+nsis_compiler=C:\\Program\ Files\ \(x86\)\\NSIS\\makensis.exe</programlisting>
+        </informalexample>
+        Variable <varname>source_dir</varname> specifies the location of the
+        unpacked or checked-out Gwyddion source code and it will likely need to
+        be adjusted.  Variable <varname>target_prefix</varname> specifies the
+        installation directory (staging area) for the cross-compiled Gwyddion.
+        The default value should be reasonable and you do not need to change it
+        unless you want to.  The remaining variables,
+        <varname>mingw32_prefix</varname>, <varname>nsis_compiler</varname>
+        and <varname>python_dir</varname>,
+        specify the location of MinGW files, NSIS compiler and Win32 Python,
+        respectively.  They do not need to be changed from the default values
+        under normal circumstances although NSIS can be installed in either
+        <filename>Program Files (x86)</filename> or
+        <filename>Program Files</filename> by default depending on Wine
+        configuration. Note <filename>setup</filename> is read by shell so
+        there must not be any spaces around <literal>=</literal>.
+      </para>
+    </sect3>
+  </sect2>
+  <sect2 id='installation-cross-mingw32-compilation'>
+    <title>Compilation</title>
+    <para>
+      The setup was tedious but it was worth it because the compilation is then
+      extremely simple.  Run
+      <informalexample>
+        <literallayout><userinput>./cross-build-32</userinput></literallayout>
+      </informalexample>
+      in <filename>mingw32-cross-compile</filename> directory to build Win32
+      insstaller.  That's all.  If it succeeds an executable Gwyddion Windows
+      installer with bundled GTK+ and everything will be created in
+      <varname>$target_prefix</varname>.  Similarly, the Win64 installer is
+      built just with
+      <informalexample>
+        <literallayout><userinput>./cross-build-64</userinput></literallayout>
+      </informalexample>
+    </para>
+    <para>
+      You can make a coffee meanwhile – or study the
+      <filename>cross-build</filename> script (it is actually quite short and
+      clear).
+    </para>
+    <para>
+      Note the cross-build scripts run <filename>autogen.sh</filename> but do
+      not clean the source code directory.  You may wish to do that manually if
+      you compile Gwyddion repeatedly.  Especially if you build for both
+      architectures in the same directory, make sure to run
+      <informalexample>
+        <literallayout><userinput>make distclean</userinput></literallayout>
+      </informalexample>
+      between the builds to get the source directory back to a well-defined
+      state.
+    </para>
+  </sect2>
+  <sect2 id='installation-cross-mingw32-running'>
+    <title>Running under Wine</title>
+    <para>
+      Compiled Gwyddion can be run under Wine.   Assuming the default value of
+      <varname>target_prefix</varname>:
+      <informalexample>
+        <literallayout><userinput>wine ~/opt/gwyddion-mingw32/bin/gwyddion.exe</userinput></literallayout>
+      </informalexample>
+      To run <filename>gwyddion.exe</filename> the dynamic linker must be able
+      to find all the necessary DLLs.  This is ensured in a somewhat crude way by
+      script <command>copysysfiles</command> that copies all necessary MinGW files
+      from system to <varname>$target_prefix</varname>.  Since
+      <command>copysysfiles</command> is executed by <command>cross-build</command>
+      you normally do not need to execute it manually.
+    </para>
+    <para>
+      The second step that might be necessary is setting registry key
+      <informalexample>
+        <literallayout>HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\gwyddion.exe</literallayout>
+      </informalexample>
+      to point to <filename>gwyddion.exe</filename> and the value
+      <literal>Path</literal> to point to the <filename>bin</filename> subdirectory.
+    </para>
+  </sect2>
+  <sect2 id='installation-cross-mingw32-modules'>
+    <title>Cross-compilation of standalone modules</title>
+    <para>
+      Cross-compilation of standalone modules requires only Gwyddion headers
+      and Win32 development libraries.  While they can be surely obtained by
+      cross-compiling entire Gwyddion is it not necessary to do so.  By
+      compiling only the libraries you can avoid the installation of various
+      rarer Gwyddion dependencies.  This can be achieved using the patch
+      <filename>gwyddion-2.22-build-only-libs.patch</filename>
+      available among the build scripts.
+    </para>
+    <para>
+      But it gets even easier, the MinGW Gwyddion libraries are available as a
+      RPM package <filename>mingw32-gwyddion-libs</filename> in the
+      gwyddion.net repository.
+    </para>
+    <para>
+      Once you have this package installed you can try cross-compilation of the
+      sample standalone module <filename>threshold-example</filename> that is
+      available in the subversion repository (or as a tarball).  See
+      <filename>README</filename> therein for some more details.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

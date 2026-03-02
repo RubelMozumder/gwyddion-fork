@@ -1,0 +1,285 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='filters' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>Filters</title>
+  <sect2 id='basic-filters'>
+    <title>
+      Basic Filters Tool <gwy:icon name='filter'/>
+    </title>
+    <para>
+      The basic <link linkend='tool-filters'>Filters tool</link>
+      lets you apply several simple filters to your image. This can be very
+      useful for data denoising; however, the real measured data will get
+      altered in the process, so great care should be taken not to destroy
+      important features of the image.
+    </para>
+    <para>
+      All filters alter the data based on the values in the neighbourhood of
+      the filtered pixel.  For some filters the size and shape of the
+      neighbourhood is fixed.  For most, however, the size can be controlled
+      with parameter <guilabel>Size</guilabel>.  Apart from Gaussian-based
+      filters (described below) the size determines the diameter of the
+      neighbourhood in pixels.  It is thus advisable to use filters of odd
+      sizes because their effect is symmetric.
+    </para>
+    <variablelist>
+      <varlistentry id='filter-mean'>
+        <term>Mean value</term>
+        <listitem>
+          <indexterm>
+            <primary>mean</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>denoising</primary>
+            <secondary>mean filter</secondary>
+          </indexterm>
+          The filtered value is the mean value of the neighbourhood of the
+          original pixel.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-median'>
+        <term>Median value</term>
+        <listitem>
+          <indexterm>
+            <primary>median</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>denoising</primary>
+            <secondary>median filter</secondary>
+          </indexterm>
+          The filtered value is the median value of the neighbourhood of the
+          original pixel.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-conservative-denoise'>
+        <term>Conservative denoise</term>
+        <listitem>
+          <indexterm><primary>conservative denoise filter</primary></indexterm>
+          <indexterm>
+            <primary>denoising</primary>
+            <secondary>conservative</secondary>
+          </indexterm>
+          The filter checks whether the value is the extreme within its
+          neighbourhood.  Non-extreme values are preserved.  Extreme values
+          are replaced by the second highest (lowest) values.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-minimum'>
+        <term>Minimum</term>
+        <listitem>
+          <indexterm>
+            <primary>minimum</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>erosion</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          Also known as erosion filter, it replaces values by the
+          minimum found in the neighbourhood.  Specifically, the erosion is
+          performed with a flat disc of specified diameter.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-maximum'>
+        <term>Maximum</term>
+        <listitem>
+          <indexterm>
+            <primary>maximum</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          <indexterm>
+            <primary>dilation</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          Also known as dilation filter, it replaces values by the maximum
+          found in the neighbourhood.  Specifically, the dilation is performed
+          with a flat disc of specified diameter.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-opening'>
+        <term>Opening</term>
+        <listitem>
+          <indexterm>
+            <primary>opening</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          Opening is erosion followed by dilation.  Positive bumps are
+          thus removed from the surface, while smooth areas and negative bumps
+          (holes) are more or less preserved.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-closing'>
+        <term>Closing</term>
+        <listitem>
+          <indexterm>
+            <primary>closing</primary>
+            <secondary>filter</secondary>
+          </indexterm>
+          Closing is dilation followed by erosion.  Negative bumps (holes) are
+          thus removed from the surface, while smooth areas and positive bumps
+          are more or less preserved.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-asf-opening'>
+        <term>ASF opening</term>
+        <listitem>
+          <indexterm>
+            <primary>alternating sequential filter</primary>
+            <secondary>closing-opening</secondary>
+          </indexterm>
+          A simple opening or closing filter may be too rough for correction of
+          defects of varying sizes.  The alternating sequential filter (ASF)
+          consists of a sequence of closing and opening operations with
+          progressively increasing discs up to the given size.  It preserves
+          better the shape of features that should not be removed by the
+          opening.  The final operation of this filter is opening.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-asf-closing'>
+        <term>ASF closing</term>
+        <listitem>
+          <indexterm>
+            <primary>alternating sequential filter</primary>
+            <secondary>opening-closing</secondary>
+          </indexterm>
+          The ASF closing filter differs from the ASF opening filter only by
+          the order of the elementary operations.  The final operation of this
+          filter is closing.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-kuwahara'>
+        <term>Kuwahara</term>
+        <listitem>
+          <indexterm><primary>Kuwahara filter</primary></indexterm>
+          <indexterm>
+            <primary>denoising</primary>
+            <secondary>Kuwahara filter</secondary>
+          </indexterm>
+          Kuwahara filter is an edge-preserving smoothing filter.
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-dechecker'>
+        <term>Dechecker</term>
+        <listitem>
+          <indexterm><primary>dechecker filter</primary></indexterm>
+          <indexterm><primary>checker pattern removal filter</primary></indexterm>
+          A simple slightly smoothing filter specially designed to remove
+          checker pattern from the image while preserving other details.  It is
+          a convolution filter with kernel
+          <xi:include href="eq-filters-dechecker.xml"/>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-gaussian'>
+        <term>Gaussian</term>
+        <listitem>
+          <indexterm><primary>Gaussian filter</primary></indexterm>
+          <indexterm>
+            <primary>denoising</primary>
+            <secondary>Gaussian filter</secondary>
+          </indexterm>
+          The Gaussian filter is a smoothing filter, the size parameter
+          determines the FWHM (full width at half maximum) of the Gaussian.
+          The relation between FWHM and <xi:include href="eqi-sigma.xml"/> is
+          <xi:include href="eq-gaussian-fwhm.xml"/>
+        </listitem>
+      </varlistentry>
+      <varlistentry id='filter-sharpen'>
+        <term>Sharpen</term>
+        <listitem>
+          <indexterm><primary>sharpening filter</primary></indexterm>
+          A simple sharpening operation which is complementary to the
+          Gaussian filter.  First it smooths the image further with the
+          corresponding Gaussian filter.  The result is then extrapolated
+          backwards to estimate the sharper image.
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      By default, these filters will be applied to the entire image. However,
+      you can apply a filter to a specific region within your image by
+      selecting it with the mouse. This can be useful for correcting poorly
+      measured areas within a good image.
+    </para>
+    <para>
+      It is also possible to limit the area by masking.  In this case the
+      mask determines the active pixels whose values will be modified by the
+      filter.  Pixels in the neighbourhood of the active area can however
+      still enter the calculation passively, i.e. their values can influence
+      the result.
+    </para>
+    <para>
+      Several of the basic filters can be used for simple denoising and defect
+      removal.
+      Further defect marking and removal functions are described in section
+      <link linkend='editing-correction'>Data Editing</link>,
+      see for instance
+      <link linkend='mask-of-outliers'>Mask of Outliers</link>
+      and
+      <link linkend='remove-data-under-mask'>Interpolate Data Under Mask</link>.
+      More advanced denoising functions in Gwyddion, for example
+      DWT denoising and FFT filtering, are described in section
+      <link linkend='edit-extended'>Extended Data Editing</link>.
+    </para>
+    <informalfigure id='fig-filters-screenshot'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='filter.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Screenshot of filter tool with median filter applied to a rectangular
+          selection
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='convolution-filter'>
+    <title>
+      Convolution Filter <gwy:icon name='convolution'/>
+    </title>
+    <indexterm>
+      <primary>convolution</primary>
+      <secondary>with given kernel</secondary>
+    </indexterm>
+    <para>
+      <menuchoice>
+        <guimenu>Data Process</guimenu>
+        <guisubmenu>Integral Transforms</guisubmenu>
+        <guisubmenu>Convolution Filter</guisubmenu>
+      </menuchoice>
+    </para>
+    <para>
+      Discrete convolutions with arbitrary kernels up to <xi:include href="eqi-9x9.xml"/>
+      can be performed using Convolution Filter (see
+      <link linkend='convolve'>Image Convolution</link> for convolution of
+      two images).
+    </para>
+    <para>
+      The <guilabel>Divisor</guilabel> entry represents a common factor all
+      the coefficients are divided by before applying the filter.  This allows
+      to use denormalized coefficients that are often nicer numbers.  The
+      normalization can be also calculated automatically when
+      <guilabel>automatic</guilabel> is checked.  When the sum of the
+      coefficients is non-zero, it makes the filter sum-preserving, i.e. it
+      normalizes the sum of coefficients to unity.  When the sum
+      of the coefficients is zero, the automatic factor is simply let equal
+      to 1.
+    </para>
+    <para>
+      Since many filters used in practice exhibit various types of symmetry,
+      the coefficients can be automatically completed according to the
+      selected symmetry type (odd, even).  Note the completion is performed
+      on pressing <keycap>Enter</keycap> in the coefficient entry.
+    </para>
+    <para>
+      In a fresh installation only a sample Identity filter is present (which
+      is not particularly useful as it does nothing).  This filter cannot be
+      modified, to create a new filter use the <guilabel>New</guilabel> button
+      on the <guilabel>Presets</guilabel> page.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id: eqi-minus-sigma-x-y.xml 19639 2017-04-20 11:55:12Z yeti-dn $ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+          'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<inlineequation>
+  <mathphrase>−<phrase role='mathvar'>σ</phrase>(<phrase role='mathvar'>x</phrase>, <phrase role='mathvar'>y</phrase>)</mathphrase>
+  <alt>-\sigma(x,y)</alt>
+</inlineequation>
+<!-- vim: set ts=2 sw=2 et : -->

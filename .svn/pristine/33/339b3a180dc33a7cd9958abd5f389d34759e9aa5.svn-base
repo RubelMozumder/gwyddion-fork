@@ -1,0 +1,284 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- @(#) $Id$ -->
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+               'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd'>
+<sect1 id='opengl-3d-view' xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <title>
+    OpenGL 3D Data Display <gwy:icon name='3d_base'/>
+  </title>
+  <indexterm>
+    <primary>3D</primary>
+    <secondary>data display</secondary>
+  </indexterm>
+  <para>
+    Three-dimensional OpenGL display of the current data window can be invoked
+    with the button with symbol of cube in <guilabel>View</guilabel> button
+    row of main window.
+  </para>
+  <para>
+    This feature is optional, i.e. it can be disabled at compile time. It can
+    also happen that while Gwyddion is capable of 3D data display your system
+    does not support it.  In both cases an attempt to invoke 3D view gives an
+    error message explaining which of the two cases occurred.  In the former
+    case you have to ask the producers of Gwyddion executables to build them
+    with 3D support or build Gwyddion yourself from source code. If it is the
+    latter case, refer to your operating system guide on how to enable OpenGL
+    3D capabilities.  If you experience a poor performance of the 3D view in
+    MS Windows try disabling desktop composition for Gwyddion (in
+    <guilabel>Compatibility</guilabel> tab of the Gwyddion shortcut).
+  </para>
+  <para>
+    The 3D window has two possible forms: with basic and expanded controls.
+    It starts with basic controls only, this form is displayed on the
+    <link linkend='fig-opengl-3d-view-screenshot'>following figure</link>.
+    It can be switched to the expanded form (and back) with an expander button
+    in the upper right corner.  Clicking on the view with right mouse button
+    brings a quick colour gradient/GL material selector.
+  </para>
+  <informalfigure id='fig-opengl-3d-view-screenshot' float='0'>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref='opengl-3d-view.png' format='PNG'/>
+      </imageobject>
+      <caption>
+        Three-dimensional OpenGL data display window with basic controls.
+      </caption>
+    </mediaobject>
+  </informalfigure>
+  <sect2 id='opengl-3d-view-basic-controls'>
+    <title>Basic Controls</title>
+    <para>
+      Basic 3D window contains interaction mode controls at the right side of
+      the view.  By default, dragging the view with mouse rotates it
+      horizontally and vertically.  All possible modes are listed below,
+      together with hotkeys that switch between them:
+    </para>
+    <variablelist>
+      <varlistentry>
+        <term>
+          Rotation
+          (<keycap>R</keycap>)
+          <gwy:icon name='rotate_3d'/>
+        </term>
+        <listitem>
+          <para>
+            The default when the 3D view is newly displayed.  Dragging the view
+            horizontally rotates it around <xi:include href='eqi-z.xml'/>-axis,
+            vertical drag rotates it around horizontal axis parallel with the
+            plane of view.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Scaling
+          (<keycap>S</keycap>)
+          <gwy:icon name='scale'/>
+        </term>
+        <listitem>
+          <para>
+            Dragging the view upwards enlarges it; dragging in downwards
+            makes it smaller.  The size can be also adjusted using the mouse
+            scroll wheel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Z-scaling
+          (<keycap>V</keycap> – value scale)
+          <gwy:icon name='scale_vertically'/>
+        </term>
+        <listitem>
+          <para>
+            Dragging the view upwards increases the
+            <xi:include href='eqi-z.xml'/>-scale, making the hills and valleys
+            more pronounced.  Dragging it downwards decreases the value scale.
+            The value scale can be also adjusted using the mouse scroll wheel
+            with <keycap>Shift</keycap> pressed.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          Light rotation
+          (<keycap>L</keycap>)
+          <gwy:icon name='light_rotate'/>
+        </term>
+        <listitem>
+          <para>
+            This control is available when there the visualization mode
+            has a light source, i.e. in lighting and overlay modes.
+            Dragging the view changes position of the light source similarly to
+            rotation of data in normal rotation mode.  Horizontal movement
+            changes the <xi:include href='eqi-phi.xml'/> angle (direction
+            in the horizontal plane).  Vertical movement changes the
+            <xi:include href='eqi-theta.xml'/> angle between the light
+            direction and the horizontal plane.  The light position is
+            visualised using a <quote>wheel</quote> around the surface.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      The basic controls also include an image export button.
+    </para>
+  </sect2>
+  <sect2 id='opengl-3d-view-full-controls'>
+    <title>Full Controls</title>
+    <para>
+      In expanded controls the mode buttons are located in top row, however
+      their function does not change.  In addition, there are several tabs
+      with options below them:
+      <itemizedlist>
+        <listitem>
+          <guilabel>Basic</guilabel> – controls to set rotations, scales
+          and axis line width numerically and to switch on and off axes, axis
+          labels, perspective projection and display of masked areas.
+        </listitem>
+        <listitem>
+          <guilabel>Light &amp; Material</guilabel> – visualization settings.
+          This tab also contains controls to set light position
+          numerically.
+        </listitem>
+        <listitem>
+          <guilabel>Labels</guilabel> – fine tuning of sizes, positions,
+          and other properties of axis labels.
+        </listitem>
+        <listitem>
+          <guilabel>Colourbar</guilabel> – settings for the false colour bar
+          which can be displayed on the right side of the 3D view.
+        </listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      Gwyddion 3D view has several visualization modes, selected in
+      <guilabel>Light &amp; Material</guilabel>, that combine two basic
+      methods:
+      <itemizedlist>
+        <listitem>
+          False colour representation of data values, similar to normal image
+          view.
+        </listitem>
+        <listitem>
+          Rendering illumination of the surface with a light source (defined by
+          the light controls).
+        </listitem>
+      </itemizedlist>
+      Modes <guilabel>Gradient</guilabel> and
+      <guilabel>Overlay – no light</guilabel> do not use illumination.
+      The only difference between them is that in the simple gradient mode the
+      colours always corresponds to the heights; in the overlay mode different
+      images can be used for heights and colours.  In
+      <guilabel>Lighting</guilabel> mode the surface illumination is rendered
+      using the selected material.  Finally, <guilabel>Overlay</guilabel>
+      combines colouring and lighting.  Again, heights and colours can be given
+      by different images.
+    </para>
+    <informalfigure id='fig-opengl-3d-view-modes' float='0'>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref='opengl-3d-view-modes.png' format='PNG'/>
+        </imageobject>
+        <caption>
+          Visualisation modes of the 3D view.  Top row: simple gradient and
+          lighting.  Bottom row: overlays with a different channel used for
+          colouring (left without lighting, right with lighting).
+        </caption>
+      </mediaobject>
+    </informalfigure>
+  </sect2>
+  <sect2 id='opengl-3d-view-saving-images'>
+    <title>Saving Images</title>
+    <para>
+      The 3D view can be saved into a bitmap image using the
+      <guibutton>Save</guibutton> button. The image has exactly the same size
+      and contents as displayed on the screen – except for possible removal
+      of empty borders, if enabled with <guilabel>Autocrop</guilabel>
+      in the <guilabel>Basic</guilabel> tab.
+    </para>
+    <para>
+      The default image format is PNG (Portable Network Graphics).  By changing
+      the file extension to
+      <filename>.jpg</filename>,
+      <filename>.jpeg</filename>,
+      <filename>.tif</filename> or
+      <filename>.tiff</filename>
+      you can change the image format to JPEG or TIFF.
+      Entering an unrecognised extension will save a PNG image, albeit with
+      a confusing extension.
+    </para>
+    <para>
+      Note due to the peculiarities of certain operating systems, graphics
+      drivers and windowing environments, artefacts may sometimes appear on
+      the exported image in parts corresponding to obscured parts of the 3D
+      view.  If you encounter this problem, make sure the 3D view is not
+      obscured by other windows during the image export.
+    </para>
+  </sect2>
+  <sect2 id='opengl-material-editor'>
+    <title>OpenGL Material Editor</title>
+    <indexterm>
+      <primary>3D</primary>
+      <secondary>material editing</secondary>
+    </indexterm>
+    <indexterm>
+      <primary>3D</primary>
+      <secondary>choosing default material</secondary>
+    </indexterm>
+    <para>OpenGL material editor can be invoked with
+      <menuchoice>
+        <guimenu>Edit</guimenu>
+        <guimenuitem>GL Materials</guimenuitem>
+      </menuchoice>.
+      The controls in the material list are the same as in the
+      <link linkend='color-gradient-editor'>colour gradient editor</link> list
+      and the material management works identically.  The actual editor is of
+      course different.  It allows to edit four quantities defining the
+      material:
+      <itemizedlist>
+        <listitem>
+          ambient colour <xi:include href="eqi-k_a-alpha.xml"/>
+          (where <xi:include href="eqi-alpha-is-red-green-blue.xml"/>),
+          controlling the reflection of ambient
+          light that is assumed coming uniformly from all directions,
+        </listitem>
+        <listitem>
+          diffuse colour <xi:include href="eqi-k_d-alpha.xml"/>,
+          describing the diffuse reflection which is independent on the
+          direction of incident light and whose apparent brightness is
+          independent of the viewing angle,
+        </listitem>
+        <listitem>
+          specular colour <xi:include href="eqi-k_s-alpha.xml"/>,
+          controlling the specular reflection with reflected light intensity
+          dependent on the angle between the observing direction and the
+          direction of light that would be reflected by an ideal mirror with
+          the same normal, and
+        </listitem>
+        <listitem>
+          shininess <xi:include href="eqi-s.xml"/>,
+          a numeric exponent determining how much the specular reflection
+          resembles an ideal mirror, smaller values mean rougher surfaces,
+          higher values mean smoother surfaces.
+        </listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      If we denote <xi:include href="eqi-vec-L.xml"/> the normal vector
+      pointing from the observed surface point to the light source,
+      <xi:include href="eqi-vec-V.xml"/> the normal vector to the observer,
+      <xi:include href="eqi-vec-N.xml"/> the normal vector to the surface and
+      <xi:include href="eqi-vec-R.xml"/> the normal vector in the direction of
+      ideal mirror reflection, the observed light intensity in OpenGL lighting
+      model can be expressed as
+      <xi:include href="eq-opengl-light-model.xml"/> where
+      <xi:include href="eqi-I_a-alpha.xml"/>,
+      <xi:include href="eqi-I_d-alpha.xml"/> and
+      <xi:include href="eqi-I_s-alpha.xml"/>
+      are the ambient, diffuse and specular light source intensities,
+      respectively.
+    </para>
+  </sect2>
+</sect1>
+<!-- vim: set ts=2 sw=2 et : -->

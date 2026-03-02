@@ -1,0 +1,541 @@
+#############################################################################
+# Video driver nonsense. Differs from machine to machine
+#
+# Various leaks reported in the AMD Radeon driver (on silex). They may be real
+# but we just cannot do anything about them.
+#############################################################################
+
+{
+    AMD GPU alloc resource internal leak
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:si_alloc_resource
+}
+
+{
+    AMD GPU init screen internal leak
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:dri2_init_screen
+}
+
+{
+    AMD GPU init screen internal leak
+    Memcheck:Leak
+    fun:memalign
+    ...
+    fun:dri2_init_screen
+}
+
+{
+    AMD GPU init screen internal leak
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:dri2_init_screen
+}
+
+{
+    AMD GPU bo create internal leak
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:amdgpu_bo_create
+}
+
+{
+    AMD GPU bo create internal leak
+    Memcheck:Leak
+    fun:memalign
+    ...
+    fun:amdgpu_bo_create
+}
+
+{
+    AMD GPU si create context internal leak
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:si_create_context
+}
+
+#############################################################################
+# DL
+#############################################################################
+
+{
+    DL init
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:_dl_init
+}
+
+{
+    DL init
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:_dl_init
+}
+
+{
+    DL threads
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:_dl_allocate_tls
+}
+
+#############################################################################
+# GLib
+#############################################################################
+
+{
+    GLib quarks
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_quark_from_string
+}
+
+{
+    GLib quark init
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_quark_init
+}
+
+{
+    GLib some per-thread slice thing
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_slice_alloc
+    ...
+    fun:g_error_new_literal
+    ...
+    fun:g_task_return_now
+}
+
+{
+    GLib static type registration
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_type_register_static
+}
+
+{
+    GLib static type registration
+    Memcheck:Leak
+    fun:realloc
+    ...
+    fun:g_type_register_static
+}
+
+{
+    GLib static interface registration
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_type_add_interface_static
+}
+
+{
+    GLib static interface registration
+    Memcheck:Leak
+    fun:realloc
+    ...
+    fun:g_type_add_interface_static
+}
+
+{
+    GLib fundamental type registration
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:g_type_register_fundamental
+}
+
+{
+    GLib intern string
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_intern_string
+}
+
+#############################################################################
+# Pango
+#############################################################################
+
+{
+    Pango load font internal leak
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:pango_fc_font_map_load_font
+}
+
+{
+    Pango load font internal leak
+    Memcheck:Leak
+    fun:realloc
+    ...
+    fun:pango_fc_font_map_load_font
+}
+
+{
+    Pango load font map internal leak
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:pango_fc_font_map_load_fontset
+}
+
+{
+    Pango load font map internal leak
+    Memcheck:Leak
+    fun:realloc
+    ...
+    fun:pango_fc_font_map_load_fontset
+}
+
+{
+    Pango get sample languge
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:pango_script_get_sample_language
+}
+
+# This may be a real leak, but does not seem to be caused by our code.
+{
+    Pango language from string
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:pango_language_from_string
+}
+
+#############################################################################
+# Font cache
+#############################################################################
+
+{
+    FC sorting
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:FcFontSetSort
+}
+
+{
+    FC sorting
+    Memcheck:Leak
+    fun:realloc
+    ...
+    fun:FcFontSetSort
+}
+
+{
+    FC something
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:FcFontRenderPrepare
+}
+
+{
+    FC something
+    Memcheck:Leak
+    fun:realloc
+    ...
+    fun:FcFontRenderPrepare
+}
+
+{
+    FC something
+    Memcheck:Leak
+    ...
+    obj:/usr/lib/x86_64-linux-gnu/libfontconfig.so.*
+}
+
+{
+    FC something
+    Memcheck:Leak
+    ...
+    obj:/usr/lib/x86_64-linux-gnu/libfontconfig.so.*
+}
+
+#############################################################################
+# GTK+
+#############################################################################
+
+{
+    GTK+ xcb write
+    Memcheck:Param
+    writev(vector[...])
+    fun:__writev
+    fun:writev
+    ...
+    fun:_cairo_xlib_surface_draw_image
+}
+
+{
+    GTK+ xcb write
+    Memcheck:Param
+    writev(vector[...])
+    fun:__writev
+    fun:writev
+    ...
+    fun:xcb_writev
+}
+
+# Fedora (silex)
+{
+    Gtk+ pixbuf theme render
+    Memcheck:Addr1
+    ...
+    fun:draw_box_gap
+}
+
+# Ubuntu (onyx)
+{
+    GTK+ pixmap engine
+    Memcheck:Cond
+    ...
+    obj:/usr/lib/x86_64-linux-gnu/gtk-2.0/*/engines/libpixmap.so
+}
+
+{
+    Gtk+ pixmap engine
+    Memcheck:Addr1
+    ...
+    obj:/usr/lib/x86_64-linux-gnu/gtk-2.0/*/engines/libpixmap.so
+}
+
+{
+    GTK+ icon loading internal leak
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:gtk_icon_info_load_icon
+}
+
+# This is maybe because we never destroy the thing in Gwyddion.
+{
+    Gtk+ tree view file system
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:gtk_tree_view_get_visible_range
+    ...
+    fun:gtk_file_system_model_get_value
+}
+
+{
+    Gtk+ pango cairo threads the whole shebang
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:g_thread_new
+    ...
+    fun:pango_fc_font_map_init
+    ...
+    fun:pango_cairo_font_map_get_default
+}
+
+{
+    GTK+ some file system thing in a thread
+    Memcheck:Leak
+    ...
+    fun:g_local_file_resolve_relative_path
+    ...
+    fun:g_task_return_now
+}
+
+{
+    GTK+ some file system thing in a thread
+    Memcheck:Leak
+    ...
+    fun:gtk_button_constructor
+    ...
+    fun:g_task_return_now
+}
+
+{
+    GTK+ rsvg
+    Memcheck:Leak
+    ...
+    obj:/usr/lib/x86_64-linux-gnu/librsvg-2.so.*
+}
+
+{
+    GTK+ module init
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:gtk_module_init
+}
+
+{
+    GTK+ module init
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:gtk_module_init
+}
+
+{
+    GTK+ display manager
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:gdk_display_manager_get
+}
+
+{
+    GTK+ tree view range
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:gtk_tree_view_get_visible_range
+}
+
+#############################################################################
+# Gwyddion: Program-wide things we create once and never bother to free at
+# the end.
+#############################################################################
+
+{
+    Gwyddion logging setup
+    Memcheck:Leak
+    ...
+    fun:g_build_filename
+    ...
+    fun:gwy_app_setup_logging
+}
+
+{
+    Gwyddion toolbox menu setup
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:gtk_item_factory_new
+    ...
+    fun:gwy_app_toolbox_window_create
+}
+
+{
+    Gwyddion GL config setup
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:gdk_gl_config_new_common
+}
+
+{
+    Gwyddion GL config setup
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:gdk_gl_config_new_common
+}
+
+{
+    Gwyddion toolbox help setup
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_strconcat
+    ...
+    fun:gwy_app_toolbox_window_create
+}
+
+{
+    Gwyddion current tool help setup
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_strconcat
+    ...
+    fun:build_uri_for_function
+}
+
+{
+    Gwyddion current data window help setup
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_strconcat
+    ...
+    fun:gwy_help_add_to_window
+}
+
+{
+    Gwyddion resource classes
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:gwy_resource_class_init
+}
+
+{
+    Gwyddion param spec for properties
+    Memcheck:Leak
+    fun:calloc
+    ...
+    fun:g_param_spec_enum
+    ...
+    fun:g_type_class_ref
+}
+
+# This may be a real leak but calibrations should be nuked from the orbit anyway.
+{
+    Gwyddion calibration loading
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:gwy_calibration_parse
+}
+
+{
+    Gwyddion quitting
+    Memcheck:Leak
+    ...
+    fun:delete_app_window
+}
+
+{
+    Gwyddion quitting
+    Memcheck:Leak
+    ...
+    fun:gwy_app_quit
+}
+
+{
+    Gwyddion quitting
+    Memcheck:Leak
+    ...
+    fun:gwy_remote_setup
+}
+
+# XXX: This one is very weird. It shows something inside the icon theme in the stack,
+# possibly even in an mmapped file which is not code. It does not depend on which module
+# we register, we always get it once (not once per module) at the line which
+# call the module's registration function. No module actuall calls g_path_get_dirname()
+# there (AFAICT). Just ignore it.
+{
+    First module registering, but why? I am confused.
+    Memcheck:Leak
+    fun:malloc
+    ...
+    fun:g_path_get_dirname
+    ...
+    fun:register_module_with_info
+}
